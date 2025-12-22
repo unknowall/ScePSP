@@ -1,0 +1,15 @@
+﻿using SafeILGenerator.Ast.Generators;
+
+namespace ScePSP.Core.Cpu.Dynarec.Ast
+{
+    public class GeneratorIlPsp : GeneratorIl
+    {
+        protected void _Generate(AstNodeStmPspInstruction pspInstruction)
+        {
+            EmitComment(
+                $"0x{pspInstruction.DisassembledResult.InstructionPc:X8}: {pspInstruction.DisassembledResult}"
+            );
+            Generate(pspInstruction.Statement);
+        }
+    }
+}

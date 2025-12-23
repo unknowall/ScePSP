@@ -7,12 +7,13 @@ namespace ScePSP.Core.Threading.Synchronization
 {
     public class MessagePipe<TMessage>
     {
+#pragma warning disable CS0693
         public class WaitableMessage<TMessage>
         {
             public TMessage Message;
             public AutoResetEvent Event = new AutoResetEvent(false);
         }
-
+#pragma warning restore CS0693
         LinkedList<WaitableMessage<TMessage>> MessageQueue = new LinkedList<WaitableMessage<TMessage>>();
         AutoResetEvent MessageEvent = new AutoResetEvent(false);
 

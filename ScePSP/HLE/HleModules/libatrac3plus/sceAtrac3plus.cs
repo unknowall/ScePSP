@@ -28,7 +28,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
 
         [Inject] public HleMemoryManager HleMemoryManager;
 
-        [Inject] InjectContext InjectContext;
+        [Inject] new InjectContext InjectContext;
 
         public enum CodecType
         {

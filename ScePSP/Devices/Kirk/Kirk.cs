@@ -777,16 +777,13 @@ namespace ScePSP.Core.Components.Crypto
             PointerUtils.Memcpy(outputBuffer, sha1Hash, sha1Hash.Length);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
+        #pragma warning disable SYSLIB0021
         public static byte[] Sha1(byte[] input)
         {
             return new SHA1CryptoServiceProvider().ComputeHash(input);
         }
-        
+        #pragma warning restore SYSLIB0021
+
         // kirk1
         public byte[] Kirk1Key =
             {0x98, 0xC9, 0x40, 0x97, 0x5C, 0x1D, 0x10, 0xE8, 0x7F, 0xE6, 0x0E, 0xA3, 0xFD, 0x03, 0xA8, 0xBA};

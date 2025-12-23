@@ -121,7 +121,7 @@ namespace ScePSP.Rasterizer
             }
             
         }
-
+#pragma warning disable CS0693
         private static void Swap<T>(ref T lhs, ref T rhs)
         {
             T temp = lhs;
@@ -129,7 +129,7 @@ namespace ScePSP.Rasterizer
             rhs = temp;
         }
     }
-
+#pragma warning restore CS0693
     public class Rasterizer
     {
         public static void RasterizeTriangle<T>(

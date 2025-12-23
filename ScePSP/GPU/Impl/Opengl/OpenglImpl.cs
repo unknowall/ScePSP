@@ -37,7 +37,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
     {
         public TextureCacheOpengl TextureCache;
 
-        private GpuStateStruct GpuState;
+        private new GpuStateStruct GpuState;
 
         public override void InvalidateCache(uint address, int size)
         {
@@ -635,8 +635,6 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             RenderbufferManager.DrawVideo(frameBufferAddress, outputPixel, width, height);
         }
 
-
-        [HandleProcessCorruptedStateExceptions]
         public override void Finish(GpuStateStruct gpuState)
         {
         }
@@ -663,31 +661,18 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         {
         }
 
-        public override PluginInfo PluginInfo => new PluginInfo
-        {
-            Name = "OpenGl 2.0 (|ES)",
-            Version = "0.1",
-        };
-
         public override bool IsWorking => true;
         
         //static public GraphicsContext MyContext;
         
         //Thread CThread;
+
         AutoResetEvent StopEvent = new AutoResetEvent(false);
         
-        
-
         bool Running = true;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public static IGlContext OpenglContext;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public static bool AlreadyInitialized;
 
         public bool IsCurrentWindow;

@@ -26,8 +26,7 @@ namespace ScePSP.Hle.Managers
         private HleCallbackManager _hleCallbackManager;
         private HleInterruptManager _hleInterruptManager;
 
-        internal HleInterruptHandler(HleInterruptManager hleInterruptManager, PspInterrupts pspInterrupt,
-            HleCallbackManager hleCallbackManager)
+        internal HleInterruptHandler(HleInterruptManager hleInterruptManager, PspInterrupts pspInterrupt, HleCallbackManager hleCallbackManager)
         {
             _hleInterruptManager = hleInterruptManager;
             PspInterrupt = pspInterrupt;

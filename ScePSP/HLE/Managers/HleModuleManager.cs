@@ -33,7 +33,7 @@ namespace ScePSP.Hle.Managers
 
         public Dictionary<string, Type> HleModuleTypes;
 
-        protected int LastCallIndex = 0;
+        //int LastCallIndex = 0;
 
         void IInjectInitialize.Initialize()
         {

@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 using ScePSPUtils;
 using ScePSPUtils.Extensions;
 
+#pragma warning disable CS0675
+
 namespace ScePSP.Hle.Formats.video
 {
     /// <summary>
@@ -320,3 +322,5 @@ namespace ScePSP.Hle.Formats.video
         }
     }
 }
+
+#pragma warning restore CS0675

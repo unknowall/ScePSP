@@ -8,7 +8,6 @@ namespace ScePSP.Utils
     {
         private static Logger Logger = Logger.GetLogger("Hashing");
 
-        [HandleProcessCorruptedStateExceptions]
         public static ulong FastHash(byte* pointer, int count, ulong startHash = 0)
         {
             if (pointer == null)
@@ -38,7 +37,6 @@ namespace ScePSP.Utils
             return startHash;
         }
 
-        [HandleProcessCorruptedStateExceptions]
         private static ulong FastHash_64(byte* pointer, int count, ulong startHash = 0)
         {
             var hash = startHash;

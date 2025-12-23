@@ -12,7 +12,7 @@ namespace ScePSP.Hle.Modules.threadman
 {
     public unsafe partial class ThreadManForUser
     {
-        [Inject] public HleThreadManager ThreadManager;
+        [Inject] public new HleThreadManager ThreadManager;
 
         [Inject] public HleMemoryManager MemoryManager;
 

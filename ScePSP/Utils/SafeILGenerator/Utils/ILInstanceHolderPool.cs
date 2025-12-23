@@ -74,7 +74,7 @@ namespace SafeILGenerator.Utils
 
         internal void Free(IlInstanceHolderPoolItem item) => _freeItems.AddLast(item.Index);
 
-        private static string DllName = "Temp.dll";
+        //private static string DllName = "Temp.dll";
         private static readonly ModuleBuilder ModuleBuilder;
 
         static IlInstanceHolderPool()

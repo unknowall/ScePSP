@@ -542,7 +542,7 @@ namespace ScePSP.Hle.Modules.rtc
             return 0;
         }
 
-        [Inject] HleConfig HleConfig;
+        [Inject] new HleConfig HleConfig;
 
         private long GetUTCOffsetInTicks()
         {

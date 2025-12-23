@@ -60,8 +60,8 @@ namespace ScePSP.Hle.Modules.threadman
         [PspUntested]
         public int sceKernelSetVTimerTimeWide(VirtualTimer VirtualTimer, long Time)
         {
-            throw new NotImplementedException();
-            //VirtualTimer.ElapsedMicroseconds = Time;
+            //throw new NotImplementedException();
+            VirtualTimer.ElapsedMicroseconds = Time;
             return 0;
         }
 

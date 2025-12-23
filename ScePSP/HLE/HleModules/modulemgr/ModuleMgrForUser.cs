@@ -143,7 +143,7 @@ namespace ScePSP.Hle.Modules.modulemgr
 
         [Inject] public ElfPspLoader Loader;
 
-        [Inject] InjectContext InjectContext;
+        [Inject] new InjectContext InjectContext;
 
         public int sceKernelLoadModuleWithStream(Func<Stream> GetStreamAction, string Path, uint Flags,
             SceKernelLMOption* SceKernelLMOption)

@@ -16,7 +16,6 @@ namespace ScePSP.Core.Gpu
         [Inject] protected PspMemory Memory;
         [Inject] protected PspStoredConfig PspStoredConfig;
         
-
         protected int _ScaleViewport = 2;
 
         internal event Action<int> OnScaleViewport;
@@ -318,8 +317,7 @@ namespace ScePSP.Core.Gpu
         {
         }
 
-        public virtual void DrawCurvedSurface(GlobalGpuState GlobalGpuState, GpuStateStruct GpuStateStruct,
-            VertexInfo[,] Patch, int UCount, int VCount)
+        public virtual void DrawCurvedSurface(GlobalGpuState GlobalGpuState, GpuStateStruct GpuStateStruct, VertexInfo[,] Patch, int UCount, int VCount)
         {
             Console.Error.WriteLine("GpuImpl.DrawCurvedSurface Not Implemented!!");
         }
@@ -409,12 +407,12 @@ namespace ScePSP.Core.Gpu
                     }
 
                     break;
+
                 default:
                     throw new NotImplementedException("VertexType.Index: " + VertexType.Index);
             }
             totalVerticesWithoutMorphing++;
          
-            
             // Fix missing geometry! At least!
             if (VertexType.Index == VertexTypeStruct.IndexEnum.Void)
             {
@@ -426,7 +424,6 @@ namespace ScePSP.Core.Gpu
             {
                 //Console.WriteLine("PRIM: {0}, {1}, Morphing:{2}, Skinning:{3}", PrimitiveType, VertexCount, MorpingVertexCount, VertexType.RealSkinningWeightCount);
             }
-
 
             //Console.WriteLine(TotalVerticesWithoutMorphing);
         }

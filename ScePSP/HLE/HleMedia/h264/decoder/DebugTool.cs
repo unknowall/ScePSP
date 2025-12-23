@@ -1,6 +1,8 @@
 using cscodec.av;
 using System;
 
+#pragma warning disable CS0162
+
 namespace cscodec.h264.decoder
 {
     public class DebugTool
@@ -181,3 +183,5 @@ namespace cscodec.h264.decoder
         }
     }
 }
+
+#pragma warning restore CS0162

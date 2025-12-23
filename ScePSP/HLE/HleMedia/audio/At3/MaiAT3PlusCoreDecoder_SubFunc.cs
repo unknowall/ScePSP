@@ -1,6 +1,8 @@
 ﻿using ScePSP.Hle.Media.audio.At3;
 using ScePSP.Hle.Media.audio.At3.SUB;
 
+#pragma warning disable CS0675
+
 namespace ScePSP.Hle.Formats.audio.At3
 {
     public sealed unsafe partial class MaiAt3PlusCoreDecoder
@@ -2891,4 +2893,5 @@ namespace ScePSP.Hle.Formats.audio.At3
             return rs;
         }
     }
+#pragma warning restore CS0675
 }

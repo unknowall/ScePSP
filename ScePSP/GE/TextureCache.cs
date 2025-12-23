@@ -225,7 +225,8 @@ namespace ScePSP.Core.Gpu
                 }
                 catch (PspMemory.InvalidAddressException InvalidAddressException)
                 {
-                    throw InvalidAddressException;
+                    //throw InvalidAddressException;
+                    Console.WriteLine("PspMemory.InvalidAddressException: "+ InvalidAddressException);
                 }
 
                 TextureCacheKey TextureCacheKey = new TextureCacheKey()

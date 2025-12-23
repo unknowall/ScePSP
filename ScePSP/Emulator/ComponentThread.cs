@@ -15,7 +15,7 @@ namespace ScePSP.Runner.Components
         protected AutoResetEvent RunningUpdatedEvent = new AutoResetEvent(false);
         public bool Running = true;
 
-        protected Thread ComponentThreadThread;
+        protected ThreadEX ComponentThreadThread;
         protected AutoResetEvent StopCompleteEvent = new AutoResetEvent(false);
         protected AutoResetEvent PauseEvent = new AutoResetEvent(false);
         protected AutoResetEvent ResumeEvent = new AutoResetEvent(false);
@@ -32,9 +32,9 @@ namespace ScePSP.Runner.Components
             //Console.WriteLine("Component {0} StartSynchronized!", this);
             var ElapsedTime = Logger.Measure(() =>
             {
-                ComponentThreadThread = new Thread(() =>
+                ComponentThreadThread = new ThreadEX(() =>
                 {
-                    Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+                    ThreadEX.CurrentThread.CurrentCulture = new CultureInfo("en-US");
                     try
                     {
                         Main();

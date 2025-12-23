@@ -9,7 +9,7 @@ using ScePSP.Hle.Vfs.MemoryStick;
 
 namespace ScePSP.Hle.Managers
 {
-    [Obsolete("Should check Interop and decide which one to use, or refactor or something.")]
+    //[Obsolete("Should check Interop and decide which one to use, or refactor or something.")]
     public class HleCallbackManager : IMemoryStickEventHandler
     {
         public HleUidPool<HleCallback> Callbacks { get; protected set; }

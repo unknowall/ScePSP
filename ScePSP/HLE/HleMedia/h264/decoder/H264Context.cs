@@ -2,6 +2,8 @@ using System;
 using cscodec.util;
 using cscodec.av;
 
+#pragma warning disable CS0675
+
 namespace cscodec.h264.decoder
 {
     public class H264Context
@@ -10748,3 +10750,5 @@ namespace cscodec.h264.decoder
         }
     }
 }
+
+#pragma warning restore CS0675

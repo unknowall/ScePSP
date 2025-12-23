@@ -22,7 +22,7 @@ namespace ScePSPPlatform.UI
         {
             new Thread(() =>
             {
-                throw new NotImplementedException();
+                //throw new NotImplementedException();
                 /*
                 var Value = MessageBox.Show(Message, "PSP", MessageBoxButtons.YesNo,
                     (Type == Dialog.Type.Error) ? MessageBoxIcon.Error : MessageBoxIcon.Question,

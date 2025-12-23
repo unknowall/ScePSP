@@ -8,7 +8,7 @@ namespace ScePSP.Hle.Modules._unknownPrx
     [HlePspModule(ModuleFlags = ModuleFlags.KernelMode | ModuleFlags.Flags0x00010011)]
     public unsafe class sceMp3 : HleModuleHost
     {
-        [Inject] InjectContext InjectContext;
+        [Inject] new InjectContext InjectContext;
 
         public struct SceMp3InitArg
         {

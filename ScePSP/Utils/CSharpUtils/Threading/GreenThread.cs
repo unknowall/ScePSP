@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Net.Http.Headers;
 using System.Threading;
 
 namespace ScePSPUtils.Threading
 {
-#if true
 	public class GreenThread : IDisposable
 	{
 		public class StopException : Exception
@@ -15,9 +13,12 @@ namespace ScePSPUtils.Threading
 
 		protected Thread ParentThread;
 		protected Thread CurrentThread;
+
 		protected ManualResetEvent ParentEvent;
 		protected ManualResetEvent ThisEvent;
+
 		protected static ThreadLocal<GreenThread> ThisGreenThreadList = new ThreadLocal<GreenThread>();
+
 		public static int GreenThreadLastId = 0;
 
 		public static Thread MonitorThread;
@@ -25,9 +26,12 @@ namespace ScePSPUtils.Threading
 		private Exception RethrowException;
 
 		public bool Running { get; protected set; }
+
 		protected bool Kill;
 
-		public GreenThread()
+		private CancellationTokenSource cts = new CancellationTokenSource();
+
+        public GreenThread()
 		{
 		}
 
@@ -55,9 +59,10 @@ namespace ScePSPUtils.Threading
 			if (Kill || !ParentThread.IsAlive)
 			{
 				//throw(new StopException());
-				Thread.CurrentThread.Abort();
-				//throw (new StopException());
-			}
+				cts.Cancel();
+				CurrentThread.Join();
+                //Thread.CurrentThread.Abort();
+            }
 		}
 
 		public void InitAndStartStopped(Action Action)
@@ -70,34 +75,36 @@ namespace ScePSPUtils.Threading
 
 			var This = this;
 
-			this.CurrentThread = new Thread(() =>
+            this.CurrentThread = new Thread(() =>
 			{
-				ThisGreenThreadList.Value = This;
-				ThisSemaphoreWaitOrParentThreadStopped();
-				try
+				while (!cts.Token.IsCancellationRequested)
 				{
-					Running = true;
-					Action();
-				}
-				catch (StopException)
-				{
-				}
-				catch (Exception Exception)
-				{
-					RethrowException = Exception;
-				}
-				finally
-				{
-					Running = false;
+					ThisGreenThreadList.Value = This;
+					ThisSemaphoreWaitOrParentThreadStopped();
 					try
 					{
-						ParentEvent.Set();
+						Running = true;
+						Action();
 					}
-					catch
+					catch (StopException)
 					{
 					}
+					catch (Exception Exception)
+					{
+						RethrowException = Exception;
+					}
+					finally
+					{
+						Running = false;
+						try
+						{
+							ParentEvent.Set();
+						}
+						catch
+						{
+						}
+					}
 				}
-
 				//Console.WriteLine("GreenThread.Running: {0}", Running);
 			});
 
@@ -106,16 +113,17 @@ namespace ScePSPUtils.Threading
 			this.CurrentThread.Start();
 		}
 
-		/// <summary>
-		/// Called from the caller thread.
-		/// This will give the control to the green thread.
-		/// </summary>
 		public void SwitchTo()
 		{
 			ParentThread = Thread.CurrentThread;
 			ParentEvent.Reset();
 			ThisEvent.Set();
-			if (Kill) Thread.CurrentThread.Abort();
+			if (Kill)
+			{
+                cts.Cancel();
+				CurrentThread.Join();
+                //Thread.CurrentThread.Abort();
+			}
 			//ThisSemaphoreWaitOrParentThreadStopped();
 			ParentEvent.WaitOne();
 			if (RethrowException != null)
@@ -124,7 +132,6 @@ namespace ScePSPUtils.Threading
 				{
 					//StackTraceUtils.PreserveStackTrace(RethrowException);
 					throw (new GreenThreadException("GreenThread Exception", RethrowException));
-					//throw (RethrowException);
 				}
 				finally
 				{
@@ -133,10 +140,6 @@ namespace ScePSPUtils.Threading
 			}
 		}
 
-		/// <summary>
-		/// Called from the green thread.
-		/// This will return the control to the caller thread.
-		/// </summary>
 		public static void Yield()
 		{
 			if (ThisGreenThreadList.IsValueCreated)
@@ -173,13 +176,14 @@ namespace ScePSPUtils.Threading
 		{
 			Kill = true;
 			ThisEvent.Set();
-			//CurrentThread.Abort();
-		}
+            cts.Cancel();
+			CurrentThread.Join();
+            //CurrentThread.Abort();
+        }
 
 		public void Dispose()
 		{
 			Stop();
-			//Stop();
 		}
 
 		public string Name
@@ -190,229 +194,9 @@ namespace ScePSPUtils.Threading
 			}
 			set
 			{
-				//CurrentThread.Name = Name;
+				CurrentThread.Name = Name;
 			}
 		}
 	}
-#else
-    /// <summary>
-    /// 
-    /// </summary>
-    public class GreenThread : IDisposable
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public class StopException : Exception
-        {
-        }
 
-        protected Action Action;
-
-        protected Thread ParentThread;
-        protected Thread CurrentThread;
-        protected Semaphore ParentSemaphore;
-        protected Semaphore ThisSemaphore;
-        protected static ThreadLocal<GreenThread> ThisGreenThreadList = new ThreadLocal<GreenThread>();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public static int GreenThreadLastId;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public static Thread MonitorThread;
-
-        private Exception _rethrowException;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public bool Running { get; protected set; }
-
-        protected bool Kill;
-
-        void ThisSemaphoreWaitOrParentThreadStopped()
-        {
-            while (true)
-            {
-                // If the parent thread have been stopped. We should not wait any longer.
-                if (Kill || !ParentThread.IsAlive)
-                {
-                    break;
-                }
-
-                if (ThisSemaphore.WaitOne(20))
-                {
-                    // Signaled.
-                    break;
-                }
-            }
-
-            if (Kill || !ParentThread.IsAlive)
-            {
-                //throw(new StopException());
-                Thread.CurrentThread.Abort2();
-                //throw (new StopException());
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="action"></param>
-        public void InitAndStartStopped(Action action)
-        {
-            Action = action;
-            ParentThread = Thread.CurrentThread;
-
-            ParentSemaphore = new Semaphore(1, 1);
-            ParentSemaphore.WaitOne();
-
-            ThisSemaphore = new Semaphore(1, 1);
-            ThisSemaphore.WaitOne();
-
-            var This = this;
-
-            CurrentThread = new Thread(() =>
-            {
-	            //Console.WriteLine("GreenThread.Start()");
-	            ThisGreenThreadList.Value = This;
-	            ThisSemaphoreWaitOrParentThreadStopped();
-	            try
-	            {
-		            Running = true;
-		            action();
-	            }
-	            catch (StackOverflowException e)
-	            {
-		            Console.Error.WriteLine(e);
-	            }
-	            catch (StopException)
-	            {
-	            }
-#if !DO_NOT_PROPAGATE_EXCEPTIONS
-	            catch (Exception e)
-	            {
-		            Console.Error.WriteLine(e);
-		            _rethrowException = e;
-	            }
-#endif
-	            finally
-	            {
-		            Running = false;
-		            try
-		            {
-			            ParentSemaphore.Release();
-		            }
-		            catch
-		            {
-			            // ignored
-		            }
-
-		            //Console.WriteLine("GreenThread.End()");
-	            }
-
-	            //Console.WriteLine("GreenThread.Running: {0}", Running);
-            })
-            {
-	            Name = $"GreenThread-{GreenThreadLastId++}"
-            };
-
-
-            CurrentThread.Start();
-        }
-
-        /// <summary>
-        /// Called from the caller thread.
-        /// This will give the control to the green thread.
-        /// </summary>
-        public void SwitchTo()
-        {
-            ParentThread = Thread.CurrentThread;
-            ThisSemaphore.Release();
-            if (Kill)
-            {
-                Thread.CurrentThread.Abort2();
-            }
-            //ThisSemaphoreWaitOrParentThreadStopped();
-            ParentSemaphore.WaitOne();
-            if (_rethrowException != null)
-            {
-                try
-                {
-                    //StackTraceUtils.PreserveStackTrace(RethrowException);
-                    throw new GreenThreadException("GreenThread Exception", _rethrowException);
-                    //throw (RethrowException);
-                }
-                finally
-                {
-                    _rethrowException = null;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Called from the green thread.
-        /// This will return the control to the caller thread.
-        /// </summary>
-        public static void Yield()
-        {
-	        if (!ThisGreenThreadList.IsValueCreated) return;
-	        
-	        var greenThread = ThisGreenThreadList.Value;
-	        if (!greenThread.Running)
-	        {
-		        throw new InvalidOperationException("GreenThread has finalized");
-	        }
-
-	        try
-	        {
-		        greenThread.Running = false;
-
-		        greenThread.ParentSemaphore.Release();
-		        greenThread.ThisSemaphoreWaitOrParentThreadStopped();
-	        }
-	        finally
-	        {
-		        greenThread.Running = true;
-	        }
-        }
-
-        public static void StopAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Stop()
-        {
-            Kill = true;
-            ThisSemaphore.Release();
-            //CurrentThread.Abort();
-        }
-
-        public void Dispose() => Stop();
-
-        public string Name => CurrentThread.Name;
-    }
-#endif
-
-	static class ThreadExt
-	{
-		static public void Abort2(this Thread thread)
-		{
-			thread.Interrupt();
-			
-			if (thread == Thread.CurrentThread)
-			{
-				//throw new ThreadInterruptedException();
-			}
-			else
-			{
-				//thread.Abort();
-			}
-		}
-	}
 }

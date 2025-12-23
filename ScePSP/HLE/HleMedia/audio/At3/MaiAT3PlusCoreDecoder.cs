@@ -479,7 +479,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                 }
                 else
                 {
-                    uint uk1B44C = 0;
+                    //uint uk1B44C = 0;
                 }
             }
 

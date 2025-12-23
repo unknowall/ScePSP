@@ -234,7 +234,7 @@ namespace ScePSP.Hle.Modules.sc_sascore
         public int __sceSasSetPause(uint SasCorePointer, uint VoiceBits, bool SetPause)
         {
             var SasCore = GetSasCore(SasCorePointer);
-            uint Out = 0;
+            //uint Out = 0;
             foreach (var Voice in SasCore.Voices)
             {
                 if ((VoiceBits & (1 << Voice.Index)) != 0)

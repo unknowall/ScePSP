@@ -19,7 +19,7 @@ namespace ScePSP.Runner
 {
     public class PspInjectContext
     {
-        public static InjectContext CreateInjectContext(PspStoredConfig storedConfig, bool test, Action<InjectContext>? configure = null)
+        public static InjectContext CreateInjectContext(PspStoredConfig storedConfig, bool test, Action<InjectContext> configure = null)
         {
             var injectContext = new InjectContext();
             configure?.Invoke(injectContext);
@@ -35,14 +35,14 @@ namespace ScePSP.Runner
                 // RENDER
                 PspPluginImpl.SelectWorkingPlugin<GpuImpl>(injectContext,
                     typeof(GpuImplSoft),
-                    typeof(OpenglGpuImpl),
-                    typeof(GpuImplNull)
+                    typeof(OpenglGpuImpl)
+                    //typeof(GpuImplNull)
                 );
 
                 // AUDIO
                 PspPluginImpl.SelectWorkingPlugin<PspAudioImpl>(injectContext, 
-                    typeof(PspAudioWaveOutImpl),
-                    typeof(PspAudioOpenalImpl),
+                    //typeof(PspAudioWaveOutImpl),
+                    //typeof(PspAudioOpenalImpl),
                     typeof(AudioImplNull)
                     );
             }

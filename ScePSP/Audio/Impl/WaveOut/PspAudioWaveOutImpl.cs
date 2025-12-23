@@ -89,12 +89,6 @@ namespace ScePSP.Core.Audio.Impl.WaveOut
             _initialized = true;
         }
 
-        public override PluginInfo PluginInfo => new PluginInfo
-        {
-            Name = "WaveOut",
-            Version = "1.0",
-        };
-
         public override bool IsWorking
         {
             get

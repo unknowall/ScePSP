@@ -9,7 +9,7 @@ namespace ScePSP.Hle.Modules.wlan
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe class sceWlanDrv : HleModuleHost
     {
-        [Inject] HleConfig HleConfig;
+        [Inject] new HleConfig HleConfig;
 
         /// <summary>
         /// Determine the state of the WLAN power switch
@@ -52,7 +52,7 @@ namespace ScePSP.Hle.Modules.wlan
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe class sceWlanDrv_lib : HleModuleHost
     {
-        [Inject] HleConfig HleConfig;
+        [Inject] new HleConfig HleConfig;
 
         /// <summary>
         /// Determine if the WLAN device is currently powered on

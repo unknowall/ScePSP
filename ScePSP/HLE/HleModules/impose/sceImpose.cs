@@ -6,7 +6,7 @@ namespace ScePSP.Hle.Modules.impose
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe class sceImpose : HleModuleHost
     {
-        [Inject] HleConfig HleConfig;
+        [Inject] new HleConfig HleConfig;
 
         uint umdPopupStatus;
 

@@ -17,7 +17,7 @@ namespace ScePSP.Hle.Modules.display
 
         [Inject] PspRtc PspRtc;
 
-        [Inject] HleThreadManager ThreadManager;
+        [Inject] new HleThreadManager ThreadManager;
 
         /// <summary>
         /// Set display mode

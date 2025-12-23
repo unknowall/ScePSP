@@ -12,7 +12,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
         
         [Inject] PspHleRunningConfig PspHleRunningConfig;
 
-        [Inject] HleThreadManager ThreadManager;
+        [Inject] new HleThreadManager ThreadManager;
 
         private class IoDelayType
         {

@@ -35,6 +35,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 #endregion
 
+#pragma warning disable CS8603
+#pragma warning disable CS8625
+
 namespace SDL2
 {
     public static class SDL
@@ -1299,7 +1302,7 @@ namespace SDL2
                 return IntPtr.Zero;
             }
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes(str + '\0');
-            IntPtr mem = SDL.SDL_malloc((IntPtr)bytes.Length);
+            IntPtr mem = SDL_malloc((IntPtr)bytes.Length);
             Marshal.Copy(bytes, 0, mem, bytes.Length);
             return mem;
         }
@@ -9011,3 +9014,6 @@ namespace SDL2
         #endregion
     }
 }
+
+#pragma warning restore CS8603
+#pragma warning restore CS8625

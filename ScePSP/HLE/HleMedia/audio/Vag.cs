@@ -77,7 +77,7 @@ namespace ScePSP.Hle.Formats.audio
         }
         */
 
-        public int SamplesCount { get; protected set; }
+        public int SamplesCount { get; set; }
 
         public Vag(byte* DataPointer, int DataLength)
         {
@@ -122,11 +122,13 @@ namespace ScePSP.Hle.Formats.audio
         internal sealed class Decoder
         {
             private const int CompressedBytesInBlock = 14;
+
             private const int DecompressedSamplesInBlock = CompressedBytesInBlock * 2; // 28
 
             private readonly short[] DecodedBlockSamples = new short[DecompressedSamplesInBlock];
 
             //private short History1 = 0, History2 = 0;
+
             private float Predict1, Predict2;
 
             private Block* BlockPointer;
@@ -134,17 +136,21 @@ namespace ScePSP.Hle.Formats.audio
             private int BlockTotalCount;
 
             //private int BlockIndex;
+
             private int SampleIndexInBlock;
 
-            private int SampleIndexInBlock2;
+            //private int SampleIndexInBlock2;
 
             private bool ReachedEnd;
 
             //private StereoShortSoundSample CurrentSample;
+
             //private StereoShortSoundSample LastSample;
+
             private readonly Stack<State> LoopStack = new Stack<State>(1);
 
             private State CurrentState;
+
             private int CurrentLoopCount, TotalLoopCount;
 
             public struct State
@@ -174,7 +180,7 @@ namespace ScePSP.Hle.Formats.audio
             {
                 this.CurrentState = default(State);
                 this.SampleIndexInBlock = 0;
-                this.SampleIndexInBlock2 = 0;
+                //this.SampleIndexInBlock2 = 0;
                 this.ReachedEnd = false;
                 this.CurrentLoopCount = 0;
             }

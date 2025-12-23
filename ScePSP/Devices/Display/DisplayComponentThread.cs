@@ -10,6 +10,7 @@ namespace ScePSP.Runner.Components.Display
     public sealed class DisplayComponentThread : ComponentThread
     {
         private HleInterruptManager _hleInterruptManager;
+
         private PspDisplay _pspDisplay;
 
         public DisplayComponentThread(HleInterruptManager hleInterruptManager, PspDisplay pspDisplay)
@@ -20,14 +21,14 @@ namespace ScePSP.Runner.Components.Display
 
         protected override string ThreadName => "DisplayThread";
 
-        TimeSpan vSyncTimeIncrement =
-            TimeSpan.FromSeconds(1.0 / (PspDisplay.HorizontalSyncHertz / (double) PspDisplay.VsyncRow));
+        TimeSpan vSyncTimeIncrement = TimeSpan.FromSeconds(1.0 / (PspDisplay.HorizontalSyncHertz / (double) PspDisplay.VsyncRow));
 
         //var VSyncTimeIncrement = TimeSpan.FromSeconds(1.0 / (PspDisplay.HorizontalSyncHertz / (double)(PspDisplay.VsyncRow / 2))); // HACK to give more time to render!
-        TimeSpan endTimeIncrement =
-            TimeSpan.FromSeconds(1.0 / (PspDisplay.HorizontalSyncHertz / (double) PspDisplay.NumberOfRows));
+
+        TimeSpan endTimeIncrement = TimeSpan.FromSeconds(1.0 / (PspDisplay.HorizontalSyncHertz / (double) PspDisplay.NumberOfRows));
 
         HleInterruptHandler vBlankInterruptHandler;
+
         public bool triggerStuff = true;
 
         public void Step(Action DrawStart, Action VBlankStart, Action VBlankEnd)
@@ -54,15 +55,16 @@ namespace ScePSP.Runner.Components.Display
         protected override void Main()
         {
             vBlankInterruptHandler = _hleInterruptManager.GetInterruptHandler(PspInterrupts.PspVblankInt);
+
             Console.WriteLine("DisplayComponentThread.Start()");
+
             try
             {
                 while (Running)
                 {
                     if (triggerStuff)
                     {
-                        Step(_pspDisplay.TriggerDrawStart, _pspDisplay.TriggerVBlankStart,
-                            _pspDisplay.TriggerVBlankEnd);
+                        Step(_pspDisplay.TriggerDrawStart, _pspDisplay.TriggerVBlankStart, _pspDisplay.TriggerVBlankEnd);
                     }
                     else
                     {

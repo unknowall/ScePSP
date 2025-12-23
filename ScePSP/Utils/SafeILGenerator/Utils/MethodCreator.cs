@@ -31,7 +31,7 @@ namespace SafeILGenerator.Utils
             Action<MethodInfo> createMethod)
         {
             var delegateType = typeof(TDelegate).GetMethod("Invoke");
-            const string dllName = "_DynamicDll.dll";
+            //const string dllName = "_DynamicDll.dll";
             var dynamicAssemblyName = "DynamicAssembly";
             const string dynamicModuleName = "DynamicModule";
             var dynamicMethodName = name;

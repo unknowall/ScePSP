@@ -1,5 +1,7 @@
 ﻿using ScePSP;
 using ScePSP.Core;
+using ScePSP.Core.Audio;
+using ScePSP.Core.Audio.Impl.Null;
 using ScePSP.Core.Components.Controller;
 using ScePSP.Core.Components.Display;
 using ScePSP.Core.Components.Rtc;

@@ -11,7 +11,7 @@ namespace ScePSP.Hle.Modules.registry
     {
         [Inject] HleRegistryManager HleRegistryManager;
 
-        [Inject] HleConfig HleConfig;
+        [Inject] new HleConfig HleConfig;
 
         /// <summary>
         /// Open the registry

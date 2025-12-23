@@ -90,7 +90,7 @@ namespace ScePSP.Hle
 
         public string WaitDescription;
 
-        public object? WaitObject;
+        public object WaitObject;
 
         //public int InitPriority;
         public PspThreadAttributes Attribute;
@@ -254,7 +254,6 @@ namespace ScePSP.Hle
             }
         }
 
-        [HandleProcessCorruptedStateExceptions]
         protected void MainLoop()
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
@@ -325,7 +324,7 @@ namespace ScePSP.Hle
             }
         }
 
-        public void SetWaitAndPrepareWakeUp(WaitType WaitType, string WaitDescription, object? WaitObject,
+        public void SetWaitAndPrepareWakeUp(WaitType WaitType, string WaitDescription, object WaitObject,
             Action<Action> PrepareCallback, bool HandleCallbacks = false)
         {
             if (this.HasAllStatus(Status.Waiting))
@@ -350,7 +349,7 @@ namespace ScePSP.Hle
             SetWait1();
         }
 
-        protected void SetWait0(WaitType waitType, string waitDescription, object? waitObject, bool handleCallbacks)
+        protected void SetWait0(WaitType waitType, string waitDescription, object waitObject, bool handleCallbacks)
         {
             this.SetStatus(Status.Waiting);
             this.CurrentWaitType = waitType;

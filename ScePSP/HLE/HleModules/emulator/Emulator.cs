@@ -8,7 +8,7 @@ namespace ScePSP.Hle.Modules.emulator
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe class Emulator : HleModuleHost
     {
-        [Inject] HleThreadManager ThreadManager;
+        [Inject] new HleThreadManager ThreadManager;
 
         [HlePspFunction(NID = 0x00000000, FirmwareVersion = 150)]
         public void emitInt(int value) => Console.WriteLine("emitInt: {0}", value);

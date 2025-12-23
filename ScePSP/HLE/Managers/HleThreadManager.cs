@@ -58,7 +58,7 @@ namespace ScePSP.Hle.Managers
                 GreenThread.Yield();
             }
         }
-
+#pragma warning disable CS0162
         void IGpuConnector.Signal(uint PC, PspGeCallbackData CallbackData, uint Signal, SignalBehavior Behavior,
             bool ExecuteNow)
         {
@@ -89,17 +89,13 @@ namespace ScePSP.Hle.Managers
                     new object[] {Arg, CallbackData.FinishArgument, PC});
             }
         }
-
+#pragma warning restore CS0162
         void IInjectInitialize.Initialize()
         {
             Processor.DebugCurrentThreadEvent += DebugCurrentThread;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public PreemptiveScheduler<HleThread> PreemptiveScheduler =
-            new PreemptiveScheduler<HleThread>(NewItemsFirst: true, ThrowException: false);
+        public PreemptiveScheduler<HleThread> PreemptiveScheduler = new PreemptiveScheduler<HleThread>(NewItemsFirst: true, ThrowException: false);
 
         public enum SCE_KERNEL_DISPATCHTHREAD_STATE : uint
         {

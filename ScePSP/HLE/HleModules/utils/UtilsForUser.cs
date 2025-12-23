@@ -15,7 +15,7 @@ namespace ScePSP.Hle.Modules.utils
     {
         [Inject] public PspRtc PspRtc;
 
-        [Inject] public CpuProcessor CpuProcessor;
+        [Inject] public new CpuProcessor CpuProcessor;
 
         public struct TimeValStruct
         {

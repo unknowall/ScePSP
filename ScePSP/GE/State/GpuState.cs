@@ -633,6 +633,16 @@ namespace ScePSP.Core.Gpu.State
         public bool Equals(VertexTypeStruct other) => ReversedNormal == other.ReversedNormal &&
                                                       NormalCount == other.NormalCount && Value == other.Value;
 
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ReversedNormal, NormalCount, Value);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is VertexTypeStruct other && Equals(other);
+        }
+
         public bool ReversedNormal => data.Bool(GpuOpCodes.RNORM);
         public byte NormalCount; // => GpuState.TextureMappingState.GetTextureComponentsCount()
         public uint Value
@@ -759,6 +769,7 @@ namespace ScePSP.Core.Gpu.State
         public int NormalSize => TypeSizeTable[(int) Normal];
 
         //public uint StructAlignment { get { return Math.Max(Math.Max(Math.Max(Math.Max(SkinSize, ColorSize), TextureSize), PositionSize), NormalSize); } }
+
         public uint StructAlignment => (uint) MathUtils.Max(SkinSize, ColorSize, TextureSize, PositionSize, NormalSize);
 
         public int GetMaxAlignment() => MathUtils.Max(SkinSize, ColorSize, TextureSize, PositionSize, NormalSize);
@@ -780,7 +791,7 @@ namespace ScePSP.Core.Gpu.State
             var alignmentSize = GetMaxAlignment();
             //Size = (uint)((Size + AlignmentSize - 1) & ~(AlignmentSize - 1));
             size = (int) MathUtils.NextAligned(size, (uint) alignmentSize);
-            //Console.WriteLine("Size:" + Size);
+            //Console.WriteLine("GetVertexSize:" + size);
             return size;
         }
 
@@ -893,7 +904,6 @@ namespace ScePSP.Core.Gpu.State
             Blue = left.Blue + right.Blue,
             Alpha = left.Alpha + right.Alpha,
         };
-
 
         public Vector4 ToVector4() => new Vector4(Red, Green, Blue, Alpha);
     }

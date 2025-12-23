@@ -1,8 +1,9 @@
-﻿using System;
+﻿using ScePSPUtils;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Xml.Serialization;
-using ScePSPUtils;
 
 namespace ScePSP.Core
 {
@@ -28,6 +29,49 @@ namespace ScePSP.Core
 
         public string LeftTriggerButton = "Q";
         public string RightTriggerButton = "E";
+    }
+
+    public static class ApplicationPaths
+    {
+        public static string ExecutablePath => Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+
+        private static string _MemoryStickRootFolder;
+
+        private static string _AssertPath;
+
+        public static string MemoryStickRootFolder
+        {
+            get
+            {
+                _MemoryStickRootFolder = ExecutablePath + "/memstick";
+
+                if (!Path.Exists(_MemoryStickRootFolder))
+                {
+                    Directory.CreateDirectory(_MemoryStickRootFolder);
+                }
+                return _MemoryStickRootFolder;
+            }
+        }
+
+        public static string AssertPath
+        {
+            get
+            {
+                _AssertPath = ExecutablePath + "/assert";
+
+                if (!Path.Exists(_AssertPath))
+                {
+                    Directory.CreateDirectory(_AssertPath);
+                }
+                return _AssertPath;
+            }
+        }
+    }
+
+    public class PspHleRunningConfig
+    {
+        public string FileNameBase;
+        public bool EnableDelayIo = true;
     }
 
     public class PspStoredConfig
@@ -67,12 +111,12 @@ namespace ScePSP.Core
                 {
                     if (Serializer == null)
                     {
-                        Serializer = XmlSerializer.FromTypes(new[] {typeof(PspStoredConfig)})[0];
+                        Serializer = XmlSerializer.FromTypes(new[] { typeof(PspStoredConfig) })[0];
                     }
 
                     using (var Stream = File.OpenRead(ConfigFilePath))
                     {
-                        return (PspStoredConfig) Serializer.Deserialize(Stream);
+                        return (PspStoredConfig)Serializer.Deserialize(Stream);
                     }
                 }
                 catch (Exception Exception)

@@ -110,7 +110,7 @@ namespace ScePSP.Runner.Components.Cpu
             HleIoManager.SetDriver("emulator:", HleIoDriverEmulator);
             HleIoManager.SetDriver("kemulator:", HleIoDriverEmulator);
 
-            HleIoManager.SetDriver("flash:", new HleIoDriverZip(new ZipArchive(ApplicationPaths.Flash0FilePath)));
+            HleIoManager.SetDriver("flash:", new HleIoDriverZip(new ZipArchive(ApplicationPaths.AssertPath+ "/flash0.zip")));
         }
 
         public IsoFile SetIso(string isoFile)
@@ -324,8 +324,8 @@ namespace ScePSP.Runner.Components.Cpu
 
                 RegisterSyscalls();
 
-                const uint startArgumentAddress = 0x08000100;
-                var endArgumentAddress = startArgumentAddress;
+                //const uint startArgumentAddress = 0x08000100;
+                //var endArgumentAddress = startArgumentAddress;
 
                 var argumentsChunk = arguments
                         .Select(argument => Encoding.UTF8.GetBytes(argument + "\0"))

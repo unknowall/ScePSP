@@ -25,7 +25,7 @@ namespace ScePSP.Core.Cpu
         {
             var cacheKey = new CacheKey {FixedGlobalAddress = fixedGlobalAddress};
             if (Cache.ContainsKey(cacheKey)) return Cache[cacheKey];
-            const string dllName = "FastPspMemoryUtils_Gen.dll";
+            //const string dllName = "FastPspMemoryUtils_Gen.dll";
             const string typeName = "Memory";
             const string methodName = "Get";
             //var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName("FastPspMemoryUtils_Gen"), AssemblyBuilderAccess.RunAndCollect, dllName);

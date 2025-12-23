@@ -342,8 +342,8 @@ namespace ScePSPUtils.Drawing.Extensions
         public static Bitmap ConvertToFormat(this Bitmap oldBitmap, PixelFormat newPixelFormat)
         {
             var newBitmap = new Bitmap(oldBitmap.Width, oldBitmap.Height, newPixelFormat);
-            //Graphics.FromImage(newBitmap).DrawImage(oldBitmap, Point.Empty);
-            throw new NotImplementedException();
+            Graphics.FromImage(newBitmap).DrawImage(oldBitmap, Point.Empty);
+            //throw new NotImplementedException();
             return newBitmap;
         }
     }

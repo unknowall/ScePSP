@@ -57,14 +57,14 @@ namespace ScePSP.Utils.Utils
 
         void* _input;
         byte* _inputByte;
-        ushort* _inputShort;
-        uint* _inputInt;
+        //ushort* _inputShort;
+        //uint* _inputInt;
         OutputPixel* _output;
         int _width;
         int _height;
         void* _palette;
         GuPixelFormats _paletteType;
-        int _paletteCount;
+        //int _paletteCount;
         int _paletteStart;
         int _paletteShift;
         int _paletteMask;
@@ -105,15 +105,15 @@ namespace ScePSP.Utils.Utils
             {
                 _input = input,
                 _inputByte = (byte*) input,
-                _inputShort = (ushort*) input,
-                _inputInt = (uint*) input,
+                //_inputShort = (ushort*) input,
+                //_inputInt = (uint*) input,
                 _output = output,
                 _strideWidth = strideWidth,
                 _width = width,
                 _height = height,
                 _palette = palette,
                 _paletteType = paletteType,
-                _paletteCount = paletteCount,
+                //_paletteCount = paletteCount,
                 _paletteStart = paletteStart,
                 _paletteShift = paletteShift,
                 _paletteMask = paletteMask,

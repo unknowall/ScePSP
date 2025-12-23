@@ -267,9 +267,6 @@ namespace ScePSP
             //Console.WriteLine("-----------------------------------------------------------------");
         }
 
-        public PluginInfo GetAudioPluginInfo() => InjectContext.GetInstance<PspAudioImpl>().PluginInfo;
-        public PluginInfo GetGpuPluginInfo() => InjectContext.GetInstance<GpuImpl>().PluginInfo;
-
         public void CaptureGpuFrame()
         {
             InjectContext.GetInstance<GpuProcessor>().CaptureFrame();

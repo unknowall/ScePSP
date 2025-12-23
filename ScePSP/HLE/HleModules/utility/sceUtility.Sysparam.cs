@@ -6,7 +6,7 @@ namespace ScePSP.Hle.Modules.utility
 {
     public unsafe partial class sceUtility
     {
-        [Inject] HleConfig HleConfig;
+        [Inject] new HleConfig HleConfig;
 
         private int _sceUtilityGetSystemParamInt(PSP_SYSTEMPARAM_ID id)
         {

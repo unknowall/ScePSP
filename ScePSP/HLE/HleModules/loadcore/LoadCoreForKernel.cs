@@ -13,7 +13,7 @@ namespace ScePSP.Hle.Modules.loadcore
 
         [Inject] ModuleMgrForUser ModuleMgrForUser;
 
-        [Inject] CpuProcessor CpuProcessor;
+        [Inject] new CpuProcessor CpuProcessor;
 
         //public enum SceModule : uint { }
         public enum SceUID : int

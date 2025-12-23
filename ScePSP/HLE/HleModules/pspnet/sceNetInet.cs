@@ -61,7 +61,7 @@ namespace ScePSP.Hle.Modules.pspnet
             public fixed byte sin_zero[8];
         };
 
-        public struct sockaddr
+        public struct SockAddr
         {
             /// <summary>
             /// total length
@@ -95,7 +95,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="AddressLength"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xDB094E1B, FirmwareVersion = 150)]
-        public int sceNetInetAccept(int SocketId, sockaddr*Address, socklen_t*AddressLength)
+        public int sceNetInetAccept(int SocketId, SockAddr*Address, socklen_t*AddressLength)
         {
             throw new NotImplementedException();
         }
@@ -108,7 +108,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="AddressLength"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x1A33F9AE, FirmwareVersion = 150)]
-        public int sceNetInetBind(int SocketId, sockaddr*Address, socklen_t AddressLength)
+        public int sceNetInetBind(int SocketId, SockAddr*Address, socklen_t AddressLength)
         {
             throw new NotImplementedException();
         }

@@ -8,20 +8,15 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-/// <summary>Implements a 16-bits cyclic redundancy check (CRC) hash algorithm.</summary>
-/// <remarks>This class is not intended to be used for security purposes. For security applications use MD5, SHA1, SHA256, SHA384, 
-/// or SHA512 in the System.Security.Cryptography namespace.</remarks>
 public class CRC16 : HashAlgorithm
 {
     #region CONSTRUCTORS
 
-    /// <summary>Creates a CRC16 object using the <see cref="DefaultPolynomial"/>.</summary>
     public CRC16() : this(DefaultPolynomial)
     {
     }
 
-    /// <summary>Creates a CRC16 object using the specified polynomial.</summary>
-    [CLSCompliant(false)]
+    //[CLSCompliant(false)]
     public CRC16(ushort polynomial)
     {
         HashSizeValue = 16;
@@ -34,7 +29,6 @@ public class CRC16 : HashAlgorithm
         Initialize();
     }
 
-    // static constructor
     static CRC16()
     {
         _crc16TablesCache = Hashtable.Synchronized(new Hashtable());
@@ -46,7 +40,8 @@ public class CRC16 : HashAlgorithm
     #region PROPERTIES
 
     /// <summary>Gets the default polynomial.</summary>
-    [CLSCompliant(false)] public static readonly ushort DefaultPolynomial = 0x8408; // Bit reversion of 0xA001;
+    //[CLSCompliant(false)]
+    public static readonly ushort DefaultPolynomial = 0x8408; // Bit reversion of 0xA001;
 
     #endregion
 

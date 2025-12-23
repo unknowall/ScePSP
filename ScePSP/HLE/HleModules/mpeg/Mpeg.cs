@@ -15,6 +15,7 @@ using ScePSPUtils.Drawing.Extensions;
 using ScePSPUtils.Extensions;
 using ScePSP.Core.Components.Display;
 using ScePSP.Utils.Utils;
+using ScePSP.Core;
 
 namespace ScePSP.Hle.Modules.mpeg
 {
@@ -125,13 +126,13 @@ namespace ScePSP.Hle.Modules.mpeg
                     {
                         case Formats.video.MpegPsDemuxer.ChunkType.ST_Video1:
                             UpdateAuFromPacketInfo(AvcAu, Info);
-                            if (DumpStreams)
-                                FileUtils.CreateAndAppendStream(@"c:\isos\psp\out\video.stream", Info.Stream.Slice());
+                            //if (DumpStreams)
+                            //    FileUtils.CreateAndAppendStream(ApplicationPaths.AssertPath + "/video.stream", Info.Stream.Slice());
                             Info.Stream.Slice().CopyToFast(VideoStream);
                             break;
                         case Formats.video.MpegPsDemuxer.ChunkType.ST_Private1:
-                            if (DumpStreams)
-                                FileUtils.CreateAndAppendStream(@"c:\isos\psp\out\audio.stream", Info.Stream.Slice());
+                            //if (DumpStreams)
+                            //    FileUtils.CreateAndAppendStream(ApplicationPaths.AssertPath + "/audio.stream", Info.Stream.Slice());
                             UpdateAuFromPacketInfo(AtracAu, Info);
                             Info.Stream.Slice().CopyToFast(AudioStream);
                             break;
@@ -145,7 +146,7 @@ namespace ScePSP.Hle.Modules.mpeg
                 MpegStream.ReadTransactionCommit();
                 return true;
             }
-            catch (EndOfStreamException EndOfStreamException)
+            catch //(EndOfStreamException EndOfStreamException)
             {
                 MpegStream.ReadTransactionRevert();
                 return false;
@@ -158,8 +159,8 @@ namespace ScePSP.Hle.Modules.mpeg
             try
             {
                 var Data = PointerUtils.PointerToByteArray((byte*) DataPointer, DataLength);
-                if (DumpStreams)
-                    FileUtils.CreateAndAppendStream(@"c:\isos\psp\out\mpeg.stream", new MemoryStream(Data));
+                //if (DumpStreams)
+                //    FileUtils.CreateAndAppendStream(ApplicationPaths.AssertPath + "/mpeg.stream", new MemoryStream(Data));
                 MpegStream.WriteBytes(Data);
             }
             catch (Exception Exception)
@@ -240,7 +241,7 @@ namespace ScePSP.Hle.Modules.mpeg
                         GpuImpl.InvalidateCache(OutputBuffer.Address, TempBuffer.Length);
                     }
 
-                    if (SaveBitmapFrame) Bitmap.Save(@"c:\temp\frame" + FrameIndex + ".png");
+                    //if (SaveBitmapFrame) Bitmap.Save(ApplicationPaths.AssertPath + "/" + FrameIndex + ".png");
                     FrameIndex++;
                 }
                 //PixelFormat

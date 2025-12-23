@@ -217,16 +217,16 @@ namespace ScePSP.Hle.Modules.pspnet
 
             public void Start()
             {
-                (this.MainThread = new Thread(ThreadMain) {IsBackground = true}).Start();
+                (this.MainThread = new ThreadEX(ThreadMain) {IsBackground = true}).Start();
             }
 
-            Thread MainThread;
-            Thread HelloThread;
-            Thread PingThread;
+            ThreadEX MainThread;
+            ThreadEX HelloThread;
+            ThreadEX PingThread;
 
             public void ThreadMain()
             {
-                (HelloThread = new Thread(() =>
+                (HelloThread = new ThreadEX(() =>
                 {
                     while (true)
                     {
@@ -234,7 +234,7 @@ namespace ScePSP.Hle.Modules.pspnet
                         Thread.Sleep(HelloDelay / 1000);
                     }
                 }) {IsBackground = true}).Start();
-                (PingThread = new Thread(() =>
+                (PingThread = new ThreadEX(() =>
                 {
                     while (true)
                     {
@@ -697,6 +697,35 @@ namespace ScePSP.Hle.Modules.pspnet
         public static bool operator !=(MacAddress a, MacAddress b)
         {
             return !a.GetAddressBytes().SequenceEqual(b.GetAddressBytes());
+        }
+
+        public bool Equals(MacAddress other)
+        {
+            byte[] thisBytes = this.GetAddressBytes();
+            byte[] otherBytes = other.GetAddressBytes();
+            for (int i = 0; i < 8; i++)
+            {
+                if (thisBytes[i] != otherBytes[i])
+                    return false;
+            }
+            return true;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is MacAddress other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            unsafe
+            {
+                fixed (byte* ptr = Data)
+                {
+                    ulong value = *(ulong*)ptr;
+                    return value.GetHashCode();
+                }
+            }
         }
     }
 }

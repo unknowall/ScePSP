@@ -3,15 +3,10 @@ using System.Runtime.Serialization;
 
 namespace ScePSPUtils
 {
-    /// <summary>
-    /// 
-    /// </summary>
+#pragma warning disable SYSLIB0050
+#pragma warning disable SYSLIB0051
     public class StackTraceUtils
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="e"></param>
         public static void PreserveStackTrace(Exception e)
         {
             var ctx = new StreamingContext(StreamingContextStates.CrossAppDomain);
@@ -25,4 +20,6 @@ namespace ScePSPUtils
             // voila, e is unmodified save for _remoteStackTraceString
         }
     }
+#pragma warning restore SYSLIB0050
+#pragma warning restore SYSLIB0051
 }

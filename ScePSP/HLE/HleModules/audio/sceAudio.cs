@@ -12,7 +12,7 @@ namespace ScePSP.Hle.Modules.audio
     {
         [Inject] PspAudio PspAudio;
 
-        [Inject] HleThreadManager ThreadManager;
+        [Inject] new HleThreadManager ThreadManager;
 
         /// <summary>
         /// 

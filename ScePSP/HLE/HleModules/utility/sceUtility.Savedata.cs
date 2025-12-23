@@ -249,48 +249,48 @@ namespace ScePSP.Hle.Modules.utility
                     case PspUtilitySavedataMode.Autoload:
                     case PspUtilitySavedataMode.Load:
                     case PspUtilitySavedataMode.ListLoad:
-                    {
-                        try
                         {
-                            Memory.WriteBytes(
-                                Params.DataBufPointer,
-                                HleIoManager.HleIoWrapper.ReadBytes(SaveDataBin)
-                            );
+                            try
+                            {
+                                Memory.WriteBytes(
+                                    Params.DataBufPointer,
+                                    HleIoManager.HleIoWrapper.ReadBytes(SaveDataBin)
+                                );
+                            }
+                            catch (IOException)
+                            {
+                                throw new SceKernelException(SceKernelErrors.ERROR_SAVEDATA_LOAD_NO_DATA);
+                            }
+                            catch (Exception Exception)
+                            {
+                                Console.WriteLine(Exception);
+                                throw new SceKernelException(SceKernelErrors.ERROR_SAVEDATA_LOAD_ACCESS_ERROR);
+                            }
                         }
-                        catch (IOException)
-                        {
-                            throw new SceKernelException(SceKernelErrors.ERROR_SAVEDATA_LOAD_NO_DATA);
-                        }
-                        catch (Exception Exception)
-                        {
-                            Console.WriteLine(Exception);
-                            throw new SceKernelException(SceKernelErrors.ERROR_SAVEDATA_LOAD_ACCESS_ERROR);
-                        }
-                    }
                         break;
                     case PspUtilitySavedataMode.Autosave:
                     case PspUtilitySavedataMode.Save:
                     case PspUtilitySavedataMode.ListSave:
-                    {
-                        try
                         {
-                            HleIoManager.HleIoWrapper.Mkdir(SavePathFolder, SceMode.All);
+                            try
+                            {
+                                HleIoManager.HleIoWrapper.Mkdir(SavePathFolder, SceMode.All);
 
-                            HleIoManager.HleIoWrapper.WriteBytes(
-                                SaveDataBin,
-                                Memory.ReadBytes(Params.DataBufPointer, Params.DataSize)
-                            );
+                                HleIoManager.HleIoWrapper.WriteBytes(
+                                    SaveDataBin,
+                                    Memory.ReadBytes(Params.DataBufPointer, Params.DataSize)
+                                );
 
-                            Save(Params.Icon0FileData, SaveIcon0);
-                            Save(Params.Pic1FileData, SavePic1);
-                            //Save(Params.SfoParam, SavePic1);
+                                Save(Params.Icon0FileData, SaveIcon0);
+                                Save(Params.Pic1FileData, SavePic1);
+                                //Save(Params.SfoParam, SavePic1);
+                            }
+                            catch (Exception Exception)
+                            {
+                                Console.Error.WriteLine(Exception);
+                                throw new SceKernelException(SceKernelErrors.ERROR_SAVEDATA_SAVE_ACCESS_ERROR);
+                            }
                         }
-                        catch (Exception Exception)
-                        {
-                            Console.Error.WriteLine(Exception);
-                            throw new SceKernelException(SceKernelErrors.ERROR_SAVEDATA_SAVE_ACCESS_ERROR);
-                        }
-                    }
                         break;
 
                     // "METAL SLUG XX" outputs the following on stdout after calling mode 8 (PspUtilitySavedataMode.Sizes):
@@ -326,38 +326,36 @@ namespace ScePSP.Hle.Modules.utility
                     //   size (32KB string) : "416 KB"
                     // error: SCE_UTILITY_SAVEDATA_TYPE_SIZES return 801103c7
                     case PspUtilitySavedataMode.Sizes:
-                    {
-                        SceKernelErrors SceKernelError = SceKernelErrors.ERROR_OK;
-
-                        //Console.Error.WriteLine("Not Implemented: sceUtilitySavedataInitStart.Sizes");
-
-                        uint SectorSize = 1024;
-                        uint FreeSize = 32 * 1024 * 1024; // 32 MB
-                        uint UsedSize = 0;
-
-                        // MS free size.
-                        // Gets the ammount of free space in the Memory Stick. If null,
-                        // the size is ignored and no error is returned.
                         {
-                            var SizeFreeInfo = (SizeFreeInfo*) Params.msFreeAddr.GetPointer<SizeFreeInfo>(Memory);
-                            SizeFreeInfo->SectorSize = SectorSize;
-                            SizeFreeInfo->FreeSectors = FreeSize / SectorSize;
-                            SizeFreeInfo->FreeKb = FreeSize / 1024;
+                            SceKernelErrors SceKernelError = SceKernelErrors.ERROR_OK;
 
-                            SizeFreeInfo->FreeKbString = SizeFreeInfo->FreeKb + "KB";
-                        }
+                            //Console.Error.WriteLine("Not Implemented: sceUtilitySavedataInitStart.Sizes");
 
-                        // MS data size.
-                        // Gets the size of the data already saved in the Memory Stick.
-                        // If null, the size is ignored and no error is returned.
-                        {
-                            var SizeUsedInfo = (SizeUsedInfo*) Params.msDataAddr.GetPointer<SizeUsedInfo>(Memory);
+                            uint SectorSize = 1024;
+                            uint FreeSize = 32 * 1024 * 1024; // 32 MB
+                            uint UsedSize = 0;
 
-                            if (SizeUsedInfo != null)
+                            // MS free size.
+                            // Gets the ammount of free space in the Memory Stick. If null,
+                            // the size is ignored and no error is returned.
                             {
-#if true
-                                if (true)
+                                var SizeFreeInfo = (SizeFreeInfo*)Params.msFreeAddr.GetPointer<SizeFreeInfo>(Memory);
+                                SizeFreeInfo->SectorSize = SectorSize;
+                                SizeFreeInfo->FreeSectors = FreeSize / SectorSize;
+                                SizeFreeInfo->FreeKb = FreeSize / 1024;
+
+                                SizeFreeInfo->FreeKbString = SizeFreeInfo->FreeKb + "KB";
+                            }
+
+                            // MS data size.
+                            // Gets the size of the data already saved in the Memory Stick.
+                            // If null, the size is ignored and no error is returned.
+                            {
+                                var SizeUsedInfo = (SizeUsedInfo*)Params.msDataAddr.GetPointer<SizeUsedInfo>(Memory);
+
+                                if (SizeUsedInfo != null)
                                 {
+#if true
                                     Console.WriteLine(SizeUsedInfo->saveName);
                                     Console.WriteLine(SizeUsedInfo->gameName);
 
@@ -366,76 +364,71 @@ namespace ScePSP.Hle.Modules.utility
 
                                     SizeUsedInfo->UsedKbString = SizeUsedInfo->UsedKb + "KB";
                                     SizeUsedInfo->UsedKb32String = SizeUsedInfo->UsedKb32 + "KB";
-                                }
-                                else
-                                {
-                                    SceKernelError = SceKernelErrors.ERROR_SAVEDATA_SIZES_NO_DATA;
-                                }
 #else
 									SceKernelError = SceKernelErrors.ERROR_SAVEDATA_SIZES_NO_DATA;
 #endif
+                                }
                             }
-                        }
 
-                        // Utility data size.
-                        // Gets the size of the data to be saved in the Memory Stick.
-                        // If null, the size is ignored and no error is returned.
-                        {
-                            var SizeRequiredSpaceInfo =
-                                (SizeRequiredSpaceInfo*) Params.utilityDataAddr.GetPointer<SizeRequiredSpaceInfo>(
-                                    Memory);
-                            if (SizeRequiredSpaceInfo != null)
+                            // Utility data size.
+                            // Gets the size of the data to be saved in the Memory Stick.
+                            // If null, the size is ignored and no error is returned.
                             {
-                                long RequiredSize = 0;
-                                RequiredSize += Params.Icon0FileData.Size;
-                                RequiredSize += Params.Icon1FileData.Size;
-                                RequiredSize += Params.Pic1FileData.Size;
-                                RequiredSize += Params.Snd0FileData.Size;
-                                RequiredSize += Params.DataSize;
+                                var SizeRequiredSpaceInfo =
+                                    (SizeRequiredSpaceInfo*)Params.utilityDataAddr.GetPointer<SizeRequiredSpaceInfo>(
+                                        Memory);
+                                if (SizeRequiredSpaceInfo != null)
+                                {
+                                    long RequiredSize = 0;
+                                    RequiredSize += Params.Icon0FileData.Size;
+                                    RequiredSize += Params.Icon1FileData.Size;
+                                    RequiredSize += Params.Pic1FileData.Size;
+                                    RequiredSize += Params.Snd0FileData.Size;
+                                    RequiredSize += Params.DataSize;
 
-                                SizeRequiredSpaceInfo->RequiredSpaceSectors =
-                                    (uint) MathUtils.RequiredBlocks(RequiredSize, SectorSize);
-                                SizeRequiredSpaceInfo->RequiredSpaceKb =
-                                    (uint) MathUtils.RequiredBlocks(RequiredSize, 1024);
-                                SizeRequiredSpaceInfo->RequiredSpace32KB =
-                                    (uint) MathUtils.RequiredBlocks(RequiredSize, 32 * 1024);
+                                    SizeRequiredSpaceInfo->RequiredSpaceSectors =
+                                        (uint)MathUtils.RequiredBlocks(RequiredSize, SectorSize);
+                                    SizeRequiredSpaceInfo->RequiredSpaceKb =
+                                        (uint)MathUtils.RequiredBlocks(RequiredSize, 1024);
+                                    SizeRequiredSpaceInfo->RequiredSpace32KB =
+                                        (uint)MathUtils.RequiredBlocks(RequiredSize, 32 * 1024);
 
-                                SizeRequiredSpaceInfo->RequiredSpaceString =
-                                    SizeRequiredSpaceInfo->RequiredSpaceKb + "KB";
-                                SizeRequiredSpaceInfo->RequiredSpace32KBString =
-                                    SizeRequiredSpaceInfo->RequiredSpace32KB + "KB";
+                                    SizeRequiredSpaceInfo->RequiredSpaceString =
+                                        SizeRequiredSpaceInfo->RequiredSpaceKb + "KB";
+                                    SizeRequiredSpaceInfo->RequiredSpace32KBString =
+                                        SizeRequiredSpaceInfo->RequiredSpace32KB + "KB";
+                                }
                             }
-                        }
 
-                        if (SceKernelError != SceKernelErrors.ERROR_OK) throw new SceKernelException(SceKernelError);
-                    }
+                            if (SceKernelError != SceKernelErrors.ERROR_OK) throw new SceKernelException(SceKernelError);
+                        }
                         break;
                     case PspUtilitySavedataMode.List:
-                    {
-                        var ListRequest = (ListRequest*) Params.idListAddr.GetPointer<ListRequest>(Memory);
-                        ListRequest->NumEntriesReaded = 0;
-                    }
+                        {
+                            var ListRequest = (ListRequest*)Params.idListAddr.GetPointer<ListRequest>(Memory);
+                            ListRequest->NumEntriesReaded = 0;
+                        }
                         break;
                     case PspUtilitySavedataMode.GetSize:
-                    {
-                        //Params.DataSize
-                        //throw (new SceKernelException(SceKernelErrors.ERROR_SAVEDATA_RW_NO_MEMSTICK));
-                        //throw (new SceKernelException(SceKernelErrors.ERROR_SAVEDATA_RW_NO_DATA));
-                        Console.Error.WriteLine("Not Implemented: sceUtilitySavedataInitStart.GetSize");
-                    }
+                        {
+                            //Params.DataSize
+                            //throw (new SceKernelException(SceKernelErrors.ERROR_SAVEDATA_RW_NO_MEMSTICK));
+                            //throw (new SceKernelException(SceKernelErrors.ERROR_SAVEDATA_RW_NO_DATA));
+                            Console.Error.WriteLine("Not Implemented: sceUtilitySavedataInitStart.GetSize");
+                        }
                         break;
                     case PspUtilitySavedataMode.Read:
                     case PspUtilitySavedataMode.ReadSecure:
-                    {
-                        //throw (new SceKernelException(SceKernelErrors.ERROR_SAVEDATA_RW_NO_DATA));
-                        Console.Error.WriteLine("Not Implemented: sceUtilitySavedataInitStart.Read");
-                    }
+                        {
+                            //throw (new SceKernelException(SceKernelErrors.ERROR_SAVEDATA_RW_NO_DATA));
+                            Console.Error.WriteLine("Not Implemented: sceUtilitySavedataInitStart.Read");
+                        }
                         break;
                     default:
                         Console.Error.WriteLine("sceUtilitySavedataInitStart: Unsupported mode: " + Params.Mode);
                         Debug.Fail("sceUtilitySavedataInitStart: Unsupported mode: " + Params.Mode);
-                        throw new SceKernelException((SceKernelErrors) (-1));
-                    //break;
+                        throw new SceKernelException((SceKernelErrors)(-1));
+                        //break;
                 }
                 //throw(new NotImplementedException());
 

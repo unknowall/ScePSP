@@ -17,13 +17,13 @@ namespace ScePSP.Hle.Modules.ge
     {
         static Logger Logger = Logger.GetLogger("sceGe");
 
-        [Inject] HleThreadManager ThreadManager;
+        [Inject] new HleThreadManager ThreadManager;
 
         [Inject] HleMemoryManager MemoryManager;
 
         [Inject] public GpuProcessor GpuProcessor;
 
-        [Inject] public CpuProcessor CpuProcessor;
+        [Inject] public new CpuProcessor CpuProcessor;
 
         [Inject] public SysMemUserForUser SysMemUserForUser;
 
@@ -65,11 +65,11 @@ namespace ScePSP.Hle.Modules.ge
         [HlePspNotImplemented]
         public int sceGeSaveContext(uint Address)
         {
-            var pointer = Memory.PspAddressToSpan<uint>(Address, 0x200);
-            //var current = this.GpuStateStructPointer.data.Span;
+            //var pointer = Memory.PspAddressToSpan<uint>(Address, 0x200);
+            //var current = this.GpuStateStruct.data.Span;
             //current.CopyTo(pointer);
             throw new NotImplementedException();
-            return 0;
+            //return 0;
         }
 
         /// <summary>
@@ -81,11 +81,11 @@ namespace ScePSP.Hle.Modules.ge
         //[HlePspNotImplemented]
         public int sceGeRestoreContext(uint Address)
         {
-            var pointer = Memory.PspAddressToSpan<uint>(Address, 0x200);
-            //var current = this.GpuStateStructPointer.data.Span;
+            //var pointer = Memory.PspAddressToSpan<uint>(Address, 0x200);
+            //var current = this.GpuStateStruct.data.Span;
             //pointer.CopyTo(current);
             throw new NotImplementedException();
-            return 0;
+            //return 0;
         }
 
         /// <summary>

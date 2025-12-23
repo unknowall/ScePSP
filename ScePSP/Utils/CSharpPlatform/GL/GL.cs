@@ -833,7 +833,7 @@ namespace ScePSPPlatform.GL
     [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
     public unsafe delegate void glGetShaderSource(uint shader, int bufsize, int* length, byte* source);
 
-    [System.CLSCompliant(false)]
+    //[System.CLSCompliant(false)]
     [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
     //public unsafe delegate string glGetString(int name);
     //public unsafe delegate byte* glGetString(int name);

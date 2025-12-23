@@ -38,7 +38,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <summary>
         /// 
         /// </summary>
-        [Inject] HleConfig HleConfig;
+        [Inject] new HleConfig HleConfig;
 
         /// <summary>
         /// 

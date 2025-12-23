@@ -4,23 +4,10 @@ namespace ScePSP.Core
 {
     public abstract class PspPluginImpl
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public abstract PluginInfo PluginInfo { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public abstract bool IsWorking { get; }
 
         //public abstract void Start();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TType"></typeparam>
-        /// <param name="AvailablePluginImplementations"></param>
         public static void SelectWorkingPlugin<TType>(InjectContext InjectContext,
             params Type[] AvailablePluginImplementations) where TType : PspPluginImpl
         {

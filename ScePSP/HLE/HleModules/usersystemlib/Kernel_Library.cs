@@ -63,7 +63,7 @@ namespace ScePSP.Hle.Modules.usersystemlib
 
         private int _sceKernelUnlockLwMutex(SceLwMutexWorkarea* workarea, int count)
         {
-            return 0;
+            //return 0;
 
             if (workarea->uid == -1)
             {

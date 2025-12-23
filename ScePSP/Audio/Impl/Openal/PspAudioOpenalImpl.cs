@@ -45,12 +45,6 @@ namespace ScePSP.Core.Audio.Impl.Openal
             AudioStream.StopSynchronized();
         }
 
-        public override PluginInfo PluginInfo => new PluginInfo
-        {
-            Name = "OpenAl",
-            Version = "1.0",
-        };
-
         public override bool IsWorking
         {
             get

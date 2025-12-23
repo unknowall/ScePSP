@@ -109,6 +109,9 @@ namespace ScePSP.Hle.Modules.threadman
                     return this.ElapsedAccumulatedTime;
                 }
             }
+            set
+            {
+            }
         }
 
         public void CancelHandler()

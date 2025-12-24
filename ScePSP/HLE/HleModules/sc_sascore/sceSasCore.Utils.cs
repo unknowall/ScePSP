@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScePSP.Hle.Formats.audio;
+using System;
 using System.Collections.Generic;
-using ScePSP.Hle.Formats.audio;
 
 namespace ScePSP.Hle.Modules.sc_sascore
 {
@@ -288,7 +288,7 @@ namespace ScePSP.Hle.Modules.sc_sascore
                 {
                     if (Voices[n].Ended)
                     {
-                        Value |= (uint) (1 << n);
+                        Value |= (uint)(1 << n);
                     }
                 }
                 return Value;

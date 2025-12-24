@@ -1,12 +1,12 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using ScePSPUtils;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Core.Memory;
+using ScePSP.Hle.Interop;
+using ScePSP.Hle.Managers;
 using ScePSP.Hle.Modules.stdio;
 using ScePSP.Hle.Vfs;
-using ScePSP.Hle.Managers;
-using ScePSP.Hle.Interop;
+using ScePSPUtils;
+using System;
+using System.IO;
+using System.Text;
 
 namespace ScePSP.Hle.Modules.iofilemgr
 {
@@ -23,7 +23,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
             protected PspIoDrvArg* PspIoDrvArg;
             protected PspIoDrv* PspIoDrv;
 
-            protected PspIoDrvFuncs* PspIoDrvFuncs => (PspIoDrvFuncs*) PspIoDrv->funcs.GetPointer<PspIoDrvFuncs>(PspMemory);
+            protected PspIoDrvFuncs* PspIoDrvFuncs => (PspIoDrvFuncs*)PspIoDrv->funcs.GetPointer<PspIoDrvFuncs>(PspMemory);
 
             protected MemoryPartition PspIoDrvArgPartition;
 
@@ -46,7 +46,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
                     DriverPointer = PspMemory.PointerToPspAddressUnsafe(PspIoDrv),
                     ArgumentPointer = 0,
                 });
-                this.PspIoDrvArg = (PspIoDrvArg*) PspIoDrvArgPartition.LowPointer;
+                this.PspIoDrvArg = (PspIoDrvArg*)PspIoDrvArgPartition.LowPointer;
                 this.PspIoDrv = PspIoDrv;
             }
 
@@ -61,7 +61,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
                 //Console.Error.WriteLine("PspIoDrv: " + new IntPtr(PspIoDrv));
                 //Console.Error.WriteLine("PspIoDrvFuncs: " + new IntPtr(PspIoDrvFuncs));
                 //Console.Error.WriteLine("IoInit: " + new IntPtr(PspIoDrvFuncs->IoInit));
-                return (int) HleInterop.ExecuteFunctionNow(
+                return (int)HleInterop.ExecuteFunctionNow(
                     PspIoDrvFuncs->IoInit,
                     PspMemory.PointerToPspAddressUnsafe(PspIoDrvArg)
                 );
@@ -71,7 +71,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
             {
                 this.PspIoDrvArgPartition.DeallocateFromParent();
 
-                return (int) HleInterop.ExecuteFunctionNow(
+                return (int)HleInterop.ExecuteFunctionNow(
                     PspIoDrvFuncs->IoExit,
                     PspMemory.PointerToPspAddressUnsafe(PspIoDrvArg)
                 );
@@ -91,7 +91,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
                     //Console.Error.WriteLineColored(ConsoleColor.Blue, "{0}", FileName);
                     //Console.Error.WriteLineColored(ConsoleColor.Blue, "{0}", Flags);
                     //Console.Error.WriteLineColored(ConsoleColor.Blue, "{0}", (int)Flags);
-                    return (int) HleInterop.ExecuteFunctionNow(
+                    return (int)HleInterop.ExecuteFunctionNow(
                         PspIoDrvFuncs->IoOpen,
                         PspIoDrvFileArgPartition.Low,
                         FileNamePartition.Low,
@@ -230,7 +230,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
             {
                 Console.Error.WriteLine("Can't find file '{0}'", FileName);
                 Console.Error.WriteLine(FileNotFoundException);
-                return (int) SceKernelErrors.ERROR_ERRNO_FILE_NOT_FOUND;
+                return (int)SceKernelErrors.ERROR_ERRNO_FILE_NOT_FOUND;
             }
             catch (Exception Exception)
             {
@@ -251,7 +251,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
         /// <param name="Bitmask">Bitmask defining which bits to change.</param>
         /// <returns>Less than 0 on error.</returns>
         [HlePspFunction(NID = 0xB8A740F4, FirmwareVersion = 150)]
-        public int sceIoChstat(string FileName, SceIoStat*SceIoStat, int Bitmask)
+        public int sceIoChstat(string FileName, SceIoStat* SceIoStat, int Bitmask)
         {
             try
             {
@@ -373,7 +373,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
             try
             {
                 var HleIoDrvFileArg = GetFileArgFromHandle(FileId);
-                return (int) HleIoDrvFileArg.HleIoDriver.IoLseek(HleIoDrvFileArg, (long) Offset, Whence);
+                return (int)HleIoDrvFileArg.HleIoDriver.IoLseek(HleIoDrvFileArg, (long)Offset, Whence);
             }
             finally
             {
@@ -448,7 +448,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
                 var Uid = HleIoManager.HleIoDrvFileArgPool.Create(Info.HleIoDrvFileArg);
                 if (Async)
                 {
-                    Info.HleIoDrvFileArg.AsyncLastResult = (long) Uid;
+                    Info.HleIoDrvFileArg.AsyncLastResult = (long)Uid;
                 }
                 return Uid;
             }
@@ -470,7 +470,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
 
             if (Async)
             {
-                Info.HleIoDrvFileArg.AsyncLastResult = (long) SceKernelErrors.ERROR_ERRNO_FILE_NOT_FOUND;
+                Info.HleIoDrvFileArg.AsyncLastResult = (long)SceKernelErrors.ERROR_ERRNO_FILE_NOT_FOUND;
                 return HleIoManager.HleIoDrvFileArgPool.Create(Info.HleIoDrvFileArg);
             }
             else
@@ -521,14 +521,14 @@ namespace ScePSP.Hle.Modules.iofilemgr
         {
             try
             {
-                switch ((StdioForUser.StdHandle) FileId)
+                switch ((StdioForUser.StdHandle)FileId)
                 {
                     case StdioForUser.StdHandle.Out:
                     case StdioForUser.StdHandle.Error:
                         ConsoleUtils.SaveRestoreConsoleState(() =>
                         {
                             //Console.BackgroundColor = ConsoleColor.DarkGray;
-                            if ((StdioForUser.StdHandle) FileId == StdioForUser.StdHandle.Out)
+                            if ((StdioForUser.StdHandle)FileId == StdioForUser.StdHandle.Out)
                             {
                                 Console.ForegroundColor = ConsoleColor.Blue;
                             }

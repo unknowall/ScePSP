@@ -1,7 +1,7 @@
-﻿using System;
-using ScePSP.Core.Cpu;
+﻿using ScePSP.Core.Cpu;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
+using System;
 
 namespace ScePSP.Hle.Modules.emulator
 {
@@ -32,7 +32,7 @@ namespace ScePSP.Hle.Modules.emulator
         public void emitLong(long value) => Console.WriteLine("emitLong: {0}", "0x%016X".Sprintf(value));
 
         [HlePspFunction(NID = 0x10000010, FirmwareVersion = 150)]
-        public long testArguments(int arg1, long arg2, float arg3) => (long) arg1 + (long) arg2 + (long) arg3;
+        public long testArguments(int arg1, long arg2, float arg3) => (long)arg1 + (long)arg2 + (long)arg3;
 
         [HlePspFunction(NID = 0x10000000, FirmwareVersion = 150)]
         public void waitThreadForever(CpuThreadState cpuThreadState)

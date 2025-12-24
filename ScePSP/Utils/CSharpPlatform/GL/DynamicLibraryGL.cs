@@ -1,7 +1,7 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using ScePSP.Core;
 using ScePSPPlatform.Library;
-using ScePSP.Core; 
+using System;
+using System.Runtime.InteropServices;
 
 namespace ScePSPPlatform.GL
 {

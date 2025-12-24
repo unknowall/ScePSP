@@ -20,7 +20,7 @@
         /// <summary>
         /// 
         /// </summary>
-        public static readonly BitmapChannel[] Rgb = {BitmapChannel.Red, BitmapChannel.Green, BitmapChannel.Blue};
+        public static readonly BitmapChannel[] Rgb = { BitmapChannel.Red, BitmapChannel.Green, BitmapChannel.Blue };
     }
 
     /// <summary>

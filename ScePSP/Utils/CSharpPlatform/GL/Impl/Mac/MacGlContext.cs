@@ -1,7 +1,7 @@
-﻿using System;
-using System.Runtime.InteropServices;
-using ScePSPPlatform.GL.Impl.Windows;
+﻿using ScePSPPlatform.GL.Impl.Windows;
 using SDL2;
+using System;
+using System.Runtime.InteropServices;
 
 namespace ScePSPPlatform.GL.Impl.Mac
 {
@@ -10,7 +10,7 @@ namespace ScePSPPlatform.GL.Impl.Mac
         private IntPtr window;
         private IntPtr context;
         private bool releaseWindow;
-        
+
         public MacGLContext(IntPtr window, bool releaseWindow)
         {
             this.window = window;
@@ -40,12 +40,13 @@ namespace ScePSPPlatform.GL.Impl.Mac
             }
         }
 
-        public GlContextSize Size {
+        public GlContextSize Size
+        {
             get
             {
                 int w, h;
                 SDL.SDL_GetWindowSize(window, out w, out h);
-                return new GlContextSize {Width = w, Height = h};
+                return new GlContextSize { Width = w, Height = h };
             }
         }
 

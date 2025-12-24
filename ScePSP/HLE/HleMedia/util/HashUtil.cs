@@ -24,7 +24,7 @@ namespace cscodec.util
         */
         public static int hash(int aSeed, char aChar)
         {
-            return firstTerm(aSeed) + (int) aChar;
+            return firstTerm(aSeed) + (int)aChar;
         }
 
         /**
@@ -45,7 +45,7 @@ namespace cscodec.util
         */
         public static int hash(int aSeed, long aLong)
         {
-            return firstTerm(aSeed) + (int) (aLong ^ (long) ((ulong) aLong >> 32));
+            return firstTerm(aSeed) + (int)(aLong ^ (long)((ulong)aLong >> 32));
         }
 
         /**
@@ -83,7 +83,7 @@ namespace cscodec.util
             }
             else
             {
-                object[] objAr = (object[]) aObject;
+                object[] objAr = (object[])aObject;
                 int length = objAr.Length;
                 for (int idx = 0; idx < length; ++idx)
                 {

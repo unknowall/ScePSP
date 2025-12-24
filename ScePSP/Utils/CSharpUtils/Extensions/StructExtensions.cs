@@ -103,7 +103,7 @@ namespace ScePSPUtils.Extensions
 
                         if (simplifyBool && value is bool)
                         {
-                            if ((bool) value)
+                            if ((bool)value)
                             {
                                 ret += memberInfo.Name;
                                 //MemberCount++;

@@ -44,7 +44,7 @@ namespace ScePSPPlatform.GL.Utils
 
         public static GLTexture Wrap(uint Texture, int Width = 0, int Height = 0)
         {
-            return new GLTexture(Texture) {Width = Width, Height = Height};
+            return new GLTexture(Texture) { Width = Width, Height = Height };
         }
 
 
@@ -57,7 +57,7 @@ namespace ScePSPPlatform.GL.Utils
 
         public void BindUnbind(Action Action)
         {
-            var OldTexture = (uint) GL.glGetInteger(GL.GL_TEXTURE_BINDING_2D);
+            var OldTexture = (uint)GL.glGetInteger(GL.GL_TEXTURE_BINDING_2D);
             try
             {
                 Bind();

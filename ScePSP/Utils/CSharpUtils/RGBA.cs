@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ScePSP.Utils;
+using System;
 using System.Drawing;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using ScePSP.Utils;
 
 namespace ScePSPUtils.Drawing
 {
@@ -55,7 +55,7 @@ namespace ScePSPUtils.Drawing
 
         public uint Value => PackInt(R, G, B, A);
 
-        public static uint PackInt(byte r, byte  g, byte  b, byte  a) => ((uint)r << 0) | ((uint)g << 8) | ((uint)b << 16) | ((uint)a << 24);
+        public static uint PackInt(byte r, byte g, byte b, byte a) => ((uint)r << 0) | ((uint)g << 8) | ((uint)b << 16) | ((uint)a << 24);
         public static uint PackInt(uint r, uint g, uint b, uint a) => ((r & 0xFF) << 0) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16) | ((a & 0xFF) << 24);
     }
 
@@ -146,7 +146,7 @@ namespace ScePSPUtils.Drawing
         /// <returns></returns>
         public static implicit operator Rgba32(ArgbRev col)
         {
-            return new Rgba32 {R = col.R, G = col.G, B = col.B, A = col.A};
+            return new Rgba32 { R = col.R, G = col.G, B = col.B, A = col.A };
         }
 
         /// <summary>
@@ -156,10 +156,10 @@ namespace ScePSPUtils.Drawing
         /// <returns></returns>
         public static implicit operator ArgbRev(Rgba32 col)
         {
-            var a = (byte) MathUtils.FastClamp(col.A, 0x00, 0xFF);
-            var r = (byte) MathUtils.FastClamp(col.R, 0x00, 0xFF);
-            var g = (byte) MathUtils.FastClamp(col.G, 0x00, 0xFF);
-            var b = (byte) MathUtils.FastClamp(col.B, 0x00, 0xFF);
+            var a = (byte)MathUtils.FastClamp(col.A, 0x00, 0xFF);
+            var r = (byte)MathUtils.FastClamp(col.R, 0x00, 0xFF);
+            var g = (byte)MathUtils.FastClamp(col.G, 0x00, 0xFF);
+            var b = (byte)MathUtils.FastClamp(col.B, 0x00, 0xFF);
             return new ArgbRev(a, r, g, b);
         }
     }
@@ -189,7 +189,7 @@ namespace ScePSPUtils.Drawing
 
         public Rgba Rgba => new Rgba(PackComponent(R), PackComponent(G), PackComponent(B), PackComponent(A));
         public uint Int => Rgba.Value;
-        static private uint PackComponent(float v) => (uint)((int) (v * 255)).Clamp(0, 255);
+        static private uint PackComponent(float v) => (uint)((int)(v * 255)).Clamp(0, 255);
     }
 
     /// <summary>
@@ -231,10 +231,10 @@ namespace ScePSPUtils.Drawing
         /// <param name="b"></param>
         public ArgbRev(int a, int r, int g, int b)
         {
-            A = (byte) MathUtils.FastClamp(a, 0, 255);
-            R = (byte) MathUtils.FastClamp(r, 0, 255);
-            G = (byte) MathUtils.FastClamp(g, 0, 255);
-            B = (byte) MathUtils.FastClamp(b, 0, 255);
+            A = (byte)MathUtils.FastClamp(a, 0, 255);
+            R = (byte)MathUtils.FastClamp(r, 0, 255);
+            G = (byte)MathUtils.FastClamp(g, 0, 255);
+            B = (byte)MathUtils.FastClamp(b, 0, 255);
         }
 
         /// <summary>
@@ -270,10 +270,10 @@ namespace ScePSPUtils.Drawing
             MathUtils.NormalizeSum(ref offset1C, ref offset2C);
 
             return new ArgbRev(
-                (int) (color1.A * offset1A + color2.A * offset2A),
-                (int) (color1.R * offset1C + color2.R * offset2C),
-                (int) (color1.G * offset1C + color2.G * offset2C),
-                (int) (color1.B * offset1C + color2.B * offset2C)
+                (int)(color1.A * offset1A + color2.A * offset2A),
+                (int)(color1.R * offset1C + color2.R * offset2C),
+                (int)(color1.G * offset1C + color2.G * offset2C),
+                (int)(color1.B * offset1C + color2.B * offset2C)
             );
         }
 
@@ -296,9 +296,9 @@ namespace ScePSPUtils.Drawing
 
             return new ArgbRev(
                 color1.A + color2.A,
-                (int) (color1.R * offset1C + color2.R * offset2C),
-                (int) (color1.G * offset1C + color2.G * offset2C),
-                (int) (color1.B * offset1C + color2.B * offset2C)
+                (int)(color1.R * offset1C + color2.R * offset2C),
+                (int)(color1.G * offset1C + color2.G * offset2C),
+                (int)(color1.B * offset1C + color2.B * offset2C)
             );
         }
 
@@ -331,22 +331,22 @@ namespace ScePSPUtils.Drawing
 
             if (col.Length >= 6)
             {
-                r = (byte) (Convert.ToInt32(col.Substr(0, 2), 16) * 255 / 255);
-                g = (byte) (Convert.ToInt32(col.Substr(2, 2), 16) * 255 / 255);
-                b = (byte) (Convert.ToInt32(col.Substr(4, 2), 16) * 255 / 255);
+                r = (byte)(Convert.ToInt32(col.Substr(0, 2), 16) * 255 / 255);
+                g = (byte)(Convert.ToInt32(col.Substr(2, 2), 16) * 255 / 255);
+                b = (byte)(Convert.ToInt32(col.Substr(4, 2), 16) * 255 / 255);
                 if (col.Length >= 8)
                 {
-                    a = (byte) (Convert.ToInt32(col.Substr(6, 2), 16) * 255 / 255);
+                    a = (byte)(Convert.ToInt32(col.Substr(6, 2), 16) * 255 / 255);
                 }
             }
             else if (col.Length >= 3)
             {
-                r = (byte) (Convert.ToInt32(col.Substr(0, 1), 16) * 255 / 15);
-                g = (byte) (Convert.ToInt32(col.Substr(1, 1), 16) * 255 / 15);
-                b = (byte) (Convert.ToInt32(col.Substr(2, 1), 16) * 255 / 15);
+                r = (byte)(Convert.ToInt32(col.Substr(0, 1), 16) * 255 / 15);
+                g = (byte)(Convert.ToInt32(col.Substr(1, 1), 16) * 255 / 15);
+                b = (byte)(Convert.ToInt32(col.Substr(2, 1), 16) * 255 / 15);
                 if (col.Length >= 4)
                 {
-                    a = (byte) (Convert.ToInt32(col.Substr(3, 1), 16) * 255 / 15);
+                    a = (byte)(Convert.ToInt32(col.Substr(3, 1), 16) * 255 / 15);
                 }
             }
             else
@@ -363,7 +363,7 @@ namespace ScePSPUtils.Drawing
         /// <param name="col"></param>
         /// <returns></returns>
         public static implicit operator ArgbRev(Color col) =>
-            new ArgbRev() {R = col.R, G = col.G, B = col.B, A = col.A};
+            new ArgbRev() { R = col.R, G = col.G, B = col.B, A = col.A };
 
         /// <summary>
         /// 

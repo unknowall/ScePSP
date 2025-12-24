@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
-using ScePSP.Core.Audio;
+﻿using ScePSP.Core.Audio;
+using ScePSP.Core.Cpu;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
-using ScePSP.Core.Cpu;
+using System;
+using System.Linq;
 
 namespace ScePSP.Hle.Modules.audio
 {
@@ -499,7 +499,7 @@ namespace ScePSP.Hle.Modules.audio
         public int sceAudioSRCChReserve(int SampleCount, int Frequency, int Channels)
         {
             if (Frequency != 44100) throw new Exception($"sceAudioSRCChReserve: {Frequency}");
-            var ValidFrequencies = new int[] {0, 8000, 11025, 12000, 16000, 22050, 24000, 32000, 48000};
+            var ValidFrequencies = new int[] { 0, 8000, 11025, 12000, 16000, 22050, 24000, 32000, 48000 };
             if (!ValidFrequencies.Contains(Frequency))
                 throw new SceKernelException(SceKernelErrors.ERROR_AUDIO_INVALID_FREQUENCY);
             if (Channels == 4) throw new SceKernelException(SceKernelErrors.PSP_AUDIO_ERROR_SRC_FORMAT_4);
@@ -578,7 +578,7 @@ namespace ScePSP.Hle.Modules.audio
         /// <returns>0 on success, an error if less than 0.</returns>
         [HlePspFunction(NID = 0xE926D3FB, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceAudioInputInitEx(pspAudioInputParams*parameters)
+        public int sceAudioInputInitEx(pspAudioInputParams* parameters)
         {
             return 0;
         }

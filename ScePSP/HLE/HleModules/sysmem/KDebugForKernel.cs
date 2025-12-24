@@ -1,8 +1,8 @@
-﻿using System;
-using ScePSPUtils;
-using ScePSP.Core.Cpu;
+﻿using ScePSP.Core.Cpu;
 using ScePSP.Hle.Attributes;
 using ScePSP.Utils;
+using ScePSPUtils;
+using System;
 
 namespace ScePSP.Hle.Modules.sysmem
 {

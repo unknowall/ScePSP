@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ScePSP.Core.Cpu.Dynarec;
 using ScePSP.Core.Cpu.InstructionCache;
-using ScePSP.Core.Cpu.Dynarec;
 using ScePSP.Core.Memory;
+using System;
+using System.Collections.Generic;
 
 namespace ScePSP.Core.Cpu
 {

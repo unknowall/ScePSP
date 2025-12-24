@@ -8,7 +8,7 @@ namespace SafeILGenerator.Ast.Nodes
     {
         public static void Ref<T>(this TransformNodesDelegate transformer, ref T node) where T : AstNode
         {
-            node = (T) transformer(node);
+            node = (T)transformer(node);
         }
 
         public static void Ref<T>(this TransformNodesDelegate transformer, ref List<T> nodes) where T : AstNode
@@ -16,7 +16,7 @@ namespace SafeILGenerator.Ast.Nodes
             var newNodes = new List<T>();
             foreach (var node in nodes)
             {
-                var newNode = (T) transformer(node);
+                var newNode = (T)transformer(node);
                 if (newNode != null) newNodes.Add(newNode);
             }
             nodes = newNodes;
@@ -27,7 +27,7 @@ namespace SafeILGenerator.Ast.Nodes
             var newNodes = new List<T>();
             foreach (var node in nodes)
             {
-                var newNode = (T) transformer(node);
+                var newNode = (T)transformer(node);
                 if (newNode != null) newNodes.Add(newNode);
             }
             nodes = newNodes.ToArray();

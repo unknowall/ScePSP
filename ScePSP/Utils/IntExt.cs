@@ -1,5 +1,4 @@
 using System.Numerics;
-using System.Runtime.CompilerServices;
 
 namespace ScePSP.Utils
 {
@@ -19,9 +18,9 @@ namespace ScePSP.Utils
         public static Vector4 Clamp(this Vector4 value, float min, float max) => new Vector4(value.X.Clamp(min, max),
             value.Y.Clamp(min, max), value.Z.Clamp(min, max), value.W.Clamp(min, max));
 
-        public static int Interpolate(this double ratio, int min, int max) => (int) (min + (max - min) * ratio);
-        public static int Interpolate(this float ratio, int min, int max) => (int) (min + (max - min) * ratio);
-        public static float RatioInRange(this int value, int min, int max) => (value - min) / (float) (max - min);
+        public static int Interpolate(this double ratio, int min, int max) => (int)(min + (max - min) * ratio);
+        public static int Interpolate(this float ratio, int min, int max) => (int)(min + (max - min) * ratio);
+        public static float RatioInRange(this int value, int min, int max) => (value - min) / (float)(max - min);
 
         public static int RangeConvert(this int value, int minSrc, int maxSrc, int minDst, int maxDst)
         {

@@ -1,9 +1,9 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using ScePSPUtils;
-using System.Runtime.InteropServices;
+﻿using ScePSPUtils;
 using ScePSPUtils.Extensions;
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace ScePSP.Core.Memory
 {
@@ -86,7 +86,7 @@ namespace ScePSP.Core.Memory
         public void ZeroFillSegment(Segment Segment)
         {
             //Range<byte>(Segment.Low, (int)Segment.Size).Fill(0);
-            PointerUtils.Memset((byte*) PspAddressToPointerSafe(Segment.Low), 0, (int) Segment.Size);
+            PointerUtils.Memset((byte*)PspAddressToPointerSafe(Segment.Low), 0, (int)Segment.Size);
         }
 
         public static readonly Segment ScratchPadSegment = new Segment(ScratchPadOffset, ScratchPadSize);
@@ -131,22 +131,22 @@ namespace ScePSP.Core.Memory
 
         public PspPointer PointerToPspPointer(void* Pointer) => new PspPointer(PointerToPspAddressSafe(Pointer));
         public void* PspPointerToPointerSafe(PspPointer Pointer, int Size = 0) => PspAddressToPointerSafe(Pointer.Address, Size);
-        public virtual uint PointerToPspAddressSafe(void* Pointer) => PointerToPspAddressSafe((byte*) Pointer);
+        public virtual uint PointerToPspAddressSafe(void* Pointer) => PointerToPspAddressSafe((byte*)Pointer);
 
         public virtual uint PointerToPspAddressSafe(byte* Pointer)
         {
             if (Pointer == null) return 0;
             //if (Pointer == NullPtr) return 0;
             if (Pointer >= ScratchPadPtr && Pointer < ScratchPadPtr + ScratchPadSize)
-                return (uint) (ScratchPadOffset + (Pointer - ScratchPadPtr));
+                return (uint)(ScratchPadOffset + (Pointer - ScratchPadPtr));
             if (Pointer >= FrameBufferPtr && Pointer < FrameBufferPtr + FrameBufferSize)
-                return (uint) (FrameBufferOffset + (Pointer - FrameBufferPtr));
+                return (uint)(FrameBufferOffset + (Pointer - FrameBufferPtr));
             if (Pointer >= MainPtr && Pointer < MainPtr + MainSize)
-                return (uint) (MainOffset + (Pointer - MainPtr));
+                return (uint)(MainOffset + (Pointer - MainPtr));
             if (Pointer >= VectorsPtr && Pointer < VectorsPtr + VectorsSize)
-                return (uint) (VectorsOffset + (Pointer - VectorsPtr));
+                return (uint)(VectorsOffset + (Pointer - VectorsPtr));
             throw new InvalidAddressException(
-                $"Pointer 0x{(ulong) Pointer:X} doesn't belong to PSP Memory. Main: 0x{(ulong) MainPtr:X}-0x{(ulong) MainSize:X}");
+                $"Pointer 0x{(ulong)Pointer:X} doesn't belong to PSP Memory. Main: 0x{(ulong)MainPtr:X}-0x{(ulong)MainSize:X}");
         }
 
         public virtual void SetPCWriteAddress(uint Address, uint PC)
@@ -158,16 +158,16 @@ namespace ScePSP.Core.Memory
         public static bool IsRangeValid(uint Address, int Size)
         {
             if (!IsAddressValid(Address)) return false;
-            if (!IsAddressValid((uint) (Address + Size - 1))) return false;
+            if (!IsAddressValid((uint)(Address + Size - 1))) return false;
             return true;
         }
 
         public static void ValidateRange(uint Address, int Size)
         {
-            if (!IsAddressValid((uint) (Address + 0))) throw new InvalidAddressException(Address);
+            if (!IsAddressValid((uint)(Address + 0))) throw new InvalidAddressException(Address);
             if (Size > 1)
             {
-                if (!IsAddressValid((uint) (Address + Size - 1))) throw new InvalidAddressException(Address);
+                if (!IsAddressValid((uint)(Address + Size - 1))) throw new InvalidAddressException(Address);
             }
         }
 
@@ -257,15 +257,15 @@ namespace ScePSP.Core.Memory
             return Output;
         }
 
-        public virtual byte Read1(uint Address) => *(byte*) PspAddressToPointerNotNull(Address);
-        public virtual ushort Read2(uint Address) => *(ushort*) PspAddressToPointerNotNull(Address);
-        public virtual uint Read4(uint Address) => *(uint*) PspAddressToPointerNotNull(Address);
-        public virtual ulong Read8(uint Address) => *(ulong*) PspAddressToPointerNotNull(Address);
-        public virtual void Write1(uint Address, byte Value) => *(byte*) PspAddressToPointerNotNull(Address) = Value;
-        public virtual void Write2(uint Address, ushort Value) => *(ushort*) PspAddressToPointerNotNull(Address) = Value;
-        public virtual void Write4(uint Address, uint Value) => *(uint*) PspAddressToPointerNotNull(Address) = Value;
-        public virtual void Write8(uint Address, ulong Value) => *(ulong*) PspAddressToPointerNotNull(Address) = Value;
-        public void ReadBytes(uint Address, byte* DataOutPointer, int DataOutLength) => PointerUtils.Memcpy(DataOutPointer, (byte*) PspAddressToPointerSafe(Address, DataOutLength), DataOutLength);
+        public virtual byte Read1(uint Address) => *(byte*)PspAddressToPointerNotNull(Address);
+        public virtual ushort Read2(uint Address) => *(ushort*)PspAddressToPointerNotNull(Address);
+        public virtual uint Read4(uint Address) => *(uint*)PspAddressToPointerNotNull(Address);
+        public virtual ulong Read8(uint Address) => *(ulong*)PspAddressToPointerNotNull(Address);
+        public virtual void Write1(uint Address, byte Value) => *(byte*)PspAddressToPointerNotNull(Address) = Value;
+        public virtual void Write2(uint Address, ushort Value) => *(ushort*)PspAddressToPointerNotNull(Address) = Value;
+        public virtual void Write4(uint Address, uint Value) => *(uint*)PspAddressToPointerNotNull(Address) = Value;
+        public virtual void Write8(uint Address, ulong Value) => *(ulong*)PspAddressToPointerNotNull(Address) = Value;
+        public void ReadBytes(uint Address, byte* DataOutPointer, int DataOutLength) => PointerUtils.Memcpy(DataOutPointer, (byte*)PspAddressToPointerSafe(Address, DataOutLength), DataOutLength);
         public void Read<T>(uint Address, Span<T> DataOut) where T : unmanaged => Range<T>(Address, DataOut.Length).CopyTo(DataOut);
         public TType ReadStruct<TType>(uint Address) where TType : struct => StructUtils.BytesToStruct<TType>(ReadBytes(Address, PointerUtils.Sizeof<TType>()));
 
@@ -278,7 +278,7 @@ namespace ScePSP.Core.Memory
         {
             var Bytes = Encoding.UTF8.GetBytes($"{String}\0");
             WriteBytes(Address, Bytes);
-            return (uint) Bytes.Length;
+            return (uint)Bytes.Length;
         }
 
         public uint WriteStringz(uint Address, string[] Strings)

@@ -19,7 +19,7 @@ namespace ScePSP.Hle.Modules._unknownPrx
             int len = str1.Length;
             for (int n = 0; n < len; n++)
             {
-                int dif = (int) str1[n] - (int) str2[n];
+                int dif = (int)str1[n] - (int)str2[n];
                 if (dif != 0) return dif;
             }
             return 0;

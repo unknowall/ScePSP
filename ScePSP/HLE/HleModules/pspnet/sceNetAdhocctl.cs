@@ -1,6 +1,6 @@
-﻿using ScePSP.Hle.Managers;
+﻿using ScePSP.Hle.Interop;
+using ScePSP.Hle.Managers;
 using System;
-using ScePSP.Hle.Interop;
 
 namespace ScePSP.Hle.Modules.pspnet
 {
@@ -106,7 +106,7 @@ namespace ScePSP.Hle.Modules.pspnet
             {
                 Console.Error.WriteLine("_notifyAdhocctlHandler: {0:X8}: {1}: {2}, {3}", Handler.callback, @event,
                     Error, Handler.parameter);
-                HleInterop.ExecuteFunctionLater(Handler.callback, (uint) @event, (uint) Error, Handler.parameter);
+                HleInterop.ExecuteFunctionLater(Handler.callback, (uint)@event, (uint)Error, Handler.parameter);
             }
         }
 

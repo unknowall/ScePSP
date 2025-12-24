@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ScePSP.Core.Cpu;
 using ScePSP.Hle.Attributes;
-using ScePSP.Hle.Modules.modulemgr;
 using ScePSP.Hle.Managers;
-using ScePSP.Core.Cpu;
+using ScePSP.Hle.Modules.modulemgr;
+using System;
 
 namespace ScePSP.Hle.Modules.loadcore
 {

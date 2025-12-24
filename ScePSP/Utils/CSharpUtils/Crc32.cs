@@ -120,7 +120,7 @@ namespace ScePSPUtils.Ext
             var createTable = new uint[256];
             for (var i = 0; i < 256; i++)
             {
-                var entry = (uint) i;
+                var entry = (uint)i;
                 for (var j = 0; j < 8; j++)
                     if ((entry & 1) == 1)
                         entry = (entry >> 1) ^ polynomial;

@@ -91,7 +91,7 @@ namespace cscodec.h264.player
                 cacheRead[2] = ReadByte();
                 while (!(cacheRead[0] == 0x00 && cacheRead[1] == 0x00 && cacheRead[2] == 0x01) && hasMoreNAL)
                 {
-                    inbuf_int[dataPointer++] = (byte) cacheRead[0];
+                    inbuf_int[dataPointer++] = (byte)cacheRead[0];
                     cacheRead[0] = cacheRead[1];
                     cacheRead[1] = cacheRead[2];
                     cacheRead[2] = ReadByte();

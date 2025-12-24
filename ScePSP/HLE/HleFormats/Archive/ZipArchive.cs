@@ -1,9 +1,9 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Hle.Formats.Archive
 {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Drawing;
-using System.Runtime.InteropServices;
-
-namespace ScePSPUtils.Drawing.Extensions
+﻿namespace ScePSPUtils.Drawing.Extensions
 {
     /*
     /// <summary>

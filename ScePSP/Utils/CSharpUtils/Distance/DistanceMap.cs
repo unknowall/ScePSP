@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ScePSPUtils.Drawing.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
-using ScePSPUtils.Drawing.Extensions;
 
 namespace ScePSPUtils.Drawing.Distance
 {
@@ -26,7 +26,7 @@ namespace ScePSPUtils.Drawing.Distance
             {
                 for (var y = 0; y < height; y++)
                 {
-                    var ptr = (byte*) bitmapData.Scan0.ToPointer() + bitmapData.Stride * y;
+                    var ptr = (byte*)bitmapData.Scan0.ToPointer() + bitmapData.Stride * y;
                     ptr += 3;
                     for (var x = 0; x < width; x++)
                     {
@@ -82,8 +82,8 @@ namespace ScePSPUtils.Drawing.Distance
             var pass1 = Range(0, height - 1);
             var pass2 = Range(height - 1, 0);
 
-            foreach (var passIterator in new[] {pass1, pass2})
-                //foreach (var PassIterator in new[] { Pass1 })
+            foreach (var passIterator in new[] { pass1, pass2 })
+            //foreach (var PassIterator in new[] { Pass1 })
             {
                 for (var n = 0; n < row.Length; n++) row[n] = new DistanceEntry(1000, 1000);
 
@@ -180,13 +180,13 @@ namespace ScePSPUtils.Drawing.Distance
         public static void DrawGlow(Bitmap bitmap, DistanceEntry[,] distanceMap, float glowDistance,
             ArgbRev glowColor, Func<float, float> function = null)
         {
-            var transparentColor = (ArgbRev) "#00000000";
+            var transparentColor = (ArgbRev)"#00000000";
 
             if (function == null) function = v => v;
 
             bitmap.Shader((color, x, y) =>
             {
-                var dist = (float) distanceMap[x, y].Distance;
+                var dist = (float)distanceMap[x, y].Distance;
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (dist == 0f && color.A == 0xFF) return color;
                 if (dist > glowDistance) return new ArgbRev(0, 0, 0, 0);
@@ -210,10 +210,10 @@ namespace ScePSPUtils.Drawing.Distance
             {
                 for (var y = 0; y < height; y++)
                 {
-                    var ptr = (byte*) bitmapData.Scan0.ToPointer() + bitmapData.Stride * y;
+                    var ptr = (byte*)bitmapData.Scan0.ToPointer() + bitmapData.Stride * y;
                     for (var x = 0; x < width; x++)
                     {
-                        var distance = (byte) MathUtils.FastClamp((int) (distanceMap[x, y].Distance * 4), 0, 255);
+                        var distance = (byte)MathUtils.FastClamp((int)(distanceMap[x, y].Distance * 4), 0, 255);
                         *ptr++ = distance;
                         *ptr++ = distance;
                         *ptr++ = distance;

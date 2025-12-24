@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.IO;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Core
 {
@@ -29,7 +29,7 @@ namespace ScePSP.Core
             }
             catch (Exception)
             {
-                return ((byte) 0).Repeat(BytesPerPage);
+                return ((byte)0).Repeat(BytesPerPage);
             }
         }
 
@@ -71,7 +71,7 @@ namespace ScePSP.Core
                 return 0;
             }
 
-            var PageOffset = (int) (Position % BytesPerPage);
+            var PageOffset = (int)(Position % BytesPerPage);
             var ToRead = BytesPerPage - PageOffset;
 
             if (count > ToRead)
@@ -81,7 +81,7 @@ namespace ScePSP.Core
                 return Read1 + Read2;
             }
 
-            var PageIndex = (int) (Position / BytesPerPage);
+            var PageIndex = (int)(Position / BytesPerPage);
 
             if (PageIndex != LastPageIndex)
             {

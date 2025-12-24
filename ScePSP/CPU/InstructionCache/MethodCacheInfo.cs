@@ -1,6 +1,6 @@
-﻿using ScePSP.Core.Cpu.Dynarec;
-using SafeILGenerator.Ast.Nodes;
+﻿using SafeILGenerator.Ast.Nodes;
 using SafeILGenerator.Utils;
+using ScePSP.Core.Cpu.Dynarec;
 using System;
 
 namespace ScePSP.Core.Cpu.InstructionCache
@@ -69,7 +69,7 @@ namespace ScePSP.Core.Cpu.InstructionCache
         /// <summary>Ast for this function.</summary>
         public AstNodeStm AstTree => DynarecFunction?.AstNode;
 
-        
+
         public void CallDelegate(CpuThreadState cpuThreadState) => _functionDelegate(cpuThreadState);
 
         public void Free() => MethodCache.Free(this);

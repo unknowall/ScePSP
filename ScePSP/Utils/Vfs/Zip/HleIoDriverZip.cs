@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ScePSP.Hle.Formats.Archive;
+using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using ScePSPUtils.Extensions;
-using ScePSP.Hle.Formats.Archive;
 
 namespace ScePSP.Hle.Vfs.Zip
 {
@@ -40,14 +40,14 @@ namespace ScePSP.Hle.Vfs.Zip
 
         public unsafe int IoClose(HleIoDrvFileArg HleIoDrvFileArg)
         {
-            var FileArgument = (Stream) HleIoDrvFileArg.FileArgument;
+            var FileArgument = (Stream)HleIoDrvFileArg.FileArgument;
             FileArgument.Close();
             return 0;
         }
 
         public unsafe int IoRead(HleIoDrvFileArg HleIoDrvFileArg, byte* OutputPointer, int OutputLength)
         {
-            var FileArgument = (Stream) HleIoDrvFileArg.FileArgument;
+            var FileArgument = (Stream)HleIoDrvFileArg.FileArgument;
             return FileArgument.ReadToPointer(OutputPointer, OutputLength);
         }
 
@@ -58,8 +58,8 @@ namespace ScePSP.Hle.Vfs.Zip
 
         public unsafe long IoLseek(HleIoDrvFileArg HleIoDrvFileArg, long Offset, SeekAnchor Whence)
         {
-            var FileArgument = (Stream) HleIoDrvFileArg.FileArgument;
-            return FileArgument.Seek(Offset, (SeekOrigin) Whence);
+            var FileArgument = (Stream)HleIoDrvFileArg.FileArgument;
+            return FileArgument.Seek(Offset, (SeekOrigin)Whence);
         }
 
         public unsafe int IoIoctl(HleIoDrvFileArg HleIoDrvFileArg, uint Command, Span<byte> Input, Span<byte> Output)

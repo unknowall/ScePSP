@@ -1,6 +1,6 @@
-﻿using System;
-using ScePSP.Core.Cpu.Switch;
+﻿using ScePSP.Core.Cpu.Switch;
 using ScePSP.Core.Cpu.Table;
+using System;
 
 // ReSharper disable InconsistentNaming
 

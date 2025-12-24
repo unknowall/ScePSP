@@ -1,5 +1,4 @@
-﻿using System;
-namespace ScePSPPlatform.GL.Impl.Mac
+﻿namespace ScePSPPlatform.GL.Impl.Mac
 {
     public class NSOpenGLContext
     {

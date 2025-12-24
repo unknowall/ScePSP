@@ -1,20 +1,20 @@
-﻿using System;
-using System.Linq;
+﻿using ScePSP.Core.Memory;
 using ScePSP.Hle.Attributes;
-using ScePSPUtils;
-using ScePSP.Core.Memory;
-using System.Net.NetworkInformation;
-using ScePSP.Hle.Managers;
-using System.Threading;
-using System.Net.Sockets;
-using System.Net;
-using System.IO;
-using ScePSPUtils.Extensions;
 using ScePSP.Hle.Interop;
+using ScePSP.Hle.Managers;
+using ScePSPUtils;
+using ScePSPUtils.Extensions;
+using System;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Threading;
 
 namespace ScePSP.Hle.Modules.pspnet
 {
-    [HlePspModule(ModuleFlags = ModuleFlags.KernelMode | (ModuleFlags) 0x00010011)]
+    [HlePspModule(ModuleFlags = ModuleFlags.KernelMode | (ModuleFlags)0x00010011)]
     public unsafe class sceNetAdhocMatching : HleModuleHost
     {
         /// <summary>
@@ -191,11 +191,11 @@ namespace ScePSP.Hle.Modules.pspnet
             public void NotifyEvent(Event Event, MacAddress Mac, byte[] Data)
             {
                 var MacPartition = HleMemoryManager.GetPartition(MemoryPartitions.User).Allocate(8);
-                PointerUtils.Memcpy((byte*) MacPartition.LowPointer, new ArraySegment<byte>(Mac.GetAddressBytes()));
+                PointerUtils.Memcpy((byte*)MacPartition.LowPointer, new ArraySegment<byte>(Mac.GetAddressBytes()));
 
                 {
                     var DataPartition = HleMemoryManager.GetPartition(MemoryPartitions.User).Allocate(Data.Length);
-                    PointerUtils.Memcpy((byte*) DataPartition.LowPointer, new ArraySegment<byte>(Data));
+                    PointerUtils.Memcpy((byte*)DataPartition.LowPointer, new ArraySegment<byte>(Data));
 
                     Console.WriteLine(
                         "Executing callback. Matching.NotifyEvent: 0x{0:X8}, {1}, {2}, 0x{3:X8}, {4}, 0x{5:X8}",
@@ -204,7 +204,7 @@ namespace ScePSP.Hle.Modules.pspnet
                     HleInterop.ExecuteFunctionLater(
                         this.Callback,
                         this.GetUidIndex(InjectContext),
-                        (int) Event,
+                        (int)Event,
                         MacPartition.Low,
                         DataPartition.Size,
                         DataPartition.Size != 0 ? DataPartition.Low : 0
@@ -217,7 +217,7 @@ namespace ScePSP.Hle.Modules.pspnet
 
             public void Start()
             {
-                (this.MainThread = new ThreadEX(ThreadMain) {IsBackground = true}).Start();
+                (this.MainThread = new ThreadEX(ThreadMain) { IsBackground = true }).Start();
             }
 
             ThreadEX MainThread;
@@ -233,7 +233,8 @@ namespace ScePSP.Hle.Modules.pspnet
                         SendHello();
                         Thread.Sleep(HelloDelay / 1000);
                     }
-                }) {IsBackground = true}).Start();
+                })
+                { IsBackground = true }).Start();
                 (PingThread = new ThreadEX(() =>
                 {
                     while (true)
@@ -241,7 +242,8 @@ namespace ScePSP.Hle.Modules.pspnet
                         SendPing();
                         Thread.Sleep(PingDelay / 1000);
                     }
-                }) {IsBackground = true}).Start();
+                })
+                { IsBackground = true }).Start();
 
                 var Socket = new Socket(SocketType.Dgram, ProtocolType.Udp);
                 Socket.ExclusiveAddressUse = false;
@@ -675,7 +677,7 @@ namespace ScePSP.Hle.Modules.pspnet
         public static MacAddress GenerateRandom()
         {
             var MacAddress = new MacAddress();
-            *(uint*) MacAddress.Data = (uint) DateTime.UtcNow.GetTotalMicroseconds();
+            *(uint*)MacAddress.Data = (uint)DateTime.UtcNow.GetTotalMicroseconds();
             return MacAddress;
         }
 
@@ -685,7 +687,7 @@ namespace ScePSP.Hle.Modules.pspnet
             var PhysicalAddress = NetworkInterface.GetAllNetworkInterfaces()
                 .First(nic => nic.OperationalStatus == OperationalStatus.Up).GetPhysicalAddress();
             var Bytes = PhysicalAddress.GetAddressBytes();
-            for (int n = 0; n < 8; n++) MacAddress.Data[n] = n < Bytes.Length ? Bytes[n] : (byte) 0;
+            for (int n = 0; n < 8; n++) MacAddress.Data[n] = n < Bytes.Length ? Bytes[n] : (byte)0;
             return MacAddress;
         }
 

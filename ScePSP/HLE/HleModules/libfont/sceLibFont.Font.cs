@@ -76,8 +76,8 @@ namespace ScePSP.Hle.Modules.libfont
                 //(int)CharInfo.BitmapTop,
                 0,
                 0,
-                (int) CharInfo.BitmapWidth,
-                (int) CharInfo.BitmapHeight
+                (int)CharInfo.BitmapWidth,
+                (int)CharInfo.BitmapHeight
             );
         }
 
@@ -127,18 +127,18 @@ namespace ScePSP.Hle.Modules.libfont
                 if (X < 0 || Y < 0) return;
                 if (X >= Width || Y >= Height) return;
                 var Offset = GetOffset(X, Y);
-                var WriteAddress = (byte*) (Address + Offset);
+                var WriteAddress = (byte*)(Address + Offset);
 
                 //byte C = (byte)((Color.R + Color.G + Color.B) * 15 / 3 / 255);
-                byte C = (byte) (Color.R * 15 / 255);
+                byte C = (byte)(Color.R * 15 / 255);
 
                 switch (FontPixelFormat)
                 {
                     case sceLibFont.FontPixelFormat.PSP_FONT_PIXELFORMAT_4:
-                        *WriteAddress = (byte) ((*WriteAddress & 0xF0) | ((C & 0xF) << 0));
+                        *WriteAddress = (byte)((*WriteAddress & 0xF0) | ((C & 0xF) << 0));
                         break;
                     case sceLibFont.FontPixelFormat.PSP_FONT_PIXELFORMAT_4_REV:
-                        *WriteAddress = (byte) ((*WriteAddress & 0x0F) | ((C & 0xF) << 4));
+                        *WriteAddress = (byte)((*WriteAddress & 0x0F) | ((C & 0xF) << 4));
                         break;
                     case sceLibFont.FontPixelFormat.PSP_FONT_PIXELFORMAT_8:
                         *WriteAddress = Color.A;
@@ -184,7 +184,7 @@ namespace ScePSP.Hle.Modules.libfont
                 var BytesPerLine = GlyphImage.BytesPerLine;
                 var Position = GlyphImage.Position;
                 var GlyphBitmap = Face.GetBitmap();
-                var OutputBitmap = new FontBitmap((byte*) Buffer, PixelFormat, (int) BufferWidth, (int) BufferHeight,
+                var OutputBitmap = new FontBitmap((byte*)Buffer, PixelFormat, (int)BufferWidth, (int)BufferHeight,
                     BytesPerLine);
 
                 Console.WriteLine(
@@ -206,7 +206,7 @@ namespace ScePSP.Hle.Modules.libfont
                         {
                             //Console.WriteLine();
                             var Pixel = GlyphBitmap.GetPixel(x + ClipX, y + ClipY);
-                            OutputBitmap.SetPixel(x + (int) Position.X, y + (int) Position.Y, new OutputPixel(Pixel));
+                            OutputBitmap.SetPixel(x + (int)Position.X, y + (int)Position.Y, new OutputPixel(Pixel));
                             //Console.Write(Pixel.R > 0x7F ? "X" : ".");
                             //OutputBitmap.SetPixel(x, y, new OutputPixel(Color.Red));
                         }

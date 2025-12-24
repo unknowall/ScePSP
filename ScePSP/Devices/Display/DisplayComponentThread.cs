@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading;
+﻿using ScePSP.Core.Components.Display;
 using ScePSP.Hle.Managers;
-using ScePSPUtils;
-using ScePSP.Core.Components.Display;
 using ScePSP.Utils;
+using ScePSPUtils;
+using System;
+using System.Threading;
 
 namespace ScePSP.Runner.Components.Display
 {
@@ -21,11 +21,11 @@ namespace ScePSP.Runner.Components.Display
 
         protected override string ThreadName => "DisplayThread";
 
-        TimeSpan vSyncTimeIncrement = TimeSpan.FromSeconds(1.0 / (PspDisplay.HorizontalSyncHertz / (double) PspDisplay.VsyncRow));
+        TimeSpan vSyncTimeIncrement = TimeSpan.FromSeconds(1.0 / (PspDisplay.HorizontalSyncHertz / (double)PspDisplay.VsyncRow));
 
         //var VSyncTimeIncrement = TimeSpan.FromSeconds(1.0 / (PspDisplay.HorizontalSyncHertz / (double)(PspDisplay.VsyncRow / 2))); // HACK to give more time to render!
 
-        TimeSpan endTimeIncrement = TimeSpan.FromSeconds(1.0 / (PspDisplay.HorizontalSyncHertz / (double) PspDisplay.NumberOfRows));
+        TimeSpan endTimeIncrement = TimeSpan.FromSeconds(1.0 / (PspDisplay.HorizontalSyncHertz / (double)PspDisplay.NumberOfRows));
 
         HleInterruptHandler vBlankInterruptHandler;
 

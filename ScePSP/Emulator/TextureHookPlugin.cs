@@ -2,12 +2,12 @@
 using ScePSP.Core.Gpu.Impl.Opengl;
 using ScePSP.Core.Types;
 using ScePSP.Inject;
+using ScePSPUtils.Drawing;
+using ScePSPUtils.Drawing.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using ScePSPUtils.Drawing;
-using ScePSPUtils.Drawing.Extensions;
 
 namespace ScePSP.TextureHook
 {
@@ -36,7 +36,7 @@ namespace ScePSP.TextureHook
                 TexMap.Clear();
                 foreach (var Line in File.ReadAllLines(LinkedTextureMapFile))
                 {
-                    var Parts = Line.Split(new[] {" ", "\t"}, 2, StringSplitOptions.RemoveEmptyEntries);
+                    var Parts = Line.Split(new[] { " ", "\t" }, 2, StringSplitOptions.RemoveEmptyEntries);
                     if (Parts.Length > 0)
                     {
                         var CacheHash = Convert.ToUInt64(Parts[0], 16);

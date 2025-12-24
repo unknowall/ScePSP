@@ -771,14 +771,14 @@ namespace cscodec.h264.decoder
                 }
 
                 ff_h264_mlps_state[128 + 2 * i + 0] =
-                    ff_h264_mps_state[2 * i + 0] = (short) (2 * mps_state[i] + 0);
+                    ff_h264_mps_state[2 * i + 0] = (short)(2 * mps_state[i] + 0);
                 ff_h264_mlps_state[128 + 2 * i + 1] =
-                    ff_h264_mps_state[2 * i + 1] = (short) (2 * mps_state[i] + 1);
+                    ff_h264_mps_state[2 * i + 1] = (short)(2 * mps_state[i] + 1);
 
                 if (i != 0)
                 {
-                    ff_h264_mlps_state[128 - 2 * i - 1] = (short) (2 * lps_state[i] + 0);
-                    ff_h264_mlps_state[128 - 2 * i - 2] = (short) (2 * lps_state[i] + 1);
+                    ff_h264_mlps_state[128 - 2 * i - 1] = (short)(2 * lps_state[i] + 0);
+                    ff_h264_mlps_state[128 - 2 * i - 2] = (short)(2 * lps_state[i] + 1);
                 }
                 else
                 {
@@ -835,7 +835,7 @@ namespace cscodec.h264.decoder
         {
             // DebugTool.printDebugString("renorm_cabac_decoder_once(1): low="+low+", range="+range+"\n");
 
-            int shift = (int) ((uint) (range - 0x00000100) >> 31);
+            int shift = (int)((uint)(range - 0x00000100) >> 31);
             range <<= shift;
             low <<= shift;
 
@@ -964,12 +964,12 @@ namespace cscodec.h264.decoder
 
         public int decode_cabac_field_decoding_flag(H264Context h)
         {
-            int mbb_xy = (int) (h.mb_xy - 2L * h.s.mb_stride);
+            int mbb_xy = (int)(h.mb_xy - 2L * h.s.mb_stride);
             int ctx = 0;
 
             ctx += h.mb_field_decoding_flag &
                    h.s.mb_x; //for FMO:(s.current_picture.mb_type[mba_xy]>>7)&(this.slice_table_base[this.slice_table_offset + mba_xy] == this.slice_num);
-            ctx += (int) ((h.s.current_picture.mb_type_base[h.s.current_picture.mb_type_offset + mbb_xy] >> 7) &
+            ctx += (int)((h.s.current_picture.mb_type_base[h.s.current_picture.mb_type_offset + mbb_xy] >> 7) &
                           (h.slice_table_base[h.slice_table_offset + mbb_xy] == h.slice_num ? 1 : 0));
 
             return this.get_cabac_noinline(h.cabac_state, 70 + ctx); // &(this.cabac_state+70)[ctx] );

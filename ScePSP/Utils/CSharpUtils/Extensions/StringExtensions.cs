@@ -1,9 +1,9 @@
-﻿using System;
+﻿using ScePSPUtils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using ScePSPUtils;
 
 public static class StringExtensions
 {
@@ -84,7 +84,7 @@ public static class StringExtensions
 
     public static byte[] GetStringzBytes(this string String, Encoding Encoding)
     {
-        return String.GetBytes(Encoding).Concat(new byte[] {0}).ToArray();
+        return String.GetBytes(Encoding).Concat(new byte[] { 0 }).ToArray();
     }
 
     public static byte[] GetBytes(this string This)
@@ -139,7 +139,7 @@ public static class StringExtensions
 
     public static long ConvertToLong(object Value)
     {
-        if (Value is int) return (uint) Convert.ToInt32(Value);
+        if (Value is int) return (uint)Convert.ToInt32(Value);
         if (Value is uint) return Convert.ToUInt32(Value);
         try
         {
@@ -149,7 +149,7 @@ public static class StringExtensions
         {
             try
             {
-                return (long) Convert.ToUInt64(Value);
+                return (long)Convert.ToUInt64(Value);
             }
             catch
             {

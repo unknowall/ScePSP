@@ -1,9 +1,8 @@
-using System;
-using ScePSPUtils;
 using ScePSP.Core.Cpu;
 using ScePSP.Core.Cpu.Emitter;
 using ScePSP.Core.Cpu.Table;
-using SafeILGenerator.Ast.Nodes;
+using ScePSPUtils;
+using System;
 
 namespace ScePSP.CPU.Interpreter
 {
@@ -96,13 +95,13 @@ namespace ScePSP.CPU.Interpreter
         public void Rotr() => AdvancePC().SetRD(CpuEmitterUtils._rotr_impl(RT_u, Pos));
 
         [InstructionName(InstructionNames.Sllv)]
-        public void Sllv() => AdvancePC().SetRD(RT_u << (int) (RS_u & 31));
+        public void Sllv() => AdvancePC().SetRD(RT_u << (int)(RS_u & 31));
 
         [InstructionName(InstructionNames.Srav)]
-        public void Srav() => AdvancePC().SetRD(RT >> (int) (RS_u & 31));
+        public void Srav() => AdvancePC().SetRD(RT >> (int)(RS_u & 31));
 
         [InstructionName(InstructionNames.Srlv)]
-        public void Srlv() => AdvancePC().SetRD(RT_u >> (int) (RS_u & 31));
+        public void Srlv() => AdvancePC().SetRD(RT_u >> (int)(RS_u & 31));
 
         [InstructionName(InstructionNames.Rotrv)]
         public void Rotrv() => AdvancePC().SetRD(CpuEmitterUtils._rotr_impl(RT_u, RS));
@@ -132,10 +131,10 @@ namespace ScePSP.CPU.Interpreter
         // Sign Extend Byte/Half word.
         /////////////////////////////////////////////////////////////////////////////////////////////////
         [InstructionName(InstructionNames.Seb)]
-        public void Seb() => AdvancePC().SetRD((sbyte) RT);
+        public void Seb() => AdvancePC().SetRD((sbyte)RT);
 
         [InstructionName(InstructionNames.Seh)]
-        public void Seh() => AdvancePC().SetRD((short) RT);
+        public void Seh() => AdvancePC().SetRD((short)RT);
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // BIT REVerse.
@@ -230,14 +229,14 @@ namespace ScePSP.CPU.Interpreter
         public void Ext()
         {
             AdvancePC();
-            SetRT(CpuEmitterUtils._ext_impl(RS_u, (int) i.Pos, (int) i.SizeE));
+            SetRT(CpuEmitterUtils._ext_impl(RS_u, (int)i.Pos, (int)i.SizeE));
         }
 
         [InstructionName(InstructionNames.Ins)]
         public void Ins()
         {
             AdvancePC();
-            SetRT(CpuEmitterUtils._ins_impl(RT_u, RS_u, (int) i.Pos, (int) i.SizeI));
+            SetRT(CpuEmitterUtils._ins_impl(RT_u, RS_u, (int)i.Pos, (int)i.SizeI));
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -284,16 +283,16 @@ namespace ScePSP.CPU.Interpreter
         // Load Byte/Half word/Word (Left/Right/Unsigned).
         /////////////////////////////////////////////////////////////////////////////////////////////////
         [InstructionName(InstructionNames.Lb)]
-        public void Lb() => AdvancePC().SetRT((sbyte) state.Memory.Read1(RS_Imm));
+        public void Lb() => AdvancePC().SetRT((sbyte)state.Memory.Read1(RS_Imm));
 
         [InstructionName(InstructionNames.Lbu)]
-        public void Lbu() => AdvancePC().SetRT((byte) state.Memory.Read1(RS_Imm));
+        public void Lbu() => AdvancePC().SetRT((byte)state.Memory.Read1(RS_Imm));
 
         [InstructionName(InstructionNames.Lh)]
-        public void Lh() => AdvancePC().SetRT((short) state.Memory.Read2(RS_Imm));
+        public void Lh() => AdvancePC().SetRT((short)state.Memory.Read2(RS_Imm));
 
         [InstructionName(InstructionNames.Lhu)]
-        public void Lhu() => AdvancePC().SetRT((ushort) state.Memory.Read2(RS_Imm));
+        public void Lhu() => AdvancePC().SetRT((ushort)state.Memory.Read2(RS_Imm));
 
         [InstructionName(InstructionNames.Lw)]
         public void Lw() => AdvancePC().SetRT(state.Memory.Read4(RS_Imm));
@@ -302,13 +301,13 @@ namespace ScePSP.CPU.Interpreter
         // Store Byte/Half word/Word (Left/Right).
         /////////////////////////////////////////////////////////////////////////////////////////////////
         [InstructionName(InstructionNames.Sb)]
-        public void Sb() => AdvancePC().state.Memory.Write1(RS_Imm, (byte) RT_u);
+        public void Sb() => AdvancePC().state.Memory.Write1(RS_Imm, (byte)RT_u);
 
         [InstructionName(InstructionNames.Sh)]
-        public void Sh() => AdvancePC().state.Memory.Write2(RS_Imm, (ushort) RT_u);
+        public void Sh() => AdvancePC().state.Memory.Write2(RS_Imm, (ushort)RT_u);
 
         [InstructionName(InstructionNames.Sw)]
-        public void Sw() => AdvancePC().state.Memory.Write4(RS_Imm, (ushort) RT_u);
+        public void Sw() => AdvancePC().state.Memory.Write4(RS_Imm, (ushort)RT_u);
 
         [InstructionName(InstructionNames.Lwl)]
         public void Lwl() => AdvancePC().SetRT(CpuEmitterUtils._lwl_exec(state, RS_u, IMM_s, RT_u));
@@ -359,7 +358,7 @@ namespace ScePSP.CPU.Interpreter
             else
             {
                 AdvancePC();
-                state.Syscall((int) i.Code);
+                state.Syscall((int)i.Code);
             }
         }
 
@@ -492,7 +491,7 @@ namespace ScePSP.CPU.Interpreter
         [InstructionName(InstructionNames.Jalr)]
         public void Jalr() => Jump(RS_u, link: true);
 
-                /////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////
         // Binary Floating Point Unit Operations
         /////////////////////////////////////////////////////////////////////////////////////////////////
         [InstructionName(InstructionNames.AddS)]
@@ -597,14 +596,14 @@ namespace ScePSP.CPU.Interpreter
 
             if (float.IsNaN(s) || float.IsNaN(t))
             {
-            	state.Fcr31.Cc = fcUnordererd;
+                state.Fcr31.Cc = fcUnordererd;
             }
             else
             {
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 var equal = (fcEqual) && (s == t);
-            	var less = (fcLess) && (s < t);
-            	state.Fcr31.Cc = (less || equal);
+                var less = (fcLess) && (s < t);
+                state.Fcr31.Cc = (less || equal);
             }
 
             AdvancePC();
@@ -680,7 +679,7 @@ namespace ScePSP.CPU.Interpreter
 
         [InstructionName(InstructionNames.CNgtS)]
         public void c_ngt_s() => _comp(7, 1);
-        
+
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // bc1(f/t)(l): Branch on C1 (False/True) (Likely)
         /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -770,34 +769,34 @@ namespace ScePSP.CPU.Interpreter
         private int RS_s => Gpr[Rs];
         private int RT_s => Gpr[Rt];
 
-        private uint RS_Imm => (uint) (RS_u + i.Imm);
+        private uint RS_Imm => (uint)(RS_u + i.Imm);
 
-        private long RD_l => (long) Gpr[Rd];
-        private long RS_l => (long) Gpr[Rs];
-        private long RT_l => (long) Gpr[Rt];
+        private long RD_l => (long)Gpr[Rd];
+        private long RS_l => (long)Gpr[Rs];
+        private long RT_l => (long)Gpr[Rt];
 
-        private ulong RD_ul => (ulong) Gpr[Rd];
-        private ulong RS_ul => (ulong) Gpr[Rs];
-        private ulong RT_ul => (ulong) Gpr[Rt];
+        private ulong RD_ul => (ulong)Gpr[Rd];
+        private ulong RS_ul => (ulong)Gpr[Rs];
+        private ulong RT_ul => (ulong)Gpr[Rt];
 
-        private uint RD_u => (uint) Gpr[Rd];
-        private uint RS_u => (uint) Gpr[Rs];
-        private uint RT_u => (uint) Gpr[Rt];
+        private uint RD_u => (uint)Gpr[Rd];
+        private uint RS_u => (uint)Gpr[Rs];
+        private uint RT_u => (uint)Gpr[Rt];
 
         private long HI_LO_s => state.HiLo;
-        private ulong HI_LO_u => (ulong) state.HiLo;
+        private ulong HI_LO_u => (ulong)state.HiLo;
 
-        private uint Pos_u => (uint) i.Pos;
-        private int Pos => (int) i.Pos;
+        private uint Pos_u => (uint)i.Pos;
+        private int Pos => (int)i.Pos;
 
         private int IMM_s => i.Imm;
         private uint IMM_u => i.Immu;
-        private uint IMM_uex => (uint) i.Imm;
+        private uint IMM_uex => (uint)i.Imm;
 
         private CpuInterpreter AdvancePC(int incr = +4)
         {
             state.Pc = state.nPC;
-            state.nPC += (uint) incr;
+            state.nPC += (uint)incr;
             return this;
         }
 
@@ -826,7 +825,7 @@ namespace ScePSP.CPU.Interpreter
             return this;
         }
 
-        private CpuInterpreter SetHiLo(ulong value) => SetHiLo((long) value);
+        private CpuInterpreter SetHiLo(ulong value) => SetHiLo((long)value);
 
         private CpuInterpreter SetRD(bool value) => SetRD(value ? 1 : 0);
         private CpuInterpreter SetRT(bool value) => SetRT(value ? 1 : 0);
@@ -834,9 +833,9 @@ namespace ScePSP.CPU.Interpreter
         private CpuInterpreter SetRD(int value) => SetGpr(Rd, value);
         private CpuInterpreter SetRT(int value) => SetGpr(Rt, value);
 
-        private CpuInterpreter SetRD(uint value) => SetGpr(Rd, (int) value);
-        private CpuInterpreter SetRT(uint value) => SetGpr(Rt, (int) value);
-        
+        private CpuInterpreter SetRD(uint value) => SetGpr(Rd, (int)value);
+        private CpuInterpreter SetRT(uint value) => SetGpr(Rt, (int)value);
+
         private CpuInterpreter SetFD(float value) => SetFpr(Fd, value);
         private CpuInterpreter SetFD_I(int value) => SetFpr_I(Fd, value);
 

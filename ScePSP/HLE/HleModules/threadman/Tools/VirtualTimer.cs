@@ -1,11 +1,11 @@
-﻿using ScePSPUtils;
+﻿using ScePSP.Core.Components.Rtc;
 using ScePSP.Core.Cpu;
 using ScePSP.Core.Memory;
-using ScePSP.Hle.Managers;
-using System;
-using ScePSPUtils.Extensions;
-using ScePSP.Core.Components.Rtc;
 using ScePSP.Hle.Interop;
+using ScePSP.Hle.Managers;
+using ScePSPUtils;
+using ScePSPUtils.Extensions;
+using System;
 
 namespace ScePSP.Hle.Modules.threadman
 {
@@ -57,7 +57,7 @@ namespace ScePSP.Hle.Modules.threadman
                 Name: "VTimer.PspSharedInfoStruct"
             );
             this.PspSharedInfo =
-                (PspSharedInfoStruct*) CpuProcessor.Memory.PspAddressToPointerSafe(
+                (PspSharedInfoStruct*)CpuProcessor.Memory.PspAddressToPointerSafe(
                     this.PspSharedInfoMemoryPartition.Low);
         }
 

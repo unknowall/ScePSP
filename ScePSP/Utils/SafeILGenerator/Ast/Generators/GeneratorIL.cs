@@ -2,8 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Reflection;
+using System.Reflection.Emit;
 
 namespace SafeILGenerator.Ast.Generators
 {
@@ -98,7 +98,7 @@ namespace SafeILGenerator.Ast.Generators
             Reset();
             Init(dynamicMethod, ilGenerator);
             Generate(astNode);
-            return (TDelegate) (object) dynamicMethod.CreateDelegate(typeof(TDelegate));
+            return (TDelegate)(object)dynamicMethod.CreateDelegate(typeof(TDelegate));
         }
 
         protected void EmitHook(OpCode opCode, object param)
@@ -242,7 +242,7 @@ namespace SafeILGenerator.Ast.Generators
                 || itemType == typeof(bool)
             )
             {
-                var value = (int) Convert.ToInt64(itemValue);
+                var value = (int)Convert.ToInt64(itemValue);
                 switch (value)
                 {
                     case -1:
@@ -292,19 +292,19 @@ namespace SafeILGenerator.Ast.Generators
 #else
                 if (Environment.Is64BitProcess)
                 {
-                    Emit(OpCodes.Ldc_I8, ((IntPtr) item.Value).ToInt64());
+                    Emit(OpCodes.Ldc_I8, ((IntPtr)item.Value).ToInt64());
                     Emit(OpCodes.Conv_I);
                 }
                 else
                 {
-                    Emit(OpCodes.Ldc_I4, ((IntPtr) item.Value).ToInt32());
+                    Emit(OpCodes.Ldc_I4, ((IntPtr)item.Value).ToInt32());
                     Emit(OpCodes.Conv_I);
                 }
 #endif
             }
             else if (itemType == typeof(float))
             {
-                Emit(OpCodes.Ldc_R4, (float) item.Value);
+                Emit(OpCodes.Ldc_R4, (float)item.Value);
             }
             else if (item.Value == null)
             {
@@ -312,12 +312,12 @@ namespace SafeILGenerator.Ast.Generators
             }
             else if (itemType == typeof(string))
             {
-                Emit(OpCodes.Ldstr, (string) item.Value);
+                Emit(OpCodes.Ldstr, (string)item.Value);
             }
             else if (itemType == typeof(Type))
             {
-                Emit(OpCodes.Ldtoken, (Type) item.Value);
-                Emit(OpCodes.Call, ((Func<RuntimeTypeHandle, Type>) Type.GetTypeFromHandle).Method);
+                Emit(OpCodes.Ldtoken, (Type)item.Value);
+                Emit(OpCodes.Call, ((Func<RuntimeTypeHandle, Type>)Type.GetTypeFromHandle).Method);
                 //IL_0005: call class [mscorlib]System.Type [mscorlib]System.Type::GetTypeFromHandle(valuetype [mscorlib]System.RuntimeTypeHandle)
             }
             else
@@ -654,7 +654,7 @@ namespace SafeILGenerator.Ast.Generators
 
         protected virtual void _Generate(AstNodeExprCallDelegate call)
         {
-            _Generate((AstNodeExprCallInstance) call);
+            _Generate((AstNodeExprCallInstance)call);
         }
 
         protected virtual void _Generate(AstNodeExprCallInstance call)

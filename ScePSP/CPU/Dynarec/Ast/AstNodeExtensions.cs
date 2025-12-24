@@ -1,7 +1,7 @@
-﻿using System;
+﻿using SafeILGenerator.Ast.Nodes;
+using System;
 using System.Reflection;
 using System.Reflection.Emit;
-using SafeILGenerator.Ast.Nodes;
 
 namespace ScePSP.Core.Cpu.Dynarec.Ast
 {

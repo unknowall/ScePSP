@@ -138,7 +138,7 @@ namespace ScePSPUtils
         {
             var origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
             var diff = date - origin;
-            return (long) Math.Floor(diff.TotalSeconds);
+            return (long)Math.Floor(diff.TotalSeconds);
         }
 
         /// <summary>
@@ -217,8 +217,8 @@ namespace ScePSPUtils
         /// <returns></returns>
         public override bool Equals(object that)
         {
-            if (that is DateTimeRange) return this == (DateTimeRange) that;
-            if (that is DateTime) return Contains((DateTime) that);
+            if (that is DateTimeRange) return this == (DateTimeRange)that;
+            if (that is DateTime) return Contains((DateTime)that);
             return false;
         }
 

@@ -52,12 +52,12 @@ public unsafe class ManagedPointer<T>
     {
         get
         {
-            CheckBounds((int) Index);
+            CheckBounds((int)Index);
             return Container[Offset + Index];
         }
         set
         {
-            CheckBounds((int) Index);
+            CheckBounds((int)Index);
             Container[Offset + Index] = value;
         }
     }

@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using CountType = System.Int32;
 
 namespace ScePSPUtils.Containers.RedBlackTree
 {
@@ -653,9 +652,9 @@ namespace ScePSPUtils.Containers.RedBlackTree
         public Expression Expression { get { return All.Expression; } }
         public IQueryProvider Provider { get { return All.Provider; } }
         */
-        
+
         ///////////////////////////////
-        
+
         static void DebugAssert(bool assertion)
         {
             if (!assertion) throw new InvalidOperationException();
@@ -1211,9 +1210,9 @@ namespace ScePSPUtils.Containers.RedBlackTree
                 return that;
             }
         }
-        
+
         ////////////////////////////////
-        
+
         /// <summary>
         /// 
         /// </summary>

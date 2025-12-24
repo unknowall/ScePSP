@@ -1,5 +1,5 @@
-﻿using System;
-using ScePSPUtils.Extensions;
+﻿using ScePSPUtils.Extensions;
+using System;
 
 namespace ScePSP.Core.Components.Rtc
 {

@@ -1,12 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Runtime.InteropServices;
-using ScePSP.Utils;
+﻿using ScePSP.Utils;
+using System;
 using static SDL2.SDL;
 
 namespace ScePSP.Core.Audio.Impl.SDL
 {
-    public unsafe class SDLAudioImpl : PspAudioImpl
+    public unsafe class SDLAudioImpl : AudioImpl
     {
         private static uint audiodeviceid;
         private SDL_AudioCallback audioCallbackDelegate;

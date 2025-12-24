@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ScePSP.Core.Types.Controller;
 using ScePSPUtils;
-using ScePSP.Core.Types;
-using ScePSP.Core.Types.Controller;
+using System;
+using System.Collections.Generic;
 
 namespace ScePSP.Core.Components.Controller
 {

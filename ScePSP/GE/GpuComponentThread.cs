@@ -1,7 +1,6 @@
-﻿using System.Threading;
-using ScePSP.Core.Gpu;
-using System;
+﻿using ScePSP.Core.Gpu;
 using ScePSP.Utils;
+using System.Threading;
 
 namespace ScePSP.Runner.Components.Gpu
 {
@@ -24,7 +23,7 @@ namespace ScePSP.Runner.Components.Gpu
             {
                 while (true)
                 {
-                    WaitHandle.WaitAny(new WaitHandle[] {GpuProcessor.DisplayListQueueUpdated, ThreadTaskQueue.EnqueuedEvent, RunningUpdatedEvent}, 200.Milliseconds());
+                    WaitHandle.WaitAny(new WaitHandle[] { GpuProcessor.DisplayListQueueUpdated, ThreadTaskQueue.EnqueuedEvent, RunningUpdatedEvent }, 200.Milliseconds());
 
                     // TODO: Should wait until the Form has created its context.
 

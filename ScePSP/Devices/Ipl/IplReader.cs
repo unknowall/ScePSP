@@ -1,10 +1,10 @@
-﻿using System;
+﻿using ScePSPUtils;
+using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using ScePSPUtils;
-using ScePSPUtils.Extensions;
 using Kirk = ScePSP.Core.Components.Crypto.Kirk;
 
 namespace ScePSP.Core.Components.Ipl
@@ -94,12 +94,12 @@ namespace ScePSP.Core.Components.Ipl
                 {
                     var ptr = iplPtr + n;
 
-                    var header = *(Kirk.Aes128CmacHeader*) ptr;
+                    var header = *(Kirk.Aes128CmacHeader*)ptr;
                     //Console.WriteLine(Header.DataSize);
                     var kirk = new Kirk();
                     kirk.kirk_init();
                     kirk.kirk_CMD1(bufferPtr, ptr, 0x1000, doCheck: false);
-                    var iplBlock = *(IplBlock*) bufferPtr;
+                    var iplBlock = *(IplBlock*)bufferPtr;
                     //Console.WriteLine(IplBlock.ToStringDefault());
                     if (toMemoryAddress)
                     {
@@ -107,7 +107,7 @@ namespace ScePSP.Core.Components.Ipl
                         Console.WriteLine("IplBlock.LoadAddress: 0x{0:X8}", iplBlock.LoadAddress);
                     }
                     outputStream.WriteBytes(PointerUtils.PointerToByteArray(&iplBlock.BlockData,
-                        (int) iplBlock.BlockSize));
+                        (int)iplBlock.BlockSize));
                     if (iplBlock.EntryFunction != 0)
                     {
                         iplInfo.EntryFunction = iplBlock.EntryFunction;

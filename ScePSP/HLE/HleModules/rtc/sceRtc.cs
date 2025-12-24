@@ -1,10 +1,10 @@
-﻿using System;
-using System.Globalization;
+﻿using ScePSP.Core.Components.Rtc;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Vfs;
 using ScePSPUtils;
 using ScePSPUtils.Extensions;
-using ScePSP.Core.Components.Rtc;
+using System;
+using System.Globalization;
 
 namespace ScePSP.Hle.Modules.rtc
 {
@@ -21,7 +21,7 @@ namespace ScePSP.Hle.Modules.rtc
         //[HlePspNotImplemented]
         public uint sceRtcGetTickResolution()
         {
-            return (uint) TimeSpan.FromSeconds(1).GetTotalMicroseconds();
+            return (uint)TimeSpan.FromSeconds(1).GetTotalMicroseconds();
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace ScePSP.Hle.Modules.rtc
         [HlePspNotImplemented]
         public int sceRtcGetTime_t(ref ScePspDateTime DateTime, out uint UnixTime)
         {
-            UnixTime = (uint) DateTime.ToUnixTimestamp();
+            UnixTime = (uint)DateTime.ToUnixTimestamp();
             return 0;
         }
 
@@ -78,7 +78,7 @@ namespace ScePSP.Hle.Modules.rtc
         [HlePspFunction(NID = 0x57726BC1, FirmwareVersion = 150)]
         public PspDaysOfWeek sceRtcGetDayOfWeek(int Year, int Month, int Day)
         {
-            var MonthTranslate = new int[] {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
+            var MonthTranslate = new int[] { 0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4 };
             if (Month == 0)
             {
                 Month = 8;
@@ -96,7 +96,7 @@ namespace ScePSP.Hle.Modules.rtc
             int MonthMod = (Month - 1) % 12;
             if (MonthMod < 0) MonthMod += 12;
             Year -= Month < 3 ? 1 : 0;
-            return (PspDaysOfWeek) ((Year + Year / 4 - Year / 100 + Year / 400 + MonthTranslate[MonthMod] + Day) % 7);
+            return (PspDaysOfWeek)((Year + Year / 4 - Year / 100 + Year / 400 + MonthTranslate[MonthMod] + Day) % 7);
         }
 
         private static int _sceRtcTickAddTimeSpan(long* dstPtr, long* srcPtr, TimeSpan TimeSpan)
@@ -241,7 +241,7 @@ namespace ScePSP.Hle.Modules.rtc
         {
             try
             {
-                Tick = (ulong) Date.ToDateTime().GetTotalMicroseconds();
+                Tick = (ulong)Date.ToDateTime().GetTotalMicroseconds();
                 return 0;
             }
             catch (Exception)
@@ -267,7 +267,7 @@ namespace ScePSP.Hle.Modules.rtc
         {
             try
             {
-                *Date = ScePspDateTime.FromDateTime(new DateTime((long) (*Ticks * 10)));
+                *Date = ScePspDateTime.FromDateTime(new DateTime((long)(*Ticks * 10)));
                 return 0;
             }
             catch (Exception Exception)
@@ -294,13 +294,13 @@ namespace ScePSP.Hle.Modules.rtc
 
             Time = new ScePspDateTime()
             {
-                Year = (ushort) CurrentDateTime.Year,
-                Month = (ushort) CurrentDateTime.Month,
-                Day = (ushort) CurrentDateTime.Day,
-                Hour = (ushort) CurrentDateTime.Hour,
-                Minute = (ushort) CurrentDateTime.Minute,
-                Second = (ushort) CurrentDateTime.Second,
-                Microsecond = (uint) (CurrentDateTime.Millisecond * 1000),
+                Year = (ushort)CurrentDateTime.Year,
+                Month = (ushort)CurrentDateTime.Month,
+                Day = (ushort)CurrentDateTime.Day,
+                Hour = (ushort)CurrentDateTime.Hour,
+                Minute = (ushort)CurrentDateTime.Minute,
+                Second = (ushort)CurrentDateTime.Second,
+                Microsecond = (uint)(CurrentDateTime.Millisecond * 1000),
             };
 
             return 0;
@@ -358,13 +358,13 @@ namespace ScePSP.Hle.Modules.rtc
 
             DateTime = new ScePspDateTime()
             {
-                Year = (ushort) CurrentDateTime.Year,
-                Month = (ushort) CurrentDateTime.Month,
-                Day = (ushort) CurrentDateTime.Day,
-                Hour = (ushort) CurrentDateTime.Hour,
-                Minute = (ushort) CurrentDateTime.Minute,
-                Second = (ushort) CurrentDateTime.Second,
-                Microsecond = (uint) (CurrentDateTime.GetTotalMicroseconds() % 1000000L),
+                Year = (ushort)CurrentDateTime.Year,
+                Month = (ushort)CurrentDateTime.Month,
+                Day = (ushort)CurrentDateTime.Day,
+                Hour = (ushort)CurrentDateTime.Hour,
+                Minute = (ushort)CurrentDateTime.Minute,
+                Second = (ushort)CurrentDateTime.Second,
+                Microsecond = (uint)(CurrentDateTime.GetTotalMicroseconds() % 1000000L),
             };
 
             return 0;

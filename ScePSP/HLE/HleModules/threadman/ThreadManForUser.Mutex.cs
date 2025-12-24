@@ -1,9 +1,9 @@
 ﻿#define MUTEX_USE_WAIT_CALLBACK
 
+using ScePSP.Core.Cpu;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ScePSP.Core.Cpu;
 
 namespace ScePSP.Hle.Modules.threadman
 {

@@ -1,6 +1,6 @@
-﻿using System.IO;
-using ScePSPUtils.Endian;
+﻿using ScePSPUtils.Endian;
 using ScePSPUtils.Extensions;
+using System.IO;
 
 namespace ScePSP.Hle.Formats.video
 {
@@ -79,7 +79,7 @@ namespace ScePSP.Hle.Formats.video
 
         public Chunk ReadChunk(Stream Stream)
         {
-            var ChunkSize = (uint) Stream.ReadStruct<UintBe>();
+            var ChunkSize = (uint)Stream.ReadStruct<UintBe>();
             //var ChunkType = (ushort)Stream.ReadStruct<ushort_be>();
             var ChunkStream = Stream.ReadStream(ChunkSize);
             return new Chunk()

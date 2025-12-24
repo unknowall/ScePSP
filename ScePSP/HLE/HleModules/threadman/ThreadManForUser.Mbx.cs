@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ScePSP.Core.Memory;
+using ScePSPUtils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using ScePSPUtils;
-using ScePSP.Core.Memory;
 
 namespace ScePSP.Hle.Modules.threadman
 {
@@ -200,7 +200,7 @@ namespace ScePSP.Hle.Modules.threadman
 
             if (TimedOut)
             {
-                return (int) SceKernelErrors.ERROR_KERNEL_WAIT_TIMEOUT;
+                return (int)SceKernelErrors.ERROR_KERNEL_WAIT_TIMEOUT;
             }
             else
             {

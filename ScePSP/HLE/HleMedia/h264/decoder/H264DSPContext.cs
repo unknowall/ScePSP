@@ -10,7 +10,7 @@ namespace cscodec.h264.decoder
         static H264DSPContext()
         {
             int i;
-            for (i = 0; i < 256; i++) ff_cropTbl[i + MAX_NEG_CROP] = (byte) i;
+            for (i = 0; i < 256; i++) ff_cropTbl[i + MAX_NEG_CROP] = (byte)i;
             for (i = 0; i < MAX_NEG_CROP; i++)
             {
                 ff_cropTbl[i] = 0;
@@ -238,8 +238,8 @@ namespace cscodec.h264.decoder
 
         private static byte av_clip_uint8(int a)
         {
-            if ((a & ~0xFF) != 0) return (byte) (-a >> 31);
-            else return (byte) a;
+            if ((a & ~0xFF) != 0) return (byte)(-a >> 31);
+            else return (byte)a;
         }
 
         /* loop filter */
@@ -277,14 +277,14 @@ namespace cscodec.h264.decoder
                         {
                             if (tc0[i] != 0)
                                 pix[pix_offset - 2 * xstride] =
-                                    (byte) (p1 + av_clip(((p2 + ((p0 + q0 + 1) >> 1)) >> 1) - p1, -tc0[i], tc0[i]));
+                                    (byte)(p1 + av_clip(((p2 + ((p0 + q0 + 1) >> 1)) >> 1) - p1, -tc0[i], tc0[i]));
                             tc++;
                         }
                         if (Math.Abs(q2 - q0) < beta)
                         {
                             if (tc0[i] != 0)
                                 pix[pix_offset + xstride] =
-                                    (byte) (q1 + av_clip(((q2 + ((p0 + q0 + 1) >> 1)) >> 1) - q1, -tc0[i], tc0[i]));
+                                    (byte)(q1 + av_clip(((q2 + ((p0 + q0 + 1) >> 1)) >> 1) - q1, -tc0[i], tc0[i]));
                             tc++;
                         }
 
@@ -334,34 +334,34 @@ namespace cscodec.h264.decoder
                         {
                             int p3 = pix[pix_offset - 4 * xstride];
                             /* p0', p1', p2' */
-                            pix[pix_offset - 1 * xstride] = (byte) ((p2 + 2 * p1 + 2 * p0 + 2 * q0 + q1 + 4) >> 3);
-                            pix[pix_offset - 2 * xstride] = (byte) ((p2 + p1 + p0 + q0 + 2) >> 2);
-                            pix[pix_offset - 3 * xstride] = (byte) ((2 * p3 + 3 * p2 + p1 + p0 + q0 + 4) >> 3);
+                            pix[pix_offset - 1 * xstride] = (byte)((p2 + 2 * p1 + 2 * p0 + 2 * q0 + q1 + 4) >> 3);
+                            pix[pix_offset - 2 * xstride] = (byte)((p2 + p1 + p0 + q0 + 2) >> 2);
+                            pix[pix_offset - 3 * xstride] = (byte)((2 * p3 + 3 * p2 + p1 + p0 + q0 + 4) >> 3);
                         }
                         else
                         {
                             /* p0' */
-                            pix[pix_offset - 1 * xstride] = (byte) ((2 * p1 + p0 + q1 + 2) >> 2);
+                            pix[pix_offset - 1 * xstride] = (byte)((2 * p1 + p0 + q1 + 2) >> 2);
                         }
                         if (Math.Abs(q2 - q0) < beta)
                         {
                             int q3 = pix[pix_offset + 3 * xstride];
                             /* q0', q1', q2' */
-                            pix[pix_offset + 0 * xstride] = (byte) ((p1 + 2 * p0 + 2 * q0 + 2 * q1 + q2 + 4) >> 3);
-                            pix[pix_offset + 1 * xstride] = (byte) ((p0 + q0 + q1 + q2 + 2) >> 2);
-                            pix[pix_offset + 2 * xstride] = (byte) ((2 * q3 + 3 * q2 + q1 + q0 + p0 + 4) >> 3);
+                            pix[pix_offset + 0 * xstride] = (byte)((p1 + 2 * p0 + 2 * q0 + 2 * q1 + q2 + 4) >> 3);
+                            pix[pix_offset + 1 * xstride] = (byte)((p0 + q0 + q1 + q2 + 2) >> 2);
+                            pix[pix_offset + 2 * xstride] = (byte)((2 * q3 + 3 * q2 + q1 + q0 + p0 + 4) >> 3);
                         }
                         else
                         {
                             /* q0' */
-                            pix[pix_offset + 0 * xstride] = (byte) ((2 * q1 + q0 + p1 + 2) >> 2);
+                            pix[pix_offset + 0 * xstride] = (byte)((2 * q1 + q0 + p1 + 2) >> 2);
                         }
                     }
                     else
                     {
                         /* p0', q0' */
-                        pix[pix_offset - 1 * xstride] = (byte) ((2 * p1 + p0 + q1 + 2) >> 2);
-                        pix[pix_offset + 0 * xstride] = (byte) ((2 * q1 + q0 + p1 + 2) >> 2);
+                        pix[pix_offset - 1 * xstride] = (byte)((2 * p1 + p0 + q1 + 2) >> 2);
+                        pix[pix_offset + 0 * xstride] = (byte)((2 * q1 + q0 + p1 + 2) >> 2);
                     }
                 }
                 pix_offset += ystride;
@@ -441,8 +441,8 @@ namespace cscodec.h264.decoder
                     Math.Abs(p1 - p0) < beta &&
                     Math.Abs(q1 - q0) < beta)
                 {
-                    pix[pix_offset - xstride] = (byte) ((2 * p1 + p0 + q1 + 2) >> 2); /* p0' */
-                    pix[pix_offset] = (byte) ((2 * q1 + q0 + p1 + 2) >> 2); /* q0' */
+                    pix[pix_offset - xstride] = (byte)((2 * p1 + p0 + q1 + 2) >> 2); /* p0' */
+                    pix[pix_offset] = (byte)((2 * q1 + q0 + p1 + 2) >> 2); /* q0' */
                 }
                 pix_offset += ystride;
             }
@@ -479,7 +479,7 @@ namespace cscodec.h264.decoder
             int i;
             int cm_pos = MAX_NEG_CROP;
 
-            block[block_offset + 0] += (short) (1 << (shift - 1));
+            block[block_offset + 0] += (short)(1 << (shift - 1));
 
             for (i = 0; i < 4; i++)
             {
@@ -488,10 +488,10 @@ namespace cscodec.h264.decoder
                 int z2 = (block[block_offset + i + block_stride * 1] >> 1) - block[block_offset + i + block_stride * 3];
                 int z3 = block[block_offset + i + block_stride * 1] + (block[block_offset + i + block_stride * 3] >> 1);
 
-                block[block_offset + i + block_stride * 0] = (short) (z0 + z3);
-                block[block_offset + i + block_stride * 1] = (short) (z1 + z2);
-                block[block_offset + i + block_stride * 2] = (short) (z1 - z2);
-                block[block_offset + i + block_stride * 3] = (short) (z0 - z3);
+                block[block_offset + i + block_stride * 0] = (short)(z0 + z3);
+                block[block_offset + i + block_stride * 1] = (short)(z1 + z2);
+                block[block_offset + i + block_stride * 2] = (short)(z1 - z2);
+                block[block_offset + i + block_stride * 3] = (short)(z0 - z3);
             }
 
             for (i = 0; i < 4; i++)
@@ -502,13 +502,13 @@ namespace cscodec.h264.decoder
                 int z3 = block[block_offset + 1 + block_stride * i] + (block[block_offset + 3 + block_stride * i] >> 1);
 
                 dst[offset + i + 0 * stride] =
-                    (byte) ff_cropTbl[cm_pos + add * dst[offset + i + 0 * stride] + ((z0 + z3) >> shift)];
+                    (byte)ff_cropTbl[cm_pos + add * dst[offset + i + 0 * stride] + ((z0 + z3) >> shift)];
                 dst[offset + i + 1 * stride] =
-                    (byte) ff_cropTbl[cm_pos + add * dst[offset + i + 1 * stride] + ((z1 + z2) >> shift)];
+                    (byte)ff_cropTbl[cm_pos + add * dst[offset + i + 1 * stride] + ((z1 + z2) >> shift)];
                 dst[offset + i + 2 * stride] =
-                    (byte) ff_cropTbl[cm_pos + add * dst[offset + i + 2 * stride] + ((z1 - z2) >> shift)];
+                    (byte)ff_cropTbl[cm_pos + add * dst[offset + i + 2 * stride] + ((z1 - z2) >> shift)];
                 dst[offset + i + 3 * stride] =
-                    (byte) ff_cropTbl[cm_pos + add * dst[offset + i + 3 * stride] + ((z0 - z3) >> shift)];
+                    (byte)ff_cropTbl[cm_pos + add * dst[offset + i + 3 * stride] + ((z0 - z3) >> shift)];
             }
         }
 
@@ -547,14 +547,14 @@ namespace cscodec.h264.decoder
                 int b5 = (a3 >> 2) - a5;
                 int b7 = a7 - (a1 >> 2);
 
-                block[block_offset + i + 0 * 8] = (short) (b0 + b7);
-                block[block_offset + i + 7 * 8] = (short) (b0 - b7);
-                block[block_offset + i + 1 * 8] = (short) (b2 + b5);
-                block[block_offset + i + 6 * 8] = (short) (b2 - b5);
-                block[block_offset + i + 2 * 8] = (short) (b4 + b3);
-                block[block_offset + i + 5 * 8] = (short) (b4 - b3);
-                block[block_offset + i + 3 * 8] = (short) (b6 + b1);
-                block[block_offset + i + 4 * 8] = (short) (b6 - b1);
+                block[block_offset + i + 0 * 8] = (short)(b0 + b7);
+                block[block_offset + i + 7 * 8] = (short)(b0 - b7);
+                block[block_offset + i + 1 * 8] = (short)(b2 + b5);
+                block[block_offset + i + 6 * 8] = (short)(b2 - b5);
+                block[block_offset + i + 2 * 8] = (short)(b4 + b3);
+                block[block_offset + i + 5 * 8] = (short)(b4 - b3);
+                block[block_offset + i + 3 * 8] = (short)(b6 + b1);
+                block[block_offset + i + 4 * 8] = (short)(b6 - b1);
             }
             for (i = 0; i < 8; i++)
             {
@@ -583,21 +583,21 @@ namespace cscodec.h264.decoder
                 int b7 = a7 - (a1 >> 2);
 
                 dst[offset + i + 0 * stride] =
-                    (byte) ff_cropTbl[cm_pos + dst[offset + i + 0 * stride] + ((b0 + b7) >> 6)];
+                    (byte)ff_cropTbl[cm_pos + dst[offset + i + 0 * stride] + ((b0 + b7) >> 6)];
                 dst[offset + i + 1 * stride] =
-                    (byte) ff_cropTbl[cm_pos + dst[offset + i + 1 * stride] + ((b2 + b5) >> 6)];
+                    (byte)ff_cropTbl[cm_pos + dst[offset + i + 1 * stride] + ((b2 + b5) >> 6)];
                 dst[offset + i + 2 * stride] =
-                    (byte) ff_cropTbl[cm_pos + dst[offset + i + 2 * stride] + ((b4 + b3) >> 6)];
+                    (byte)ff_cropTbl[cm_pos + dst[offset + i + 2 * stride] + ((b4 + b3) >> 6)];
                 dst[offset + i + 3 * stride] =
-                    (byte) ff_cropTbl[cm_pos + dst[offset + i + 3 * stride] + ((b6 + b1) >> 6)];
+                    (byte)ff_cropTbl[cm_pos + dst[offset + i + 3 * stride] + ((b6 + b1) >> 6)];
                 dst[offset + i + 4 * stride] =
-                    (byte) ff_cropTbl[cm_pos + dst[offset + i + 4 * stride] + ((b6 - b1) >> 6)];
+                    (byte)ff_cropTbl[cm_pos + dst[offset + i + 4 * stride] + ((b6 - b1) >> 6)];
                 dst[offset + i + 5 * stride] =
-                    (byte) ff_cropTbl[cm_pos + dst[offset + i + 5 * stride] + ((b4 - b3) >> 6)];
+                    (byte)ff_cropTbl[cm_pos + dst[offset + i + 5 * stride] + ((b4 - b3) >> 6)];
                 dst[offset + i + 6 * stride] =
-                    (byte) ff_cropTbl[cm_pos + dst[offset + i + 6 * stride] + ((b2 - b5) >> 6)];
+                    (byte)ff_cropTbl[cm_pos + dst[offset + i + 6 * stride] + ((b2 - b5) >> 6)];
                 dst[offset + i + 7 * stride] =
-                    (byte) ff_cropTbl[cm_pos + dst[offset + i + 7 * stride] + ((b0 - b7) >> 6)];
+                    (byte)ff_cropTbl[cm_pos + dst[offset + i + 7 * stride] + ((b0 - b7) >> 6)];
             }
         }
 
@@ -611,7 +611,7 @@ namespace cscodec.h264.decoder
             for (j = 0; j < 4; j++)
             {
                 for (i = 0; i < 4; i++)
-                    dst[offset + dst_pos + i] = (byte) ff_cropTbl[cm_pos + dst[offset + dst_pos + i]];
+                    dst[offset + dst_pos + i] = (byte)ff_cropTbl[cm_pos + dst[offset + dst_pos + i]];
                 dst_pos += stride;
             }
         }
@@ -626,7 +626,7 @@ namespace cscodec.h264.decoder
             for (j = 0; j < 8; j++)
             {
                 for (i = 0; i < 8; i++)
-                    dst[offset + dst_pos + i] = (byte) ff_cropTbl[cm_pos + dst[offset + dst_pos + i]];
+                    dst[offset + dst_pos + i] = (byte)ff_cropTbl[cm_pos + dst[offset + dst_pos + i]];
                 dst_pos += stride;
             }
         }
@@ -720,7 +720,7 @@ namespace cscodec.h264.decoder
         {
             int i;
             int[] temp = new int[16];
-            short[] x_offset = {0, 2 * 16, 8 * 16, 10 * 16};
+            short[] x_offset = { 0, 2 * 16, 8 * 16, 10 * 16 };
 
             for (i = 0; i < 4; i++)
             {
@@ -743,10 +743,10 @@ namespace cscodec.h264.decoder
                 int z2 = temp[4 * 1 + i] - temp[4 * 3 + i];
                 int z3 = temp[4 * 1 + i] + temp[4 * 3 + i];
 
-                output[output_offset + 16 * 0 + offset] = (short) (((z0 + z3) * qmul + 128) >> 8);
-                output[output_offset + 16 * 1 + offset] = (short) (((z1 + z2) * qmul + 128) >> 8);
-                output[output_offset + 16 * 4 + offset] = (short) (((z1 - z2) * qmul + 128) >> 8);
-                output[output_offset + 16 * 5 + offset] = (short) (((z0 - z3) * qmul + 128) >> 8);
+                output[output_offset + 16 * 0 + offset] = (short)(((z0 + z3) * qmul + 128) >> 8);
+                output[output_offset + 16 * 1 + offset] = (short)(((z1 + z2) * qmul + 128) >> 8);
+                output[output_offset + 16 * 4 + offset] = (short)(((z1 - z2) * qmul + 128) >> 8);
+                output[output_offset + 16 * 5 + offset] = (short)(((z0 - z3) * qmul + 128) >> 8);
             }
         }
 
@@ -767,10 +767,10 @@ namespace cscodec.h264.decoder
             b = c - d;
             c = c + d;
 
-            output[output_offset + stride * 0 + xStride * 0] = (short) (((a + c) * qmul) >> 7);
-            output[output_offset + stride * 0 + xStride * 1] = (short) (((e + b) * qmul) >> 7);
-            output[output_offset + stride * 1 + xStride * 0] = (short) (((a - c) * qmul) >> 7);
-            output[output_offset + stride * 1 + xStride * 1] = (short) (((e - b) * qmul) >> 7);
+            output[output_offset + stride * 0 + xStride * 0] = (short)(((a + c) * qmul) >> 7);
+            output[output_offset + stride * 0 + xStride * 1] = (short)(((e + b) * qmul) >> 7);
+            output[output_offset + stride * 1 + xStride * 0] = (short)(((a - c) * qmul) >> 7);
+            output[output_offset + stride * 1 + xStride * 1] = (short)(((e - b) * qmul) >> 7);
         }
 
         public void ff_h264dsp_init()

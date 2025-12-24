@@ -1,6 +1,6 @@
-﻿using System;
-using ScePSP.Hle.Threading.EventFlags;
+﻿using ScePSP.Hle.Threading.EventFlags;
 using ScePSPUtils;
+using System;
 
 namespace ScePSP.Hle.Modules.threadman
 {

@@ -53,13 +53,13 @@ namespace ScePSPUtils
                 // Make sure the array won't be moved around by the GC 
                 var handle = GCHandle.Alloc(output, GCHandleType.Pinned);
 
-                var destination = (byte*) handle.AddrOfPinnedObject().ToPointer();
+                var destination = (byte*)handle.AddrOfPinnedObject().ToPointer();
                 var byteLength = length * sizeInBytes;
 
                 // There are faster ways to do this, particularly by using wider types or by 
                 // handling special lengths.
                 for (int i = 0; i < byteLength; i++)
-                    destination[i] = ((byte*) source)[i];
+                    destination[i] = ((byte*)source)[i];
 
                 handle.Free();
             }
@@ -74,9 +74,9 @@ namespace ScePSPUtils
 
                 for (var i = 0; i < length; i++)
                 {
-                    var p = new IntPtr((byte*) source + i * sizeInBytes);
+                    var p = new IntPtr((byte*)source + i * sizeInBytes);
 
-                    output[i] = (T) Marshal.PtrToStructure(p, typeof(T));
+                    output[i] = (T)Marshal.PtrToStructure(p, typeof(T));
                 }
             }
             else
@@ -108,7 +108,7 @@ namespace ScePSPUtils
                 }
                 for (var n = 0; n < rowCount; n++)
                 {
-                    var c = (char) data[offset + n];
+                    var c = (char)data[offset + n];
                     Console.Write("{0}", char.IsControl(c) ? '?' : c);
                 }
 

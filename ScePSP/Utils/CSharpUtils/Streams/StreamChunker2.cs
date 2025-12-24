@@ -1,7 +1,7 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using ScePSPUtils.Extensions;
 
 namespace ScePSPUtils.Streams
 {
@@ -51,7 +51,7 @@ namespace ScePSPUtils.Streams
         public static List<byte[]> SplitInChunks(Stream inputStream, byte[] separator)
         {
             var list = new List<byte[]>();
-            Split(inputStream, separator, delegate(byte[] chunk) { list.Add(chunk); });
+            Split(inputStream, separator, delegate (byte[] chunk) { list.Add(chunk); });
             return list;
         }
 
@@ -79,7 +79,7 @@ namespace ScePSPUtils.Streams
                 if (foundIndex != -1)
                 {
                     var bytesToRemoveFromChunk = endIndex - foundIndex;
-                    var realChunkSize = (int) (chunk.Length - bytesToRemoveFromChunk);
+                    var realChunkSize = (int)(chunk.Length - bytesToRemoveFromChunk);
                     var newChunk = new MemoryStream();
 
                     newChunk.WriteBytes(chunk.ReadChunk(realChunkSize, bytesToRemoveFromChunk));
@@ -94,7 +94,7 @@ namespace ScePSPUtils.Streams
 
             if (chunk.Length > 0)
             {
-                chunkHandler(chunk.ReadChunk(skipChunkStart, (int) chunk.Length - skipChunkStart));
+                chunkHandler(chunk.ReadChunk(skipChunkStart, (int)chunk.Length - skipChunkStart));
             }
         }
     }

@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
-using ScePSP.Core.Cpu;
+﻿using ScePSP.Core.Cpu;
+using ScePSP.Core.Memory;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
-using ScePSP.Core.Memory;
 using ScePSPUtils;
+using System;
+using System.Linq;
 
 namespace ScePSP.Hle.Modules.sysmem
 {
@@ -109,7 +109,7 @@ namespace ScePSP.Hle.Modules.sysmem
         [HlePspNotImplemented]
         public void sceKernelSetCompiledSdkVersion370(uint SdkVersion)
         {
-            _sceKernelSetCompiledSdkVersion(SdkVersion, "sceKernelSetCompiledSdkVersion370", new uint[] {0x3070000});
+            _sceKernelSetCompiledSdkVersion(SdkVersion, "sceKernelSetCompiledSdkVersion370", new uint[] { 0x3070000 });
         }
 
         /// <summary>
@@ -192,7 +192,7 @@ namespace ScePSP.Hle.Modules.sysmem
         public int sceKernelAllocPartitionMemory(MemoryPartitions PartitionId, string Name,
             HleMemoryManager.BlockTypeEnum Type, int Size, /* void* */uint Address)
         {
-            if ((int) PartitionId <= 0 || (int) PartitionId == 7 || (int) PartitionId >= 10)
+            if ((int)PartitionId <= 0 || (int)PartitionId == 7 || (int)PartitionId >= 10)
                 throw new SceKernelException(SceKernelErrors.ERROR_KERNEL_ILLEGAL_ARGUMENT);
             if (Size <= 0) throw new SceKernelException(SceKernelErrors.ERROR_KERNEL_FAILED_ALLOC_MEMBLOCK);
 
@@ -206,11 +206,11 @@ namespace ScePSP.Hle.Modules.sysmem
             {
                 case HleMemoryManager.BlockTypeEnum.HighAligned:
                 case HleMemoryManager.BlockTypeEnum.LowAligned:
-                    Alignment = (int) Address;
+                    Alignment = (int)Address;
                     break;
             }
 
-            if (Alignment == 0 || !MathUtils.IsPowerOfTwo((uint) Alignment))
+            if (Alignment == 0 || !MathUtils.IsPowerOfTwo((uint)Alignment))
             {
                 throw new SceKernelException(SceKernelErrors.ERROR_KERNEL_ILLEGAL_ALIGNMENT_SIZE);
             }
@@ -250,7 +250,7 @@ namespace ScePSP.Hle.Modules.sysmem
 
             //Console.Error.WriteLineColored(ConsoleColor.Cyan, "  sceKernelAllocPartitionMemory: {0}", MemoryPartition);
 
-            return (int) MemoryManager.MemoryPartitionsUid.Create(MemoryPartition);
+            return (int)MemoryManager.MemoryPartitionsUid.Create(MemoryPartition);
             //return MemoryPartition;
         }
 
@@ -316,7 +316,7 @@ namespace ScePSP.Hle.Modules.sysmem
         public void sceKernelSetCompiledSdkVersion500_505(uint SdkVersion)
         {
             _sceKernelSetCompiledSdkVersion(SdkVersion, "sceKernelSetCompiledSdkVersion500_505",
-                new uint[] {0x5000000, 0x5050000});
+                new uint[] { 0x5000000, 0x5050000 });
         }
 
         [HlePspFunction(NID = 0xFE707FDF, FirmwareVersion = 150, Name = "SysMemUserForUser_FE707FDF")]
@@ -343,7 +343,7 @@ namespace ScePSP.Hle.Modules.sysmem
         public void sceKernelSetCompiledSdkVersion603_605(uint SdkVersion)
         {
             _sceKernelSetCompiledSdkVersion(SdkVersion, "sceKernelSetCompiledSdkVersion603_605",
-                new uint[] {0x6040000, 0x6030000, 0x6050000});
+                new uint[] { 0x6040000, 0x6030000, 0x6050000 });
         }
     }
 }

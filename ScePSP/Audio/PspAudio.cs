@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScePSP.Core.Types;
+using System;
 using System.Linq;
-using ScePSP.Core.Types;
 
 namespace ScePSP.Core.Audio
 {
@@ -31,7 +31,7 @@ namespace ScePSP.Core.Audio
 
         public PspAudioChannel SrcOutput2Channel;
 
-        [Inject] public PspAudioImpl PspAudioImpl;
+        [Inject] public AudioImpl PspAudioImpl;
 
         private PspAudio()
         {

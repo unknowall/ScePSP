@@ -1,21 +1,19 @@
-﻿using System;
+﻿using ScePSP.Core.Cpu;
+using ScePSP.Core.Memory;
+using ScePSP.Hle.Interop;
+using ScePSP.Hle.Loader;
+using ScePSP.Hle.Managers;
+using ScePSP.Hle.Threading.EventFlags;
+using ScePSPUtils;
+using ScePSPUtils.Threading;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading;
-using ScePSP.Core;
-using ScePSP.Core.Cpu;
-using ScePSP.Core.Memory;
-using ScePSP.Hle.Managers;
-using ScePSP.Hle.Threading.EventFlags;
-using ScePSPUtils;
-using ScePSPUtils.Threading;
-using ScePSP.Hle.Interop;
-using ScePSP.Hle.Loader;
 
 namespace ScePSP.Hle
 {
@@ -270,7 +268,7 @@ namespace ScePSP.Hle
                 var Field = typeof(AccessViolationException)
                     .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                     .Single(FieldInfo => FieldInfo.Name == "_target");
-                var Address = (ulong) ((IntPtr) Field.GetValue(AccessViolationException)).ToInt64();
+                var Address = (ulong)((IntPtr)Field.GetValue(AccessViolationException)).ToInt64();
                 throw new PspMemory.InvalidAddressException(Address);
                 //AccessViolationException.
             }

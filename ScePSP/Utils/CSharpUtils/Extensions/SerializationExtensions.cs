@@ -44,7 +44,7 @@ namespace ScePSPUtils.Extensions
         public static T FromXmlString<T>(this string xmlString)
         {
             var serializer = new XmlSerializer(typeof(T));
-            return (T) serializer.Deserialize(new StringReader(xmlString));
+            return (T)serializer.Deserialize(new StringReader(xmlString));
         }
     }
 }

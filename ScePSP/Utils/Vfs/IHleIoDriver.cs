@@ -24,7 +24,8 @@ namespace ScePSP.Hle.Vfs
 
     public class HleIoDrvFileArg : IDisposable
     {
-        public HleIoDrvFileArg(string DriverName, IHleIoDriver HleIoDriver, int FileSystemNumber = 0,  IDisposable FileArgument = null)  {
+        public HleIoDrvFileArg(string DriverName, IHleIoDriver HleIoDriver, int FileSystemNumber = 0, IDisposable FileArgument = null)
+        {
             this.DriverName = DriverName;
             this.HleIoDriver = HleIoDriver;
             this.FileSystemNumber = FileSystemNumber;
@@ -247,25 +248,25 @@ namespace ScePSP.Hle.Vfs
         {
             return new ScePspDateTime()
             {
-                Year = (ushort) DateTime.Year,
-                Month = (ushort) DateTime.Month,
-                Day = (ushort) DateTime.Day,
-                Hour = (ushort) DateTime.Hour,
-                Minute = (ushort) DateTime.Minute,
-                Second = (ushort) DateTime.Second,
-                Microsecond = (uint) (DateTime.Millisecond * 1000),
+                Year = (ushort)DateTime.Year,
+                Month = (ushort)DateTime.Month,
+                Day = (ushort)DateTime.Day,
+                Hour = (ushort)DateTime.Hour,
+                Minute = (ushort)DateTime.Minute,
+                Second = (ushort)DateTime.Second,
+                Microsecond = (uint)(DateTime.Millisecond * 1000),
             };
         }
 
         public DateTime ToDateTime()
         {
-            return new DateTime((int) Year, (int) Month, (int) Day, (int) Hour, (int) Minute, (int) Second,
-                (int) Microsecond / 1000, DateTimeKind.Utc);
+            return new DateTime((int)Year, (int)Month, (int)Day, (int)Hour, (int)Minute, (int)Second,
+                (int)Microsecond / 1000, DateTimeKind.Utc);
         }
 
         public long ToUnixTimestamp()
         {
-            return (long) (ToDateTime() - new DateTime(1970, 1, 1)).TotalSeconds;
+            return (long)(ToDateTime() - new DateTime(1970, 1, 1)).TotalSeconds;
         }
 
         public override string ToString()
@@ -387,7 +388,8 @@ namespace ScePSP.Hle.Vfs
         {
             if (Span == null || Span.Length < count * sizeof(T))
                 throw new SceKernelException(SceKernelErrors.ERROR_INVALID_ARGUMENT);
-            fixed (byte* bp = &Span.GetPinnableReference()) {
+            fixed (byte* bp = &Span.GetPinnableReference())
+            {
                 //return new Span<T>(bp, count * sizeof(T));
                 return new Span<T>(bp, Span.Length / sizeof(T));
             }

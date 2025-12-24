@@ -1,6 +1,6 @@
-﻿using ScePSP.Hle.Vfs;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
+using ScePSP.Hle.Vfs;
 using ScePSPUtils;
 
 namespace ScePSP.Hle.Modules.iofilemgr

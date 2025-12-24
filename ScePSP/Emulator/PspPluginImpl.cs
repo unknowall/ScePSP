@@ -17,7 +17,7 @@ namespace ScePSP.Core
 
                 try
                 {
-                    IsWorking = ((PspPluginImpl) InjectContext.GetInstance(ImplementationType)).IsWorking;
+                    IsWorking = ((PspPluginImpl)InjectContext.GetInstance(ImplementationType)).IsWorking;
                 }
                 catch (Exception Exception)
                 {

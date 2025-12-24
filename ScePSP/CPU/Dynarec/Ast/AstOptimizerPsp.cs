@@ -1,10 +1,10 @@
 ﻿#define ENABLE_OPTIMIZE_LWL_LWR
 
+using SafeILGenerator.Ast.Nodes;
+using SafeILGenerator.Ast.Optimizers;
 using ScePSP.Core.Cpu.Emitter;
 using ScePSP.Core.Cpu.Table;
 using ScePSP.Core.Memory;
-using SafeILGenerator.Ast.Nodes;
-using SafeILGenerator.Ast.Optimizers;
 using System.Collections.Generic;
 
 namespace ScePSP.Core.Cpu.Dynarec.Ast
@@ -18,7 +18,7 @@ namespace ScePSP.Core.Cpu.Dynarec.Ast
         {
             if (processor == null || processor.CpuConfig.EnableAstOptimizations)
             {
-                return (AstNodeStm) new AstOptimizerPsp(processor?.Memory).Optimize(
+                return (AstNodeStm)new AstOptimizerPsp(processor?.Memory).Optimize(
                     ast.Statements(astNodeStm, ast.Return()));
             }
             return astNodeStm;

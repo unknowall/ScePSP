@@ -24,7 +24,7 @@ namespace ScePSPUtils.Extensions
         /// <returns></returns>
         public static char ReadChar(this TextReader textReader)
         {
-            return (char) textReader.Read();
+            return (char)textReader.Read();
         }
     }
 }

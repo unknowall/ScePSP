@@ -1,9 +1,9 @@
-﻿using System;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
+using System;
 
 namespace ScePSP.Hle.Modules.pspnet
 {
-    [HlePspModule(ModuleFlags = ModuleFlags.KernelMode | (ModuleFlags) 0x00010011)]
+    [HlePspModule(ModuleFlags = ModuleFlags.KernelMode | (ModuleFlags)0x00010011)]
     public unsafe class sceNetAdhocDiscover : HleModuleHost
     {
         [HlePspFunction(NID = 0x941B3877, FirmwareVersion = 150)]

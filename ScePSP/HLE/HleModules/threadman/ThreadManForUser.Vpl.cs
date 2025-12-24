@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using ScePSPUtils;
-using ScePSP.Core.Cpu;
+﻿using ScePSP.Core.Cpu;
 using ScePSP.Core.Memory;
 using ScePSP.Hle.Managers;
+using ScePSPUtils;
+using System;
+using System.Collections.Generic;
 
 namespace ScePSP.Hle.Modules.threadman
 {
@@ -86,8 +86,8 @@ namespace ScePSP.Hle.Modules.threadman
 
             public bool TryAllocate(CpuThreadState CpuThreadState, int Size, PspPointer* AddressPointer)
             {
-                Size = (int) MathUtils.NextAligned(Size, 4);
-                if (Size > Info.PoolSize) throw new SceKernelException((SceKernelErrors) (-1));
+                Size = (int)MathUtils.NextAligned(Size, 4);
+                if (Size > Info.PoolSize) throw new SceKernelException((SceKernelErrors)(-1));
                 try
                 {
                     var AllocatedSegment = MemoryPartition.Allocate(Size, InternalMemoryAnchor);
@@ -220,7 +220,7 @@ namespace ScePSP.Hle.Modules.threadman
             }
             else
             {
-                return (int) SceKernelErrors.ERROR_KERNEL_NO_MEMORY;
+                return (int)SceKernelErrors.ERROR_KERNEL_NO_MEMORY;
             }
         }
 

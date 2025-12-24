@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using ScePSP.Hle.Media.audio.At3.SUB;
+﻿using ScePSP.Hle.Media.audio.At3.SUB;
+using System.Linq;
 
 namespace ScePSP.Hle.Formats.audio.At3
 {
@@ -137,9 +137,9 @@ namespace ScePSP.Hle.Formats.audio.At3
     {
         MaiAt3PlusCoreDecoderChnInfo[] _chnInfo = new MaiAt3PlusCoreDecoderChnInfo[2];
 
-        float[][] _synBuf = {new float[0x1000], new float[0x1000]};
-        float[][] _dstBuf = {new float[0x800], new float[0x800]};
-        float[][] _kyouBuf = {new float[0x800], new float[0x800]};
+        float[][] _synBuf = { new float[0x1000], new float[0x1000] };
+        float[][] _dstBuf = { new float[0x800], new float[0x800] };
+        float[][] _kyouBuf = { new float[0x800], new float[0x800] };
         int _c900;
 
         public MaiAt3PlusCoreDecoder()
@@ -231,11 +231,11 @@ namespace ScePSP.Hle.Formats.audio.At3
         int DecodeBandNum(MaiBitReader mbr0, MaiAt3PlusCoreDecoderChnInfo[] chnInfos)
         {
             chnInfos[0].JointChnInfo.NumBandSplitedDeclared =
-                (uint) mbr0.GetWithI32Buffer(5) + 1;
+                (uint)mbr0.GetWithI32Buffer(5) + 1;
 
 
             chnInfos[0].JointChnInfo.NumBandDeclared =
-                (uint) MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_band_num_table0[
+                (uint)MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_band_num_table0[
                     chnInfos[0].JointChnInfo.NumBandSplitedDeclared] + 1;
 
             chnInfos[0].JointChnInfo.Var118 =
@@ -277,7 +277,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             }
 
             chnInfos[0].JointChnInfo.NumBandUsed =
-                (uint) MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_band_num_table0[
+                (uint)MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_band_num_table0[
                     chnInfos[0].JointChnInfo.NumBandSplitedUsed] + 1;
 
             //check
@@ -332,14 +332,14 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             if (chnInfos[0].JointChnInfo.NumBandSplitedUsed != 0) //
             {
-                chnInfos[0].JointChnInfo.Var90 = (uint) mbr0.GetWithI32Buffer(1); //[90] tmp4 [arg1]
+                chnInfos[0].JointChnInfo.Var90 = (uint)mbr0.GetWithI32Buffer(1); //[90] tmp4 [arg1]
 
                 for (uint a0 = 0; a0 < chns; a0++)
                 {
                     for (uint a1 = 0; a1 < 0x20; a1++)
                         chnInfos[a0].Table2[a1] = 0;
 
-                    chnInfos[a0].Var1034 = (uint) mbr0.GetWithI32Buffer(1); //[1034] tmp5
+                    chnInfos[a0].Var1034 = (uint)mbr0.GetWithI32Buffer(1); //[1034] tmp5
 
                     MAPCDSF_makeTable0CheckTable(chnInfos[a0], chnInfos[a0].CheckTable0); //check
 
@@ -388,7 +388,7 @@ namespace ScePSP.Hle.Formats.audio.At3
 
                         MAPCDSF_decodeTable3Sub0(mbr0,
                             chnInfos[a0].Table3
-                                .GetPointer((int) MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_bind_table0[a1]),
+                                .GetPointer((int)MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_bind_table0[a1]),
                             MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_bind_table1[a1], huffTableNow);
                     }
                 }
@@ -396,12 +396,12 @@ namespace ScePSP.Hle.Formats.audio.At3
                 if (chnInfos[0].JointChnInfo.NumBandSplitedUsed > 2)
                 {
                     for (uint a1 = 0;
-                        a1 < (uint) (MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_band_num_table1[
+                        a1 < (uint)(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_band_num_table1[
                                          MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_band_num_table0[
                                              chnInfos[0].JointChnInfo.NumBandSplitedUsed] + 1] + 1);
                         a1++)
                     {
-                        chnInfos[a0].Table4[a1] = (uint) mbr0.GetWithI32Buffer(4);
+                        chnInfos[a0].Table4[a1] = (uint)mbr0.GetWithI32Buffer(4);
                     }
                 }
             }
@@ -439,15 +439,15 @@ namespace ScePSP.Hle.Formats.audio.At3
             {
                 chnInfos[a0].AccDataNow.TableMemset();
 
-                uint uk1B444 = (uint) mbr0.GetWithI32Buffer(1);
+                uint uk1B444 = (uint)mbr0.GetWithI32Buffer(1);
 
                 if (uk1B444 != 0)
                 {
-                    chnInfos[a0].Uk1B450 = (uint) mbr0.GetWithI32Buffer(4) + 1;
-                    uint uk1B448 = (uint) mbr0.GetWithI32Buffer(1);
+                    chnInfos[a0].Uk1B450 = (uint)mbr0.GetWithI32Buffer(4) + 1;
+                    uint uk1B448 = (uint)mbr0.GetWithI32Buffer(1);
 
                     uint uk1B44C = chnInfos[a0].Uk1B450;
-                    if (uk1B448 != 0) uk1B44C = (uint) mbr0.GetWithI32Buffer(4) + 1;
+                    if (uk1B448 != 0) uk1B44C = (uint)mbr0.GetWithI32Buffer(4) + 1;
 
                     //call 478200
                     if ((rs = MAPCDSF_decodeACC2MainSub0(mbr0, chnInfos[a0])) != 0)
@@ -467,7 +467,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                         {
                             chnInfos[a0].AccDataNow.Table[b0].NumAcc =
                                 chnInfos[a0].AccDataNow.Table[b0 - 1].NumAcc;
-                            for (uint b1 = 0; b1 < (uint) chnInfos[a0].AccDataNow.Table[b0].NumAcc; b1++)
+                            for (uint b1 = 0; b1 < (uint)chnInfos[a0].AccDataNow.Table[b0].NumAcc; b1++)
                             {
                                 chnInfos[a0].AccDataNow.Table[b0].Data1[b1] =
                                     chnInfos[a0].AccDataNow.Table[b0 - 1].Data1[b1];
@@ -493,7 +493,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             dst = src;
         }
 
-        static int DecodeAcc6Inner(MaiBitReader mbr0, MaiAt3PlusCoreDecoderChnInfo[]chnInfos, uint chns)
+        static int DecodeAcc6Inner(MaiBitReader mbr0, MaiAt3PlusCoreDecoderChnInfo[] chnInfos, uint chns)
         {
             int rs = 0;
 
@@ -525,7 +525,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                 chnInfos[0].AccTableNow.Inner.Unk1 =
                     mbr0.GetWithI32Buffer(1);
 
-                chnInfos[0].AccTableNow.Inner.Unk2 = (int) (
+                chnInfos[0].AccTableNow.Inner.Unk2 = (int)(
                     MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_11[0], mbr0)
                     + 1
                 );
@@ -534,11 +534,11 @@ namespace ScePSP.Hle.Formats.audio.At3
                 if (chns == 2)
                 {
                     MAPCDSF_readPackTable0(mbr0, chnInfos[0].AccTableNow.Inner.TableUnk0,
-                        (uint) chnInfos[0].AccTableNow.Inner.Unk2);
+                        (uint)chnInfos[0].AccTableNow.Inner.Unk2);
                     MAPCDSF_readPackTable0(mbr0, chnInfos[0].AccTableNow.Inner.TableUnk2,
-                        (uint) chnInfos[0].AccTableNow.Inner.Unk2);
+                        (uint)chnInfos[0].AccTableNow.Inner.Unk2);
                     MAPCDSF_readPackTable0(mbr0, chnInfos[0].AccTableNow.Inner.TableUnk1,
-                        (uint) chnInfos[0].AccTableNow.Inner.Unk2);
+                        (uint)chnInfos[0].AccTableNow.Inner.Unk2);
                 }
 
                 for (uint a0 = 0; a0 < chns; a0++)

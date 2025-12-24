@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ScePSPUtils;
+using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using ScePSPUtils;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Hle.Threading.EventFlags
 {
@@ -215,7 +215,7 @@ namespace ScePSP.Hle.Threading.EventFlags
         {
             Size = sizeof(EventFlagInfo);
             //Name[0] = 0;
-            Attributes = (HleEventFlag.AttributesSet) 0;
+            Attributes = (HleEventFlag.AttributesSet)0;
             InitialPattern = 0;
             CurrentPattern = 0;
             NumberOfWaitingThreads = 0;

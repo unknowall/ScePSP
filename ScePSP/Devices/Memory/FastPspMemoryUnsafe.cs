@@ -60,7 +60,7 @@ namespace ScePSP.Core.Memory
                 {
                     if (Platform.OS == OS.Windows)
                     {
-                        TryBases = new ulong[] {0x31000000, 0x40000000, 0x50000000};
+                        TryBases = new ulong[] { 0x31000000, 0x40000000, 0x50000000 };
                     }
                     else
                     {
@@ -73,11 +73,11 @@ namespace ScePSP.Core.Memory
                 {
                     if (Platform.OS == OS.Windows)
                     {
-                        TryBases = new ulong[] {0xE7000000, 0xE1000000, 0x0012340080000000, 0x00123400A0000000};
+                        TryBases = new ulong[] { 0xE7000000, 0xE1000000, 0x0012340080000000, 0x00123400A0000000 };
                     }
                     else
                     {
-                        TryBases = new ulong[] {0x2300000000, 0x31000000, 0x40000000, 0x50000000, 0xE1000000};
+                        TryBases = new ulong[] { 0x2300000000, 0x31000000, 0x40000000, 0x50000000, 0xE1000000 };
                     }
                 }
 
@@ -87,16 +87,16 @@ namespace ScePSP.Core.Memory
 
                 foreach (var TryBase in TryBases)
                 {
-                    _Base = (byte*) TryBase;
+                    _Base = (byte*)TryBase;
                     Console.WriteLine("FastPspMemory.AllocMemoryOnce: Trying Base ... 0x{0:X}", TryBase);
 
                     StaticNullPtr = _Base;
                     Platform.AllocRangeGuard(_Base, _Base + ScratchPadOffset);
-                    StaticScratchPadPtr = (byte*) Platform.AllocRange(_Base + ScratchPadOffset, ScratchPadAllocSize);
+                    StaticScratchPadPtr = (byte*)Platform.AllocRange(_Base + ScratchPadOffset, ScratchPadAllocSize);
                     Platform.AllocRangeGuard(_Base + ScratchPadOffset + ScratchPadAllocSize, _Base + FrameBufferOffset);
-                    StaticFrameBufferPtr = (byte*) Platform.AllocRange(_Base + FrameBufferOffset, FrameBufferAllocSize);
+                    StaticFrameBufferPtr = (byte*)Platform.AllocRange(_Base + FrameBufferOffset, FrameBufferAllocSize);
                     Platform.AllocRangeGuard(_Base + FrameBufferOffset + FrameBufferAllocSize, _Base + MainOffset);
-                    StaticMainPtr = (byte*) Platform.AllocRange(_Base + MainOffset, MainAllocSize);
+                    StaticMainPtr = (byte*)Platform.AllocRange(_Base + MainOffset, MainAllocSize);
 
                     if (StaticScratchPadPtr != null && StaticFrameBufferPtr != null && StaticMainPtr != null)
                     {
@@ -164,7 +164,7 @@ namespace ScePSP.Core.Memory
         public override uint PointerToPspAddressUnsafe(void* Pointer)
         {
             if (Pointer == null) return 0;
-            return (uint) ((byte*) Pointer - _Base);
+            return (uint)((byte*)Pointer - _Base);
         }
 
         public override void* PspAddressToPointerUnsafe(uint _Address)

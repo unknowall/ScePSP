@@ -10,7 +10,7 @@ namespace cscodec
         {
             //pkt.data
             uint crc = BitConverter.ToUInt32(
-                new CRC32().ComputeHash(pkt.data_base.Select(Item => (byte) Item).ToArray(), pkt.data_offset, pkt.size),
+                new CRC32().ComputeHash(pkt.data_base.Select(Item => (byte)Item).ToArray(), pkt.data_offset, pkt.size),
                 0);
 
             //snprintf(buf, sizeof(buf), "%d, %10"PRId64", %10"PRId64", %8d, %8d, 0x%08x",

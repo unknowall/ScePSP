@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.IO;
-using ScePSPUtils.Extensions;
 
 namespace ScePSPUtils.Streams
 {

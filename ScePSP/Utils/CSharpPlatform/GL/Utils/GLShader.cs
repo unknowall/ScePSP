@@ -1,9 +1,9 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
-using ScePSPUtils.Extensions;
 
 namespace ScePSPPlatform.GL.Utils
 {
@@ -146,7 +146,7 @@ namespace ScePSPPlatform.GL.Utils
                 NameTemp[name_len] = 0;
                 var Name = Marshal.PtrToStringAnsi(new IntPtr(NameTemp));
                 int location = GL.glGetUniformLocation(Program, Name);
-                _Uniforms[Name] = new GlUniform(this, Name, location, num, (GLValueType) type);
+                _Uniforms[Name] = new GlUniform(this, Name, location, num, (GLValueType)type);
                 //Console.WriteLine(Uniforms[Name]);
             }
         }
@@ -165,7 +165,7 @@ namespace ScePSPPlatform.GL.Utils
                 NameTemp[name_len] = 0;
                 var Name = Marshal.PtrToStringAnsi(new IntPtr(NameTemp));
                 int location = GL.glGetAttribLocation(Program, Name);
-                _Attributes[Name] = new GlAttribute(this, Name, location, num, (GLValueType) type);
+                _Attributes[Name] = new GlAttribute(this, Name, location, num, (GLValueType)type);
                 //Console.WriteLine(Attributes[Name]);
             }
         }
@@ -241,7 +241,7 @@ namespace ScePSPPlatform.GL.Utils
         {
             Use();
             SetDataCallback();
-            GL.glDrawArrays((int) Geometry, Offset, Count);
+            GL.glDrawArrays((int)Geometry, Offset, Count);
         }
 
         public void Draw(GLGeometry Geometry, uint[] Indices, int Count, Action SetDataCallback, int IndicesOffset = 0)
@@ -250,7 +250,7 @@ namespace ScePSPPlatform.GL.Utils
             SetDataCallback();
             fixed (uint* IndicesPtr = &Indices[IndicesOffset])
             {
-                GL.glDrawElements((int) Geometry, Count, GL.GL_UNSIGNED_INT, IndicesPtr);
+                GL.glDrawElements((int)Geometry, Count, GL.GL_UNSIGNED_INT, IndicesPtr);
             }
         }
 

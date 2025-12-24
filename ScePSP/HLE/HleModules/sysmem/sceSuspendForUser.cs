@@ -104,7 +104,7 @@ namespace ScePSP.Hle.Modules.sysmem
 
             if (!VolatileMemLocked)
             {
-                throw new SceKernelException((SceKernelErrors) (-1));
+                throw new SceKernelException((SceKernelErrors)(-1));
             }
 
             VolatileMemLocked = false;

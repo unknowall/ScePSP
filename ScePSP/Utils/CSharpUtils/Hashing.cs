@@ -1,7 +1,7 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.IO;
 using System.Security.Cryptography;
-using ScePSPUtils.Extensions;
 
 namespace ScePSPUtils
 {

@@ -1,6 +1,6 @@
-﻿using ScePSPUtils;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Core.Memory;
 using ScePSP.Hle.Formats;
+using ScePSPUtils;
 using System.Text;
 
 namespace ScePSP.Hle.Modules

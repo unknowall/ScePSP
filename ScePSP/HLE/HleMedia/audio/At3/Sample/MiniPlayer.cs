@@ -1,8 +1,7 @@
-﻿using System;
-using System.IO;
-using ScePSPUtils.Endian;
+﻿using ScePSPUtils.Endian;
 using ScePSPUtils.Extensions;
-using ScePSP.Hle.Formats.audio.At3;
+using System;
+using System.IO;
 
 namespace ScePSP.Hle.Media.audio.At3.Sample
 {

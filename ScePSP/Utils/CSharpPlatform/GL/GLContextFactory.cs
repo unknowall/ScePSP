@@ -1,9 +1,9 @@
-﻿using System;
+﻿using ScePSP.Core;
 using ScePSPPlatform.GL.Impl.Android;
 using ScePSPPlatform.GL.Impl.Linux;
 using ScePSPPlatform.GL.Impl.Mac;
 using ScePSPPlatform.GL.Impl.Windows;
-using ScePSP.Core;
+using System;
 
 namespace ScePSPPlatform.GL
 {

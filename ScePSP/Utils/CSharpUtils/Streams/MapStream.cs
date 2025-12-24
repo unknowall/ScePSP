@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ScePSPUtils.Extensions;
 
 namespace ScePSPUtils.Streams
 {
@@ -234,8 +234,8 @@ namespace ScePSPUtils.Streams
         /// <returns></returns>
         public override int Read(byte[] buffer, int offset, int count)
         {
-            return (int) _Transfer(buffer, offset, count,
-                (buf, off, cnt) => _currentStream.Read(buf, (int) off, (int) cnt));
+            return (int)_Transfer(buffer, offset, count,
+                (buf, off, cnt) => _currentStream.Read(buf, (int)off, (int)cnt));
         }
 
         /// <summary>
@@ -248,7 +248,7 @@ namespace ScePSPUtils.Streams
         {
             _Transfer(buffer, offset, count, (buf, off, cnt) =>
             {
-                _currentStream.Write(buf, (int) off, (int) cnt);
+                _currentStream.Write(buf, (int)off, (int)cnt);
                 return cnt;
             });
         }
@@ -284,8 +284,8 @@ namespace ScePSPUtils.Streams
         {
             throw new NotImplementedException();
         }
-        
-         /// <summary>
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="targetStream"></param>
@@ -298,7 +298,7 @@ namespace ScePSPUtils.Streams
             targetStream.WriteVariableUlongBit8Extends(1);
 
             // ListEntryCount
-            targetStream.WriteVariableUlongBit8Extends((ulong) _StreamEntries.Count);
+            targetStream.WriteVariableUlongBit8Extends((ulong)_StreamEntries.Count);
 
             //ulong FileOffset = 0;
 
@@ -309,10 +309,10 @@ namespace ScePSPUtils.Streams
                 //TargetStream.WriteVariableUlongBit8Extends(FileOffset);
 
                 // EntryMapOffset
-                targetStream.WriteVariableUlongBit8Extends((ulong) streamEntry.Position);
+                targetStream.WriteVariableUlongBit8Extends((ulong)streamEntry.Position);
 
                 // EntryLength
-                targetStream.WriteVariableUlongBit8Extends((ulong) streamEntry.Length);
+                targetStream.WriteVariableUlongBit8Extends((ulong)streamEntry.Length);
             }
 
             // EntryContents
@@ -340,7 +340,7 @@ namespace ScePSPUtils.Streams
             switch (version)
             {
                 case 1:
-                    var entryCount = (int) targetStream.ReadVariableUlongBit8Extends();
+                    var entryCount = (int)targetStream.ReadVariableUlongBit8Extends();
                     var entries = new Tuple<ulong, ulong>[entryCount];
                     for (var n = 0; n < entryCount; n++)
                     {
@@ -354,8 +354,8 @@ namespace ScePSPUtils.Streams
                     {
                         var entryMapOffset = entry.Item1;
                         var entryLength = entry.Item2;
-                        var entryStream = targetStream.ReadStream((long) entryLength);
-                        mapStream.Map((long) entryMapOffset, entryStream);
+                        var entryStream = targetStream.ReadStream((long)entryLength);
+                        mapStream.Map((long)entryMapOffset, entryStream);
                     }
 
                     break;

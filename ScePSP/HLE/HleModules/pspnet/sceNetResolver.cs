@@ -1,7 +1,7 @@
-﻿using System;
-using System.Net;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
+using System;
+using System.Net;
 
 namespace ScePSP.Hle.Modules.pspnet
 {
@@ -63,7 +63,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <returns>0 on sucess, less than 0 on error.</returns>
         [HlePspFunction(NID = 0x244172AF, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceNetResolverCreate(int*PointerToResolverId, void*Buffer, int BufferLength)
+        public int sceNetResolverCreate(int* PointerToResolverId, void* Buffer, int BufferLength)
         {
             var Resolver = new Resolver();
             var ResolverId = Resolvers.Create(Resolver);
@@ -117,7 +117,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="retry">Number of retries</param>
         /// <returns>0 on success, less than 0 on error</returns>
         [HlePspFunction(NID = 0x629E2FB7, FirmwareVersion = 150)]
-        public int sceNetResolverStartAtoN(int rid, in_addr* addr, byte*hostname, int hostname_len, uint timeout,
+        public int sceNetResolverStartAtoN(int rid, in_addr* addr, byte* hostname, int hostname_len, uint timeout,
             int retry)
         {
             throw new NotImplementedException();

@@ -12,7 +12,6 @@ using ScePSP.Hle;
 using ScePSP.Hle.Managers;
 using ScePSP.Hle.Modules;
 using System;
-using System.Collections.Generic;
 
 namespace ScePSP.Runner
 {
@@ -35,11 +34,11 @@ namespace ScePSP.Runner
                 PspPluginImpl.SelectWorkingPlugin<GpuImpl>(injectContext,
                     typeof(GpuImplSoft),
                     typeof(OpenglGpuImpl)
-                    //typeof(GpuImplNull)
+                //typeof(GpuImplNull)
                 );
 
                 // AUDIO
-                PspPluginImpl.SelectWorkingPlugin<PspAudioImpl>(injectContext, 
+                PspPluginImpl.SelectWorkingPlugin<AudioImpl>(injectContext,
                     typeof(SDLAudioImpl),
                     typeof(AudioImplNull)
                     );
@@ -47,7 +46,7 @@ namespace ScePSP.Runner
             else
             {
                 injectContext.SetInstanceType<GpuImpl, GpuImplNull>();
-                injectContext.SetInstanceType<PspAudioImpl, AudioImplNull>();
+                injectContext.SetInstanceType<AudioImpl, AudioImplNull>();
             }
 
             return injectContext;

@@ -1263,15 +1263,15 @@ namespace ScePSP.Core.Gpu
         /// 0xFF - 
         /// </summary>
         Dummy,
-        
+
         TMATRIX_BASE = 0x100,
         VIEW_MATRIX_BASE = 0x110,
         WORLD_MATRIX_BASE = 0x120,
         PROJ_MATRIX_BASE = 0x130,
         BONE_MATRIX_BASE = 0x140,
-        
+
         EX_TEXEL_SIZE = 0x1b0,
 
-        UNKNOWN = unchecked((byte) -1),
+        UNKNOWN = unchecked((byte)-1),
     }
 }

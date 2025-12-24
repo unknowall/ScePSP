@@ -1,6 +1,6 @@
-﻿using System;
-using ScePSP.Core.Cpu;
+﻿using ScePSP.Core.Cpu;
 using ScePSP.Hle.Vfs;
+using System;
 
 namespace ScePSP.Hle.Modules.iofilemgr
 {
@@ -16,7 +16,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
         [HlePspFunction(NID = 0x89AA9906, FirmwareVersion = 150)]
         public SceUID sceIoOpenAsync(string FileName, HleIoFlags Flags, SceMode Mode)
         {
-            return (SceUID) _sceIoOpen(FileName, Flags, Mode, Async: true);
+            return (SceUID)_sceIoOpen(FileName, Flags, Mode, Async: true);
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
         [HlePspFunction(NID = 0x1B385D8F, FirmwareVersion = 150)]
         public int sceIoLseek32Async(SceUID FileId, uint Offset, SeekAnchor Whence)
         {
-            return sceIoLseekAsync(FileId, (long) Offset, Whence);
+            return sceIoLseekAsync(FileId, (long)Offset, Whence);
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
         {
             var File = HleIoManager.HleIoDrvFileArgPool.Get(FileId);
             Result = File.AsyncLastResult;
-            CpuThreadState.Lo = (int) FileId;
+            CpuThreadState.Lo = (int)FileId;
 
             return 0;
             /*
@@ -220,7 +220,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
         [HlePspFunction(NID = 0x0FACAB19, FirmwareVersion = 150)]
         public int sceIoWriteAsync(SceUID FileId, void* data, SceSize size)
         {
-            _DelayIo(IoDelayType.Write, (long) size);
+            _DelayIo(IoDelayType.Write, (long)size);
             throw new NotImplementedException();
             /*
             unimplemented();

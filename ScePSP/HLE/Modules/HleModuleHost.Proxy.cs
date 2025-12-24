@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using SafeILGenerator.Ast.Generators;
+using SafeILGenerator.Ast.Nodes;
+using SafeILGenerator.Utils;
 using ScePSP.Core.Cpu;
+using ScePSP.Core.Cpu.Dynarec.Ast;
 using ScePSP.Core.Cpu.Emitter;
 using ScePSP.Core.Memory;
 using ScePSP.Hle.Managers;
 using ScePSPUtils;
-using SafeILGenerator.Ast.Nodes;
-using SafeILGenerator.Ast.Generators;
-using System.Runtime.InteropServices;
 using ScePSPUtils.Extensions;
-using ScePSP.Core.Cpu.Dynarec.Ast;
-using SafeILGenerator.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace ScePSP.Hle
 {
@@ -43,7 +43,7 @@ namespace ScePSP.Hle
         public static TType GetObjectFromPoolHelper<TType>(CpuThreadState CpuThreadState, int Index)
         {
             //Console.Error.WriteLine("GetObjectFromPoolHelper");
-            return (TType) CpuThreadState.CpuProcessor.InjectContext.GetInstance<HleUidPoolManager>()
+            return (TType)CpuThreadState.CpuProcessor.InjectContext.GetInstance<HleUidPoolManager>()
                 .Get(typeof(TType), Index);
         }
 
@@ -59,7 +59,7 @@ namespace ScePSP.Hle
             IHleUidPoolClass Item)
         {
             //Console.Error.WriteLine("AllocIndexFromPoolHelper");
-            return (uint) CpuThreadState.CpuProcessor.InjectContext.GetInstance<HleUidPoolManager>()
+            return (uint)CpuThreadState.CpuProcessor.InjectContext.GetInstance<HleUidPoolManager>()
                 .GetOrAllocIndex(Type, Item);
         }
 
@@ -88,12 +88,12 @@ namespace ScePSP.Hle
                 if (Type == typeof(int) || Type == typeof(uint))
                 {
                     return CpuThreadState.Memory.ReadSafe<uint>(
-                        (uint) (this.CpuThreadState.Gpr[29] + (MaxGprIndex - Index) * 4));
+                        (uint)(this.CpuThreadState.Gpr[29] + (MaxGprIndex - Index) * 4));
                 }
                 if (Type == typeof(long) || Type == typeof(ulong))
                 {
                     return CpuThreadState.Memory.ReadSafe<ulong>(
-                        (uint) (this.CpuThreadState.Gpr[29] + (MaxGprIndex - Index) * 4));
+                        (uint)(this.CpuThreadState.Gpr[29] + (MaxGprIndex - Index) * 4));
                 }
                 throw new NotImplementedException("Invalid operation");
             }
@@ -252,7 +252,7 @@ namespace ScePSP.Hle
                     {
                         AstParameters.Add(
                             ast.CallStatic(
-                                (Func<CpuThreadState, uint, string>) HleModuleHost.StringFromAddress,
+                                (Func<CpuThreadState, uint, string>)HleModuleHost.StringFromAddress,
                                 ast.CpuThreadStateExpr,
                                 RegisterReader.Read<uint>(ParameterInfo)
                             )
@@ -289,7 +289,7 @@ namespace ScePSP.Hle
                     else if (ParameterType == typeof(PspPointer))
                     {
                         AstParameters.Add(ast.CallStatic(
-                            typeof(PspPointer).GetMethod("op_Implicit", new[] {typeof(uint)}),
+                            typeof(PspPointer).GetMethod("op_Implicit", new[] { typeof(uint) }),
                             RegisterReader.Read<uint>(ParameterInfo)
                         ));
                     }
@@ -303,7 +303,7 @@ namespace ScePSP.Hle
                         }
 
                         AstParameters.Add(ast.Cast(ParameterType, ast.CallStatic(
-                            (Func<CpuThreadState, Type, int, bool, object>) GetObjectFromPoolHelper,
+                            (Func<CpuThreadState, Type, int, bool, object>)GetObjectFromPoolHelper,
                             ast.CpuThreadStateExpr,
                             ast.Immediate(ParameterType),
                             RegisterReader.Read<int>(ParameterInfo),
@@ -341,7 +341,7 @@ namespace ScePSP.Hle
                 AstNodes.AddStatement(ast.Assign(
                     ast.Gpr(2),
                     ast.CallStatic(
-                        (Func<CpuThreadState, Type, IHleUidPoolClass, uint>) GetOrAllocIndexFromPoolHelper,
+                        (Func<CpuThreadState, Type, IHleUidPoolClass, uint>)GetOrAllocIndexFromPoolHelper,
                         ast.CpuThreadStateExpr,
                         ast.Immediate(AstMethodCall.Type),
                         ast.Cast<IHleUidPoolClass>(AstMethodCall)
@@ -362,7 +362,7 @@ namespace ScePSP.Hle
             }
 
             bool SkipLog = HlePspFunctionAttribute.SkipLog;
-            var NotImplementedAttribute = (HlePspNotImplementedAttribute) MethodInfo
+            var NotImplementedAttribute = (HlePspNotImplementedAttribute)MethodInfo
                 .GetCustomAttributes(typeof(HlePspNotImplementedAttribute), true).FirstOrDefault();
             bool NotImplementedFunc = NotImplementedAttribute != null && NotImplementedAttribute.Notice;
 
@@ -372,7 +372,7 @@ namespace ScePSP.Hle
                 ast.Statements(
                     // Do stuff before
                     CreateDelegateForMethodInfoPriv(MethodInfo, HlePspFunctionAttribute, out ParamInfoList)
-                    // Do stuff after
+                // Do stuff after
                 )
             );
 
@@ -472,11 +472,11 @@ namespace ScePSP.Hle
                 }
                 catch (MemoryPartitionNoMemoryException)
                 {
-                    CpuThreadState.Gpr[2] = (int) SceKernelErrors.ERROR_ERRNO_NO_MEMORY;
+                    CpuThreadState.Gpr[2] = (int)SceKernelErrors.ERROR_ERRNO_NO_MEMORY;
                 }
                 catch (SceKernelException SceKernelException)
                 {
-                    CpuThreadState.Gpr[2] = (int) SceKernelException.SceKernelError;
+                    CpuThreadState.Gpr[2] = (int)SceKernelException.SceKernelError;
                 }
                 catch (SceKernelSelfStopUnloadModuleException)
                 {
@@ -498,8 +498,8 @@ namespace ScePSP.Hle
                         Out.WriteLine(" : {0}",
                             ToNormalizedTypeString(MethodInfo.ReturnType, CpuThreadState,
                                 MethodInfo.ReturnType == typeof(float)
-                                    ? (object) CpuThreadState.Fpr[0]
-                                    : (object) CpuThreadState.Gpr[2]));
+                                    ? (object)CpuThreadState.Fpr[0]
+                                    : (object)CpuThreadState.Gpr[2]));
                         Out.WriteLine("");
                     }
                 }
@@ -515,7 +515,7 @@ namespace ScePSP.Hle
 
             if (ParameterType == typeof(string))
             {
-                return $"'{StringFromAddress(CpuThreadState, (uint) Convert.ToInt64(Value))}'";
+                return $"'{StringFromAddress(CpuThreadState, (uint)Convert.ToInt64(Value))}'";
             }
 
             if (ParameterType == typeof(int))
@@ -533,7 +533,7 @@ namespace ScePSP.Hle
             if (ParameterType.IsPointer)
             {
                 return
-                    $"0x{CpuThreadState.CpuProcessor.Memory.PointerToPspAddressUnsafe((void*) Convert.ToInt64(Value)):X8}";
+                    $"0x{CpuThreadState.CpuProcessor.Memory.PointerToPspAddressUnsafe((void*)Convert.ToInt64(Value)):X8}";
             }
 
             if (ParameterType == typeof(float))

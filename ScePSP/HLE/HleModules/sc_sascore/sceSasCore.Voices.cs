@@ -1,5 +1,5 @@
-﻿using System;
-using ScePSP.Hle.Formats.audio;
+﻿using ScePSP.Hle.Formats.audio;
+using System;
 
 namespace ScePSP.Hle.Modules.sc_sascore
 {

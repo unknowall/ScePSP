@@ -1,7 +1,7 @@
-﻿using System;
+﻿using ScePSPPlatform.GL.Impl.Windows;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using ScePSPPlatform.GL.Impl.Windows;
 
 namespace ScePSPPlatform.GL.Impl.Linux
 {
@@ -76,16 +76,16 @@ namespace ScePSPPlatform.GL.Impl.Linux
 			visualAttributes.AddRange(new[] { (int)GLXAttribute.DOUBLEBUFFER, 1 });
 			visualAttributes.AddRange(new[] { (int)0, 0 });
 #else
-            visualAttributes.AddRange(new[] {(int) GLXAttribute.DRAWABLE_TYPE, 1});
-            visualAttributes.AddRange(new[] {(int) GLXAttribute.RENDER_TYPE, 1});
-            visualAttributes.AddRange(new[] {(int) GLXAttribute.RED_SIZE, 8});
-            visualAttributes.AddRange(new[] {(int) GLXAttribute.GREEN_SIZE, 8});
-            visualAttributes.AddRange(new[] {(int) GLXAttribute.BLUE_SIZE, 8});
-            visualAttributes.AddRange(new[] {(int) GLXAttribute.ALPHA_SIZE, 8});
-            visualAttributes.AddRange(new[] {(int) GLXAttribute.DEPTH_SIZE, 24});
-            visualAttributes.AddRange(new[] {(int) GLXAttribute.STENCIL_SIZE, 8});
-            visualAttributes.AddRange(new[] {(int) GLXAttribute.DOUBLEBUFFER, 1});
-            visualAttributes.AddRange(new[] {0, 0});
+            visualAttributes.AddRange(new[] { (int)GLXAttribute.DRAWABLE_TYPE, 1 });
+            visualAttributes.AddRange(new[] { (int)GLXAttribute.RENDER_TYPE, 1 });
+            visualAttributes.AddRange(new[] { (int)GLXAttribute.RED_SIZE, 8 });
+            visualAttributes.AddRange(new[] { (int)GLXAttribute.GREEN_SIZE, 8 });
+            visualAttributes.AddRange(new[] { (int)GLXAttribute.BLUE_SIZE, 8 });
+            visualAttributes.AddRange(new[] { (int)GLXAttribute.ALPHA_SIZE, 8 });
+            visualAttributes.AddRange(new[] { (int)GLXAttribute.DEPTH_SIZE, 24 });
+            visualAttributes.AddRange(new[] { (int)GLXAttribute.STENCIL_SIZE, 8 });
+            visualAttributes.AddRange(new[] { (int)GLXAttribute.DOUBLEBUFFER, 1 });
+            visualAttributes.AddRange(new[] { 0, 0 });
 #endif
 
             Console.WriteLine("++++++++++++++++++++++++");
@@ -143,11 +143,11 @@ namespace ScePSPPlatform.GL.Impl.Linux
                 attr.border_pixel = IntPtr.Zero;
                 attr.colormap = XCreateColormap(Display, root, info.Visual, 0);
                 attr.event_mask =
-                    (IntPtr) (EventMask.StructureNotifyMask | EventMask.ExposureMask | EventMask.KeyPressMask);
+                    (IntPtr)(EventMask.StructureNotifyMask | EventMask.ExposureMask | EventMask.KeyPressMask);
                 //var mask = (IntPtr)(CreateWindowMask.CWBackPixel | CreateWindowMask.CWBorderPixel | CreateWindowMask.CWColormap | CreateWindowMask.CWEventMask);
 
-                uint mask = (uint) SetWindowValuemask.ColorMap | (uint) SetWindowValuemask.EventMask |
-                            (uint) SetWindowValuemask.BackPixel | (uint) SetWindowValuemask.BorderPixel;
+                uint mask = (uint)SetWindowValuemask.ColorMap | (uint)SetWindowValuemask.EventMask |
+                            (uint)SetWindowValuemask.BackPixel | (uint)SetWindowValuemask.BorderPixel;
 
                 Console.WriteLine("{0}, {1}", info.Visual, info.VisualID);
 
@@ -156,8 +156,8 @@ namespace ScePSPPlatform.GL.Impl.Linux
                     root,
                     0, 0, width, height,
                     0,
-                    info.Depth, (int) XWindowClass.InputOutput,
-                    info.Visual, (IntPtr) mask, ref attr
+                    info.Depth, (int)XWindowClass.InputOutput,
+                    info.Visual, (IntPtr)mask, ref attr
                 );
             }
 
@@ -222,7 +222,7 @@ namespace ScePSPPlatform.GL.Impl.Linux
         public delegate IntPtr CreateContextAttribsARB(IntPtr display, IntPtr fbconfig, IntPtr shareContext,
             bool direct, int* attribs);
 
-        public GlContextSize Size => new GlContextSize {Width = 0, Height = 0};
+        public GlContextSize Size => new GlContextSize { Width = 0, Height = 0 };
 
         public IGlContext MakeCurrent()
         {

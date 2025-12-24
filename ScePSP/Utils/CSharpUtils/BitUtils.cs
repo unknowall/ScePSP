@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Runtime;
-using System.Runtime.CompilerServices;
 
 namespace ScePSPUtils
 {
@@ -15,10 +13,10 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="size"></param>
         /// <returns></returns>
-        
-        
+
+
         //public static uint CreateMask(int size) => (size == 0) ? 0 : (uint) ((1 << size) - 1);
-        public static uint CreateMask(this int size) => (uint) ((1 << size) - 1);
+        public static uint CreateMask(this int size) => (uint)((1 << size) - 1);
 
         /// <summary>
         /// 
@@ -28,8 +26,8 @@ namespace ScePSPUtils
         /// <param name="count"> </param>
         /// <param name="valueToInsert"> </param>
         /// <returns></returns>
-        
-        
+
+
         public static void Insert(ref uint value, int offset, int count, uint valueToInsert) =>
             value = Insert(value, offset, count, valueToInsert);
 
@@ -41,8 +39,8 @@ namespace ScePSPUtils
         /// <param name="count"> </param>
         /// <param name="valueToInsert"> </param>
         /// <returns></returns>
-        
-        
+
+
         public static uint Insert(this uint initialValue, int offset, int count, uint valueToInsert) =>
             InsertWithMask(initialValue, offset, CreateMask(count), valueToInsert);
 
@@ -54,8 +52,8 @@ namespace ScePSPUtils
         /// <param name="valueToInsert"> </param>
         /// <param name="maxValue"></param>
         /// <returns></returns>
-        
-        
+
+
         public static void
             InsertScaled(ref uint initialValue, int offset, int count, uint valueToInsert, uint maxValue) =>
             initialValue = InsertScaled(initialValue, offset, count, valueToInsert, maxValue);
@@ -68,8 +66,8 @@ namespace ScePSPUtils
         /// <param name="valueToInsert"> </param>
         /// <param name="maxValue"></param>
         /// <returns></returns>
-        
-        
+
+
         public static uint InsertScaled(this uint initialValue, int offset, int count, uint valueToInsert, uint maxValue) =>
             InsertWithMask(initialValue, offset, CreateMask(count),
                 valueToInsert * CreateMask(count) / maxValue);
@@ -82,8 +80,8 @@ namespace ScePSPUtils
         /// <param name="mask"></param>
         /// <param name="valueToInsert"></param>
         /// <returns></returns>
-        
-        
+
+
         private static uint InsertWithMask(this uint initialValue, int offset, uint mask, uint valueToInsert) =>
             (initialValue & ~(mask << offset)) | ((valueToInsert & mask) << offset);
 
@@ -94,8 +92,8 @@ namespace ScePSPUtils
         /// <param name="offset"> </param>
         /// <param name="count"> </param>
         /// <returns></returns>
-        
-        
+
+
         public static uint Extract(this uint initialValue, int offset, int count) =>
             (initialValue >> offset) & CreateMask(count);
 
@@ -107,13 +105,13 @@ namespace ScePSPUtils
         /// <param name="count"> </param>
         /// <param name="scale"> </param>
         /// <returns></returns>
-        
-        
+
+
         public static uint ExtractScaled(this uint initialValue, int offset, int count, int scale) =>
-            (uint) (Extract(initialValue, offset, count) * scale / CreateMask(count));
+            (uint)(Extract(initialValue, offset, count) * scale / CreateMask(count));
 
         public static uint ExtractScaled(this ushort initialValue, int offset, int count, int scale) =>
-            ExtractScaled((uint) initialValue, offset, count, scale);
+            ExtractScaled((uint)initialValue, offset, count, scale);
 
         /// <summary>
         /// 
@@ -121,8 +119,8 @@ namespace ScePSPUtils
         /// <param name="initialValue"> </param>
         /// <param name="offset"> </param>
         /// <returns></returns>
-        
-        
+
+
         public static bool ExtractBool(this uint initialValue, int offset) => Extract(initialValue, offset, 1) != 0;
 
         /// <summary>
@@ -132,18 +130,18 @@ namespace ScePSPUtils
         /// <param name="offset"> </param>
         /// <param name="count"> </param>
         /// <returns></returns>
-        
-        
+
+
         public static int ExtractSigned(this uint initialValue, int offset, int count)
         {
             var mask = CreateMask(count);
-            var signBit = (uint) (1 << (offset + (count - 1)));
+            var signBit = (uint)(1 << (offset + (count - 1)));
             var value = (initialValue >> offset) & mask;
             if ((value & signBit) != 0)
             {
                 value |= ~mask;
             }
-            return (int) value;
+            return (int)value;
         }
 
         /// <summary>
@@ -154,10 +152,10 @@ namespace ScePSPUtils
         /// <param name="count"> </param>
         /// <param name="scale"> </param>
         /// <returns></returns>
-        
+
         public static float ExtractUnsignedScaled(this uint value, int offset, int count, float scale = 1.0f)
         {
-            return (float) Extract(value, offset, count) / CreateMask(count) * scale;
+            return (float)Extract(value, offset, count) / CreateMask(count) * scale;
         }
 
         /// <summary>
@@ -189,7 +187,7 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="v"></param>
         /// <returns></returns>
-        
-        public static int GetFirstBit1(this uint v) => MultiplyDeBruijnBitPosition[(uint) ((v & -v) * 0x077CB531U) >> 27];
+
+        public static int GetFirstBit1(this uint v) => MultiplyDeBruijnBitPosition[(uint)((v & -v) * 0x077CB531U) >> 27];
     }
 }

@@ -37,7 +37,7 @@ namespace ScePSP.Core.Memory
             {
                 AlreadyInitialized = true;
 
-                _Base = (byte*) Marshal.AllocHGlobal((int) FastMemorySize).ToPointer();
+                _Base = (byte*)Marshal.AllocHGlobal((int)FastMemorySize).ToPointer();
 
                 //Console.WriteLine("*****************************");
             }
@@ -51,7 +51,7 @@ namespace ScePSP.Core.Memory
         public override uint PointerToPspAddressUnsafe(void* Pointer)
         {
             if (Pointer == null) return 0;
-            return (uint) ((byte*) Pointer - _Base);
+            return (uint)((byte*)Pointer - _Base);
         }
 
         public override void* PspAddressToPointerUnsafe(uint _Address)

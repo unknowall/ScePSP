@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScePSPUtils;
+using System;
 using System.IO;
-using ScePSPUtils;
 
 namespace ScePSP.Hle.Formats
 {
@@ -40,21 +40,21 @@ namespace ScePSP.Hle.Formats
         protected void PrepareBlock()
         {
             var macroBlockSize = CompressedIso.BlockSize * MacroBlockCount;
-            var currentMacroBlock = (int) (Position / macroBlockSize);
+            var currentMacroBlock = (int)(Position / macroBlockSize);
 
             if (currentMacroBlock != SelectedCurrentMacroBlock)
             {
                 SelectedCurrentMacroBlock = currentMacroBlock;
                 //Console.WriteLine("[1]");
                 SelectedCurrentMacroBlockData = new ArraySegment<byte>(CompressedIso
-                    .ReadBlocksDecompressed((uint) (currentMacroBlock * MacroBlockCount), MacroBlockCount)
+                    .ReadBlocksDecompressed((uint)(currentMacroBlock * MacroBlockCount), MacroBlockCount)
                     .CombineAsASingleByteArray());
                 //var Data = CompressedIso.ReadBlocksDecompressed((uint)(CurrentMacroBlock * this.MacroBlockCount), 1);
                 //ArrayUtils.HexDump(this.SelectedCurrentMacroBlockData.Array);
                 //Console.WriteLine("[2]");
             }
 
-            SelectedCurrentPositionInMacroBlock = (int) (Position % macroBlockSize);
+            SelectedCurrentPositionInMacroBlock = (int)(Position % macroBlockSize);
         }
 
         public override int Read(byte[] buffer, int offset, int count)

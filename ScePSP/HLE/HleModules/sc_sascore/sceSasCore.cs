@@ -1,8 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using ScePSP.Core.Types;
 using ScePSP.Hle.Attributes;
 using ScePSPUtils;
-using ScePSP.Core.Types;
+using System;
+using System.Linq;
 
 namespace ScePSP.Hle.Modules.sc_sascore
 {
@@ -264,9 +264,9 @@ namespace ScePSP.Hle.Modules.sc_sascore
             uint Out = 0;
             foreach (var Voice in SasCore.Voices)
             {
-                if (Voice.Paused) Out |= (uint) (1 << Voice.Index);
+                if (Voice.Paused) Out |= (uint)(1 << Voice.Index);
             }
-            return (int) Out;
+            return (int)Out;
         }
 
         /// <summary>

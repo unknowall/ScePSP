@@ -79,7 +79,7 @@ namespace ScePSPUtils
         public int Write(byte[] transferData, int offset = 0, int length = -1)
         {
             if (length == -1) length = _dataLength - offset;
-            length = Math.Min(length, (int) WriteAvailable);
+            length = Math.Min(length, (int)WriteAvailable);
             var transferred = 0;
             while (length-- > 0)
             {
@@ -99,7 +99,7 @@ namespace ScePSPUtils
         public int Read(byte[] transferData, int offset = 0, int length = -1)
         {
             if (length == -1) length = _dataLength - offset;
-            length = Math.Min(length, (int) ReadAvailable);
+            length = Math.Min(length, (int)ReadAvailable);
             var transferred = 0;
             while (length-- > 0)
             {
@@ -176,7 +176,7 @@ namespace ScePSPUtils
         public int Write(T[] transferData, int offset = 0, int length = -1)
         {
             if (length == -1) length = Data.Length - offset;
-            length = Math.Min(length, (int) WriteAvailable);
+            length = Math.Min(length, (int)WriteAvailable);
             var transferred = 0;
             while (length-- > 0)
             {
@@ -196,7 +196,7 @@ namespace ScePSPUtils
         public int Read(T[] transferData, int offset = 0, int length = -1)
         {
             if (length == -1) length = Data.Length - offset;
-            length = Math.Min(length, (int) ReadAvailable);
+            length = Math.Min(length, (int)ReadAvailable);
             var transferred = 0;
             while (length-- > 0)
             {

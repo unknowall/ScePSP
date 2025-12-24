@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScePSPUtils;
+using System;
 using System.Text;
-using ScePSPUtils;
 
 namespace ScePSP.Hle.Modules.utility
 {
@@ -12,14 +12,14 @@ namespace ScePSP.Hle.Modules.utility
         {
             switch (id)
             {
-                case PSP_SYSTEMPARAM_ID.INT_ADHOC_CHANNEL: return (int) HleConfig.AdhocChannel;
-                case PSP_SYSTEMPARAM_ID.INT_WLAN_POWERSAVE: return (int) HleConfig.WlanPowersave;
-                case PSP_SYSTEMPARAM_ID.INT_DATE_FORMAT: return (int) HleConfig.DateFormat;
-                case PSP_SYSTEMPARAM_ID.INT_TIME_FORMAT: return (int) HleConfig.TimeFormat;
+                case PSP_SYSTEMPARAM_ID.INT_ADHOC_CHANNEL: return (int)HleConfig.AdhocChannel;
+                case PSP_SYSTEMPARAM_ID.INT_WLAN_POWERSAVE: return (int)HleConfig.WlanPowersave;
+                case PSP_SYSTEMPARAM_ID.INT_DATE_FORMAT: return (int)HleConfig.DateFormat;
+                case PSP_SYSTEMPARAM_ID.INT_TIME_FORMAT: return (int)HleConfig.TimeFormat;
                 case PSP_SYSTEMPARAM_ID.INT_TIMEZONE: return -5 * 60;
-                case PSP_SYSTEMPARAM_ID.INT_DAYLIGHTSAVINGS: return (int) HleConfig.DaylightSavings;
-                case PSP_SYSTEMPARAM_ID.INT_LANGUAGE: return (int) HleConfig.Language;
-                case PSP_SYSTEMPARAM_ID.INT_BUTTON_PREFERENCE: return (int) HleConfig.ConfirmButton;
+                case PSP_SYSTEMPARAM_ID.INT_DAYLIGHTSAVINGS: return (int)HleConfig.DaylightSavings;
+                case PSP_SYSTEMPARAM_ID.INT_LANGUAGE: return (int)HleConfig.Language;
+                case PSP_SYSTEMPARAM_ID.INT_BUTTON_PREFERENCE: return (int)HleConfig.ConfirmButton;
                 default: throw new SceKernelException(SceKernelErrors.PSP_SYSTEMPARAM_RETVAL);
             }
         }

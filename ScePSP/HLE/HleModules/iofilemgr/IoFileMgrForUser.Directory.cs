@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScePSP.Hle.Vfs;
+using System;
 using System.IO;
-using ScePSP.Hle.Vfs;
 
 namespace ScePSP.Hle.Modules.iofilemgr
 {

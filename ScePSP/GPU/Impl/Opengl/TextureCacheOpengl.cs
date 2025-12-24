@@ -1,6 +1,6 @@
-﻿using ScePSPPlatform.GL.Utils;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
+using ScePSPPlatform.GL.Utils;
 
 namespace ScePSP.Core.Gpu.Impl.Opengl
 {
@@ -16,7 +16,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
     {
         public GLTexture Texture;
 
-        public int TextureId => (int) Texture.Texture;
+        public int TextureId => (int)Texture.Texture;
 
         protected override void Init()
         {

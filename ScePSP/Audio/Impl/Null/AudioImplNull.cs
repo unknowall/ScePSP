@@ -2,7 +2,7 @@
 
 namespace ScePSP.Core.Audio.Impl.Null
 {
-    public class AudioImplNull : PspAudioImpl
+    public class AudioImplNull : AudioImpl
     {
         public override void Update(Action<short[]> readStream)
         {

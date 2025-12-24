@@ -1,10 +1,10 @@
-﻿using System;
-using System.Drawing;
-using ScePSP.Core.Components.Rtc;
+﻿using ScePSP.Core.Components.Rtc;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Threading.Synchronization;
 using ScePSP.Core.Types;
 using ScePSP.Utils.Utils;
+using System;
+using System.Drawing;
 
 namespace ScePSP.Core.Components.Display
 {
@@ -84,7 +84,7 @@ namespace ScePSP.Core.Components.Display
         public int GetHCount()
         {
             var elaspedTime = DateTime.UtcNow - _startDrawTime;
-            return (int) (elaspedTime.TotalSeconds / (1 / HorizontalSyncHertz));
+            return (int)(elaspedTime.TotalSeconds / (1 / HorizontalSyncHertz));
         }
 
         public static event Action VBlankCallback;
@@ -131,7 +131,7 @@ namespace ScePSP.Core.Components.Display
                 CurrentInfo.PixelFormat,
                 CurrentInfo.BufferWidth,
                 CurrentInfo.Height,
-                (byte*) _memory.PspAddressToPointerSafe(
+                (byte*)_memory.PspAddressToPointerSafe(
                     CurrentInfo.FrameAddress,
                     PixelFormatDecoder.GetPixelsSize(CurrentInfo.PixelFormat,
                         CurrentInfo.BufferWidth * CurrentInfo.Height)

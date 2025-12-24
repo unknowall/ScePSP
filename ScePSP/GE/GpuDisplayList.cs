@@ -1,16 +1,16 @@
 ﻿#define PRIM_BATCH
 
-using System;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Threading;
 using ScePSP.Core.Gpu.State;
+using ScePSP.Core.Gpu.VertexReading;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Threading.Synchronization;
 using ScePSPUtils;
-using System.Runtime.InteropServices;
 using ScePSPUtils.Extensions;
-using ScePSP.Core.Gpu.VertexReading;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
+using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace ScePSP.Core.Gpu
 {
@@ -19,7 +19,7 @@ namespace ScePSP.Core.Gpu
     {
         public uint Instruction;
 
-        public GpuOpCodes OpCode => (GpuOpCodes) ((Instruction >> 24) & 0xFF);
+        public GpuOpCodes OpCode => (GpuOpCodes)((Instruction >> 24) & 0xFF);
 
         public uint Params => Instruction & 0xFFFFFF;
 
@@ -29,7 +29,7 @@ namespace ScePSP.Core.Gpu
     public sealed unsafe class GpuDisplayList
     {
         public static uint[] DummyData = new uint[GpuStateStruct.StructSizeInBytes];
-        
+
         private static readonly Logger Logger = Logger.GetLogger("Gpu");
 
         private static bool Debug = false;
@@ -48,7 +48,7 @@ namespace ScePSP.Core.Gpu
         private volatile uint InstructionAddressCurrent;
         private volatile uint InstructionAddressStall;
         AutoResetEvent StallAddressUpdated = new AutoResetEvent(false);
-        public GpuStateStruct GpuStateStructPointer = new GpuStateStruct(new GpuStateData(DummyData)); 
+        public GpuStateStruct GpuStateStructPointer = new GpuStateStruct(new GpuStateData(DummyData));
         public GpuStateData GpuStateData => GpuStateStructPointer.data;
         private GlobalGpuState GlobalGpuState;
         private readonly Stack<IntPtr> ExecutionStack = new Stack<IntPtr>();
@@ -149,7 +149,7 @@ namespace ScePSP.Core.Gpu
 
         internal GpuInstruction ReadInstructionAndMoveNext()
         {
-            var Value = *(GpuInstruction*) Memory.PspAddressToPointerUnsafe(InstructionAddressCurrent);
+            var Value = *(GpuInstruction*)Memory.PspAddressToPointerUnsafe(InstructionAddressCurrent);
             InstructionAddressCurrent += 4;
             return Value;
         }
@@ -160,7 +160,7 @@ namespace ScePSP.Core.Gpu
         {
             var Instruction = ReadInstructionAndMoveNext();
             var Params24 = Instruction.Params;
-            
+
             //Console.WriteLine($"ProcessInstruction: Pc={Pc}, Instruction={Instruction}");
 
             //InstructionSwitch(GpuDisplayListRunner, Instruction.OpCode, Instruction.Params);
@@ -176,34 +176,34 @@ namespace ScePSP.Core.Gpu
 
                 // Flow
                 case GpuOpCodes.JUMP:
-                {
-                    JumpRelativeOffset((uint) (Params24 & ~3));
-                    break;
-                }
+                    {
+                        JumpRelativeOffset((uint)(Params24 & ~3));
+                        break;
+                    }
                 case GpuOpCodes.CALL:
-                {
-                    CallRelativeOffset((uint) (Params24 & ~3));
-                    break;
-                }
+                    {
+                        CallRelativeOffset((uint)(Params24 & ~3));
+                        break;
+                    }
                 case GpuOpCodes.RET:
-                {
-                    Ret();
-                    break;
-                }
+                    {
+                        Ret();
+                        break;
+                    }
 
                 // Finishing
                 case GpuOpCodes.END:
-                {
-                    Done = true;
-                    GpuProcessor.GpuImpl.End(GpuStateStructPointer);
-                    break;
-                }
+                    {
+                        Done = true;
+                        GpuProcessor.GpuImpl.End(GpuStateStructPointer);
+                        break;
+                    }
                 case GpuOpCodes.FINISH:
-                {
-                    GpuProcessor.GpuImpl.Finish(GpuStateStructPointer);
-                    DoFinish(InstructionAddressCurrent, Params24, ExecuteNow: true);
-                    break;
-                }
+                    {
+                        GpuProcessor.GpuImpl.Finish(GpuStateStructPointer);
+                        DoFinish(InstructionAddressCurrent, Params24, ExecuteNow: true);
+                        break;
+                    }
 
                 // Texture
                 case GpuOpCodes.TFLUSH:
@@ -212,7 +212,7 @@ namespace ScePSP.Core.Gpu
                 case GpuOpCodes.TSYNC:
                     GpuProcessor.GpuImpl.TextureSync(GpuStateStructPointer);
                     break;
-                
+
                 // Kicking
                 case GpuOpCodes.SPLINE:
                     // @TODO
@@ -224,159 +224,159 @@ namespace ScePSP.Core.Gpu
                     break;
 
                 case GpuOpCodes.TRXKICK:
-                {
-                    var transfer = GpuStateStructPointer.TextureTransferState;
-                    transfer.TexelSize =
-                        (TextureTransferStateStruct.TexelSizeEnum) Params24.Extract(0, 1);
-                    GpuProcessor.GpuImpl.Transfer(GpuStateStructPointer);
-                    break;
-                }
+                    {
+                        var transfer = GpuStateStructPointer.TextureTransferState;
+                        transfer.TexelSize =
+                            (TextureTransferStateStruct.TexelSizeEnum)Params24.Extract(0, 1);
+                        GpuProcessor.GpuImpl.Transfer(GpuStateStructPointer);
+                        break;
+                    }
 
                 case GpuOpCodes.PPRIM:
-                {
-                    //gpu.state.patch.type = command.extract!(PatchPrimitiveType, 0);
-                    break;
-                }
+                    {
+                        //gpu.state.patch.type = command.extract!(PatchPrimitiveType, 0);
+                        break;
+                    }
 
                 case GpuOpCodes.PRIM:
-                {
-                    var primitiveType = (GuPrimitiveType) Params24.Extract(16, 3);
-                    var vertexCount = (ushort) Params24.Extract(0, 16);
+                    {
+                        var primitiveType = (GuPrimitiveType)Params24.Extract(16, 3);
+                        var vertexCount = (ushort)Params24.Extract(0, 16);
 
 #if PRIM_BATCH
-                    var nextInstruction = *(GpuInstruction*) Memory.PspAddressToPointerUnsafe(Pc + 4);
+                        var nextInstruction = *(GpuInstruction*)Memory.PspAddressToPointerUnsafe(Pc + 4);
 
-                    if (_primCount == 0)
-                    {
-                        GpuProcessor.GpuImpl.BeforeDraw(GpuStateStructPointer);
-                        GpuProcessor.GpuImpl.PrimStart(GlobalGpuState, GpuStateStructPointer,
-                            primitiveType);
-                    }
+                        if (_primCount == 0)
+                        {
+                            GpuProcessor.GpuImpl.BeforeDraw(GpuStateStructPointer);
+                            GpuProcessor.GpuImpl.PrimStart(GlobalGpuState, GpuStateStructPointer,
+                                primitiveType);
+                        }
 
-                    if (vertexCount > 0)
-                    {
-                        GpuProcessor.GpuImpl.Prim(vertexCount);
-                    }
+                        if (vertexCount > 0)
+                        {
+                            GpuProcessor.GpuImpl.Prim(vertexCount);
+                        }
 
-                    if (nextInstruction.OpCode == GpuOpCodes.PRIM &&
-                        (GuPrimitiveType) nextInstruction.Params.Extract(16, 3) == primitiveType)
-                    {
-                        //Console.WriteLine();
-                        _primCount++;
-                    }
-                    else
-                    {
-                        //Console.WriteLine("{0:X8}", PC);
+                        if (nextInstruction.OpCode == GpuOpCodes.PRIM &&
+                            (GuPrimitiveType)nextInstruction.Params.Extract(16, 3) == primitiveType)
+                        {
+                            //Console.WriteLine();
+                            _primCount++;
+                        }
+                        else
+                        {
+                            //Console.WriteLine("{0:X8}", PC);
 
-                        _primCount = 0;
-                        GpuProcessor.GpuImpl.PrimEnd();
-                    }
+                            _primCount = 0;
+                            GpuProcessor.GpuImpl.PrimEnd();
+                        }
 #else
                     GpuDisplayList.GpuProcessor.GpuImpl.BeforeDraw(GpuDisplayList.GpuStateStructPointer);
                     GpuDisplayList.GpuProcessor.GpuImpl.PrimStart(GlobalGpuState, GpuDisplayList.GpuStateStructPointer);
                     GpuDisplayList.GpuProcessor.GpuImpl.Prim(GlobalGpuState, GpuDisplayList.GpuStateStructPointer, primitiveType, vertexCount);
                     GpuDisplayList.GpuProcessor.GpuImpl.PrimEnd(GlobalGpuState, GpuDisplayList.GpuStateStructPointer);
 #endif
-                }
+                    }
                     break;
                 case GpuOpCodes.BEZIER:
-                {
-                    var uCount = (byte)Params24.Extract(0, 8);
-                    var vCount = (byte)Params24.Extract(8, 8);
-                    DrawBezier(uCount, vCount);
-                    break;
-                }
-                case GpuOpCodes.ZBW:
-                {
-                    GpuProcessor.MarkDepthBufferLoad(); // @TODO: Is this required?
-                    break;
-                }
-
-                case GpuOpCodes.SIGNAL:
-                {
-                    var signal = Params24.Extract(0, 16);
-                    var behaviour = (SignalBehavior) Params24.Extract(16, 8);
-
-                    Console.Out.WriteLineColored(ConsoleColor.Green, "OP_SIGNAL: {0}, {1}", signal, behaviour);
-
-                    switch (behaviour)
                     {
-                        case SignalBehavior.PSP_GE_SIGNAL_NONE:
-                            break;
-                        case SignalBehavior.PSP_GE_SIGNAL_HANDLER_CONTINUE:
-                        case SignalBehavior.PSP_GE_SIGNAL_HANDLER_PAUSE:
-                        case SignalBehavior.PSP_GE_SIGNAL_HANDLER_SUSPEND:
-                            var next = ReadInstructionAndMoveNext();
-                            if (next.OpCode != GpuOpCodes.END)
-                            {
-                                throw new NotImplementedException("Error! Next Signal not an END! : " + next.OpCode);
-                            }
-                            break;
-                        default:
-                            throw new NotImplementedException($"Not implemented {behaviour}");
+                        var uCount = (byte)Params24.Extract(0, 8);
+                        var vCount = (byte)Params24.Extract(8, 8);
+                        DrawBezier(uCount, vCount);
+                        break;
+                    }
+                case GpuOpCodes.ZBW:
+                    {
+                        GpuProcessor.MarkDepthBufferLoad(); // @TODO: Is this required?
+                        break;
                     }
 
-                    DoSignal(Pc, signal, behaviour, ExecuteNow: true);
+                case GpuOpCodes.SIGNAL:
+                    {
+                        var signal = Params24.Extract(0, 16);
+                        var behaviour = (SignalBehavior)Params24.Extract(16, 8);
 
-                    break;
-                }
-                
+                        Console.Out.WriteLineColored(ConsoleColor.Green, "OP_SIGNAL: {0}, {1}", signal, behaviour);
+
+                        switch (behaviour)
+                        {
+                            case SignalBehavior.PSP_GE_SIGNAL_NONE:
+                                break;
+                            case SignalBehavior.PSP_GE_SIGNAL_HANDLER_CONTINUE:
+                            case SignalBehavior.PSP_GE_SIGNAL_HANDLER_PAUSE:
+                            case SignalBehavior.PSP_GE_SIGNAL_HANDLER_SUSPEND:
+                                var next = ReadInstructionAndMoveNext();
+                                if (next.OpCode != GpuOpCodes.END)
+                                {
+                                    throw new NotImplementedException("Error! Next Signal not an END! : " + next.OpCode);
+                                }
+                                break;
+                            default:
+                                throw new NotImplementedException($"Not implemented {behaviour}");
+                        }
+
+                        DoSignal(Pc, signal, behaviour, ExecuteNow: true);
+
+                        break;
+                    }
+
                 // Matrices
                 case GpuOpCodes.TMS:
-                {
-                    GpuStateData[GpuOpCodes.TMS] = 0;
-                    break;
-                }
+                    {
+                        GpuStateData[GpuOpCodes.TMS] = 0;
+                        break;
+                    }
                 case GpuOpCodes.TMATRIX:
-                {
-                    var pos = GpuStateData[GpuOpCodes.TMS]++;
-                    GpuStateData[GpuOpCodes.TMATRIX_BASE + (ushort) pos] = Params24 << 8;
-                    break;
-                }
+                    {
+                        var pos = GpuStateData[GpuOpCodes.TMS]++;
+                        GpuStateData[GpuOpCodes.TMATRIX_BASE + (ushort)pos] = Params24 << 8;
+                        break;
+                    }
                 case GpuOpCodes.VMS:
-                {
-                    GpuStateData[GpuOpCodes.VMS] = 0;
-                    break;
-                }
+                    {
+                        GpuStateData[GpuOpCodes.VMS] = 0;
+                        break;
+                    }
                 case GpuOpCodes.VIEW:
-                {
-                    var pos = GpuStateData[GpuOpCodes.VMS]++;
-                    GpuStateData[GpuOpCodes.VIEW_MATRIX_BASE + (ushort) pos] = Params24 << 8;
-                    break;
-                }
+                    {
+                        var pos = GpuStateData[GpuOpCodes.VMS]++;
+                        GpuStateData[GpuOpCodes.VIEW_MATRIX_BASE + (ushort)pos] = Params24 << 8;
+                        break;
+                    }
                 case GpuOpCodes.WMS:
-                {
-                    GpuStateData[GpuOpCodes.WMS] = 0;
-                    break;
-                }
+                    {
+                        GpuStateData[GpuOpCodes.WMS] = 0;
+                        break;
+                    }
                 case GpuOpCodes.WORLD:
-                {
-                    var pos = GpuStateData[GpuOpCodes.WMS]++;
-                    GpuStateData[GpuOpCodes.WORLD_MATRIX_BASE + (ushort) pos] = Params24 << 8;
-                    break;
-                }
+                    {
+                        var pos = GpuStateData[GpuOpCodes.WMS]++;
+                        GpuStateData[GpuOpCodes.WORLD_MATRIX_BASE + (ushort)pos] = Params24 << 8;
+                        break;
+                    }
                 case GpuOpCodes.PMS:
-                {
-                    GpuStateData[GpuOpCodes.PMS] = 0;
-                    break;
-                }
+                    {
+                        GpuStateData[GpuOpCodes.PMS] = 0;
+                        break;
+                    }
                 case GpuOpCodes.PROJ:
-                {
-                    var pos = GpuStateData[GpuOpCodes.PMS]++;
-                    GpuStateData[GpuOpCodes.PROJ_MATRIX_BASE + (ushort) pos] = Params24 << 8;
-                    break;
-                }
+                    {
+                        var pos = GpuStateData[GpuOpCodes.PMS]++;
+                        GpuStateData[GpuOpCodes.PROJ_MATRIX_BASE + (ushort)pos] = Params24 << 8;
+                        break;
+                    }
                 case GpuOpCodes.BOFS:
-                {
-                    GpuStateData[GpuOpCodes.BOFS] = Params24;
-                    break;
-                }
+                    {
+                        GpuStateData[GpuOpCodes.BOFS] = Params24;
+                        break;
+                    }
                 case GpuOpCodes.BONE:
-                {
-                    var pos = GpuStateData[GpuOpCodes.BOFS]++;
-                    GpuStateData[GpuOpCodes.BONE_MATRIX_BASE + (ushort) pos] = Params24 << 8;
-                    break;
-                }
+                    {
+                        var pos = GpuStateData[GpuOpCodes.BOFS]++;
+                        GpuStateData[GpuOpCodes.BONE_MATRIX_BASE + (ushort)pos] = Params24 << 8;
+                        break;
+                    }
             }
 
             if (Debug)
@@ -425,7 +425,7 @@ namespace ScePSP.Core.Gpu
             var controlPoints = new VertexInfo[uCount, vCount];
 
             var vertexPtr =
-                (byte*) GpuProcessor.Memory.PspAddressToPointerSafe(
+                (byte*)GpuProcessor.Memory.PspAddressToPointerSafe(
                     GpuStateStructPointer.GetAddressRelativeToBaseOffset(GpuStateStructPointer.VertexAddress));
             var vertexReader = new VertexReader();
             vertexReader.SetVertexTypeStruct(GpuStateStructPointer.VertexState.Type, vertexPtr);
@@ -442,7 +442,7 @@ namespace ScePSP.Core.Gpu
         }
 
         int _primCount;
-        
+
         private void DrawBezier(int uCount, int vCount)
         {
             var divS = GpuStateStructPointer.PatchState.DivS;
@@ -485,9 +485,9 @@ namespace ScePSP.Core.Gpu
 
             for (var j = 0; j <= divT; j++)
             {
-                var vglobal = (float) j * vpcount / divT;
+                var vglobal = (float)j * vpcount / divT;
 
-                var vpatch = (int) vglobal; // Patch number
+                var vpatch = (int)vglobal; // Patch number
                 var v = vglobal - vpatch;
                 if (j == divT)
                 {
@@ -498,8 +498,8 @@ namespace ScePSP.Core.Gpu
 
                 for (var i = 0; i <= divS; i++)
                 {
-                    var uglobal = (float) i * upcount / divS;
-                    var upatch = (int) uglobal;
+                    var uglobal = (float)i * upcount / divS;
+                    var upatch = (int)uglobal;
                     var u = uglobal - upatch;
                     if (i == divS)
                     {
@@ -559,7 +559,7 @@ namespace ScePSP.Core.Gpu
             GpuProcessor.GpuImpl.DrawCurvedSurface(GlobalGpuState, GpuStateStructPointer,
                 patch, uCount, vCount);
         }
-        
+
 
         internal void JumpRelativeOffset(uint Address)
         {
@@ -574,7 +574,7 @@ namespace ScePSP.Core.Gpu
         internal void CallRelativeOffset(uint Address)
         {
             CallStack.Push(InstructionAddressCurrent);
-            CallStack.Push((uint) GpuStateStructPointer.BaseOffset);
+            CallStack.Push((uint)GpuStateStructPointer.BaseOffset);
             //CallStack.Push(InstructionAddressCurrent);
             JumpRelativeOffset(Address);
             //throw new NotImplementedException();

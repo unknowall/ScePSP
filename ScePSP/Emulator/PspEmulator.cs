@@ -1,20 +1,19 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Threading;
+﻿using ScePSP.cheats;
 using ScePSP.Core;
-using ScePSP.Core.Audio;
+using ScePSP.Core.Components.Display;
 using ScePSP.Core.Cpu;
 using ScePSP.Core.Gpu;
 using ScePSP.Core.Memory;
-using ScePSP.Runner;
-using ScePSP.Hle.Managers;
 using ScePSP.Hle;
-using ScePSP.Core.Components.Display;
 using ScePSP.Hle.Loader;
-using ScePSP.cheats;
+using ScePSP.Hle.Managers;
 using ScePSP.Inject;
+using ScePSP.Runner;
 using ScePSP.TextureHook;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading;
 
 namespace ScePSP
 {
@@ -166,7 +165,7 @@ namespace ScePSP
             }
             CreateNewContextAndRemoveOldOne();
 
-            MessageBus.Dispatch(new LoadFileMessage() {FileName = FileName});
+            MessageBus.Dispatch(new LoadFileMessage() { FileName = FileName });
 
             PspRunner.CpuComponentThread.ThreadTaskQueue.EnqueueAndWaitCompleted(() =>
             {

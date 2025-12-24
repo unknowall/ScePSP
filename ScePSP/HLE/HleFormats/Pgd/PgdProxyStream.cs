@@ -1,5 +1,5 @@
-﻿using System.IO;
-using ScePSPUtils.Streams;
+﻿using ScePSPUtils.Streams;
+using System.IO;
 
 namespace ScePSP.Hle.Formats.Pgd
 {

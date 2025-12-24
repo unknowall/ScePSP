@@ -1,17 +1,16 @@
 ﻿//#define DEBUG_FUNCTION_CREATION
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
 using ScePSP.Core.Cpu.Assembler;
-using ScePSP.Core.Cpu.VFpu;
-using ScePSP.Core.Cpu.InstructionCache;
 using ScePSP.Core.Cpu.Dynarec;
+using ScePSP.Core.Cpu.Emitter;
+using ScePSP.Core.Cpu.InstructionCache;
+using ScePSP.Core.Cpu.VFpu;
 using ScePSP.Core.Memory;
 using ScePSPUtils;
-using ScePSP.Core.Cpu.Emitter;
-using System.Runtime;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace ScePSP.Core.Cpu
 {
@@ -61,15 +60,15 @@ namespace ScePSP.Core.Cpu
 
         public long HiLo
         {
-            
+
             get
             {
-                fixed (int* loPtr = &Lo) return *(long*) loPtr;
+                fixed (int* loPtr = &Lo) return *(long*)loPtr;
             }
-            
+
             set
             {
-                fixed (int* loPtr = &Lo) *(long*) loPtr = value;
+                fixed (int* loPtr = &Lo) *(long*)loPtr = value;
             }
         }
 
@@ -416,7 +415,7 @@ namespace ScePSP.Core.Cpu
                 uint value = 0;
                 fixed (bool* vfrCc = &VfrCc0)
                 {
-                    for (int n = 0; n < 8; n++) value |= (uint) (vfrCc[n] ? 1 << n : 0);
+                    for (int n = 0; n < 8; n++) value |= (uint)(vfrCc[n] ? 1 << n : 0);
                 }
                 return value;
             }
@@ -526,12 +525,12 @@ namespace ScePSP.Core.Cpu
         public void SetGpr(int index, int value)
         {
             if (index == 0) return;
-            fixed (uint* ptr = &Gpr0) ptr[index] = (uint)value;            
+            fixed (uint* ptr = &Gpr0) ptr[index] = (uint)value;
         }
 
         public int GetGpr(int index)
         {
-            fixed (uint* ptr = &Gpr0) return (int)ptr[index];            
+            fixed (uint* ptr = &Gpr0) return (int)ptr[index];
         }
 
         public GprList Gpr;
@@ -599,11 +598,11 @@ namespace ScePSP.Core.Cpu
             MethodCache = processor.MethodCache;
             //this.Memory = Processor.Memory;
 
-            Gpr = new GprList {CpuThreadState = this};
-            Fpr = new FprList {CpuThreadState = this};
-            C0R = new C0RList {CpuThreadState = this};
-            FprI = new FprListInteger {CpuThreadState = this};
-            Vfpr = new VfprList {CpuThreadState = this};
+            Gpr = new GprList { CpuThreadState = this };
+            Fpr = new FprList { CpuThreadState = this };
+            C0R = new C0RList { CpuThreadState = this };
+            FprI = new FprListInteger { CpuThreadState = this };
+            Vfpr = new VfprList { CpuThreadState = this };
 
             for (var n = 0; n < 32; n++) Gpr[n] = 0;
             for (var n = 0; n < 32; n++) Fpr[n] = 0.0f;
@@ -637,8 +636,8 @@ namespace ScePSP.Core.Cpu
         /// Function called on some situations, that allow
         /// to yield the thread.
         /// </summary>
-        
-        
+
+
         public void Tick()
         {
             //Console.WriteLine("Tick1");
@@ -647,7 +646,7 @@ namespace ScePSP.Core.Cpu
                 _tickCount++;
 
                 if ((_tickCount & 0x1F) == 1)
-                    //if ((TickCount & 3) == 1)
+                //if ((TickCount & 3) == 1)
                 {
                     Tick2();
                 }
@@ -851,9 +850,9 @@ namespace ScePSP.Core.Cpu
             {
                 get
                 {
-                    _value = BitUtils.Insert(_value, 0, 2, (uint) Rm);
-                    _value = BitUtils.Insert(_value, 23, 1, (uint) (Cc ? 1 : 0));
-                    _value = BitUtils.Insert(_value, 24, 1, (uint) (Fs ? 1 : 0));
+                    _value = BitUtils.Insert(_value, 0, 2, (uint)Rm);
+                    _value = BitUtils.Insert(_value, 23, 1, (uint)(Cc ? 1 : 0));
+                    _value = BitUtils.Insert(_value, 24, 1, (uint)(Fs ? 1 : 0));
                     return _value;
                 }
                 set
@@ -861,7 +860,7 @@ namespace ScePSP.Core.Cpu
                     _value = value;
                     Cc = BitUtils.Extract(value, 23, 1) != 0;
                     Fs = BitUtils.Extract(value, 24, 1) != 0;
-                    Rm = (TypeEnum) BitUtils.Extract(value, 0, 2);
+                    Rm = (TypeEnum)BitUtils.Extract(value, 0, 2);
                 }
             }
 
@@ -931,11 +930,11 @@ namespace ScePSP.Core.Cpu
             {
                 get
                 {
-                    fixed (float* ptr = &CpuThreadState.Fpr0) return ((int*) ptr)[index];
+                    fixed (float* ptr = &CpuThreadState.Fpr0) return ((int*)ptr)[index];
                 }
                 set
                 {
-                    fixed (float* ptr = &CpuThreadState.Fpr0) ((int*) ptr)[index] = value;
+                    fixed (float* ptr = &CpuThreadState.Fpr0) ((int*)ptr)[index] = value;
                 }
             }
         }

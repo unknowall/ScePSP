@@ -1,6 +1,6 @@
-﻿using System;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
 using ScePSPUtils;
+using System;
 
 namespace ScePSP.Hle.Modules._unknownPrx
 {

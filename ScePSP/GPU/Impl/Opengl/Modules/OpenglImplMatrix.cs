@@ -1,6 +1,5 @@
-﻿using System.Numerics;
-using ScePSPPlatform;
-using ScePSP.Core.Gpu.State;
+﻿using ScePSP.Core.Gpu.State;
+using System.Numerics;
 
 namespace ScePSP.Core.Gpu.Impl.Opengl.Modules
 {
@@ -11,7 +10,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl.Modules
             // DRAW BEGIN COMMON
             {
                 if (gpuState.VertexState.Type.Transform2D)
-                    //if (true)
+                //if (true)
                 {
                     worldViewProjectionMatrix = Matrix4x4.CreateOrthographic(512, 272, 0, -0xFFFF);
                     //WorldViewProjectionMatrix = Matrix4f.Ortho(0, 480, 272, 0, 0, -0xFFFF);
@@ -20,7 +19,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl.Modules
                 {
                     worldViewProjectionMatrix =
                         gpuState.VertexState.WorldMatrix * gpuState.VertexState.ViewMatrix *
-                        gpuState.VertexState.ProjectionMatrix;  
+                        gpuState.VertexState.ProjectionMatrix;
                 }
             }
         }

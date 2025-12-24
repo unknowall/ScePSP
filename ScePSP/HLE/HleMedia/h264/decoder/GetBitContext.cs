@@ -153,11 +153,11 @@ namespace cscodec.h264.decoder
 
         public static long bitswap_32(long _x)
         {
-            ulong x = (ulong) _x;
-            return av_reverse[(int) (x & 0x0FF)] << 24
-                   | av_reverse[(int) ((x >> 8) & 0x0FF)] << 16
-                   | av_reverse[(int) ((x >> 16) & 0x0FF)] << 8
-                   | av_reverse[(int) (x >> 24)];
+            ulong x = (ulong)_x;
+            return av_reverse[(int)(x & 0x0FF)] << 24
+                   | av_reverse[(int)((x >> 8) & 0x0FF)] << 16
+                   | av_reverse[(int)((x >> 16) & 0x0FF)] << 8
+                   | av_reverse[(int)(x >> 24)];
         }
 
         // Copy ctor??
@@ -218,7 +218,7 @@ namespace cscodec.h264.decoder
 
             //sign=(~cache)>>31;
             // we use long
-            sign = (int) (~cache >> 63);
+            sign = (int)(~cache >> 63);
 
             //LAST_SKIP_BITS(re, s, n)
             re_index += n;
@@ -228,7 +228,7 @@ namespace cscodec.h264.decoder
 
             //return (NEG_USR32(sign ^ cache, n) ^ sign) - sign;
             //Console.WriteLine("get_xbit: "+ (( (((int)(sign ^ cache))>>(32-(n))) ^ sign) - sign) );
-            return (((int) (sign ^ cache) >> (32 - n)) ^ sign) - sign;
+            return (((int)(sign ^ cache) >> (32 - n)) ^ sign) - sign;
         }
 
         public /*inline*/ int get_sbits(int n)
@@ -250,7 +250,7 @@ namespace cscodec.h264.decoder
 
             //tmp= SHOW_SBITS(re, s, n);
             ////tmp = ((( int32_t)(re_cache))>>(32-(n)))
-            tmp = (int) re_cache >> (32 - n);
+            tmp = (int)re_cache >> (32 - n);
 
             //LAST_SKIP_BITS(re, s, n)
             re_index += n;
@@ -414,7 +414,7 @@ namespace cscodec.h264.decoder
         public /*inline*/ int get_sbits_long(int n, string message)
         {
             //return sign_extend(get_bits_long(n), n);
-            return ((int) get_bits_long(n, message) << (8 * 4 - n)) >> (8 * 4 - n);
+            return ((int)get_bits_long(n, message) << (8 * 4 - n)) >> (8 * 4 - n);
         }
 
         /**
@@ -591,7 +591,7 @@ namespace cscodec.h264.decoder
                     /* no need to add another table */
                     //!!! Prevent 32-Bit value in negative interval
                     long tmp = code & 0xffffffffL;
-                    j = (int) (tmp >> (32 - table_nb_bits));
+                    j = (int)(tmp >> (32 - table_nb_bits));
                     nb = 1 << (table_nb_bits - n);
                     inc = 1;
                     if ((flags & INIT_VLC_LE) != 0)
@@ -603,13 +603,13 @@ namespace cscodec.h264.decoder
                     {
                         //Console.WriteLine("["+j+"]: code="+i+" n="+n);
 
-                        if (table_base[(int) (table_offset + j)][1] /*bits*/ != 0)
+                        if (table_base[(int)(table_offset + j)][1] /*bits*/ != 0)
                         {
                             //Console.WriteLine("incorrect codes.");
                             return -1;
                         }
-                        table_base[(int) (table_offset + j)][1] = (short) n; //bits
-                        table_base[(int) (table_offset + j)][0] = (short) symbol;
+                        table_base[(int)(table_offset + j)][1] = (short)n; //bits
+                        table_base[(int)(table_offset + j)][0] = (short)symbol;
                         j += inc;
                     }
                 }
@@ -618,10 +618,10 @@ namespace cscodec.h264.decoder
                     /* fill auxiliary table recursively */
                     n -= table_nb_bits;
                     long tmp = code & 0xffffffffL;
-                    code_prefix = (int) (tmp >> (32 - table_nb_bits));
+                    code_prefix = (int)(tmp >> (32 - table_nb_bits));
                     subtable_bits = n;
-                    codes_base[codes_offset + i].bits = (byte) n;
-                    codes_base[codes_offset + i].code = (uint) (code << table_nb_bits);
+                    codes_base[codes_offset + i].bits = (byte)n;
+                    codes_base[codes_offset + i].code = (uint)(code << table_nb_bits);
                     for (k = i + 1; k < nb_codes; k++)
                     {
                         n = codes_base[codes_offset + k].bits - table_nb_bits;
@@ -630,13 +630,13 @@ namespace cscodec.h264.decoder
                         code = codes_base[codes_offset + k].code;
                         if (code >> (32 - table_nb_bits) != code_prefix)
                             break;
-                        codes_base[codes_offset + k].bits = (byte) n;
-                        codes_base[codes_offset + k].code = (uint) (code << table_nb_bits);
+                        codes_base[codes_offset + k].bits = (byte)n;
+                        codes_base[codes_offset + k].code = (uint)(code << table_nb_bits);
                         subtable_bits = Math.Max(subtable_bits, n);
                     }
                     subtable_bits = Math.Min(subtable_bits, table_nb_bits);
                     j = (flags & INIT_VLC_LE) != 0 ? bitswap_32(code_prefix) >> (32 - table_nb_bits) : code_prefix;
-                    table_base[(int) (table_offset + j)][1] = (short) -subtable_bits;
+                    table_base[(int)(table_offset + j)][1] = (short)-subtable_bits;
 
                     //Console.WriteLine("["+j+"]: n="+codes_base[codes_offset + i].bits + table_nb_bits+"(subtable)");
 
@@ -646,7 +646,7 @@ namespace cscodec.h264.decoder
                     /* note: realloc has been done, so reload tables */
                     table_base = vlc.table_base;
                     table_offset = vlc.table_offset + table_index;
-                    table_base[(int) (table_offset + j)][0] = (short) index; //code
+                    table_base[(int)(table_offset + j)][0] = (short)index; //code
                     i = k - 1;
                 }
             }
@@ -695,7 +695,7 @@ namespace cscodec.h264.decoder
 
                 //index= SHOW_UBITS(name, gb, bits);
                 ////index = NEG_USR32(re_cache, bits)
-                index = (int) (re_cache >> (32 - bits));
+                index = (int)(re_cache >> (32 - bits));
 
                 code = table_base[table_offset + index][0];
                 n = table_base[table_offset + index][1];
@@ -724,7 +724,7 @@ namespace cscodec.h264.decoder
 
                     //index= SHOW_UBITS(name, gb, nb_bits) + code;
                     ////index = NEG_USR32(re_cache, nb_bits) + code
-                    index = (int) (re_cache >> (32 - nb_bits)) + code;
+                    index = (int)(re_cache >> (32 - nb_bits)) + code;
 
                     code = table_base[table_offset + index][0];
                     n = table_base[table_offset + index][1];
@@ -752,7 +752,7 @@ namespace cscodec.h264.decoder
 
                         //index= SHOW_UBITS(name, gb, nb_bits) + code;
                         ////index = NEG_USR32(re_cache, nb_bits) + code
-                        index = (int) (re_cache >> (32 - nb_bits)) + code;
+                        index = (int)(re_cache >> (32 - nb_bits)) + code;
 
                         code = table_base[table_offset + index][0];
                         n = table_base[table_offset + index][1];
@@ -806,13 +806,13 @@ namespace cscodec.h264.decoder
             {
                 buf >>= 32 - 9;
                 //            LAST_SKIP_BITS(re, gb, ff_golomb_vlc_len[buf]);
-                re_index += ff_golomb_vlc_len[(int) buf];
+                re_index += ff_golomb_vlc_len[(int)buf];
 
                 //        	CLOSE_READER(re, gb);
                 this.index = re_index;
 
                 //Console.WriteLine("get_ue_golomb(,"+ff_golomb_vlc_len[(int)buf]+","+message+"): "+ (ff_ue_golomb_vlc_code[(int)buf]) );        
-                return ff_ue_golomb_vlc_code[(int) buf];
+                return ff_ue_golomb_vlc_code[(int)buf];
             }
             else
             {
@@ -826,7 +826,7 @@ namespace cscodec.h264.decoder
                 this.index = re_index;
 
                 //Console.WriteLine("get_ue_golomb(,"+(32 - log)+","+message+"): "+ ((int)buf) );                    
-                return (int) buf;
+                return (int)buf;
             }
         }
 
@@ -859,13 +859,13 @@ namespace cscodec.h264.decoder
 
             //buf >>= 32 - 9;
             //        LAST_SKIP_BITS(re, gb, ff_golomb_vlc_len[buf]);
-            re_index += ff_golomb_vlc_len[(int) buf];
+            re_index += ff_golomb_vlc_len[(int)buf];
 
             //        CLOSE_READER(re, gb);
             this.index = re_index;
 
             //Console.WriteLine("get_ue_golomb_31(,"+(ff_golomb_vlc_len[(int)buf])+","+message+"): "+ (ff_ue_golomb_vlc_code[(int)buf]) );               
-            return ff_ue_golomb_vlc_code[(int) buf];
+            return ff_ue_golomb_vlc_code[(int)buf];
         }
 
         /**
@@ -898,13 +898,13 @@ namespace cscodec.h264.decoder
             {
                 buf >>= 32 - 9;
                 //	        LAST_SKIP_BITS(re, gb, ff_golomb_vlc_len[buf]);
-                re_index += ff_golomb_vlc_len[(int) buf];
+                re_index += ff_golomb_vlc_len[(int)buf];
 
                 //	    	CLOSE_READER(re, gb);
                 this.index = re_index;
 
                 //Console.WriteLine("get_se_golomb(,"+(ff_golomb_vlc_len[(int)buf])+","+message+"): "+ (ff_se_golomb_vlc_code[(int)buf]) );               	        
-                return ff_se_golomb_vlc_code[(int) buf];
+                return ff_se_golomb_vlc_code[(int)buf];
             }
             else
             {
@@ -921,7 +921,7 @@ namespace cscodec.h264.decoder
                 else buf = buf >> 1;
 
                 //Console.WriteLine("get_se_golomb(,"+(32 - log)+","+message+"): "+ ((int)buf) );               	        	        
-                return (int) buf;
+                return (int)buf;
             }
         }
     }

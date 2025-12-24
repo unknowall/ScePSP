@@ -1,8 +1,8 @@
 ﻿using ScePSP.Core;
+using ScePSPPlatform.Library.Impl;
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using ScePSPPlatform.Library.Impl;
 
 namespace ScePSPPlatform.Library
 {
@@ -16,7 +16,8 @@ namespace ScePSPPlatform.Library
             if (nameAndroid == null) nameAndroid = nameLinux;
 
             string name;
-            switch (Platform.OS) {
+            switch (Platform.OS)
+            {
                 case OS.Windows:
                     name = nameWindows;
                     break;
@@ -38,16 +39,16 @@ namespace ScePSPPlatform.Library
             }
 
 
-            switch (Platform.OS) 
+            switch (Platform.OS)
             {
                 case OS.Windows:
-                    return (IDynamicLibrary) new DynamicLibraryWindows(name);
+                    return (IDynamicLibrary)new DynamicLibraryWindows(name);
                 case OS.Mac:
-                    return (IDynamicLibrary) new DynamicLibraryMac(name);
-                default: return (IDynamicLibrary) new DynamicLibraryPosix(name);
+                    return (IDynamicLibrary)new DynamicLibraryMac(name);
+                default: return (IDynamicLibrary)new DynamicLibraryPosix(name);
             }
         }
-        
+
         public static void MapLibraryToType<TType>(IDynamicLibrary dynamicLibrary)
         {
             var type = typeof(TType);

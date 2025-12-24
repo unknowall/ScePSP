@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using ScePSPPlatform;
 
 namespace ScePSP.Core.Gpu.Impl.Opengl.Utils
 {

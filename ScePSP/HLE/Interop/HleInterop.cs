@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using ScePSPUtils;
-using ScePSP.Core.Cpu;
+﻿using ScePSP.Core.Cpu;
 using ScePSP.Core.Memory;
 using ScePSP.Hle.Managers;
+using ScePSPUtils;
+using System;
+using System.Collections.Generic;
 
 namespace ScePSP.Hle.Interop
 {
@@ -118,7 +118,7 @@ namespace ScePSP.Hle.Interop
             var gprIndex = 4;
 
             //int FprIndex = 0;
-            void Align(int alignment) => gprIndex = (int) MathUtils.NextAligned((uint) gprIndex, alignment);
+            void Align(int alignment) => gprIndex = (int)MathUtils.NextAligned((uint)gprIndex, alignment);
 
             foreach (var argument in arguments)
             {
@@ -126,17 +126,17 @@ namespace ScePSP.Hle.Interop
                 if (argumentType == typeof(uint))
                 {
                     Align(1);
-                    cpuThreadState.Gpr[gprIndex++] = (int) (uint) argument;
+                    cpuThreadState.Gpr[gprIndex++] = (int)(uint)argument;
                 }
                 else if (argumentType == typeof(int))
                 {
                     Align(1);
-                    cpuThreadState.Gpr[gprIndex++] = (int) argument;
+                    cpuThreadState.Gpr[gprIndex++] = (int)argument;
                 }
                 else if (argumentType == typeof(PspPointer))
                 {
                     Align(1);
-                    cpuThreadState.Gpr[gprIndex++] = (int) (uint) (PspPointer) argument;
+                    cpuThreadState.Gpr[gprIndex++] = (int)(uint)(PspPointer)argument;
                 }
                 else if (argumentType.IsEnum)
                 {

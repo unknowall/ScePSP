@@ -1,8 +1,7 @@
-﻿using System;
+﻿using ScePSP.Core.Types;
 using ScePSPUtils;
 using ScePSPUtils.Drawing;
-using ScePSPUtils.Extensions;
-using ScePSP.Core.Types;
+using System;
 
 namespace ScePSP.Utils.Utils
 {
@@ -47,12 +46,12 @@ namespace ScePSP.Utils.Utils
 
         public static int GetPixelsBits(GuPixelFormats pixelFormat)
         {
-            return (int) (Sizes[(int) pixelFormat] * 8);
+            return (int)(Sizes[(int)pixelFormat] * 8);
         }
 
         public static int GetPixelsSize(GuPixelFormats pixelFormat, int pixelCount)
         {
-            return (int) (Sizes[(int) pixelFormat] * pixelCount);
+            return (int)(Sizes[(int)pixelFormat] * pixelCount);
         }
 
         void* _input;
@@ -100,11 +99,11 @@ namespace ScePSP.Utils.Utils
             bool ignoreAlpha = false)
         {
             if (strideWidth == -1) strideWidth = GetPixelsSize(pixelFormat, width);
-            var pixelFormatInt = (int) pixelFormat;
+            var pixelFormatInt = (int)pixelFormat;
             var pixelFormatDecoder = new PixelFormatDecoder()
             {
                 _input = input,
-                _inputByte = (byte*) input,
+                _inputByte = (byte*)input,
                 //_inputShort = (ushort*) input,
                 //_inputInt = (uint*) input,
                 _output = output,
@@ -171,7 +170,7 @@ namespace ScePSP.Utils.Utils
                 {
                     OutputPixel outputPixel;
                     outputPixel.R = 0xFF;
-                    outputPixel.G = (byte) ((n & 1) == 0 ? 0xFF : 0x00);
+                    outputPixel.G = (byte)((n & 1) == 0 ? 0xFF : 0x00);
                     outputPixel.B = 0x00;
                     outputPixel.A = 0xFF;
                     _output[n] = outputPixel;
@@ -193,41 +192,41 @@ namespace ScePSP.Utils.Utils
             {
                 for (var x = 0; x < _width; x += 4, ni++)
                 {
-                    var block = ((Dxt5Block*) _inputByte)[ni];
+                    var block = ((Dxt5Block*)_inputByte)[ni];
                     colors[0] = Decode_RGBA_5650_Pixel(block.Color0)
                         .Transform((r, g, b, a) => OutputPixel.FromRgba(b, g, r, a));
                     colors[1] = Decode_RGBA_5650_Pixel(block.Color1)
                         .Transform((r, g, b, a) => OutputPixel.FromRgba(b, g, r, a));
                     colors[2] = OutputPixel.OperationPerComponent(colors[0], colors[1],
-                        (a, b) => (byte) (a * 2 / 3 + b * 1 / 3));
+                        (a, b) => (byte)(a * 2 / 3 + b * 1 / 3));
                     colors[3] = OutputPixel.OperationPerComponent(colors[0], colors[1],
-                        (a, b) => (byte) (a * 1 / 3 + b * 2 / 3));
+                        (a, b) => (byte)(a * 1 / 3 + b * 2 / 3));
 
                     // Create Alpha Lookup
                     var alphaLookup = new byte[8];
-                    var alphas = (ushort) (block.Alpha >> 48);
-                    var alpha0 = (byte) ((alphas >> 0) & 0xFF);
-                    var alpha1 = (byte) ((alphas >> 8) & 0xFF);
+                    var alphas = (ushort)(block.Alpha >> 48);
+                    var alpha0 = (byte)((alphas >> 0) & 0xFF);
+                    var alpha1 = (byte)((alphas >> 8) & 0xFF);
 
                     alphaLookup[0] = alpha0;
                     alphaLookup[1] = alpha1;
                     if (alpha0 > alpha1)
                     {
-                        alphaLookup[2] = (byte) ((6 * alpha0 + alpha1) / 7);
-                        alphaLookup[3] = (byte) ((5 * alpha0 + 2 * alpha1) / 7);
-                        alphaLookup[4] = (byte) ((4 * alpha0 + 3 * alpha1) / 7);
-                        alphaLookup[5] = (byte) ((3 * alpha0 + 4 * alpha1) / 7);
-                        alphaLookup[6] = (byte) ((2 * alpha0 + 5 * alpha1) / 7);
-                        alphaLookup[7] = (byte) ((alpha0 + 6 * alpha1) / 7);
+                        alphaLookup[2] = (byte)((6 * alpha0 + alpha1) / 7);
+                        alphaLookup[3] = (byte)((5 * alpha0 + 2 * alpha1) / 7);
+                        alphaLookup[4] = (byte)((4 * alpha0 + 3 * alpha1) / 7);
+                        alphaLookup[5] = (byte)((3 * alpha0 + 4 * alpha1) / 7);
+                        alphaLookup[6] = (byte)((2 * alpha0 + 5 * alpha1) / 7);
+                        alphaLookup[7] = (byte)((alpha0 + 6 * alpha1) / 7);
                     }
                     else
                     {
-                        alphaLookup[2] = (byte) ((4 * alpha0 + alpha1) / 5);
-                        alphaLookup[3] = (byte) ((3 * alpha0 + 2 * alpha1) / 5);
-                        alphaLookup[4] = (byte) ((2 * alpha0 + 3 * alpha1) / 5);
-                        alphaLookup[5] = (byte) ((alpha0 + 4 * alpha1) / 5);
-                        alphaLookup[6] = (byte) 0x00;
-                        alphaLookup[7] = (byte) 0xFF;
+                        alphaLookup[2] = (byte)((4 * alpha0 + alpha1) / 5);
+                        alphaLookup[3] = (byte)((3 * alpha0 + 2 * alpha1) / 5);
+                        alphaLookup[4] = (byte)((2 * alpha0 + 3 * alpha1) / 5);
+                        alphaLookup[5] = (byte)((alpha0 + 4 * alpha1) / 5);
+                        alphaLookup[6] = (byte)0x00;
+                        alphaLookup[7] = (byte)0xFF;
                     }
 
                     var no = 0;
@@ -268,15 +267,15 @@ namespace ScePSP.Utils.Utils
             {
                 for (var x = 0; x < _width; x += 4, ni++)
                 {
-                    var block = ((Dxt3Block*) _inputByte)[ni];
+                    var block = ((Dxt3Block*)_inputByte)[ni];
                     colors[0] = Decode_RGBA_5650_Pixel(block.Color0)
                         .Transform((r, g, b, a) => OutputPixel.FromRgba(b, g, r, a));
                     colors[1] = Decode_RGBA_5650_Pixel(block.Color1)
                         .Transform((r, g, b, a) => OutputPixel.FromRgba(b, g, r, a));
                     colors[2] = OutputPixel.OperationPerComponent(colors[0], colors[1],
-                        (a, b) => (byte) (a * 2 / 3 + b * 1 / 3));
+                        (a, b) => (byte)(a * 2 / 3 + b * 1 / 3));
                     colors[3] = OutputPixel.OperationPerComponent(colors[0], colors[1],
-                        (a, b) => (byte) (a * 1 / 3 + b * 2 / 3));
+                        (a, b) => (byte)(a * 1 / 3 + b * 2 / 3));
 
                     var no = 0;
                     for (var y2 = 0; y2 < 4; y2++)
@@ -291,7 +290,7 @@ namespace ScePSP.Utils.Utils
                             var n = ry * _width + rx;
 
                             _output[n] = colors[color];
-                            _output[n].A = (byte) (alpha * 0xFF / 0xF);
+                            _output[n].A = (byte)(alpha * 0xFF / 0xF);
                         }
                     }
                 }
@@ -306,7 +305,7 @@ namespace ScePSP.Utils.Utils
             {
                 for (int x = 0; x < _width; x += 4, ni++)
                 {
-                    var block = ((Dxt1Block*) _inputByte)[ni];
+                    var block = ((Dxt1Block*)_inputByte)[ni];
 
                     colors[0] = Decode_RGBA_5650_Pixel(block.Color0)
                         .Transform((r, g, b, a) => OutputPixel.FromRgba(b, g, r, a));
@@ -316,14 +315,14 @@ namespace ScePSP.Utils.Utils
                     if (block.Color0 > block.Color1)
                     {
                         colors[2] = OutputPixel.OperationPerComponent(colors[0], colors[1],
-                            (a, b) => (byte) (a * 2 / 3 + b * 1 / 3));
+                            (a, b) => (byte)(a * 2 / 3 + b * 1 / 3));
                         colors[3] = OutputPixel.OperationPerComponent(colors[0], colors[1],
-                            (a, b) => (byte) (a * 1 / 3 + b * 2 / 3));
+                            (a, b) => (byte)(a * 1 / 3 + b * 2 / 3));
                     }
                     else
                     {
                         colors[2] = OutputPixel.OperationPerComponent(colors[0], colors[1],
-                            (a, b) => (byte) (a * 1 / 2 + b * 1 / 2));
+                            (a, b) => (byte)(a * 1 / 2 + b * 1 / 2));
                         colors[3] = OutputPixel.FromRgba(0, 0, 0, 0);
                     }
 
@@ -351,7 +350,7 @@ namespace ScePSP.Utils.Utils
 
         private void Decode_PALETTE_T8()
         {
-            var input = (byte*) _input;
+            var input = (byte*)_input;
 
             var paletteSize = 256;
             var palettePixels = new OutputPixel[paletteSize];
@@ -431,11 +430,11 @@ namespace ScePSP.Utils.Utils
 
         private void _Decode_RGBA_XXXX_uint(Func<uint, OutputPixel> decodePixel)
         {
-            var input = (uint*) _input;
+            var input = (uint*)_input;
 
             for (int y = 0, n = 0; y < _height; y++)
             {
-                var inputRow = (uint*) &_inputByte[y * _strideWidth];
+                var inputRow = (uint*)&_inputByte[y * _strideWidth];
                 for (var x = 0; x < _width; x++, n++)
                 {
                     _output[n] = decodePixel(inputRow[x]);
@@ -449,7 +448,7 @@ namespace ScePSP.Utils.Utils
 
             for (int y = 0, n = 0; y < _height; y++)
             {
-                var inputRow = (ushort*) &_inputByte[y * _strideWidth];
+                var inputRow = (ushort*)&_inputByte[y * _strideWidth];
                 for (var x = 0; x < _width; x++, n++)
                 {
                     _output[n] = decodePixel(inputRow[x]);
@@ -474,7 +473,7 @@ namespace ScePSP.Utils.Utils
             BitUtils.InsertScaled(ref Out, 4, 4, pixel.G, 255);
             BitUtils.InsertScaled(ref Out, 8, 4, pixel.B, 255);
             BitUtils.InsertScaled(ref Out, 12, 4, pixel.A, 255);
-            return (ushort) Out;
+            return (ushort)Out;
         }
 
         private static ushort Encode_RGBA_5551_Pixel(OutputPixel pixel)
@@ -484,7 +483,7 @@ namespace ScePSP.Utils.Utils
             BitUtils.InsertScaled(ref Out, 5, 5, pixel.G, 255);
             BitUtils.InsertScaled(ref Out, 10, 5, pixel.B, 255);
             BitUtils.InsertScaled(ref Out, 15, 1, pixel.A, 255);
-            return (ushort) Out;
+            return (ushort)Out;
         }
 
         private static ushort Encode_RGBA_5650_Pixel(OutputPixel pixel)
@@ -493,36 +492,36 @@ namespace ScePSP.Utils.Utils
             BitUtils.InsertScaled(ref Out, 0, 5, pixel.R, 255);
             BitUtils.InsertScaled(ref Out, 5, 6, pixel.G, 255);
             BitUtils.InsertScaled(ref Out, 11, 5, pixel.B, 255);
-            return (ushort) Out;
+            return (ushort)Out;
         }
 
-        private static uint Encode_RGBA_8888_Pixel(OutputPixel pixel) => *(uint*) &pixel;
+        private static uint Encode_RGBA_8888_Pixel(OutputPixel pixel) => *(uint*)&pixel;
 
         public static OutputPixel Decode_RGBA_4444_Pixel(ushort value) =>
             new OutputPixel(
-                (byte) value.ExtractScaled(0, 4, 255),
-                (byte) value.ExtractScaled(4, 4, 255),
-                (byte) value.ExtractScaled(8, 4, 255),
-                (byte) value.ExtractScaled(12, 4, 255)
+                (byte)value.ExtractScaled(0, 4, 255),
+                (byte)value.ExtractScaled(4, 4, 255),
+                (byte)value.ExtractScaled(8, 4, 255),
+                (byte)value.ExtractScaled(12, 4, 255)
             );
 
         public static OutputPixel Decode_RGBA_5551_Pixel(ushort value) =>
             new OutputPixel(
-                (byte) value.ExtractScaled(0, 5, 255),
-                (byte) value.ExtractScaled(5, 5, 255),
-                (byte) value.ExtractScaled(10, 5, 255),
-                (byte) value.ExtractScaled(15, 1, 255)
+                (byte)value.ExtractScaled(0, 5, 255),
+                (byte)value.ExtractScaled(5, 5, 255),
+                (byte)value.ExtractScaled(10, 5, 255),
+                (byte)value.ExtractScaled(15, 1, 255)
             );
 
         public static OutputPixel Decode_RGBA_5650_Pixel(ushort value) =>
             new OutputPixel(
-                (byte) value.ExtractScaled(0, 5, 255),
-                (byte) value.ExtractScaled(5, 6, 255),
-                (byte) value.ExtractScaled(11, 5, 255),
+                (byte)value.ExtractScaled(0, 5, 255),
+                (byte)value.ExtractScaled(5, 6, 255),
+                (byte)value.ExtractScaled(11, 5, 255),
                 0xFF
             );
 
-        public static OutputPixel Decode_RGBA_8888_Pixel(uint value) => *(OutputPixel*) &value;
+        public static OutputPixel Decode_RGBA_8888_Pixel(uint value) => *(OutputPixel*)&value;
 
         /// <summary>
         /// 
@@ -546,14 +545,14 @@ namespace ScePSP.Utils.Utils
             var bxc = rowWidth / 16;
             var byc = textureHeight / 8;
 
-            var src = (uint*) input;
-            var ydest = (byte*) output;
+            var src = (uint*)input;
+            var ydest = (byte*)output;
             for (var by = 0; by < byc; by++)
             {
                 var xdest = ydest;
                 for (var bx = 0; bx < bxc; bx++)
                 {
-                    var dest = (uint*) xdest;
+                    var dest = (uint*)xdest;
                     for (var n = 0; n < 8; n++, dest += pitch)
                     {
                         *dest++ = *src++;
@@ -574,7 +573,7 @@ namespace ScePSP.Utils.Utils
             {
                 Unswizzle(data, tempPointer, rowWidth, textureHeight);
             }
-            PointerUtils.Memcpy((byte*) data, temp, rowWidth * textureHeight);
+            PointerUtils.Memcpy((byte*)data, temp, rowWidth * textureHeight);
         }
 
         public static void UnswizzleInline(GuPixelFormats format, void* data, int width, int height)
@@ -586,7 +585,7 @@ namespace ScePSP.Utils.Utils
         {
             var totalBytes = GetPixelsSize(pixelFormat, width * height);
 
-            return Hashing.FastHash((byte*) input, totalBytes, (ulong) ((int) pixelFormat * width * height));
+            return Hashing.FastHash((byte*)input, totalBytes, (ulong)((int)pixelFormat * width * height));
         }
 
         public static void Encode(GuPixelFormats guPixelFormat, OutputPixel* input, byte* output, int count)
@@ -594,28 +593,28 @@ namespace ScePSP.Utils.Utils
             switch (guPixelFormat)
             {
                 case GuPixelFormats.Rgba8888:
-                {
-                    var o = (uint*) output;
-                    for (var n = 0; n < count; n++) *o++ = Encode_RGBA_8888_Pixel(*input++);
-                }
+                    {
+                        var o = (uint*)output;
+                        for (var n = 0; n < count; n++) *o++ = Encode_RGBA_8888_Pixel(*input++);
+                    }
                     break;
                 case GuPixelFormats.Rgba5551:
-                {
-                    var o = (ushort*) output;
-                    for (var n = 0; n < count; n++) *o++ = Encode_RGBA_5551_Pixel(*input++);
-                }
+                    {
+                        var o = (ushort*)output;
+                        for (var n = 0; n < count; n++) *o++ = Encode_RGBA_5551_Pixel(*input++);
+                    }
                     break;
                 case GuPixelFormats.Rgba5650:
-                {
-                    var o = (ushort*) output;
-                    for (var n = 0; n < count; n++) *o++ = Encode_RGBA_5650_Pixel(*input++);
-                }
+                    {
+                        var o = (ushort*)output;
+                        for (var n = 0; n < count; n++) *o++ = Encode_RGBA_5650_Pixel(*input++);
+                    }
                     break;
                 case GuPixelFormats.Rgba4444:
-                {
-                    var o = (ushort*) output;
-                    for (var n = 0; n < count; n++) *o++ = Encode_RGBA_4444_Pixel(*input++);
-                }
+                    {
+                        var o = (ushort*)output;
+                        for (var n = 0; n < count; n++) *o++ = Encode_RGBA_4444_Pixel(*input++);
+                    }
                     break;
                 default:
                     throw new NotImplementedException("Not implemented " + guPixelFormat);

@@ -1,7 +1,7 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.IO;
 using System.IO.Compression;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Hle.Formats
 {
@@ -47,7 +47,7 @@ namespace ScePSP.Hle.Formats
             /// <summary>
             /// 
             /// </summary>
-            public int NumberOfBlocks => (int) (TotalBytes / BlockSize);
+            public int NumberOfBlocks => (int)(TotalBytes / BlockSize);
         }
 
         public struct BlockInfo
@@ -96,7 +96,7 @@ namespace ScePSP.Hle.Formats
         /// <summary>
         /// Size of each block.
         /// </summary>
-        public int BlockSize => (int) Header.BlockSize;
+        public int BlockSize => (int)Header.BlockSize;
 
         /// <summary>
         /// Total number of blocks in the file
@@ -125,7 +125,7 @@ namespace ScePSP.Hle.Formats
             }
 
             // Read the block list
-            Blocks = Stream.ReadStructVector<BlockInfo>((uint) (NumberOfBlocks + 1));
+            Blocks = Stream.ReadStructVector<BlockInfo>((uint)(NumberOfBlocks + 1));
         }
 
         /// <summary>
@@ -140,11 +140,11 @@ namespace ScePSP.Hle.Formats
             var blockLength = blockEnd - blockStart;
 
             Stream.Position = blockStart;
-            var data = Stream.ReadBytes((int) blockLength);
+            var data = Stream.ReadBytes((int)blockLength);
             for (var n = 0; n < count; n++)
             {
-                var start = (int) (Blocks[block + n + 0].Position - blockStart);
-                var end = (int) (Blocks[block + n + 1].Position - blockStart);
+                var start = (int)(Blocks[block + n + 0].Position - blockStart);
+                var end = (int)(Blocks[block + n + 1].Position - blockStart);
                 list[n] = new ArraySegment<byte>(data, start, end - start);
             }
             return list;
@@ -159,7 +159,7 @@ namespace ScePSP.Hle.Formats
         {
             if (block + count >= NumberOfBlocks)
             {
-                count = (int) (NumberOfBlocks - block);
+                count = (int)(NumberOfBlocks - block);
             }
 
             if (count <= 0)
@@ -174,7 +174,7 @@ namespace ScePSP.Hle.Formats
                     segments[n] = new ArraySegment<byte>(new DeflateStream(
                         new MemoryStream(segments[n].Array, segments[n].Offset, segments[n].Count),
                         CompressionMode.Decompress
-                    ).ReadBytes((int) Header.BlockSize));
+                    ).ReadBytes((int)Header.BlockSize));
                 }
             }
 

@@ -6,7 +6,7 @@ namespace ScePSP.Hle.Formats
     {
         public static IsoFile GetIso(string isoFile)
         {
-            var isoFileStream = (Stream) File.OpenRead(isoFile);
+            var isoFileStream = (Stream)File.OpenRead(isoFile);
             FormatDetector.SubType detectedFormat;
 
             switch (detectedFormat = new FormatDetector().DetectSubType(isoFileStream))

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using static System.String;
 
@@ -221,7 +221,7 @@ namespace ScePSPUtils
             {
                 var timeSpans = new List<TimeSpan>();
                 for (var n = 1; n < DateTimeList.Count; n++) timeSpans.Add(DateTimeList[n] - DateTimeList[n - 1]);
-                return $"Logger.Stopwatch({Join(",", timeSpans.Select(item => $"{(int) item.TotalMilliseconds} ms"))})";
+                return $"Logger.Stopwatch({Join(",", timeSpans.Select(item => $"{(int)item.TotalMilliseconds} ms"))})";
             }
         }
 
@@ -260,7 +260,7 @@ namespace ScePSPUtils
             }
 
             public override Encoding Encoding { get; }
-            
+
             StringBuilder sb = new StringBuilder();
 
             public override void Write(char value)

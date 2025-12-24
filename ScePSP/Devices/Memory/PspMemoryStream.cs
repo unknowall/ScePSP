@@ -28,7 +28,7 @@ namespace ScePSP.Core.Memory
         public override long Position
         {
             get => _Position;
-            set => _Position = (uint) value;
+            set => _Position = (uint)value;
         }
 
         public override long Seek(long offset, SeekOrigin origin)
@@ -56,14 +56,14 @@ namespace ScePSP.Core.Memory
         public override int Read(byte[] buffer, int offset, int count)
         {
             Memory.Read(_Position, new Span<byte>(buffer, offset, count));
-            _Position += (uint) count;
+            _Position += (uint)count;
             return count;
         }
 
         public override void Write(byte[] buffer, int offset, int count)
         {
             Memory.Write(_Position, new Span<byte>(buffer, offset, count));
-            _Position += (uint) count;
+            _Position += (uint)count;
         }
     }
 }

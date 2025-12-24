@@ -53,7 +53,7 @@ namespace ScePSP.Hle.Managers
 
         public MemoryPartition GetPartition(MemoryPartitions Partition)
         {
-            return MemoryPartitionsUid.Get((int) Partition);
+            return MemoryPartitionsUid.Get((int)Partition);
         }
 
         private HleMemoryManager()
@@ -62,15 +62,15 @@ namespace ScePSP.Hle.Managers
 
         void IInjectInitialize.Initialize()
         {
-            MemoryPartitionsUid.Set((int) MemoryPartitions.Kernel0,
+            MemoryPartitionsUid.Set((int)MemoryPartitions.Kernel0,
                 new MemoryPartition(InjectContext, Low: 0x88000000, High: 0x88300000, Allocated: false,
                     Name: "Kernel Partition 1")); // 3MB
             //MemoryPartitionsUid.Set((int)MemoryPartitions.Kernel1, new MemoryPartition(InjectContext, Low: 0x88300000, High: 0x88400000, Allocated: false, Name: "Kernel Partition 2")); // 1MB
 
-            MemoryPartitionsUid.Set((int) MemoryPartitions.User,
+            MemoryPartitionsUid.Set((int)MemoryPartitions.User,
                 new MemoryPartition(InjectContext, Low: 0x08800000, High: PspMemory.MainSegment.High, Allocated: false,
                     Name: "User Partition")); // 24MB
-            MemoryPartitionsUid.Set((int) MemoryPartitions.UserStacks,
+            MemoryPartitionsUid.Set((int)MemoryPartitions.UserStacks,
                 new MemoryPartition(InjectContext, Low: 0x08800000, High: 0x0B000000, Allocated: false,
                     Name: "User Stacks Partition")); // 24MB
 

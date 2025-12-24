@@ -67,7 +67,7 @@ namespace ScePSP.Hle.Media.audio.At3
                     break;
 
                 for (int a0 = 0; a0 < chns; a0++)
-                    _cores[counterSubstream].getAudioSamplesI16((uint) a0,
+                    _cores[counterSubstream].getAudioSamplesI16((uint)a0,
                         new ManagedPointer<short>(_sampleBufTmp, 0x800 * counterChn++));
 
                 counterSubstream++;

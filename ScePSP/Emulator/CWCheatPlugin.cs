@@ -1,10 +1,10 @@
-﻿using ScePSPUtils;
+﻿using ScePSP.Core.Components.Display;
 using ScePSP.Core.Memory;
 using ScePSP.Inject;
+using ScePSPUtils;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using ScePSP.Core.Components.Display;
 
 namespace ScePSP.cheats
 {
@@ -94,7 +94,7 @@ namespace ScePSP.cheats
                 {
                     if (Part.Substr(0, 2) == "0x")
                     {
-                        Values.Enqueue((uint) NumberUtils.ParseIntegerConstant(Part));
+                        Values.Enqueue((uint)NumberUtils.ParseIntegerConstant(Part));
                     }
                 }
             }

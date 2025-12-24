@@ -62,7 +62,7 @@ namespace ScePSPUtils.Json
 
             if (objectToEncode is bool)
             {
-                return (bool) objectToEncode ? "true" : "false";
+                return (bool)objectToEncode ? "true" : "false";
             }
 
             if (objectToEncode is IDictionary)

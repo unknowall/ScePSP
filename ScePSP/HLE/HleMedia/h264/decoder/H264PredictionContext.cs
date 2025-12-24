@@ -733,7 +733,7 @@ namespace cscodec.h264.decoder
          */
         public static void pred4x4_dc_c(byte[] src, int src_offset, byte[] topright, int topright_offset, int stride)
         {
-            byte dc = (byte) ((src[src_offset - stride] + src[src_offset + 1 - stride] + src[src_offset + 2 - stride] +
+            byte dc = (byte)((src[src_offset - stride] + src[src_offset + 1 - stride] + src[src_offset + 2 - stride] +
                                src[src_offset + 3 - stride] + src[src_offset - 1 + 0 * stride] +
                                src[src_offset - 1 + 1 * stride] + src[src_offset - 1 + 2 * stride] +
                                src[src_offset - 1 + 3 * stride] + 4) >> 3);
@@ -770,7 +770,7 @@ namespace cscodec.h264.decoder
         public static void pred4x4_left_dc_c(byte[] src, int src_offset, byte[] topright, int topright_offset,
             int stride)
         {
-            byte dc = (byte) ((src[src_offset - 1 + 0 * stride] + src[src_offset - 1 + 1 * stride] +
+            byte dc = (byte)((src[src_offset - 1 + 0 * stride] + src[src_offset - 1 + 1 * stride] +
                                src[src_offset - 1 + 2 * stride] + src[src_offset - 1 + 3 * stride] + 2) >> 2);
 
             src[src_offset + 0 * stride + 0] = dc;
@@ -805,7 +805,7 @@ namespace cscodec.h264.decoder
         public static void pred4x4_top_dc_c(byte[] src, int src_offset, byte[] topright, int topright_offset,
             int stride)
         {
-            byte dc = (byte) ((src[src_offset - stride] + src[src_offset + 1 - stride] + src[src_offset + 2 - stride] +
+            byte dc = (byte)((src[src_offset - stride] + src[src_offset + 1 - stride] + src[src_offset + 2 - stride] +
                                src[src_offset + 3 - stride] + 2) >> 2);
 
             src[src_offset + 0 * stride + 0] = dc;
@@ -940,25 +940,25 @@ namespace cscodec.h264.decoder
             //int t6= topright[topright_offset + 2];
             //int t7= topright[topright_offset + 3];
 
-            src[src_offset + 0 * stride + 0] = (byte) ((lt + 2 * t0 + t1 + 2) >> 2);
-            src[src_offset + 0 * stride + 1] = (byte) ((t0 + 2 * t1 + t2 + 2) >> 2);
-            src[src_offset + 0 * stride + 2] = (byte) ((t1 + 2 * t2 + t3 + 2) >> 2);
-            src[src_offset + 0 * stride + 3] = (byte) ((t2 + 2 * t3 + t4 + 2) >> 2);
+            src[src_offset + 0 * stride + 0] = (byte)((lt + 2 * t0 + t1 + 2) >> 2);
+            src[src_offset + 0 * stride + 1] = (byte)((t0 + 2 * t1 + t2 + 2) >> 2);
+            src[src_offset + 0 * stride + 2] = (byte)((t1 + 2 * t2 + t3 + 2) >> 2);
+            src[src_offset + 0 * stride + 3] = (byte)((t2 + 2 * t3 + t4 + 2) >> 2);
 
-            src[src_offset + 1 * stride + 0] = (byte) ((lt + 2 * t0 + t1 + 2) >> 2);
-            src[src_offset + 1 * stride + 1] = (byte) ((t0 + 2 * t1 + t2 + 2) >> 2);
-            src[src_offset + 1 * stride + 2] = (byte) ((t1 + 2 * t2 + t3 + 2) >> 2);
-            src[src_offset + 1 * stride + 3] = (byte) ((t2 + 2 * t3 + t4 + 2) >> 2);
+            src[src_offset + 1 * stride + 0] = (byte)((lt + 2 * t0 + t1 + 2) >> 2);
+            src[src_offset + 1 * stride + 1] = (byte)((t0 + 2 * t1 + t2 + 2) >> 2);
+            src[src_offset + 1 * stride + 2] = (byte)((t1 + 2 * t2 + t3 + 2) >> 2);
+            src[src_offset + 1 * stride + 3] = (byte)((t2 + 2 * t3 + t4 + 2) >> 2);
 
-            src[src_offset + 2 * stride + 0] = (byte) ((lt + 2 * t0 + t1 + 2) >> 2);
-            src[src_offset + 2 * stride + 1] = (byte) ((t0 + 2 * t1 + t2 + 2) >> 2);
-            src[src_offset + 2 * stride + 2] = (byte) ((t1 + 2 * t2 + t3 + 2) >> 2);
-            src[src_offset + 2 * stride + 3] = (byte) ((t2 + 2 * t3 + t4 + 2) >> 2);
+            src[src_offset + 2 * stride + 0] = (byte)((lt + 2 * t0 + t1 + 2) >> 2);
+            src[src_offset + 2 * stride + 1] = (byte)((t0 + 2 * t1 + t2 + 2) >> 2);
+            src[src_offset + 2 * stride + 2] = (byte)((t1 + 2 * t2 + t3 + 2) >> 2);
+            src[src_offset + 2 * stride + 3] = (byte)((t2 + 2 * t3 + t4 + 2) >> 2);
 
-            src[src_offset + 3 * stride + 0] = (byte) ((lt + 2 * t0 + t1 + 2) >> 2);
-            src[src_offset + 3 * stride + 1] = (byte) ((t0 + 2 * t1 + t2 + 2) >> 2);
-            src[src_offset + 3 * stride + 2] = (byte) ((t1 + 2 * t2 + t3 + 2) >> 2);
-            src[src_offset + 3 * stride + 3] = (byte) ((t2 + 2 * t3 + t4 + 2) >> 2);
+            src[src_offset + 3 * stride + 0] = (byte)((lt + 2 * t0 + t1 + 2) >> 2);
+            src[src_offset + 3 * stride + 1] = (byte)((t0 + 2 * t1 + t2 + 2) >> 2);
+            src[src_offset + 3 * stride + 2] = (byte)((t1 + 2 * t2 + t3 + 2) >> 2);
+            src[src_offset + 3 * stride + 3] = (byte)((t2 + 2 * t3 + t4 + 2) >> 2);
         }
 
         public static void pred4x4_horizontal_vp8_c(byte[] src, int src_offset, byte[] topright, int topright_offset,
@@ -974,22 +974,22 @@ namespace cscodec.h264.decoder
             src[src_offset + 0 * stride + 0] =
                 src[src_offset + 0 * stride + 1] =
                     src[src_offset + 0 * stride + 2] =
-                        src[src_offset + 0 * stride + 3] = (byte) ((lt + 2 * l0 + l1 + 2) >> 2);
+                        src[src_offset + 0 * stride + 3] = (byte)((lt + 2 * l0 + l1 + 2) >> 2);
 
             src[src_offset + 1 * stride + 0] =
                 src[src_offset + 1 * stride + 1] =
                     src[src_offset + 1 * stride + 2] =
-                        src[src_offset + 1 * stride + 3] = (byte) ((l0 + 2 * l1 + l2 + 2) >> 2);
+                        src[src_offset + 1 * stride + 3] = (byte)((l0 + 2 * l1 + l2 + 2) >> 2);
 
             src[src_offset + 2 * stride + 0] =
                 src[src_offset + 2 * stride + 1] =
                     src[src_offset + 2 * stride + 2] =
-                        src[src_offset + 2 * stride + 3] = (byte) ((l1 + 2 * l2 + l3 + 2) >> 2);
+                        src[src_offset + 2 * stride + 3] = (byte)((l1 + 2 * l2 + l3 + 2) >> 2);
 
             src[src_offset + 3 * stride + 0] =
                 src[src_offset + 3 * stride + 1] =
                     src[src_offset + 3 * stride + 2] =
-                        src[src_offset + 3 * stride + 3] = (byte) ((l2 + 2 * l3 + l3 + 2) >> 2);
+                        src[src_offset + 3 * stride + 3] = (byte)((l2 + 2 * l3 + l3 + 2) >> 2);
         }
 
         public static void pred4x4_down_right_c(byte[] src, int src_offset, byte[] topright, int topright_offset,
@@ -1007,22 +1007,22 @@ namespace cscodec.h264.decoder
             int l2 = src[src_offset - 1 + 2 * stride];
             int l3 = src[src_offset - 1 + 3 * stride];
 
-            src[src_offset + 0 + 3 * stride] = (byte) ((l3 + 2 * l2 + l1 + 2) >> 2);
+            src[src_offset + 0 + 3 * stride] = (byte)((l3 + 2 * l2 + l1 + 2) >> 2);
             src[src_offset + 0 + 2 * stride] =
-                src[src_offset + 1 + 3 * stride] = (byte) ((l2 + 2 * l1 + l0 + 2) >> 2);
+                src[src_offset + 1 + 3 * stride] = (byte)((l2 + 2 * l1 + l0 + 2) >> 2);
             src[src_offset + 0 + 1 * stride] =
                 src[src_offset + 1 + 2 * stride] =
-                    src[src_offset + 2 + 3 * stride] = (byte) ((l1 + 2 * l0 + lt + 2) >> 2);
+                    src[src_offset + 2 + 3 * stride] = (byte)((l1 + 2 * l0 + lt + 2) >> 2);
             src[src_offset + 0 + 0 * stride] =
                 src[src_offset + 1 + 1 * stride] =
                     src[src_offset + 2 + 2 * stride] =
-                        src[src_offset + 3 + 3 * stride] = (byte) ((l0 + 2 * lt + t0 + 2) >> 2);
+                        src[src_offset + 3 + 3 * stride] = (byte)((l0 + 2 * lt + t0 + 2) >> 2);
             src[src_offset + 1 + 0 * stride] =
                 src[src_offset + 2 + 1 * stride] =
-                    src[src_offset + 3 + 2 * stride] = (byte) ((lt + 2 * t0 + t1 + 2) >> 2);
+                    src[src_offset + 3 + 2 * stride] = (byte)((lt + 2 * t0 + t1 + 2) >> 2);
             src[src_offset + 2 + 0 * stride] =
-                src[src_offset + 3 + 1 * stride] = (byte) ((t0 + 2 * t1 + t2 + 2) >> 2);
-            src[src_offset + 3 + 0 * stride] = (byte) ((t1 + 2 * t2 + t3 + 2) >> 2);
+                src[src_offset + 3 + 1 * stride] = (byte)((t0 + 2 * t1 + t2 + 2) >> 2);
+            src[src_offset + 3 + 0 * stride] = (byte)((t1 + 2 * t2 + t3 + 2) >> 2);
         }
 
         public static void pred4x4_down_left_c(byte[] src, int src_offset, byte[] topright, int topright_offset,
@@ -1040,22 +1040,22 @@ namespace cscodec.h264.decoder
 
             //	    LOAD_LEFT_EDGE
 
-            src[src_offset + 0 + 0 * stride] = (byte) ((t0 + t2 + 2 * t1 + 2) >> 2);
+            src[src_offset + 0 + 0 * stride] = (byte)((t0 + t2 + 2 * t1 + 2) >> 2);
             src[src_offset + 1 + 0 * stride] =
-                src[src_offset + 0 + 1 * stride] = (byte) ((t1 + t3 + 2 * t2 + 2) >> 2);
+                src[src_offset + 0 + 1 * stride] = (byte)((t1 + t3 + 2 * t2 + 2) >> 2);
             src[src_offset + 2 + 0 * stride] =
                 src[src_offset + 1 + 1 * stride] =
-                    src[src_offset + 0 + 2 * stride] = (byte) ((t2 + t4 + 2 * t3 + 2) >> 2);
+                    src[src_offset + 0 + 2 * stride] = (byte)((t2 + t4 + 2 * t3 + 2) >> 2);
             src[src_offset + 3 + 0 * stride] =
                 src[src_offset + 2 + 1 * stride] =
                     src[src_offset + 1 + 2 * stride] =
-                        src[src_offset + 0 + 3 * stride] = (byte) ((t3 + t5 + 2 * t4 + 2) >> 2);
+                        src[src_offset + 0 + 3 * stride] = (byte)((t3 + t5 + 2 * t4 + 2) >> 2);
             src[src_offset + 3 + 1 * stride] =
                 src[src_offset + 2 + 2 * stride] =
-                    src[src_offset + 1 + 3 * stride] = (byte) ((t4 + t6 + 2 * t5 + 2) >> 2);
+                    src[src_offset + 1 + 3 * stride] = (byte)((t4 + t6 + 2 * t5 + 2) >> 2);
             src[src_offset + 3 + 2 * stride] =
-                src[src_offset + 2 + 3 * stride] = (byte) ((t5 + t7 + 2 * t6 + 2) >> 2);
-            src[src_offset + 3 + 3 * stride] = (byte) ((t6 + 3 * t7 + 2) >> 2);
+                src[src_offset + 2 + 3 * stride] = (byte)((t5 + t7 + 2 * t6 + 2) >> 2);
+            src[src_offset + 3 + 3 * stride] = (byte)((t6 + 3 * t7 + 2) >> 2);
         }
 
         public static void pred4x4_down_left_svq3_c(byte[] src, int src_offset, byte[] topright, int topright_offset,
@@ -1071,9 +1071,9 @@ namespace cscodec.h264.decoder
             int l2 = src[src_offset - 1 + 2 * stride];
             int l3 = src[src_offset - 1 + 3 * stride];
 
-            src[src_offset + 0 + 0 * stride] = (byte) ((l1 + t1) >> 1);
+            src[src_offset + 0 + 0 * stride] = (byte)((l1 + t1) >> 1);
             src[src_offset + 1 + 0 * stride] =
-                src[src_offset + 0 + 1 * stride] = (byte) ((l2 + t2) >> 1);
+                src[src_offset + 0 + 1 * stride] = (byte)((l2 + t2) >> 1);
             src[src_offset + 2 + 0 * stride] =
                 src[src_offset + 1 + 1 * stride] =
                     src[src_offset + 0 + 2 * stride] =
@@ -1086,7 +1086,7 @@ namespace cscodec.h264.decoder
                                                 src[src_offset + 1 + 3 * stride] =
                                                     src[src_offset + 3 + 2 * stride] =
                                                         src[src_offset + 2 + 3 * stride] =
-                                                            src[src_offset + 3 + 3 * stride] = (byte) ((l3 + t3) >> 1);
+                                                            src[src_offset + 3 + 3 * stride] = (byte)((l3 + t3) >> 1);
         }
 
         public static void pred4x4_down_left_rv40_c(byte[] src, int src_offset, byte[] topright, int topright_offset,
@@ -1112,22 +1112,22 @@ namespace cscodec.h264.decoder
             int l6 = src[src_offset - 1 + 6 * stride];
             int l7 = src[src_offset - 1 + 7 * stride];
 
-            src[src_offset + 0 + 0 * stride] = (byte) ((t0 + t2 + 2 * t1 + 2 + l0 + l2 + 2 * l1 + 2) >> 3);
+            src[src_offset + 0 + 0 * stride] = (byte)((t0 + t2 + 2 * t1 + 2 + l0 + l2 + 2 * l1 + 2) >> 3);
             src[src_offset + 1 + 0 * stride] =
-                src[src_offset + 0 + 1 * stride] = (byte) ((t1 + t3 + 2 * t2 + 2 + l1 + l3 + 2 * l2 + 2) >> 3);
+                src[src_offset + 0 + 1 * stride] = (byte)((t1 + t3 + 2 * t2 + 2 + l1 + l3 + 2 * l2 + 2) >> 3);
             src[src_offset + 2 + 0 * stride] =
                 src[src_offset + 1 + 1 * stride] =
-                    src[src_offset + 0 + 2 * stride] = (byte) ((t2 + t4 + 2 * t3 + 2 + l2 + l4 + 2 * l3 + 2) >> 3);
+                    src[src_offset + 0 + 2 * stride] = (byte)((t2 + t4 + 2 * t3 + 2 + l2 + l4 + 2 * l3 + 2) >> 3);
             src[src_offset + 3 + 0 * stride] =
                 src[src_offset + 2 + 1 * stride] =
                     src[src_offset + 1 + 2 * stride] =
-                        src[src_offset + 0 + 3 * stride] = (byte) ((t3 + t5 + 2 * t4 + 2 + l3 + l5 + 2 * l4 + 2) >> 3);
+                        src[src_offset + 0 + 3 * stride] = (byte)((t3 + t5 + 2 * t4 + 2 + l3 + l5 + 2 * l4 + 2) >> 3);
             src[src_offset + 3 + 1 * stride] =
                 src[src_offset + 2 + 2 * stride] =
-                    src[src_offset + 1 + 3 * stride] = (byte) ((t4 + t6 + 2 * t5 + 2 + l4 + l6 + 2 * l5 + 2) >> 3);
+                    src[src_offset + 1 + 3 * stride] = (byte)((t4 + t6 + 2 * t5 + 2 + l4 + l6 + 2 * l5 + 2) >> 3);
             src[src_offset + 3 + 2 * stride] =
-                src[src_offset + 2 + 3 * stride] = (byte) ((t5 + t7 + 2 * t6 + 2 + l5 + l7 + 2 * l6 + 2) >> 3);
-            src[src_offset + 3 + 3 * stride] = (byte) ((t6 + t7 + 1 + l6 + l7 + 1) >> 2);
+                src[src_offset + 2 + 3 * stride] = (byte)((t5 + t7 + 2 * t6 + 2 + l5 + l7 + 2 * l6 + 2) >> 3);
+            src[src_offset + 3 + 3 * stride] = (byte)((t6 + t7 + 1 + l6 + l7 + 1) >> 2);
         }
 
         public static void pred4x4_down_left_rv40_nodown_c(byte[] src, int src_offset, byte[] topright,
@@ -1148,22 +1148,22 @@ namespace cscodec.h264.decoder
             int l2 = src[src_offset - 1 + 2 * stride];
             int l3 = src[src_offset - 1 + 3 * stride];
 
-            src[src_offset + 0 + 0 * stride] = (byte) ((t0 + t2 + 2 * t1 + 2 + l0 + l2 + 2 * l1 + 2) >> 3);
+            src[src_offset + 0 + 0 * stride] = (byte)((t0 + t2 + 2 * t1 + 2 + l0 + l2 + 2 * l1 + 2) >> 3);
             src[src_offset + 1 + 0 * stride] =
-                src[src_offset + 0 + 1 * stride] = (byte) ((t1 + t3 + 2 * t2 + 2 + l1 + l3 + 2 * l2 + 2) >> 3);
+                src[src_offset + 0 + 1 * stride] = (byte)((t1 + t3 + 2 * t2 + 2 + l1 + l3 + 2 * l2 + 2) >> 3);
             src[src_offset + 2 + 0 * stride] =
                 src[src_offset + 1 + 1 * stride] =
-                    src[src_offset + 0 + 2 * stride] = (byte) ((t2 + t4 + 2 * t3 + 2 + l2 + 3 * l3 + 2) >> 3);
+                    src[src_offset + 0 + 2 * stride] = (byte)((t2 + t4 + 2 * t3 + 2 + l2 + 3 * l3 + 2) >> 3);
             src[src_offset + 3 + 0 * stride] =
                 src[src_offset + 2 + 1 * stride] =
                     src[src_offset + 1 + 2 * stride] =
-                        src[src_offset + 0 + 3 * stride] = (byte) ((t3 + t5 + 2 * t4 + 2 + l3 * 4 + 2) >> 3);
+                        src[src_offset + 0 + 3 * stride] = (byte)((t3 + t5 + 2 * t4 + 2 + l3 * 4 + 2) >> 3);
             src[src_offset + 3 + 1 * stride] =
                 src[src_offset + 2 + 2 * stride] =
-                    src[src_offset + 1 + 3 * stride] = (byte) ((t4 + t6 + 2 * t5 + 2 + l3 * 4 + 2) >> 3);
+                    src[src_offset + 1 + 3 * stride] = (byte)((t4 + t6 + 2 * t5 + 2 + l3 * 4 + 2) >> 3);
             src[src_offset + 3 + 2 * stride] =
-                src[src_offset + 2 + 3 * stride] = (byte) ((t5 + t7 + 2 * t6 + 2 + l3 * 4 + 2) >> 3);
-            src[src_offset + 3 + 3 * stride] = (byte) ((t6 + t7 + 1 + 2 * l3 + 1) >> 2);
+                src[src_offset + 2 + 3 * stride] = (byte)((t5 + t7 + 2 * t6 + 2 + l3 * 4 + 2) >> 3);
+            src[src_offset + 3 + 3 * stride] = (byte)((t6 + t7 + 1 + 2 * l3 + 1) >> 2);
         }
 
         public static void pred4x4_vertical_right_c(byte[] src, int src_offset, byte[] topright, int topright_offset,
@@ -1182,21 +1182,21 @@ namespace cscodec.h264.decoder
             //int  l3= src[src_offset -1+3*stride];
 
             src[src_offset + 0 + 0 * stride] =
-                src[src_offset + 1 + 2 * stride] = (byte) ((lt + t0 + 1) >> 1);
+                src[src_offset + 1 + 2 * stride] = (byte)((lt + t0 + 1) >> 1);
             src[src_offset + 1 + 0 * stride] =
-                src[src_offset + 2 + 2 * stride] = (byte) ((t0 + t1 + 1) >> 1);
+                src[src_offset + 2 + 2 * stride] = (byte)((t0 + t1 + 1) >> 1);
             src[src_offset + 2 + 0 * stride] =
-                src[src_offset + 3 + 2 * stride] = (byte) ((t1 + t2 + 1) >> 1);
-            src[src_offset + 3 + 0 * stride] = (byte) ((t2 + t3 + 1) >> 1);
+                src[src_offset + 3 + 2 * stride] = (byte)((t1 + t2 + 1) >> 1);
+            src[src_offset + 3 + 0 * stride] = (byte)((t2 + t3 + 1) >> 1);
             src[src_offset + 0 + 1 * stride] =
-                src[src_offset + 1 + 3 * stride] = (byte) ((l0 + 2 * lt + t0 + 2) >> 2);
+                src[src_offset + 1 + 3 * stride] = (byte)((l0 + 2 * lt + t0 + 2) >> 2);
             src[src_offset + 1 + 1 * stride] =
-                src[src_offset + 2 + 3 * stride] = (byte) ((lt + 2 * t0 + t1 + 2) >> 2);
+                src[src_offset + 2 + 3 * stride] = (byte)((lt + 2 * t0 + t1 + 2) >> 2);
             src[src_offset + 2 + 1 * stride] =
-                src[src_offset + 3 + 3 * stride] = (byte) ((t0 + 2 * t1 + t2 + 2) >> 2);
-            src[src_offset + 3 + 1 * stride] = (byte) ((t1 + 2 * t2 + t3 + 2) >> 2);
-            src[src_offset + 0 + 2 * stride] = (byte) ((lt + 2 * l0 + l1 + 2) >> 2);
-            src[src_offset + 0 + 3 * stride] = (byte) ((l0 + 2 * l1 + l2 + 2) >> 2);
+                src[src_offset + 3 + 3 * stride] = (byte)((t0 + 2 * t1 + t2 + 2) >> 2);
+            src[src_offset + 3 + 1 * stride] = (byte)((t1 + 2 * t2 + t3 + 2) >> 2);
+            src[src_offset + 0 + 2 * stride] = (byte)((lt + 2 * l0 + l1 + 2) >> 2);
+            src[src_offset + 0 + 3 * stride] = (byte)((l0 + 2 * l1 + l2 + 2) >> 2);
         }
 
         public static void pred4x4_vertical_left_c(byte[] src, int src_offset, byte[] topright, int topright_offset,
@@ -1212,22 +1212,22 @@ namespace cscodec.h264.decoder
             int t6 = topright[topright_offset + 2];
             //int t7= topright[topright_offset + 3];
 
-            src[src_offset + 0 + 0 * stride] = (byte) ((t0 + t1 + 1) >> 1);
+            src[src_offset + 0 + 0 * stride] = (byte)((t0 + t1 + 1) >> 1);
             src[src_offset + 1 + 0 * stride] =
-                src[src_offset + 0 + 2 * stride] = (byte) ((t1 + t2 + 1) >> 1);
+                src[src_offset + 0 + 2 * stride] = (byte)((t1 + t2 + 1) >> 1);
             src[src_offset + 2 + 0 * stride] =
-                src[src_offset + 1 + 2 * stride] = (byte) ((t2 + t3 + 1) >> 1);
+                src[src_offset + 1 + 2 * stride] = (byte)((t2 + t3 + 1) >> 1);
             src[src_offset + 3 + 0 * stride] =
-                src[src_offset + 2 + 2 * stride] = (byte) ((t3 + t4 + 1) >> 1);
-            src[src_offset + 3 + 2 * stride] = (byte) ((t4 + t5 + 1) >> 1);
-            src[src_offset + 0 + 1 * stride] = (byte) ((t0 + 2 * t1 + t2 + 2) >> 2);
+                src[src_offset + 2 + 2 * stride] = (byte)((t3 + t4 + 1) >> 1);
+            src[src_offset + 3 + 2 * stride] = (byte)((t4 + t5 + 1) >> 1);
+            src[src_offset + 0 + 1 * stride] = (byte)((t0 + 2 * t1 + t2 + 2) >> 2);
             src[src_offset + 1 + 1 * stride] =
-                src[src_offset + 0 + 3 * stride] = (byte) ((t1 + 2 * t2 + t3 + 2) >> 2);
+                src[src_offset + 0 + 3 * stride] = (byte)((t1 + 2 * t2 + t3 + 2) >> 2);
             src[src_offset + 2 + 1 * stride] =
-                src[src_offset + 1 + 3 * stride] = (byte) ((t2 + 2 * t3 + t4 + 2) >> 2);
+                src[src_offset + 1 + 3 * stride] = (byte)((t2 + 2 * t3 + t4 + 2) >> 2);
             src[src_offset + 3 + 1 * stride] =
-                src[src_offset + 2 + 3 * stride] = (byte) ((t3 + 2 * t4 + t5 + 2) >> 2);
-            src[src_offset + 3 + 3 * stride] = (byte) ((t4 + 2 * t5 + t6 + 2) >> 2);
+                src[src_offset + 2 + 3 * stride] = (byte)((t3 + 2 * t4 + t5 + 2) >> 2);
+            src[src_offset + 3 + 3 * stride] = (byte)((t4 + 2 * t5 + t6 + 2) >> 2);
         }
 
         public static void pred4x4_vertical_left_rv40(byte[] src, int src_offset, byte[] topright, int topright_offset,
@@ -1244,22 +1244,22 @@ namespace cscodec.h264.decoder
             int t6 = topright[topright_offset + 2];
             //int t7= topright[topright_offset + 3];
 
-            src[src_offset + 0 + 0 * stride] = (byte) ((2 * t0 + 2 * t1 + l1 + 2 * l2 + l3 + 4) >> 3);
+            src[src_offset + 0 + 0 * stride] = (byte)((2 * t0 + 2 * t1 + l1 + 2 * l2 + l3 + 4) >> 3);
             src[src_offset + 1 + 0 * stride] =
-                src[src_offset + 0 + 2 * stride] = (byte) ((t1 + t2 + 1) >> 1);
+                src[src_offset + 0 + 2 * stride] = (byte)((t1 + t2 + 1) >> 1);
             src[src_offset + 2 + 0 * stride] =
-                src[src_offset + 1 + 2 * stride] = (byte) ((t2 + t3 + 1) >> 1);
+                src[src_offset + 1 + 2 * stride] = (byte)((t2 + t3 + 1) >> 1);
             src[src_offset + 3 + 0 * stride] =
-                src[src_offset + 2 + 2 * stride] = (byte) ((t3 + t4 + 1) >> 1);
-            src[src_offset + 3 + 2 * stride] = (byte) ((t4 + t5 + 1) >> 1);
-            src[src_offset + 0 + 1 * stride] = (byte) ((t0 + 2 * t1 + t2 + l2 + 2 * l3 + l4 + 4) >> 3);
+                src[src_offset + 2 + 2 * stride] = (byte)((t3 + t4 + 1) >> 1);
+            src[src_offset + 3 + 2 * stride] = (byte)((t4 + t5 + 1) >> 1);
+            src[src_offset + 0 + 1 * stride] = (byte)((t0 + 2 * t1 + t2 + l2 + 2 * l3 + l4 + 4) >> 3);
             src[src_offset + 1 + 1 * stride] =
-                src[src_offset + 0 + 3 * stride] = (byte) ((t1 + 2 * t2 + t3 + 2) >> 2);
+                src[src_offset + 0 + 3 * stride] = (byte)((t1 + 2 * t2 + t3 + 2) >> 2);
             src[src_offset + 2 + 1 * stride] =
-                src[src_offset + 1 + 3 * stride] = (byte) ((t2 + 2 * t3 + t4 + 2) >> 2);
+                src[src_offset + 1 + 3 * stride] = (byte)((t2 + 2 * t3 + t4 + 2) >> 2);
             src[src_offset + 3 + 1 * stride] =
-                src[src_offset + 2 + 3 * stride] = (byte) ((t3 + 2 * t4 + t5 + 2) >> 2);
-            src[src_offset + 3 + 3 * stride] = (byte) ((t4 + 2 * t5 + t6 + 2) >> 2);
+                src[src_offset + 2 + 3 * stride] = (byte)((t3 + 2 * t4 + t5 + 2) >> 2);
+            src[src_offset + 3 + 3 * stride] = (byte)((t4 + 2 * t5 + t6 + 2) >> 2);
         }
 
         public static void pred4x4_vertical_left_rv40_c(byte[] src, int src_offset, byte[] topright,
@@ -1302,22 +1302,22 @@ namespace cscodec.h264.decoder
             int t6 = topright[topright_offset + 2];
             int t7 = topright[topright_offset + 3];
 
-            src[src_offset + 0 + 0 * stride] = (byte) ((t0 + t1 + 1) >> 1);
+            src[src_offset + 0 + 0 * stride] = (byte)((t0 + t1 + 1) >> 1);
             src[src_offset + 1 + 0 * stride] =
-                src[src_offset + 0 + 2 * stride] = (byte) ((t1 + t2 + 1) >> 1);
+                src[src_offset + 0 + 2 * stride] = (byte)((t1 + t2 + 1) >> 1);
             src[src_offset + 2 + 0 * stride] =
-                src[src_offset + 1 + 2 * stride] = (byte) ((t2 + t3 + 1) >> 1);
+                src[src_offset + 1 + 2 * stride] = (byte)((t2 + t3 + 1) >> 1);
             src[src_offset + 3 + 0 * stride] =
-                src[src_offset + 2 + 2 * stride] = (byte) ((t3 + t4 + 1) >> 1);
-            src[src_offset + 0 + 1 * stride] = (byte) ((t0 + 2 * t1 + t2 + 2) >> 2);
+                src[src_offset + 2 + 2 * stride] = (byte)((t3 + t4 + 1) >> 1);
+            src[src_offset + 0 + 1 * stride] = (byte)((t0 + 2 * t1 + t2 + 2) >> 2);
             src[src_offset + 1 + 1 * stride] =
-                src[src_offset + 0 + 3 * stride] = (byte) ((t1 + 2 * t2 + t3 + 2) >> 2);
+                src[src_offset + 0 + 3 * stride] = (byte)((t1 + 2 * t2 + t3 + 2) >> 2);
             src[src_offset + 2 + 1 * stride] =
-                src[src_offset + 1 + 3 * stride] = (byte) ((t2 + 2 * t3 + t4 + 2) >> 2);
+                src[src_offset + 1 + 3 * stride] = (byte)((t2 + 2 * t3 + t4 + 2) >> 2);
             src[src_offset + 3 + 1 * stride] =
-                src[src_offset + 2 + 3 * stride] = (byte) ((t3 + 2 * t4 + t5 + 2) >> 2);
-            src[src_offset + 3 + 2 * stride] = (byte) ((t4 + 2 * t5 + t6 + 2) >> 2);
-            src[src_offset + 3 + 3 * stride] = (byte) ((t5 + 2 * t6 + t7 + 2) >> 2);
+                src[src_offset + 2 + 3 * stride] = (byte)((t3 + 2 * t4 + t5 + 2) >> 2);
+            src[src_offset + 3 + 2 * stride] = (byte)((t4 + 2 * t5 + t6 + 2) >> 2);
+            src[src_offset + 3 + 3 * stride] = (byte)((t5 + 2 * t6 + t7 + 2) >> 2);
         }
 
         public static void pred4x4_horizontal_up_c(byte[] src, int src_offset, byte[] topright, int topright_offset,
@@ -1328,22 +1328,22 @@ namespace cscodec.h264.decoder
             int l2 = src[src_offset - 1 + 2 * stride];
             int l3 = src[src_offset - 1 + 3 * stride];
 
-            src[src_offset + 0 + 0 * stride] = (byte) ((l0 + l1 + 1) >> 1);
-            src[src_offset + 1 + 0 * stride] = (byte) ((l0 + 2 * l1 + l2 + 2) >> 2);
+            src[src_offset + 0 + 0 * stride] = (byte)((l0 + l1 + 1) >> 1);
+            src[src_offset + 1 + 0 * stride] = (byte)((l0 + 2 * l1 + l2 + 2) >> 2);
             src[src_offset + 2 + 0 * stride] =
-                src[src_offset + 0 + 1 * stride] = (byte) ((l1 + l2 + 1) >> 1);
+                src[src_offset + 0 + 1 * stride] = (byte)((l1 + l2 + 1) >> 1);
             src[src_offset + 3 + 0 * stride] =
-                src[src_offset + 1 + 1 * stride] = (byte) ((l1 + 2 * l2 + l3 + 2) >> 2);
+                src[src_offset + 1 + 1 * stride] = (byte)((l1 + 2 * l2 + l3 + 2) >> 2);
             src[src_offset + 2 + 1 * stride] =
-                src[src_offset + 0 + 2 * stride] = (byte) ((l2 + l3 + 1) >> 1);
+                src[src_offset + 0 + 2 * stride] = (byte)((l2 + l3 + 1) >> 1);
             src[src_offset + 3 + 1 * stride] =
-                src[src_offset + 1 + 2 * stride] = (byte) ((l2 + 2 * l3 + l3 + 2) >> 2);
+                src[src_offset + 1 + 2 * stride] = (byte)((l2 + 2 * l3 + l3 + 2) >> 2);
             src[src_offset + 3 + 2 * stride] =
                 src[src_offset + 1 + 3 * stride] =
                     src[src_offset + 0 + 3 * stride] =
                         src[src_offset + 2 + 2 * stride] =
                             src[src_offset + 2 + 3 * stride] =
-                                src[src_offset + 3 + 3 * stride] = (byte) l3;
+                                src[src_offset + 3 + 3 * stride] = (byte)l3;
         }
 
         public static void pred4x4_horizontal_up_rv40_c(byte[] src, int src_offset, byte[] topright,
@@ -1369,22 +1369,22 @@ namespace cscodec.h264.decoder
             int t6 = topright[topright_offset + 2];
             int t7 = topright[topright_offset + 3];
 
-            src[src_offset + 0 + 0 * stride] = (byte) ((t1 + 2 * t2 + t3 + 2 * l0 + 2 * l1 + 4) >> 3);
-            src[src_offset + 1 + 0 * stride] = (byte) ((t2 + 2 * t3 + t4 + l0 + 2 * l1 + l2 + 4) >> 3);
+            src[src_offset + 0 + 0 * stride] = (byte)((t1 + 2 * t2 + t3 + 2 * l0 + 2 * l1 + 4) >> 3);
+            src[src_offset + 1 + 0 * stride] = (byte)((t2 + 2 * t3 + t4 + l0 + 2 * l1 + l2 + 4) >> 3);
             src[src_offset + 2 + 0 * stride] =
-                src[src_offset + 0 + 1 * stride] = (byte) ((t3 + 2 * t4 + t5 + 2 * l1 + 2 * l2 + 4) >> 3);
+                src[src_offset + 0 + 1 * stride] = (byte)((t3 + 2 * t4 + t5 + 2 * l1 + 2 * l2 + 4) >> 3);
             src[src_offset + 3 + 0 * stride] =
-                src[src_offset + 1 + 1 * stride] = (byte) ((t4 + 2 * t5 + t6 + l1 + 2 * l2 + l3 + 4) >> 3);
+                src[src_offset + 1 + 1 * stride] = (byte)((t4 + 2 * t5 + t6 + l1 + 2 * l2 + l3 + 4) >> 3);
             src[src_offset + 2 + 1 * stride] =
-                src[src_offset + 0 + 2 * stride] = (byte) ((t5 + 2 * t6 + t7 + 2 * l2 + 2 * l3 + 4) >> 3);
+                src[src_offset + 0 + 2 * stride] = (byte)((t5 + 2 * t6 + t7 + 2 * l2 + 2 * l3 + 4) >> 3);
             src[src_offset + 3 + 1 * stride] =
-                src[src_offset + 1 + 2 * stride] = (byte) ((t6 + 3 * t7 + l2 + 3 * l3 + 4) >> 3);
+                src[src_offset + 1 + 2 * stride] = (byte)((t6 + 3 * t7 + l2 + 3 * l3 + 4) >> 3);
             src[src_offset + 3 + 2 * stride] =
-                src[src_offset + 1 + 3 * stride] = (byte) ((l3 + 2 * l4 + l5 + 2) >> 2);
+                src[src_offset + 1 + 3 * stride] = (byte)((l3 + 2 * l4 + l5 + 2) >> 2);
             src[src_offset + 0 + 3 * stride] =
-                src[src_offset + 2 + 2 * stride] = (byte) ((t6 + t7 + l3 + l4 + 2) >> 2);
-            src[src_offset + 2 + 3 * stride] = (byte) ((l4 + l5 + 1) >> 1);
-            src[src_offset + 3 + 3 * stride] = (byte) ((l4 + 2 * l5 + l6 + 2) >> 2);
+                src[src_offset + 2 + 2 * stride] = (byte)((t6 + t7 + l3 + l4 + 2) >> 2);
+            src[src_offset + 2 + 3 * stride] = (byte)((l4 + l5 + 1) >> 1);
+            src[src_offset + 3 + 3 * stride] = (byte)((l4 + 2 * l5 + l6 + 2) >> 2);
         }
 
         public static void pred4x4_horizontal_up_rv40_nodown_c(byte[] src, int src_offset, byte[] topright,
@@ -1405,22 +1405,22 @@ namespace cscodec.h264.decoder
             int t6 = topright[topright_offset + 2];
             int t7 = topright[topright_offset + 3];
 
-            src[src_offset + 0 + 0 * stride] = (byte) ((t1 + 2 * t2 + t3 + 2 * l0 + 2 * l1 + 4) >> 3);
-            src[src_offset + 1 + 0 * stride] = (byte) ((t2 + 2 * t3 + t4 + l0 + 2 * l1 + l2 + 4) >> 3);
+            src[src_offset + 0 + 0 * stride] = (byte)((t1 + 2 * t2 + t3 + 2 * l0 + 2 * l1 + 4) >> 3);
+            src[src_offset + 1 + 0 * stride] = (byte)((t2 + 2 * t3 + t4 + l0 + 2 * l1 + l2 + 4) >> 3);
             src[src_offset + 2 + 0 * stride] =
-                src[src_offset + 0 + 1 * stride] = (byte) ((t3 + 2 * t4 + t5 + 2 * l1 + 2 * l2 + 4) >> 3);
+                src[src_offset + 0 + 1 * stride] = (byte)((t3 + 2 * t4 + t5 + 2 * l1 + 2 * l2 + 4) >> 3);
             src[src_offset + 3 + 0 * stride] =
-                src[src_offset + 1 + 1 * stride] = (byte) ((t4 + 2 * t5 + t6 + l1 + 2 * l2 + l3 + 4) >> 3);
+                src[src_offset + 1 + 1 * stride] = (byte)((t4 + 2 * t5 + t6 + l1 + 2 * l2 + l3 + 4) >> 3);
             src[src_offset + 2 + 1 * stride] =
-                src[src_offset + 0 + 2 * stride] = (byte) ((t5 + 2 * t6 + t7 + 2 * l2 + 2 * l3 + 4) >> 3);
+                src[src_offset + 0 + 2 * stride] = (byte)((t5 + 2 * t6 + t7 + 2 * l2 + 2 * l3 + 4) >> 3);
             src[src_offset + 3 + 1 * stride] =
-                src[src_offset + 1 + 2 * stride] = (byte) ((t6 + 3 * t7 + l2 + 3 * l3 + 4) >> 3);
+                src[src_offset + 1 + 2 * stride] = (byte)((t6 + 3 * t7 + l2 + 3 * l3 + 4) >> 3);
             src[src_offset + 3 + 2 * stride] =
-                src[src_offset + 1 + 3 * stride] = (byte) l3;
+                src[src_offset + 1 + 3 * stride] = (byte)l3;
             src[src_offset + 0 + 3 * stride] =
-                src[src_offset + 2 + 2 * stride] = (byte) ((t6 + t7 + 2 * l3 + 2) >> 2);
+                src[src_offset + 2 + 2 * stride] = (byte)((t6 + t7 + 2 * l3 + 2) >> 2);
             src[src_offset + 2 + 3 * stride] =
-                src[src_offset + 3 + 3 * stride] = (byte) l3;
+                src[src_offset + 3 + 3 * stride] = (byte)l3;
         }
 
         public static void pred4x4_horizontal_down_c(byte[] src, int src_offset, byte[] topright, int topright_offset,
@@ -1439,21 +1439,21 @@ namespace cscodec.h264.decoder
             int l3 = src[src_offset - 1 + 3 * stride];
 
             src[src_offset + 0 + 0 * stride] =
-                src[src_offset + 2 + 1 * stride] = (byte) ((lt + l0 + 1) >> 1);
+                src[src_offset + 2 + 1 * stride] = (byte)((lt + l0 + 1) >> 1);
             src[src_offset + 1 + 0 * stride] =
-                src[src_offset + 3 + 1 * stride] = (byte) ((l0 + 2 * lt + t0 + 2) >> 2);
-            src[src_offset + 2 + 0 * stride] = (byte) ((lt + 2 * t0 + t1 + 2) >> 2);
-            src[src_offset + 3 + 0 * stride] = (byte) ((t0 + 2 * t1 + t2 + 2) >> 2);
+                src[src_offset + 3 + 1 * stride] = (byte)((l0 + 2 * lt + t0 + 2) >> 2);
+            src[src_offset + 2 + 0 * stride] = (byte)((lt + 2 * t0 + t1 + 2) >> 2);
+            src[src_offset + 3 + 0 * stride] = (byte)((t0 + 2 * t1 + t2 + 2) >> 2);
             src[src_offset + 0 + 1 * stride] =
-                src[src_offset + 2 + 2 * stride] = (byte) ((l0 + l1 + 1) >> 1);
+                src[src_offset + 2 + 2 * stride] = (byte)((l0 + l1 + 1) >> 1);
             src[src_offset + 1 + 1 * stride] =
-                src[src_offset + 3 + 2 * stride] = (byte) ((lt + 2 * l0 + l1 + 2) >> 2);
+                src[src_offset + 3 + 2 * stride] = (byte)((lt + 2 * l0 + l1 + 2) >> 2);
             src[src_offset + 0 + 2 * stride] =
-                src[src_offset + 2 + 3 * stride] = (byte) ((l1 + l2 + 1) >> 1);
+                src[src_offset + 2 + 3 * stride] = (byte)((l1 + l2 + 1) >> 1);
             src[src_offset + 1 + 2 * stride] =
-                src[src_offset + 3 + 3 * stride] = (byte) ((l0 + 2 * l1 + l2 + 2) >> 2);
-            src[src_offset + 0 + 3 * stride] = (byte) ((l2 + l3 + 1) >> 1);
-            src[src_offset + 1 + 3 * stride] = (byte) ((l1 + 2 * l2 + l3 + 2) >> 2);
+                src[src_offset + 3 + 3 * stride] = (byte)((l0 + 2 * l1 + l2 + 2) >> 2);
+            src[src_offset + 0 + 3 * stride] = (byte)((l2 + l3 + 1) >> 1);
+            src[src_offset + 1 + 3 * stride] = (byte)((l1 + 2 * l2 + l3 + 2) >> 2);
         }
 
         public static void pred4x4_tm_vp8_c(byte[] src, int src_offset, byte[] topright, int topright_offset,
@@ -1466,10 +1466,10 @@ namespace cscodec.h264.decoder
             for (y = 0; y < 4; y++)
             {
                 int cm_in_offset = cm_offset + src[src_offset - 1];
-                src[src_offset + 0] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 0]];
-                src[src_offset + 1] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 1]];
-                src[src_offset + 2] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 2]];
-                src[src_offset + 3] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 3]];
+                src[src_offset + 0] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 0]];
+                src[src_offset + 1] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 1]];
+                src[src_offset + 2] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 2]];
+                src[src_offset + 3] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 3]];
                 src_offset += stride;
             }
         }
@@ -1575,7 +1575,7 @@ namespace cscodec.h264.decoder
                                                                     src[src_offset + i * stride + 13] =
                                                                         src[src_offset + i * stride + 14] =
                                                                             src[src_offset + i * stride + 15] =
-                                                                                (byte) dc;
+                                                                                (byte)dc;
             }
         }
 
@@ -1610,7 +1610,7 @@ namespace cscodec.h264.decoder
                                                                     src[src_offset + i * stride + 13] =
                                                                         src[src_offset + i * stride + 14] =
                                                                             src[src_offset + i * stride + 15] =
-                                                                                (byte) dc;
+                                                                                (byte)dc;
             }
         }
 
@@ -1642,7 +1642,7 @@ namespace cscodec.h264.decoder
                                                                     src[src_offset + i * stride + 13] =
                                                                         src[src_offset + i * stride + 14] =
                                                                             src[src_offset + i * stride + 15] =
-                                                                                (byte) dc;
+                                                                                (byte)dc;
             }
         }
 
@@ -1762,10 +1762,10 @@ namespace cscodec.h264.decoder
                 a += V;
                 for (i = -16; i < 0; i += 4)
                 {
-                    src[src_offset + 16 + i] = (byte) H264DSPContext.ff_cropTbl[cm_offset + (b >> 5)];
-                    src[src_offset + 17 + i] = (byte) H264DSPContext.ff_cropTbl[cm_offset + ((b + H) >> 5)];
-                    src[src_offset + 18 + i] = (byte) H264DSPContext.ff_cropTbl[cm_offset + ((b + 2 * H) >> 5)];
-                    src[src_offset + 19 + i] = (byte) H264DSPContext.ff_cropTbl[cm_offset + ((b + 3 * H) >> 5)];
+                    src[src_offset + 16 + i] = (byte)H264DSPContext.ff_cropTbl[cm_offset + (b >> 5)];
+                    src[src_offset + 17 + i] = (byte)H264DSPContext.ff_cropTbl[cm_offset + ((b + H) >> 5)];
+                    src[src_offset + 18 + i] = (byte)H264DSPContext.ff_cropTbl[cm_offset + ((b + 2 * H) >> 5)];
+                    src[src_offset + 19 + i] = (byte)H264DSPContext.ff_cropTbl[cm_offset + ((b + 3 * H) >> 5)];
                     b += 4 * H;
                 }
                 src_offset += stride;
@@ -1796,22 +1796,22 @@ namespace cscodec.h264.decoder
             for (y = 0; y < 16; y++)
             {
                 int cm_in_offset = cm_offset + src[src_offset - 1];
-                src[src_offset + 0] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 0]];
-                src[src_offset + 1] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 1]];
-                src[src_offset + 2] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 2]];
-                src[src_offset + 3] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 3]];
-                src[src_offset + 4] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 4]];
-                src[src_offset + 5] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 5]];
-                src[src_offset + 6] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 6]];
-                src[src_offset + 7] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 7]];
-                src[src_offset + 8] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 8]];
-                src[src_offset + 9] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 9]];
-                src[src_offset + 10] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 10]];
-                src[src_offset + 11] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 11]];
-                src[src_offset + 12] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 12]];
-                src[src_offset + 13] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 13]];
-                src[src_offset + 14] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 14]];
-                src[src_offset + 15] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 15]];
+                src[src_offset + 0] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 0]];
+                src[src_offset + 1] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 1]];
+                src[src_offset + 2] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 2]];
+                src[src_offset + 3] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 3]];
+                src[src_offset + 4] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 4]];
+                src[src_offset + 5] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 5]];
+                src[src_offset + 6] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 6]];
+                src[src_offset + 7] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 7]];
+                src[src_offset + 8] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 8]];
+                src[src_offset + 9] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 9]];
+                src[src_offset + 10] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 10]];
+                src[src_offset + 11] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 11]];
+                src[src_offset + 12] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 12]];
+                src[src_offset + 13] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 13]];
+                src[src_offset + 14] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 14]];
+                src[src_offset + 15] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 15]];
                 src_offset += stride;
             }
         }
@@ -1925,7 +1925,7 @@ namespace cscodec.h264.decoder
                                 src[src_offset + i * stride + 4] =
                                     src[src_offset + i * stride + 5] =
                                         src[src_offset + i * stride + 6] =
-                                            src[src_offset + i * stride + 7] = (byte) dc0;
+                                            src[src_offset + i * stride + 7] = (byte)dc0;
             }
             for (i = 4; i < 8; i++)
             {
@@ -1936,7 +1936,7 @@ namespace cscodec.h264.decoder
                                 src[src_offset + i * stride + 4] =
                                     src[src_offset + i * stride + 5] =
                                         src[src_offset + i * stride + 6] =
-                                            src[src_offset + i * stride + 7] = (byte) dc2;
+                                            src[src_offset + i * stride + 7] = (byte)dc2;
             }
         }
 
@@ -1959,7 +1959,7 @@ namespace cscodec.h264.decoder
                                 src[src_offset + i * stride + 4] =
                                     src[src_offset + i * stride + 5] =
                                         src[src_offset + i * stride + 6] =
-                                            src[src_offset + i * stride + 7] = (byte) dc0;
+                                            src[src_offset + i * stride + 7] = (byte)dc0;
             }
         }
 
@@ -1982,24 +1982,24 @@ namespace cscodec.h264.decoder
                 src[src_offset + i * stride + 0] =
                     src[src_offset + i * stride + 1] =
                         src[src_offset + i * stride + 2] =
-                            src[src_offset + i * stride + 3] = (byte) dc0;
+                            src[src_offset + i * stride + 3] = (byte)dc0;
 
                 src[src_offset + i * stride + 4] =
                     src[src_offset + i * stride + 5] =
                         src[src_offset + i * stride + 6] =
-                            src[src_offset + i * stride + 7] = (byte) dc1;
+                            src[src_offset + i * stride + 7] = (byte)dc1;
             }
             for (i = 4; i < 8; i++)
             {
                 src[src_offset + i * stride + 0] =
                     src[src_offset + i * stride + 1] =
                         src[src_offset + i * stride + 2] =
-                            src[src_offset + i * stride + 3] = (byte) dc0;
+                            src[src_offset + i * stride + 3] = (byte)dc0;
 
                 src[src_offset + i * stride + 4] =
                     src[src_offset + i * stride + 5] =
                         src[src_offset + i * stride + 6] =
-                            src[src_offset + i * stride + 7] = (byte) dc1;
+                            src[src_offset + i * stride + 7] = (byte)dc1;
             }
         }
 
@@ -2021,7 +2021,7 @@ namespace cscodec.h264.decoder
                                 src[src_offset + i * stride + 4] =
                                     src[src_offset + i * stride + 5] =
                                         src[src_offset + i * stride + 6] =
-                                            src[src_offset + i * stride + 7] = (byte) dc0;
+                                            src[src_offset + i * stride + 7] = (byte)dc0;
             }
         }
 
@@ -2048,24 +2048,24 @@ namespace cscodec.h264.decoder
                 src[src_offset + i * stride + 0] =
                     src[src_offset + i * stride + 1] =
                         src[src_offset + i * stride + 2] =
-                            src[src_offset + i * stride + 3] = (byte) dc0;
+                            src[src_offset + i * stride + 3] = (byte)dc0;
 
                 src[src_offset + i * stride + 4] =
                     src[src_offset + i * stride + 5] =
                         src[src_offset + i * stride + 6] =
-                            src[src_offset + i * stride + 7] = (byte) dc1;
+                            src[src_offset + i * stride + 7] = (byte)dc1;
             }
             for (i = 4; i < 8; i++)
             {
                 src[src_offset + i * stride + 0] =
                     src[src_offset + i * stride + 1] =
                         src[src_offset + i * stride + 2] =
-                            src[src_offset + i * stride + 3] = (byte) dc2;
+                            src[src_offset + i * stride + 3] = (byte)dc2;
 
                 src[src_offset + i * stride + 4] =
                     src[src_offset + i * stride + 5] =
                         src[src_offset + i * stride + 6] =
-                            src[src_offset + i * stride + 7] = (byte) dc3;
+                            src[src_offset + i * stride + 7] = (byte)dc3;
             }
         }
 
@@ -2114,24 +2114,24 @@ namespace cscodec.h264.decoder
                 src[src_offset + i * stride + 0] =
                     src[src_offset + i * stride + 1] =
                         src[src_offset + i * stride + 2] =
-                            src[src_offset + i * stride + 3] = (byte) dc0;
+                            src[src_offset + i * stride + 3] = (byte)dc0;
 
                 src[src_offset + i * stride + 4] =
                     src[src_offset + i * stride + 5] =
                         src[src_offset + i * stride + 6] =
-                            src[src_offset + i * stride + 7] = (byte) dc0;
+                            src[src_offset + i * stride + 7] = (byte)dc0;
             }
             for (i = 4; i < 8; i++)
             {
                 src[src_offset + i * stride + 0] =
                     src[src_offset + i * stride + 1] =
                         src[src_offset + i * stride + 2] =
-                            src[src_offset + i * stride + 3] = (byte) dc0;
+                            src[src_offset + i * stride + 3] = (byte)dc0;
 
                 src[src_offset + i * stride + 4] =
                     src[src_offset + i * stride + 5] =
                         src[src_offset + i * stride + 6] =
-                            src[src_offset + i * stride + 7] = (byte) dc0;
+                            src[src_offset + i * stride + 7] = (byte)dc0;
             }
         }
 
@@ -2160,14 +2160,14 @@ namespace cscodec.h264.decoder
             {
                 int b = a;
                 a += V;
-                src[src_offset + 0] = (byte) H264DSPContext.ff_cropTbl[cm_offset + (b >> 5)];
-                src[src_offset + 1] = (byte) H264DSPContext.ff_cropTbl[cm_offset + ((b + H) >> 5)];
-                src[src_offset + 2] = (byte) H264DSPContext.ff_cropTbl[cm_offset + ((b + 2 * H) >> 5)];
-                src[src_offset + 3] = (byte) H264DSPContext.ff_cropTbl[cm_offset + ((b + 3 * H) >> 5)];
-                src[src_offset + 4] = (byte) H264DSPContext.ff_cropTbl[cm_offset + ((b + 4 * H) >> 5)];
-                src[src_offset + 5] = (byte) H264DSPContext.ff_cropTbl[cm_offset + ((b + 5 * H) >> 5)];
-                src[src_offset + 6] = (byte) H264DSPContext.ff_cropTbl[cm_offset + ((b + 6 * H) >> 5)];
-                src[src_offset + 7] = (byte) H264DSPContext.ff_cropTbl[cm_offset + ((b + 7 * H) >> 5)];
+                src[src_offset + 0] = (byte)H264DSPContext.ff_cropTbl[cm_offset + (b >> 5)];
+                src[src_offset + 1] = (byte)H264DSPContext.ff_cropTbl[cm_offset + ((b + H) >> 5)];
+                src[src_offset + 2] = (byte)H264DSPContext.ff_cropTbl[cm_offset + ((b + 2 * H) >> 5)];
+                src[src_offset + 3] = (byte)H264DSPContext.ff_cropTbl[cm_offset + ((b + 3 * H) >> 5)];
+                src[src_offset + 4] = (byte)H264DSPContext.ff_cropTbl[cm_offset + ((b + 4 * H) >> 5)];
+                src[src_offset + 5] = (byte)H264DSPContext.ff_cropTbl[cm_offset + ((b + 5 * H) >> 5)];
+                src[src_offset + 6] = (byte)H264DSPContext.ff_cropTbl[cm_offset + ((b + 6 * H) >> 5)];
+                src[src_offset + 7] = (byte)H264DSPContext.ff_cropTbl[cm_offset + ((b + 7 * H) >> 5)];
                 src_offset += stride;
             }
         }
@@ -2181,14 +2181,14 @@ namespace cscodec.h264.decoder
             for (y = 0; y < 8; y++)
             {
                 int cm_in_offset = cm_offset + src[src_offset - 1];
-                src[src_offset + 0] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 0]];
-                src[src_offset + 1] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 1]];
-                src[src_offset + 2] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 2]];
-                src[src_offset + 3] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 3]];
-                src[src_offset + 4] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 4]];
-                src[src_offset + 5] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 5]];
-                src[src_offset + 6] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 6]];
-                src[src_offset + 7] = (byte) H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 7]];
+                src[src_offset + 0] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 0]];
+                src[src_offset + 1] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 1]];
+                src[src_offset + 2] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 2]];
+                src[src_offset + 3] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 3]];
+                src[src_offset + 4] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 4]];
+                src[src_offset + 5] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 5]];
+                src[src_offset + 6] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 6]];
+                src[src_offset + 7] = (byte)H264DSPContext.ff_cropTbl[cm_in_offset + src[top_offset + 7]];
                 src_offset += stride;
             }
         }
@@ -2231,7 +2231,7 @@ namespace cscodec.h264.decoder
                       src[src_offset - 1 + 7 * stride] + 2) >> 2;
             int l7 = (src[src_offset - 1 + 6 * stride] + 3 * src[src_offset - 1 + 7 * stride] + 2) >> 2;
 
-            byte dc = (byte) ((l0 + l1 + l2 + l3 + l4 + l5 + l6 + l7 + 4) >> 3);
+            byte dc = (byte)((l0 + l1 + l2 + l3 + l4 + l5 + l6 + l7 + 4) >> 3);
             int y;
             for (y = 0; y < 8; y++)
             {
@@ -2266,7 +2266,7 @@ namespace cscodec.h264.decoder
             int t7 = ((has_topright != 0 ? src[src_offset + 8 - 1 * stride] : src[src_offset + 7 - 1 * stride])
                       + 2 * src[src_offset + 7 - 1 * stride] + src[src_offset + 6 - 1 * stride] + 2) >> 2;
 
-            byte dc = (byte) ((t0 + t1 + t2 + t3 + t4 + t5 + t6 + t7 + 4) >> 3);
+            byte dc = (byte)((t0 + t1 + t2 + t3 + t4 + t5 + t6 + t7 + 4) >> 3);
             int y;
             for (y = 0; y < 8; y++)
             {
@@ -2318,7 +2318,7 @@ namespace cscodec.h264.decoder
                       + 2 * src[src_offset + 7 - 1 * stride] + src[src_offset + 6 - 1 * stride] + 2) >> 2;
 
             byte dc =
-                (byte) ((l0 + l1 + l2 + l3 + l4 + l5 + l6 + l7 + t0 + t1 + t2 + t3 + t4 + t5 + t6 + t7 + 8) >> 4);
+                (byte)((l0 + l1 + l2 + l3 + l4 + l5 + l6 + l7 + t0 + t1 + t2 + t3 + t4 + t5 + t6 + t7 + 8) >> 4);
             for (int y = 0; y < 8; y++)
             {
                 src[src_offset + 0] =
@@ -2337,21 +2337,21 @@ namespace cscodec.h264.decoder
             int stride)
         {
             byte l0 =
-                (byte) (((has_topleft != 0 ? src[src_offset - 1 - 1 * stride] : src[src_offset - 1 + 0 * stride]) +
+                (byte)(((has_topleft != 0 ? src[src_offset - 1 - 1 * stride] : src[src_offset - 1 + 0 * stride]) +
                          2 * src[src_offset - 1 + 0 * stride] + src[src_offset - 1 + 1 * stride] + 2) >> 2);
-            byte l1 = (byte) ((src[src_offset - 1 + 0 * stride] + 2 * src[src_offset - 1 + 1 * stride] +
+            byte l1 = (byte)((src[src_offset - 1 + 0 * stride] + 2 * src[src_offset - 1 + 1 * stride] +
                                src[src_offset - 1 + 2 * stride] + 2) >> 2);
-            byte l2 = (byte) ((src[src_offset - 1 + 1 * stride] + 2 * src[src_offset - 1 + 2 * stride] +
+            byte l2 = (byte)((src[src_offset - 1 + 1 * stride] + 2 * src[src_offset - 1 + 2 * stride] +
                                src[src_offset - 1 + 3 * stride] + 2) >> 2);
-            byte l3 = (byte) ((src[src_offset - 1 + 2 * stride] + 2 * src[src_offset - 1 + 3 * stride] +
+            byte l3 = (byte)((src[src_offset - 1 + 2 * stride] + 2 * src[src_offset - 1 + 3 * stride] +
                                src[src_offset - 1 + 4 * stride] + 2) >> 2);
-            byte l4 = (byte) ((src[src_offset - 1 + 3 * stride] + 2 * src[src_offset - 1 + 4 * stride] +
+            byte l4 = (byte)((src[src_offset - 1 + 3 * stride] + 2 * src[src_offset - 1 + 4 * stride] +
                                src[src_offset - 1 + 5 * stride] + 2) >> 2);
-            byte l5 = (byte) ((src[src_offset - 1 + 4 * stride] + 2 * src[src_offset - 1 + 5 * stride] +
+            byte l5 = (byte)((src[src_offset - 1 + 4 * stride] + 2 * src[src_offset - 1 + 5 * stride] +
                                src[src_offset - 1 + 6 * stride] + 2) >> 2);
-            byte l6 = (byte) ((src[src_offset - 1 + 5 * stride] + 2 * src[src_offset - 1 + 6 * stride] +
+            byte l6 = (byte)((src[src_offset - 1 + 5 * stride] + 2 * src[src_offset - 1 + 6 * stride] +
                                src[src_offset - 1 + 7 * stride] + 2) >> 2);
-            byte l7 = (byte) ((src[src_offset - 1 + 6 * stride] + 3 * src[src_offset - 1 + 7 * stride] + 2) >> 2);
+            byte l7 = (byte)((src[src_offset - 1 + 6 * stride] + 3 * src[src_offset - 1 + 7 * stride] + 2) >> 2);
 
             src[src_offset + 0 * stride + 0] =
                 src[src_offset + 0 * stride + 1] =
@@ -2430,22 +2430,22 @@ namespace cscodec.h264.decoder
             int stride)
         {
             byte t0 =
-                (byte) (((has_topleft != 0 ? src[src_offset - 1 - 1 * stride] : src[src_offset + 0 - 1 * stride]) +
+                (byte)(((has_topleft != 0 ? src[src_offset - 1 - 1 * stride] : src[src_offset + 0 - 1 * stride]) +
                          2 * src[src_offset + 0 - 1 * stride] + src[src_offset + 1 - 1 * stride] + 2) >> 2);
-            byte t1 = (byte) ((src[src_offset + 0 - 1 * stride] + 2 * src[src_offset + 1 - 1 * stride] +
+            byte t1 = (byte)((src[src_offset + 0 - 1 * stride] + 2 * src[src_offset + 1 - 1 * stride] +
                                src[src_offset + 2 - 1 * stride] + 2) >> 2);
-            byte t2 = (byte) ((src[src_offset + 1 - 1 * stride] + 2 * src[src_offset + 2 - 1 * stride] +
+            byte t2 = (byte)((src[src_offset + 1 - 1 * stride] + 2 * src[src_offset + 2 - 1 * stride] +
                                src[src_offset + 3 - 1 * stride] + 2) >> 2);
-            byte t3 = (byte) ((src[src_offset + 2 - 1 * stride] + 2 * src[src_offset + 3 - 1 * stride] +
+            byte t3 = (byte)((src[src_offset + 2 - 1 * stride] + 2 * src[src_offset + 3 - 1 * stride] +
                                src[src_offset + 4 - 1 * stride] + 2) >> 2);
-            byte t4 = (byte) ((src[src_offset + 3 - 1 * stride] + 2 * src[src_offset + 4 - 1 * stride] +
+            byte t4 = (byte)((src[src_offset + 3 - 1 * stride] + 2 * src[src_offset + 4 - 1 * stride] +
                                src[src_offset + 5 - 1 * stride] + 2) >> 2);
-            byte t5 = (byte) ((src[src_offset + 4 - 1 * stride] + 2 * src[src_offset + 5 - 1 * stride] +
+            byte t5 = (byte)((src[src_offset + 4 - 1 * stride] + 2 * src[src_offset + 5 - 1 * stride] +
                                src[src_offset + 6 - 1 * stride] + 2) >> 2);
-            byte t6 = (byte) ((src[src_offset + 5 - 1 * stride] + 2 * src[src_offset + 6 - 1 * stride] +
+            byte t6 = (byte)((src[src_offset + 5 - 1 * stride] + 2 * src[src_offset + 6 - 1 * stride] +
                                src[src_offset + 7 - 1 * stride] + 2) >> 2);
             byte t7 =
-                (byte) (((has_topright != 0 ? src[src_offset + 8 - 1 * stride] : src[src_offset + 7 - 1 * stride]) +
+                (byte)(((has_topright != 0 ? src[src_offset + 8 - 1 * stride] : src[src_offset + 7 - 1 * stride]) +
                          2 * src[src_offset + 7 - 1 * stride] + src[src_offset + 6 - 1 * stride] + 2) >> 2);
 
             src[src_offset + 0] = t0;
@@ -2510,34 +2510,34 @@ namespace cscodec.h264.decoder
             }
             else t8 = t9 = t10 = t11 = t12 = t13 = t14 = t15 = src[src_offset + 7 - 1 * stride];
 
-            src[src_offset + 0 + 0 * stride] = (byte) ((t0 + 2 * t1 + t2 + 2) >> 2);
+            src[src_offset + 0 + 0 * stride] = (byte)((t0 + 2 * t1 + t2 + 2) >> 2);
             src[src_offset + 0 + 1 * stride] =
-                src[src_offset + 1 + 0 * stride] = (byte) ((t1 + 2 * t2 + t3 + 2) >> 2);
+                src[src_offset + 1 + 0 * stride] = (byte)((t1 + 2 * t2 + t3 + 2) >> 2);
             src[src_offset + 0 + 2 * stride] =
                 src[src_offset + 1 + 1 * stride] =
-                    src[src_offset + 2 + 0 * stride] = (byte) ((t2 + 2 * t3 + t4 + 2) >> 2);
+                    src[src_offset + 2 + 0 * stride] = (byte)((t2 + 2 * t3 + t4 + 2) >> 2);
             src[src_offset + 0 + 3 * stride] =
                 src[src_offset + 1 + 2 * stride] =
                     src[src_offset + 2 + 1 * stride] =
-                        src[src_offset + 3 + 0 * stride] = (byte) ((t3 + 2 * t4 + t5 + 2) >> 2);
+                        src[src_offset + 3 + 0 * stride] = (byte)((t3 + 2 * t4 + t5 + 2) >> 2);
             src[src_offset + 0 + 4 * stride] =
                 src[src_offset + 1 + 3 * stride] =
                     src[src_offset + 2 + 2 * stride] =
                         src[src_offset + 3 + 1 * stride] =
-                            src[src_offset + 4 + 0 * stride] = (byte) ((t4 + 2 * t5 + t6 + 2) >> 2);
+                            src[src_offset + 4 + 0 * stride] = (byte)((t4 + 2 * t5 + t6 + 2) >> 2);
             src[src_offset + 0 + 5 * stride] =
                 src[src_offset + 1 + 4 * stride] =
                     src[src_offset + 2 + 3 * stride] =
                         src[src_offset + 3 + 2 * stride] =
                             src[src_offset + 4 + 1 * stride] =
-                                src[src_offset + 5 + 0 * stride] = (byte) ((t5 + 2 * t6 + t7 + 2) >> 2);
+                                src[src_offset + 5 + 0 * stride] = (byte)((t5 + 2 * t6 + t7 + 2) >> 2);
             src[src_offset + 0 + 6 * stride] =
                 src[src_offset + 1 + 5 * stride] =
                     src[src_offset + 2 + 4 * stride] =
                         src[src_offset + 3 + 3 * stride] =
                             src[src_offset + 4 + 2 * stride] =
                                 src[src_offset + 5 + 1 * stride] =
-                                    src[src_offset + 6 + 0 * stride] = (byte) ((t6 + 2 * t7 + t8 + 2) >> 2);
+                                    src[src_offset + 6 + 0 * stride] = (byte)((t6 + 2 * t7 + t8 + 2) >> 2);
             src[src_offset + 0 + 7 * stride] =
                 src[src_offset + 1 + 6 * stride] =
                     src[src_offset + 2 + 5 * stride] =
@@ -2545,7 +2545,7 @@ namespace cscodec.h264.decoder
                             src[src_offset + 4 + 3 * stride] =
                                 src[src_offset + 5 + 2 * stride] =
                                     src[src_offset + 6 + 1 * stride] =
-                                        src[src_offset + 7 + 0 * stride] = (byte) ((t7 + 2 * t8 + t9 + 2) >> 2);
+                                        src[src_offset + 7 + 0 * stride] = (byte)((t7 + 2 * t8 + t9 + 2) >> 2);
 
             src[src_offset + 1 + 7 * stride] =
                 src[src_offset + 2 + 6 * stride] =
@@ -2553,28 +2553,28 @@ namespace cscodec.h264.decoder
                         src[src_offset + 4 + 4 * stride] =
                             src[src_offset + 5 + 3 * stride] =
                                 src[src_offset + 6 + 2 * stride] =
-                                    src[src_offset + 7 + 1 * stride] = (byte) ((t8 + 2 * t9 + t10 + 2) >> 2);
+                                    src[src_offset + 7 + 1 * stride] = (byte)((t8 + 2 * t9 + t10 + 2) >> 2);
             src[src_offset + 2 + 7 * stride] =
                 src[src_offset + 3 + 6 * stride] =
                     src[src_offset + 4 + 5 * stride] =
                         src[src_offset + 5 + 4 * stride] =
                             src[src_offset + 6 + 3 * stride] =
-                                src[src_offset + 7 + 2 * stride] = (byte) ((t9 + 2 * t10 + t11 + 2) >> 2);
+                                src[src_offset + 7 + 2 * stride] = (byte)((t9 + 2 * t10 + t11 + 2) >> 2);
             src[src_offset + 3 + 7 * stride] =
                 src[src_offset + 4 + 6 * stride] =
                     src[src_offset + 5 + 5 * stride] =
                         src[src_offset + 6 + 4 * stride] =
-                            src[src_offset + 7 + 3 * stride] = (byte) ((t10 + 2 * t11 + t12 + 2) >> 2);
+                            src[src_offset + 7 + 3 * stride] = (byte)((t10 + 2 * t11 + t12 + 2) >> 2);
             src[src_offset + 4 + 7 * stride] =
                 src[src_offset + 5 + 6 * stride] =
                     src[src_offset + 6 + 5 * stride] =
-                        src[src_offset + 7 + 4 * stride] = (byte) ((t11 + 2 * t12 + t13 + 2) >> 2);
+                        src[src_offset + 7 + 4 * stride] = (byte)((t11 + 2 * t12 + t13 + 2) >> 2);
             src[src_offset + 5 + 7 * stride] =
                 src[src_offset + 6 + 6 * stride] =
-                    src[src_offset + 7 + 5 * stride] = (byte) ((t12 + 2 * t13 + t14 + 2) >> 2);
+                    src[src_offset + 7 + 5 * stride] = (byte)((t12 + 2 * t13 + t14 + 2) >> 2);
             src[src_offset + 6 + 7 * stride] =
-                src[src_offset + 7 + 6 * stride] = (byte) ((t13 + 2 * t14 + t15 + 2) >> 2);
-            src[src_offset + 7 + 7 * stride] = (byte) ((t14 + 3 * t15 + 2) >> 2);
+                src[src_offset + 7 + 6 * stride] = (byte)((t13 + 2 * t14 + t15 + 2) >> 2);
+            src[src_offset + 7 + 7 * stride] = (byte)((t14 + 3 * t15 + 2) >> 2);
         }
 
         public static void pred8x8l_down_right_c(byte[] src, int src_offset, int has_topleft, int has_topright,
@@ -2616,34 +2616,34 @@ namespace cscodec.h264.decoder
             int lt = (src[src_offset - 1 + 0 * stride] + 2 * src[src_offset - 1 - 1 * stride] +
                       src[src_offset + 0 - 1 * stride] + 2) >> 2;
 
-            src[src_offset + 0 + 7 * stride] = (byte) ((l7 + 2 * l6 + l5 + 2) >> 2);
+            src[src_offset + 0 + 7 * stride] = (byte)((l7 + 2 * l6 + l5 + 2) >> 2);
             src[src_offset + 0 + 6 * stride] =
-                src[src_offset + 1 + 7 * stride] = (byte) ((l6 + 2 * l5 + l4 + 2) >> 2);
+                src[src_offset + 1 + 7 * stride] = (byte)((l6 + 2 * l5 + l4 + 2) >> 2);
             src[src_offset + 0 + 5 * stride] =
                 src[src_offset + 1 + 6 * stride] =
-                    src[src_offset + 2 + 7 * stride] = (byte) ((l5 + 2 * l4 + l3 + 2) >> 2);
+                    src[src_offset + 2 + 7 * stride] = (byte)((l5 + 2 * l4 + l3 + 2) >> 2);
             src[src_offset + 0 + 4 * stride] =
                 src[src_offset + 1 + 5 * stride] =
                     src[src_offset + 2 + 6 * stride] =
-                        src[src_offset + 3 + 7 * stride] = (byte) ((l4 + 2 * l3 + l2 + 2) >> 2);
+                        src[src_offset + 3 + 7 * stride] = (byte)((l4 + 2 * l3 + l2 + 2) >> 2);
             src[src_offset + 0 + 3 * stride] =
                 src[src_offset + 1 + 4 * stride] =
                     src[src_offset + 2 + 5 * stride] =
                         src[src_offset + 3 + 6 * stride] =
-                            src[src_offset + 4 + 7 * stride] = (byte) ((l3 + 2 * l2 + l1 + 2) >> 2);
+                            src[src_offset + 4 + 7 * stride] = (byte)((l3 + 2 * l2 + l1 + 2) >> 2);
             src[src_offset + 0 + 2 * stride] =
                 src[src_offset + 1 + 3 * stride] =
                     src[src_offset + 2 + 4 * stride] =
                         src[src_offset + 3 + 5 * stride] =
                             src[src_offset + 4 + 6 * stride] =
-                                src[src_offset + 5 + 7 * stride] = (byte) ((l2 + 2 * l1 + l0 + 2) >> 2);
+                                src[src_offset + 5 + 7 * stride] = (byte)((l2 + 2 * l1 + l0 + 2) >> 2);
             src[src_offset + 0 + 1 * stride] =
                 src[src_offset + 1 + 2 * stride] =
                     src[src_offset + 2 + 3 * stride] =
                         src[src_offset + 3 + 4 * stride] =
                             src[src_offset + 4 + 5 * stride] =
                                 src[src_offset + 5 + 6 * stride] =
-                                    src[src_offset + 6 + 7 * stride] = (byte) ((l1 + 2 * l0 + lt + 2) >> 2);
+                                    src[src_offset + 6 + 7 * stride] = (byte)((l1 + 2 * l0 + lt + 2) >> 2);
             src[src_offset + 0 + 0 * stride] =
                 src[src_offset + 1 + 1 * stride] =
                     src[src_offset + 2 + 2 * stride] =
@@ -2651,35 +2651,35 @@ namespace cscodec.h264.decoder
                             src[src_offset + 4 + 4 * stride] =
                                 src[src_offset + 5 + 5 * stride] =
                                     src[src_offset + 6 + 6 * stride] =
-                                        src[src_offset + 7 + 7 * stride] = (byte) ((l0 + 2 * lt + t0 + 2) >> 2);
+                                        src[src_offset + 7 + 7 * stride] = (byte)((l0 + 2 * lt + t0 + 2) >> 2);
             src[src_offset + 1 + 0 * stride] =
                 src[src_offset + 2 + 1 * stride] =
                     src[src_offset + 3 + 2 * stride] =
                         src[src_offset + 4 + 3 * stride] =
                             src[src_offset + 5 + 4 * stride] =
                                 src[src_offset + 6 + 5 * stride] =
-                                    src[src_offset + 7 + 6 * stride] = (byte) ((lt + 2 * t0 + t1 + 2) >> 2);
+                                    src[src_offset + 7 + 6 * stride] = (byte)((lt + 2 * t0 + t1 + 2) >> 2);
             src[src_offset + 2 + 0 * stride] =
                 src[src_offset + 3 + 1 * stride] =
                     src[src_offset + 4 + 2 * stride] =
                         src[src_offset + 5 + 3 * stride] =
                             src[src_offset + 6 + 4 * stride] =
-                                src[src_offset + 7 + 5 * stride] = (byte) ((t0 + 2 * t1 + t2 + 2) >> 2);
+                                src[src_offset + 7 + 5 * stride] = (byte)((t0 + 2 * t1 + t2 + 2) >> 2);
             src[src_offset + 3 + 0 * stride] =
                 src[src_offset + 4 + 1 * stride] =
                     src[src_offset + 5 + 2 * stride] =
                         src[src_offset + 6 + 3 * stride] =
-                            src[src_offset + 7 + 4 * stride] = (byte) ((t1 + 2 * t2 + t3 + 2) >> 2);
+                            src[src_offset + 7 + 4 * stride] = (byte)((t1 + 2 * t2 + t3 + 2) >> 2);
             src[src_offset + 4 + 0 * stride] =
                 src[src_offset + 5 + 1 * stride] =
                     src[src_offset + 6 + 2 * stride] =
-                        src[src_offset + 7 + 3 * stride] = (byte) ((t2 + 2 * t3 + t4 + 2) >> 2);
+                        src[src_offset + 7 + 3 * stride] = (byte)((t2 + 2 * t3 + t4 + 2) >> 2);
             src[src_offset + 5 + 0 * stride] =
                 src[src_offset + 6 + 1 * stride] =
-                    src[src_offset + 7 + 2 * stride] = (byte) ((t3 + 2 * t4 + t5 + 2) >> 2);
+                    src[src_offset + 7 + 2 * stride] = (byte)((t3 + 2 * t4 + t5 + 2) >> 2);
             src[src_offset + 6 + 0 * stride] =
-                src[src_offset + 7 + 1 * stride] = (byte) ((t4 + 2 * t5 + t6 + 2) >> 2);
-            src[src_offset + 7 + 0 * stride] = (byte) ((t5 + 2 * t6 + t7 + 2) >> 2);
+                src[src_offset + 7 + 1 * stride] = (byte)((t4 + 2 * t5 + t6 + 2) >> 2);
+            src[src_offset + 7 + 0 * stride] = (byte)((t5 + 2 * t6 + t7 + 2) >> 2);
         }
 
         public static void pred8x8l_vertical_right_c(byte[] src, int src_offset, int has_topleft, int has_topright,
@@ -2721,70 +2721,70 @@ namespace cscodec.h264.decoder
             int lt = (src[src_offset - 1 + 0 * stride] + 2 * src[src_offset - 1 - 1 * stride] +
                       src[src_offset + 0 - 1 * stride] + 2) >> 2;
 
-            src[src_offset + 0 + 6 * stride] = (byte) ((l5 + 2 * l4 + l3 + 2) >> 2);
-            src[src_offset + 0 + 7 * stride] = (byte) ((l6 + 2 * l5 + l4 + 2) >> 2);
+            src[src_offset + 0 + 6 * stride] = (byte)((l5 + 2 * l4 + l3 + 2) >> 2);
+            src[src_offset + 0 + 7 * stride] = (byte)((l6 + 2 * l5 + l4 + 2) >> 2);
             src[src_offset + 0 + 4 * stride] =
-                src[src_offset + 1 + 6 * stride] = (byte) ((l3 + 2 * l2 + l1 + 2) >> 2);
+                src[src_offset + 1 + 6 * stride] = (byte)((l3 + 2 * l2 + l1 + 2) >> 2);
             src[src_offset + 0 + 5 * stride] =
-                src[src_offset + 1 + 7 * stride] = (byte) ((l4 + 2 * l3 + l2 + 2) >> 2);
+                src[src_offset + 1 + 7 * stride] = (byte)((l4 + 2 * l3 + l2 + 2) >> 2);
             src[src_offset + 0 + 2 * stride] =
                 src[src_offset + 1 + 4 * stride] =
-                    src[src_offset + 2 + 6 * stride] = (byte) ((l1 + 2 * l0 + lt + 2) >> 2);
+                    src[src_offset + 2 + 6 * stride] = (byte)((l1 + 2 * l0 + lt + 2) >> 2);
             src[src_offset + 0 + 3 * stride] =
                 src[src_offset + 1 + 5 * stride] =
-                    src[src_offset + 2 + 7 * stride] = (byte) ((l2 + 2 * l1 + l0 + 2) >> 2);
+                    src[src_offset + 2 + 7 * stride] = (byte)((l2 + 2 * l1 + l0 + 2) >> 2);
             src[src_offset + 0 + 1 * stride] =
                 src[src_offset + 1 + 3 * stride] =
                     src[src_offset + 2 + 5 * stride] =
-                        src[src_offset + 3 + 7 * stride] = (byte) ((l0 + 2 * lt + t0 + 2) >> 2);
+                        src[src_offset + 3 + 7 * stride] = (byte)((l0 + 2 * lt + t0 + 2) >> 2);
             src[src_offset + 0 + 0 * stride] =
                 src[src_offset + 1 + 2 * stride] =
                     src[src_offset + 2 + 4 * stride] =
-                        src[src_offset + 3 + 6 * stride] = (byte) ((lt + t0 + 1) >> 1);
+                        src[src_offset + 3 + 6 * stride] = (byte)((lt + t0 + 1) >> 1);
             src[src_offset + 1 + 1 * stride] =
                 src[src_offset + 2 + 3 * stride] =
                     src[src_offset + 3 + 5 * stride] =
-                        src[src_offset + 4 + 7 * stride] = (byte) ((lt + 2 * t0 + t1 + 2) >> 2);
+                        src[src_offset + 4 + 7 * stride] = (byte)((lt + 2 * t0 + t1 + 2) >> 2);
             src[src_offset + 1 + 0 * stride] =
                 src[src_offset + 2 + 2 * stride] =
                     src[src_offset + 3 + 4 * stride] =
-                        src[src_offset + 4 + 6 * stride] = (byte) ((t0 + t1 + 1) >> 1);
+                        src[src_offset + 4 + 6 * stride] = (byte)((t0 + t1 + 1) >> 1);
             src[src_offset + 2 + 1 * stride] =
                 src[src_offset + 3 + 3 * stride] =
                     src[src_offset + 4 + 5 * stride] =
-                        src[src_offset + 5 + 7 * stride] = (byte) ((t0 + 2 * t1 + t2 + 2) >> 2);
+                        src[src_offset + 5 + 7 * stride] = (byte)((t0 + 2 * t1 + t2 + 2) >> 2);
             src[src_offset + 2 + 0 * stride] =
                 src[src_offset + 3 + 2 * stride] =
                     src[src_offset + 4 + 4 * stride] =
-                        src[src_offset + 5 + 6 * stride] = (byte) ((t1 + t2 + 1) >> 1);
+                        src[src_offset + 5 + 6 * stride] = (byte)((t1 + t2 + 1) >> 1);
             src[src_offset + 3 + 1 * stride] =
                 src[src_offset + 4 + 3 * stride] =
                     src[src_offset + 5 + 5 * stride] =
-                        src[src_offset + 6 + 7 * stride] = (byte) ((t1 + 2 * t2 + t3 + 2) >> 2);
+                        src[src_offset + 6 + 7 * stride] = (byte)((t1 + 2 * t2 + t3 + 2) >> 2);
             src[src_offset + 3 + 0 * stride] =
                 src[src_offset + 4 + 2 * stride] =
                     src[src_offset + 5 + 4 * stride] =
-                        src[src_offset + 6 + 6 * stride] = (byte) ((t2 + t3 + 1) >> 1);
+                        src[src_offset + 6 + 6 * stride] = (byte)((t2 + t3 + 1) >> 1);
             src[src_offset + 4 + 1 * stride] =
                 src[src_offset + 5 + 3 * stride] =
                     src[src_offset + 6 + 5 * stride] =
-                        src[src_offset + 7 + 7 * stride] = (byte) ((t2 + 2 * t3 + t4 + 2) >> 2);
+                        src[src_offset + 7 + 7 * stride] = (byte)((t2 + 2 * t3 + t4 + 2) >> 2);
             src[src_offset + 4 + 0 * stride] =
                 src[src_offset + 5 + 2 * stride] =
                     src[src_offset + 6 + 4 * stride] =
-                        src[src_offset + 7 + 6 * stride] = (byte) ((t3 + t4 + 1) >> 1);
+                        src[src_offset + 7 + 6 * stride] = (byte)((t3 + t4 + 1) >> 1);
             src[src_offset + 5 + 1 * stride] =
                 src[src_offset + 6 + 3 * stride] =
-                    src[src_offset + 7 + 5 * stride] = (byte) ((t3 + 2 * t4 + t5 + 2) >> 2);
+                    src[src_offset + 7 + 5 * stride] = (byte)((t3 + 2 * t4 + t5 + 2) >> 2);
             src[src_offset + 5 + 0 * stride] =
                 src[src_offset + 6 + 2 * stride] =
-                    src[src_offset + 7 + 4 * stride] = (byte) ((t4 + t5 + 1) >> 1);
+                    src[src_offset + 7 + 4 * stride] = (byte)((t4 + t5 + 1) >> 1);
             src[src_offset + 6 + 1 * stride] =
-                src[src_offset + 7 + 3 * stride] = (byte) ((t4 + 2 * t5 + t6 + 2) >> 2);
+                src[src_offset + 7 + 3 * stride] = (byte)((t4 + 2 * t5 + t6 + 2) >> 2);
             src[src_offset + 6 + 0 * stride] =
-                src[src_offset + 7 + 2 * stride] = (byte) ((t5 + t6 + 1) >> 1);
-            src[src_offset + 7 + 1 * stride] = (byte) ((t5 + 2 * t6 + t7 + 2) >> 2);
-            src[src_offset + 7 + 0 * stride] = (byte) ((t6 + t7 + 1) >> 1);
+                src[src_offset + 7 + 2 * stride] = (byte)((t5 + t6 + 1) >> 1);
+            src[src_offset + 7 + 1 * stride] = (byte)((t5 + 2 * t6 + t7 + 2) >> 2);
+            src[src_offset + 7 + 0 * stride] = (byte)((t6 + t7 + 1) >> 1);
         }
 
         public static void pred8x8l_horizontal_down_c(byte[] src, int src_offset, int has_topleft, int has_topright,
@@ -2826,70 +2826,70 @@ namespace cscodec.h264.decoder
             int lt = (src[src_offset - 1 + 0 * stride] + 2 * src[src_offset - 1 - 1 * stride] +
                       src[src_offset + 0 - 1 * stride] + 2) >> 2;
 
-            src[src_offset + 0 + 7 * stride] = (byte) ((l6 + l7 + 1) >> 1);
-            src[src_offset + 1 + 7 * stride] = (byte) ((l5 + 2 * l6 + l7 + 2) >> 2);
+            src[src_offset + 0 + 7 * stride] = (byte)((l6 + l7 + 1) >> 1);
+            src[src_offset + 1 + 7 * stride] = (byte)((l5 + 2 * l6 + l7 + 2) >> 2);
             src[src_offset + 0 + 6 * stride] =
-                src[src_offset + 2 + 7 * stride] = (byte) ((l5 + l6 + 1) >> 1);
+                src[src_offset + 2 + 7 * stride] = (byte)((l5 + l6 + 1) >> 1);
             src[src_offset + 1 + 6 * stride] =
-                src[src_offset + 3 + 7 * stride] = (byte) ((l4 + 2 * l5 + l6 + 2) >> 2);
+                src[src_offset + 3 + 7 * stride] = (byte)((l4 + 2 * l5 + l6 + 2) >> 2);
             src[src_offset + 0 + 5 * stride] =
                 src[src_offset + 2 + 6 * stride] =
-                    src[src_offset + 4 + 7 * stride] = (byte) ((l4 + l5 + 1) >> 1);
+                    src[src_offset + 4 + 7 * stride] = (byte)((l4 + l5 + 1) >> 1);
             src[src_offset + 1 + 5 * stride] =
                 src[src_offset + 3 + 6 * stride] =
-                    src[src_offset + 5 + 7 * stride] = (byte) ((l3 + 2 * l4 + l5 + 2) >> 2);
+                    src[src_offset + 5 + 7 * stride] = (byte)((l3 + 2 * l4 + l5 + 2) >> 2);
             src[src_offset + 0 + 4 * stride] =
                 src[src_offset + 2 + 5 * stride] =
                     src[src_offset + 4 + 6 * stride] =
-                        src[src_offset + 6 + 7 * stride] = (byte) ((l3 + l4 + 1) >> 1);
+                        src[src_offset + 6 + 7 * stride] = (byte)((l3 + l4 + 1) >> 1);
             src[src_offset + 1 + 4 * stride] =
                 src[src_offset + 3 + 5 * stride] =
                     src[src_offset + 5 + 6 * stride] =
-                        src[src_offset + 7 + 7 * stride] = (byte) ((l2 + 2 * l3 + l4 + 2) >> 2);
+                        src[src_offset + 7 + 7 * stride] = (byte)((l2 + 2 * l3 + l4 + 2) >> 2);
             src[src_offset + 0 + 3 * stride] =
                 src[src_offset + 2 + 4 * stride] =
                     src[src_offset + 4 + 5 * stride] =
-                        src[src_offset + 6 + 6 * stride] = (byte) ((l2 + l3 + 1) >> 1);
+                        src[src_offset + 6 + 6 * stride] = (byte)((l2 + l3 + 1) >> 1);
             src[src_offset + 1 + 3 * stride] =
                 src[src_offset + 3 + 4 * stride] =
                     src[src_offset + 5 + 5 * stride] =
-                        src[src_offset + 7 + 6 * stride] = (byte) ((l1 + 2 * l2 + l3 + 2) >> 2);
+                        src[src_offset + 7 + 6 * stride] = (byte)((l1 + 2 * l2 + l3 + 2) >> 2);
             src[src_offset + 0 + 2 * stride] =
                 src[src_offset + 2 + 3 * stride] =
                     src[src_offset + 4 + 4 * stride] =
-                        src[src_offset + 6 + 5 * stride] = (byte) ((l1 + l2 + 1) >> 1);
+                        src[src_offset + 6 + 5 * stride] = (byte)((l1 + l2 + 1) >> 1);
             src[src_offset + 1 + 2 * stride] =
                 src[src_offset + 3 + 3 * stride] =
                     src[src_offset + 5 + 4 * stride] =
-                        src[src_offset + 7 + 5 * stride] = (byte) ((l0 + 2 * l1 + l2 + 2) >> 2);
+                        src[src_offset + 7 + 5 * stride] = (byte)((l0 + 2 * l1 + l2 + 2) >> 2);
             src[src_offset + 0 + 1 * stride] =
                 src[src_offset + 2 + 2 * stride] =
                     src[src_offset + 4 + 3 * stride] =
-                        src[src_offset + 6 + 4 * stride] = (byte) ((l0 + l1 + 1) >> 1);
+                        src[src_offset + 6 + 4 * stride] = (byte)((l0 + l1 + 1) >> 1);
             src[src_offset + 1 + 1 * stride] =
                 src[src_offset + 3 + 2 * stride] =
                     src[src_offset + 5 + 3 * stride] =
-                        src[src_offset + 7 + 4 * stride] = (byte) ((lt + 2 * l0 + l1 + 2) >> 2);
+                        src[src_offset + 7 + 4 * stride] = (byte)((lt + 2 * l0 + l1 + 2) >> 2);
             src[src_offset + 0 + 0 * stride] =
                 src[src_offset + 2 + 1 * stride] =
                     src[src_offset + 4 + 2 * stride] =
-                        src[src_offset + 6 + 3 * stride] = (byte) ((lt + l0 + 1) >> 1);
+                        src[src_offset + 6 + 3 * stride] = (byte)((lt + l0 + 1) >> 1);
             src[src_offset + 1 + 0 * stride] =
                 src[src_offset + 3 + 1 * stride] =
                     src[src_offset + 5 + 2 * stride] =
-                        src[src_offset + 7 + 3 * stride] = (byte) ((l0 + 2 * lt + t0 + 2) >> 2);
+                        src[src_offset + 7 + 3 * stride] = (byte)((l0 + 2 * lt + t0 + 2) >> 2);
             src[src_offset + 2 + 0 * stride] =
                 src[src_offset + 4 + 1 * stride] =
-                    src[src_offset + 6 + 2 * stride] = (byte) ((t1 + 2 * t0 + lt + 2) >> 2);
+                    src[src_offset + 6 + 2 * stride] = (byte)((t1 + 2 * t0 + lt + 2) >> 2);
             src[src_offset + 3 + 0 * stride] =
                 src[src_offset + 5 + 1 * stride] =
-                    src[src_offset + 7 + 2 * stride] = (byte) ((t2 + 2 * t1 + t0 + 2) >> 2);
+                    src[src_offset + 7 + 2 * stride] = (byte)((t2 + 2 * t1 + t0 + 2) >> 2);
             src[src_offset + 4 + 0 * stride] =
-                src[src_offset + 6 + 1 * stride] = (byte) ((t3 + 2 * t2 + t1 + 2) >> 2);
+                src[src_offset + 6 + 1 * stride] = (byte)((t3 + 2 * t2 + t1 + 2) >> 2);
             src[src_offset + 5 + 0 * stride] =
-                src[src_offset + 7 + 1 * stride] = (byte) ((t4 + 2 * t3 + t2 + 2) >> 2);
-            src[src_offset + 6 + 0 * stride] = (byte) ((t5 + 2 * t4 + t3 + 2) >> 2);
-            src[src_offset + 7 + 0 * stride] = (byte) ((t6 + 2 * t5 + t4 + 2) >> 2);
+                src[src_offset + 7 + 1 * stride] = (byte)((t4 + 2 * t3 + t2 + 2) >> 2);
+            src[src_offset + 6 + 0 * stride] = (byte)((t5 + 2 * t4 + t3 + 2) >> 2);
+            src[src_offset + 7 + 0 * stride] = (byte)((t6 + 2 * t5 + t4 + 2) >> 2);
         }
 
         public static void pred8x8l_vertical_left_c(byte[] src, int src_offset, int has_topleft, int has_topright,
@@ -2931,70 +2931,70 @@ namespace cscodec.h264.decoder
             }
             else t8 = t9 = t10 = t11 = t12 /*=t13=t14=t15*/ = src[src_offset + 7 - 1 * stride];
 
-            src[src_offset + 0 + 0 * stride] = (byte) ((t0 + t1 + 1) >> 1);
-            src[src_offset + 0 + 1 * stride] = (byte) ((t0 + 2 * t1 + t2 + 2) >> 2);
+            src[src_offset + 0 + 0 * stride] = (byte)((t0 + t1 + 1) >> 1);
+            src[src_offset + 0 + 1 * stride] = (byte)((t0 + 2 * t1 + t2 + 2) >> 2);
             src[src_offset + 0 + 2 * stride] =
-                src[src_offset + 1 + 0 * stride] = (byte) ((t1 + t2 + 1) >> 1);
+                src[src_offset + 1 + 0 * stride] = (byte)((t1 + t2 + 1) >> 1);
             src[src_offset + 0 + 3 * stride] =
-                src[src_offset + 1 + 1 * stride] = (byte) ((t1 + 2 * t2 + t3 + 2) >> 2);
+                src[src_offset + 1 + 1 * stride] = (byte)((t1 + 2 * t2 + t3 + 2) >> 2);
             src[src_offset + 0 + 4 * stride] =
                 src[src_offset + 1 + 2 * stride] =
-                    src[src_offset + 2 + 0 * stride] = (byte) ((t2 + t3 + 1) >> 1);
+                    src[src_offset + 2 + 0 * stride] = (byte)((t2 + t3 + 1) >> 1);
             src[src_offset + 0 + 5 * stride] =
                 src[src_offset + 1 + 3 * stride] =
-                    src[src_offset + 2 + 1 * stride] = (byte) ((t2 + 2 * t3 + t4 + 2) >> 2);
+                    src[src_offset + 2 + 1 * stride] = (byte)((t2 + 2 * t3 + t4 + 2) >> 2);
             src[src_offset + 0 + 6 * stride] =
                 src[src_offset + 1 + 4 * stride] =
                     src[src_offset + 2 + 2 * stride] =
-                        src[src_offset + 3 + 0 * stride] = (byte) ((t3 + t4 + 1) >> 1);
+                        src[src_offset + 3 + 0 * stride] = (byte)((t3 + t4 + 1) >> 1);
             src[src_offset + 0 + 7 * stride] =
                 src[src_offset + 1 + 5 * stride] =
                     src[src_offset + 2 + 3 * stride] =
-                        src[src_offset + 3 + 1 * stride] = (byte) ((t3 + 2 * t4 + t5 + 2) >> 2);
+                        src[src_offset + 3 + 1 * stride] = (byte)((t3 + 2 * t4 + t5 + 2) >> 2);
             src[src_offset + 1 + 6 * stride] =
                 src[src_offset + 2 + 4 * stride] =
                     src[src_offset + 3 + 2 * stride] =
-                        src[src_offset + 4 + 0 * stride] = (byte) ((t4 + t5 + 1) >> 1);
+                        src[src_offset + 4 + 0 * stride] = (byte)((t4 + t5 + 1) >> 1);
             src[src_offset + 1 + 7 * stride] =
                 src[src_offset + 2 + 5 * stride] =
                     src[src_offset + 3 + 3 * stride] =
-                        src[src_offset + 4 + 1 * stride] = (byte) ((t4 + 2 * t5 + t6 + 2) >> 2);
+                        src[src_offset + 4 + 1 * stride] = (byte)((t4 + 2 * t5 + t6 + 2) >> 2);
             src[src_offset + 2 + 6 * stride] =
                 src[src_offset + 3 + 4 * stride] =
                     src[src_offset + 4 + 2 * stride] =
-                        src[src_offset + 5 + 0 * stride] = (byte) ((t5 + t6 + 1) >> 1);
+                        src[src_offset + 5 + 0 * stride] = (byte)((t5 + t6 + 1) >> 1);
             src[src_offset + 2 + 7 * stride] =
                 src[src_offset + 3 + 5 * stride] =
                     src[src_offset + 4 + 3 * stride] =
-                        src[src_offset + 5 + 1 * stride] = (byte) ((t5 + 2 * t6 + t7 + 2) >> 2);
+                        src[src_offset + 5 + 1 * stride] = (byte)((t5 + 2 * t6 + t7 + 2) >> 2);
             src[src_offset + 3 + 6 * stride] =
                 src[src_offset + 4 + 4 * stride] =
                     src[src_offset + 5 + 2 * stride] =
-                        src[src_offset + 6 + 0 * stride] = (byte) ((t6 + t7 + 1) >> 1);
+                        src[src_offset + 6 + 0 * stride] = (byte)((t6 + t7 + 1) >> 1);
             src[src_offset + 3 + 7 * stride] =
                 src[src_offset + 4 + 5 * stride] =
                     src[src_offset + 5 + 3 * stride] =
-                        src[src_offset + 6 + 1 * stride] = (byte) ((t6 + 2 * t7 + t8 + 2) >> 2);
+                        src[src_offset + 6 + 1 * stride] = (byte)((t6 + 2 * t7 + t8 + 2) >> 2);
             src[src_offset + 4 + 6 * stride] =
                 src[src_offset + 5 + 4 * stride] =
                     src[src_offset + 6 + 2 * stride] =
-                        src[src_offset + 7 + 0 * stride] = (byte) ((t7 + t8 + 1) >> 1);
+                        src[src_offset + 7 + 0 * stride] = (byte)((t7 + t8 + 1) >> 1);
             src[src_offset + 4 + 7 * stride] =
                 src[src_offset + 5 + 5 * stride] =
                     src[src_offset + 6 + 3 * stride] =
-                        src[src_offset + 7 + 1 * stride] = (byte) ((t7 + 2 * t8 + t9 + 2) >> 2);
+                        src[src_offset + 7 + 1 * stride] = (byte)((t7 + 2 * t8 + t9 + 2) >> 2);
             src[src_offset + 5 + 6 * stride] =
                 src[src_offset + 6 + 4 * stride] =
-                    src[src_offset + 7 + 2 * stride] = (byte) ((t8 + t9 + 1) >> 1);
+                    src[src_offset + 7 + 2 * stride] = (byte)((t8 + t9 + 1) >> 1);
             src[src_offset + 5 + 7 * stride] =
                 src[src_offset + 6 + 5 * stride] =
-                    src[src_offset + 7 + 3 * stride] = (byte) ((t8 + 2 * t9 + t10 + 2) >> 2);
+                    src[src_offset + 7 + 3 * stride] = (byte)((t8 + 2 * t9 + t10 + 2) >> 2);
             src[src_offset + 6 + 6 * stride] =
-                src[src_offset + 7 + 4 * stride] = (byte) ((t9 + t10 + 1) >> 1);
+                src[src_offset + 7 + 4 * stride] = (byte)((t9 + t10 + 1) >> 1);
             src[src_offset + 6 + 7 * stride] =
-                src[src_offset + 7 + 5 * stride] = (byte) ((t9 + 2 * t10 + t11 + 2) >> 2);
-            src[src_offset + 7 + 6 * stride] = (byte) ((t10 + t11 + 1) >> 1);
-            src[src_offset + 7 + 7 * stride] = (byte) ((t10 + 2 * t11 + t12 + 2) >> 2);
+                src[src_offset + 7 + 5 * stride] = (byte)((t9 + 2 * t10 + t11 + 2) >> 2);
+            src[src_offset + 7 + 6 * stride] = (byte)((t10 + t11 + 1) >> 1);
+            src[src_offset + 7 + 7 * stride] = (byte)((t10 + 2 * t11 + t12 + 2) >> 2);
         }
 
         public static void pred8x8l_horizontal_up_c(byte[] src, int src_offset, int has_topleft, int has_topright,
@@ -3016,50 +3016,50 @@ namespace cscodec.h264.decoder
                       src[src_offset - 1 + 7 * stride] + 2) >> 2;
             int l7 = (src[src_offset - 1 + 6 * stride] + 3 * src[src_offset - 1 + 7 * stride] + 2) >> 2;
 
-            src[src_offset + 0 + 0 * stride] = (byte) ((l0 + l1 + 1) >> 1);
-            src[src_offset + 1 + 0 * stride] = (byte) ((l0 + 2 * l1 + l2 + 2) >> 2);
+            src[src_offset + 0 + 0 * stride] = (byte)((l0 + l1 + 1) >> 1);
+            src[src_offset + 1 + 0 * stride] = (byte)((l0 + 2 * l1 + l2 + 2) >> 2);
             src[src_offset + 0 + 1 * stride] =
-                src[src_offset + 2 + 0 * stride] = (byte) ((l1 + l2 + 1) >> 1);
+                src[src_offset + 2 + 0 * stride] = (byte)((l1 + l2 + 1) >> 1);
             src[src_offset + 1 + 1 * stride] =
-                src[src_offset + 3 + 0 * stride] = (byte) ((l1 + 2 * l2 + l3 + 2) >> 2);
+                src[src_offset + 3 + 0 * stride] = (byte)((l1 + 2 * l2 + l3 + 2) >> 2);
             src[src_offset + 0 + 2 * stride] =
                 src[src_offset + 2 + 1 * stride] =
-                    src[src_offset + 4 + 0 * stride] = (byte) ((l2 + l3 + 1) >> 1);
+                    src[src_offset + 4 + 0 * stride] = (byte)((l2 + l3 + 1) >> 1);
             src[src_offset + 1 + 2 * stride] =
                 src[src_offset + 3 + 1 * stride] =
-                    src[src_offset + 5 + 0 * stride] = (byte) ((l2 + 2 * l3 + l4 + 2) >> 2);
+                    src[src_offset + 5 + 0 * stride] = (byte)((l2 + 2 * l3 + l4 + 2) >> 2);
             src[src_offset + 0 + 3 * stride] =
                 src[src_offset + 2 + 2 * stride] =
                     src[src_offset + 4 + 1 * stride] =
-                        src[src_offset + 6 + 0 * stride] = (byte) ((l3 + l4 + 1) >> 1);
+                        src[src_offset + 6 + 0 * stride] = (byte)((l3 + l4 + 1) >> 1);
             src[src_offset + 1 + 3 * stride] =
                 src[src_offset + 3 + 2 * stride] =
                     src[src_offset + 5 + 1 * stride] =
-                        src[src_offset + 7 + 0 * stride] = (byte) ((l3 + 2 * l4 + l5 + 2) >> 2);
+                        src[src_offset + 7 + 0 * stride] = (byte)((l3 + 2 * l4 + l5 + 2) >> 2);
             src[src_offset + 0 + 4 * stride] =
                 src[src_offset + 2 + 3 * stride] =
                     src[src_offset + 4 + 2 * stride] =
-                        src[src_offset + 6 + 1 * stride] = (byte) ((l4 + l5 + 1) >> 1);
+                        src[src_offset + 6 + 1 * stride] = (byte)((l4 + l5 + 1) >> 1);
             src[src_offset + 1 + 4 * stride] =
                 src[src_offset + 3 + 3 * stride] =
                     src[src_offset + 5 + 2 * stride] =
-                        src[src_offset + 7 + 1 * stride] = (byte) ((l4 + 2 * l5 + l6 + 2) >> 2);
+                        src[src_offset + 7 + 1 * stride] = (byte)((l4 + 2 * l5 + l6 + 2) >> 2);
             src[src_offset + 0 + 5 * stride] =
                 src[src_offset + 2 + 4 * stride] =
                     src[src_offset + 4 + 3 * stride] =
-                        src[src_offset + 6 + 2 * stride] = (byte) ((l5 + l6 + 1) >> 1);
+                        src[src_offset + 6 + 2 * stride] = (byte)((l5 + l6 + 1) >> 1);
             src[src_offset + 1 + 5 * stride] =
                 src[src_offset + 3 + 4 * stride] =
                     src[src_offset + 5 + 3 * stride] =
-                        src[src_offset + 7 + 2 * stride] = (byte) ((l5 + 2 * l6 + l7 + 2) >> 2);
+                        src[src_offset + 7 + 2 * stride] = (byte)((l5 + 2 * l6 + l7 + 2) >> 2);
             src[src_offset + 0 + 6 * stride] =
                 src[src_offset + 2 + 5 * stride] =
                     src[src_offset + 4 + 4 * stride] =
-                        src[src_offset + 6 + 3 * stride] = (byte) ((l6 + l7 + 1) >> 1);
+                        src[src_offset + 6 + 3 * stride] = (byte)((l6 + l7 + 1) >> 1);
             src[src_offset + 1 + 6 * stride] =
                 src[src_offset + 3 + 5 * stride] =
                     src[src_offset + 5 + 4 * stride] =
-                        src[src_offset + 7 + 3 * stride] = (byte) ((l6 + 3 * l7 + 2) >> 2);
+                        src[src_offset + 7 + 3 * stride] = (byte)((l6 + 3 * l7 + 2) >> 2);
             src[src_offset + 0 + 7 * stride] =
                 src[src_offset + 1 + 7 * stride] =
                     src[src_offset + 2 + 6 * stride] =
@@ -3082,7 +3082,7 @@ namespace cscodec.h264.decoder
                                                                                         =
                                                                                         src[
                                                                                             src_offset + 7 +
-                                                                                            7 * stride] = (byte) l7;
+                                                                                            7 * stride] = (byte)l7;
         }
 
         public static void pred4x4_vertical_add_c(byte[] pix, int pix_offset, short[] block, int block_offset,
@@ -3092,10 +3092,10 @@ namespace cscodec.h264.decoder
             for (int i = 0; i < 4; i++)
             {
                 int v = pix[pix_offset + 0];
-                pix[pix_offset + 1 * stride] = (byte) (v += block[block_offset + 0]);
-                pix[pix_offset + 2 * stride] = (byte) (v += block[block_offset + 4]);
-                pix[pix_offset + 3 * stride] = (byte) (v += block[block_offset + 8]);
-                pix[pix_offset + 4 * stride] = (byte) (v + block[block_offset + 12]);
+                pix[pix_offset + 1 * stride] = (byte)(v += block[block_offset + 0]);
+                pix[pix_offset + 2 * stride] = (byte)(v += block[block_offset + 4]);
+                pix[pix_offset + 3 * stride] = (byte)(v += block[block_offset + 8]);
+                pix[pix_offset + 4 * stride] = (byte)(v + block[block_offset + 12]);
                 pix_offset++;
                 block_offset++;
             }
@@ -3107,10 +3107,10 @@ namespace cscodec.h264.decoder
             for (int i = 0; i < 4; i++)
             {
                 int v = pix[pix_offset - 1];
-                pix[pix_offset + 0] = (byte) (v += block[block_offset + 0]);
-                pix[pix_offset + 1] = (byte) (v += block[block_offset + 1]);
-                pix[pix_offset + 2] = (byte) (v += block[block_offset + 2]);
-                pix[pix_offset + 3] = (byte) (v + block[block_offset + 3]);
+                pix[pix_offset + 0] = (byte)(v += block[block_offset + 0]);
+                pix[pix_offset + 1] = (byte)(v += block[block_offset + 1]);
+                pix[pix_offset + 2] = (byte)(v += block[block_offset + 2]);
+                pix[pix_offset + 3] = (byte)(v + block[block_offset + 3]);
                 pix_offset += stride;
                 block_offset += 4;
             }
@@ -3123,14 +3123,14 @@ namespace cscodec.h264.decoder
             for (int i = 0; i < 8; i++)
             {
                 int v = pix[pix_offset + 0];
-                pix[pix_offset + 1 * stride] = (byte) (v += block[block_offset + 0]);
-                pix[pix_offset + 2 * stride] = (byte) (v += block[block_offset + 8]);
-                pix[pix_offset + 3 * stride] = (byte) (v += block[block_offset + 16]);
-                pix[pix_offset + 4 * stride] = (byte) (v += block[block_offset + 24]);
-                pix[pix_offset + 5 * stride] = (byte) (v += block[block_offset + 32]);
-                pix[pix_offset + 6 * stride] = (byte) (v += block[block_offset + 40]);
-                pix[pix_offset + 7 * stride] = (byte) (v += block[block_offset + 48]);
-                pix[pix_offset + 8 * stride] = (byte) (v + block[block_offset + 56]);
+                pix[pix_offset + 1 * stride] = (byte)(v += block[block_offset + 0]);
+                pix[pix_offset + 2 * stride] = (byte)(v += block[block_offset + 8]);
+                pix[pix_offset + 3 * stride] = (byte)(v += block[block_offset + 16]);
+                pix[pix_offset + 4 * stride] = (byte)(v += block[block_offset + 24]);
+                pix[pix_offset + 5 * stride] = (byte)(v += block[block_offset + 32]);
+                pix[pix_offset + 6 * stride] = (byte)(v += block[block_offset + 40]);
+                pix[pix_offset + 7 * stride] = (byte)(v += block[block_offset + 48]);
+                pix[pix_offset + 8 * stride] = (byte)(v + block[block_offset + 56]);
                 pix_offset++;
                 block_offset++;
             }
@@ -3143,14 +3143,14 @@ namespace cscodec.h264.decoder
             for (i = 0; i < 8; i++)
             {
                 int v = pix[pix_offset - 1];
-                pix[pix_offset + 0] = (byte) (v += block[block_offset + 0]);
-                pix[pix_offset + 1] = (byte) (v += block[block_offset + 1]);
-                pix[pix_offset + 2] = (byte) (v += block[block_offset + 2]);
-                pix[pix_offset + 3] = (byte) (v += block[block_offset + 3]);
-                pix[pix_offset + 4] = (byte) (v += block[block_offset + 4]);
-                pix[pix_offset + 5] = (byte) (v += block[block_offset + 5]);
-                pix[pix_offset + 6] = (byte) (v += block[block_offset + 6]);
-                pix[pix_offset + 7] = (byte) (v + block[block_offset + 7]);
+                pix[pix_offset + 0] = (byte)(v += block[block_offset + 0]);
+                pix[pix_offset + 1] = (byte)(v += block[block_offset + 1]);
+                pix[pix_offset + 2] = (byte)(v += block[block_offset + 2]);
+                pix[pix_offset + 3] = (byte)(v += block[block_offset + 3]);
+                pix[pix_offset + 4] = (byte)(v += block[block_offset + 4]);
+                pix[pix_offset + 5] = (byte)(v += block[block_offset + 5]);
+                pix[pix_offset + 6] = (byte)(v += block[block_offset + 6]);
+                pix[pix_offset + 7] = (byte)(v + block[block_offset + 7]);
                 pix_offset += stride;
                 block_offset += 8;
             }

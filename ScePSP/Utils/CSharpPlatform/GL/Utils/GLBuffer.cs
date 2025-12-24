@@ -33,7 +33,7 @@ namespace ScePSPPlatform.GL.Utils
             {
                 return SetData(
                     Length * Marshal.SizeOf(typeof(T)),
-                    (byte*) Handle.AddrOfPinnedObject().ToPointer() + Offset * Marshal.SizeOf(typeof(T))
+                    (byte*)Handle.AddrOfPinnedObject().ToPointer() + Offset * Marshal.SizeOf(typeof(T))
                 );
             }
             finally
@@ -45,7 +45,7 @@ namespace ScePSPPlatform.GL.Utils
         public GLBuffer SetData(int Size, void* Data)
         {
             Bind();
-            GL.glBufferData(GL.GL_ARRAY_BUFFER, (uint) Size, Data, GL.GL_STATIC_DRAW);
+            GL.glBufferData(GL.GL_ARRAY_BUFFER, (uint)Size, Data, GL.GL_STATIC_DRAW);
             return this;
         }
 

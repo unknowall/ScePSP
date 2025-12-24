@@ -38,7 +38,7 @@ namespace ScePSP.Core.Cpu.VFpu
 
         public static implicit operator uint(VfpuPrefix value) => value.Value;
 
-        public static implicit operator VfpuPrefix(uint value) => new VfpuPrefix() {Value = value};
+        public static implicit operator VfpuPrefix(uint value) => new VfpuPrefix() { Value = value };
 
         // swz(xyzw)
         //assert(i >= 0 && i < 4);
@@ -124,7 +124,7 @@ namespace ScePSP.Core.Cpu.VFpu
         }
 
 
-        public static readonly string[] ComponentNames = {"x", "y", "z", "w"};
+        public static readonly string[] ComponentNames = { "x", "y", "z", "w" };
 
         public override string ToString() =>
             $"VfpuPrefix(Enabled={Enabled}, UsedPC=0x{UsedPc:X}, DeclaredPC=0x{DeclaredPc:X})({Format})";
@@ -158,7 +158,7 @@ namespace ScePSP.Core.Cpu.VFpu
         public static implicit operator uint(VfpuDestinationPrefix value) => value.Value;
 
         public static implicit operator VfpuDestinationPrefix(uint value) =>
-            new VfpuDestinationPrefix() {Value = value};
+            new VfpuDestinationPrefix() { Value = value };
 
         // sat(xyzw)
         //assert(i >= 0 && i < 4);

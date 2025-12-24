@@ -172,8 +172,7 @@ class Program
                     {
                         //Console.WriteLine(display.CurrentInfo.FrameAddress);
                         var pixels2 = new uint[PspDisplay.MaxBufferArea];
-                        var displayData =
-                            memory.Range<uint>(display.CurrentInfo.FrameAddress, PspDisplay.MaxBufferArea);
+                        var displayData = memory.Range<uint>(display.CurrentInfo.FrameAddress, PspDisplay.MaxBufferArea);
                         for (var m = 0; m < PspDisplay.MaxBufferArea; m++)
                         {
                             var color = displayData[m];

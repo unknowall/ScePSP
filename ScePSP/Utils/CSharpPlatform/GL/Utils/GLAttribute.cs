@@ -47,7 +47,7 @@ namespace ScePSPPlatform.GL.Utils
         public T NoWarning()
         {
             ShowWarnings = false;
-            return (T) (object) this;
+            return (T)(object)this;
         }
     }
 
@@ -88,7 +88,7 @@ namespace ScePSPPlatform.GL.Utils
         public void Set(Vector4 vector)
         {
             if (!CheckValid()) return;
-            Set(new[] {vector});
+            Set(new[] { vector });
         }
 
         [DebuggerHidden]
@@ -110,7 +110,7 @@ namespace ScePSPPlatform.GL.Utils
         public void Set(Matrix4x4 matrix)
         {
             if (!CheckValid()) return;
-            Set(new[] {matrix});
+            Set(new[] { matrix });
         }
 
         [DebuggerHidden]
@@ -124,7 +124,7 @@ namespace ScePSPPlatform.GL.Utils
             PrepareUsing();
             fixed (Matrix4x4* ptr = &matrices[0])
             {
-                GL.glUniformMatrix4fv(Location, matrices.Length, false, (float *)ptr);
+                GL.glUniformMatrix4fv(Location, matrices.Length, false, (float*)ptr);
             }
         }
 
@@ -138,8 +138,8 @@ namespace ScePSPPlatform.GL.Utils
         {
         }
 
-        private void Enable() => GL.glEnableVertexAttribArray((uint) Location);
-        private void Disable() => GL.glDisableVertexAttribArray((uint) Location);
+        private void Enable() => GL.glEnableVertexAttribArray((uint)Location);
+        private void Disable() => GL.glDisableVertexAttribArray((uint)Location);
         public void UnsetData() => Disable();
 
         public void SetData<TType>(GLBuffer buffer, int elementSize = 4, int offset = 0, int stride = 0,
@@ -158,12 +158,12 @@ namespace ScePSPPlatform.GL.Utils
 
             buffer.Bind();
             GL.glVertexAttribPointer(
-                (uint) Location,
+                (uint)Location,
                 elementSize,
                 glType,
                 normalize,
                 stride,
-                (void*) offset
+                (void*)offset
             );
             buffer.Unbind();
             Enable();

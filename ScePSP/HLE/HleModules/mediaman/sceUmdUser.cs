@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using ScePSP.Core.Cpu;
+﻿using ScePSP.Core.Cpu;
 using ScePSP.Hle.Attributes;
-using ScePSP.Hle.Modules.threadman;
 using ScePSP.Hle.Managers;
+using ScePSP.Hle.Modules.threadman;
+using System;
+using System.Collections.Generic;
 
 namespace ScePSP.Hle.Modules.mediaman
 {
@@ -59,7 +59,7 @@ namespace ScePSP.Hle.Modules.mediaman
 
             RegisteredCallbacks[CallbackId] = HleCallback.Create(
                 "sceUmdRegisterUMDCallBack", Callback.Function,
-                1, (int) (PspUmdState.PSP_UMD_READABLE | PspUmdState.PSP_UMD_READY | PspUmdState.PSP_UMD_PRESENT),
+                1, (int)(PspUmdState.PSP_UMD_READABLE | PspUmdState.PSP_UMD_READY | PspUmdState.PSP_UMD_PRESENT),
                 Callback.Arguments[0]
             );
 

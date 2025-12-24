@@ -49,7 +49,7 @@ namespace ScePSPUtils.Streams
             }
             try
             {
-                return (uint) (ByteData & ((1 << count) - 1));
+                return (uint)(ByteData & ((1 << count) - 1));
             }
             finally
             {
@@ -63,7 +63,7 @@ namespace ScePSPUtils.Streams
         /// </summary>
         protected void PrepareData()
         {
-            ByteData = (uint) Stream.ReadByte();
+            ByteData = (uint)Stream.ReadByte();
             ByteAvailableBits = 8;
         }
     }

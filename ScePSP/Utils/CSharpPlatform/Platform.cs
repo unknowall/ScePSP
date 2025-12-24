@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScePSPUtils;
+using System;
 using System.Runtime.InteropServices;
-using ScePSPUtils;
 
 namespace ScePSP.Core
 {
@@ -68,7 +68,7 @@ namespace ScePSP.Core
                 {
                     case "AMD64": return Architecture.x64;
                 }
-                return (Architecture) Enum.Parse(typeof(Architecture), _Architecture);
+                return (Architecture)Enum.Parse(typeof(Architecture), _Architecture);
             }
         }
 
@@ -109,7 +109,7 @@ namespace ScePSP.Core
             public long sec;
             public long usec;
 
-            public long total_usec => (long) usec + (long) sec * 1000 * 1000;
+            public long total_usec => (long)usec + (long)sec * 1000 * 1000;
         }
 
         private class InternalUnix
@@ -290,7 +290,7 @@ namespace ScePSP.Core
         public static void* AllocRangeGuard(byte* Low, byte* High)
         {
             if (High < Low) throw new Exception("Invalid High");
-            return _AllocRange(Low, (uint) (High - Low), Guard: true);
+            return _AllocRange(Low, (uint)(High - Low), Guard: true);
         }
 
         private static void* _AllocRange(void* Address, uint Size, bool Guard)
@@ -298,54 +298,54 @@ namespace ScePSP.Core
             switch (OS)
             {
                 case OS.Windows:
-                {
-                    byte* Pointer;
-                    if (Guard)
                     {
-                        Pointer = InternalWindows.VirtualAlloc(Address, Size, MEM_RESERVE, PAGE_GUARD);
-                    }
-                    else
-                    {
-                        Pointer = InternalWindows.VirtualAlloc(Address, Size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-                    }
-
-                    if (Pointer != null)
-                    {
-                        if ((void*) Pointer != (void*) Address)
+                        byte* Pointer;
+                        if (Guard)
                         {
-                            throw new Exception(
-                                $"Not allocated the desired address! Expected {new IntPtr(Address):X}, Allocated: {new IntPtr(Pointer):X}");
+                            Pointer = InternalWindows.VirtualAlloc(Address, Size, MEM_RESERVE, PAGE_GUARD);
                         }
-                        PointerUtils.Memset(Pointer, 0, (int) Size);
+                        else
+                        {
+                            Pointer = InternalWindows.VirtualAlloc(Address, Size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+                        }
+
+                        if (Pointer != null)
+                        {
+                            if ((void*)Pointer != (void*)Address)
+                            {
+                                throw new Exception(
+                                    $"Not allocated the desired address! Expected {new IntPtr(Address):X}, Allocated: {new IntPtr(Pointer):X}");
+                            }
+                            PointerUtils.Memset(Pointer, 0, (int)Size);
+                        }
+                        return Pointer;
                     }
-                    return Pointer;
-                }
                 default:
-                {
-                    int errno;
-
-                    InternalUnix.reset_errno();
-                    void* AllocatedAddress = InternalUnix.mmap(
-                        Address,
-                        Size,
-                        PROT_READ | PROT_WRITE,
-                        MAP_SHARED | MAP_ANONYMOUS | MAP_FIXED,
-                        -1,
-                        0
-                    );
-                    errno = InternalUnix.errno();
-                    if (errno != 0)
-                        Console.Error.WriteLine("mmap errno: {0} : {1}", errno, InternalUnix.strerror(errno));
-
-                    if (AllocatedAddress == (void*) -1) AllocatedAddress = null;
-
-
-                    if (AllocatedAddress != Address)
                     {
-                        Console.WriteLine("Alloc pointer mismatch! {0}, {1}", new IntPtr(AllocatedAddress),
-                            new IntPtr(Address));
-                        //Console.ReadKey();
-                    }
+                        int errno;
+
+                        InternalUnix.reset_errno();
+                        void* AllocatedAddress = InternalUnix.mmap(
+                            Address,
+                            Size,
+                            PROT_READ | PROT_WRITE,
+                            MAP_SHARED | MAP_ANONYMOUS | MAP_FIXED,
+                            -1,
+                            0
+                        );
+                        errno = InternalUnix.errno();
+                        if (errno != 0)
+                            Console.Error.WriteLine("mmap errno: {0} : {1}", errno, InternalUnix.strerror(errno));
+
+                        if (AllocatedAddress == (void*)-1) AllocatedAddress = null;
+
+
+                        if (AllocatedAddress != Address)
+                        {
+                            Console.WriteLine("Alloc pointer mismatch! {0}, {1}", new IntPtr(AllocatedAddress),
+                                new IntPtr(Address));
+                            //Console.ReadKey();
+                        }
 
 #if false
 						InternalUnix.reset_errno();
@@ -355,8 +355,8 @@ namespace ScePSP.Core
 						if (result3 != 0) Console.Error.WriteLine("mprotect result3: {0}", result3);
 #endif
 
-                    return AllocatedAddress;
-                }
+                        return AllocatedAddress;
+                    }
             }
             throw new NotImplementedException();
         }

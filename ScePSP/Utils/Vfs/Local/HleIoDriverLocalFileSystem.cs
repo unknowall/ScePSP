@@ -101,7 +101,7 @@ namespace ScePSP.Hle.Vfs.Local
 
         public unsafe int IoClose(HleIoDrvFileArg HleIoDrvFileArg)
         {
-            var FileStream = (FileStream) HleIoDrvFileArg.FileArgument;
+            var FileStream = (FileStream)HleIoDrvFileArg.FileArgument;
             FileStream.Close();
             return 0;
         }
@@ -111,7 +111,7 @@ namespace ScePSP.Hle.Vfs.Local
             try
             {
                 var Buffer = new byte[OutputLength];
-                var FileStream = (FileStream) HleIoDrvFileArg.FileArgument;
+                var FileStream = (FileStream)HleIoDrvFileArg.FileArgument;
                 //Console.WriteLine("ReadPosition: {0}", FileStream.Position);
                 int Readed = FileStream.Read(Buffer, 0, OutputLength);
                 for (int n = 0; n < Readed; n++) *OutputPointer++ = Buffer[n];
@@ -131,7 +131,7 @@ namespace ScePSP.Hle.Vfs.Local
                 var Buffer = new byte[InputLength];
                 for (int n = 0; n < InputLength; n++) Buffer[n] = *InputPointer++;
 
-                var FileStream = (FileStream) HleIoDrvFileArg.FileArgument;
+                var FileStream = (FileStream)HleIoDrvFileArg.FileArgument;
                 FileStream.Write(Buffer, 0, InputLength);
                 FileStream.Flush();
                 return InputLength;
@@ -145,7 +145,7 @@ namespace ScePSP.Hle.Vfs.Local
 
         public unsafe long IoLseek(HleIoDrvFileArg HleIoDrvFileArg, long Offset, SeekAnchor Whence)
         {
-            var FileStream = (FileStream) HleIoDrvFileArg.FileArgument;
+            var FileStream = (FileStream)HleIoDrvFileArg.FileArgument;
             switch (Whence)
             {
                 case SeekAnchor.Set:
@@ -225,13 +225,13 @@ namespace ScePSP.Hle.Vfs.Local
                 if (DirectoryInfo != null)
                 {
                     HleIoDirent.Stat.Size = 4096;
-                    HleIoDirent.Stat.Mode = (SceMode) 4605;
+                    HleIoDirent.Stat.Mode = (SceMode)4605;
                     HleIoDirent.Stat.Attributes = IOFileModes.Directory;
                 }
                 else
                 {
                     HleIoDirent.Stat.Size = FileInfo.Length;
-                    HleIoDirent.Stat.Mode = (SceMode) 8628;
+                    HleIoDirent.Stat.Mode = (SceMode)8628;
                     HleIoDirent.Stat.Attributes = IOFileModes.File;
                 }
                 HleIoDirent.Name = FileSystemInfo.Name.ToLower();
@@ -248,7 +248,7 @@ namespace ScePSP.Hle.Vfs.Local
         public unsafe int IoDread(HleIoDrvFileArg HleIoDrvFileArg, HleIoDirent* IoDirent)
         {
             //var Enumerator = (DirectoryEnumerator<HleIoDirent>)(DisposableDummy<DirectoryEnumerator<HleIoDirent>>)HleIoDrvFileArg.FileArgument;
-            var Enumerator = (DirectoryEnumerator<HleIoDirent>) HleIoDrvFileArg.FileArgument;
+            var Enumerator = (DirectoryEnumerator<HleIoDirent>)HleIoDrvFileArg.FileArgument;
 
             // More items.
             if (Enumerator.MoveNext())

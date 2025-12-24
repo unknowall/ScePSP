@@ -1,34 +1,11 @@
-﻿using System;
+﻿using ScePSPPlatform.Library;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Text;
-using ScePSPPlatform.Library;
-using EGLBoolean = System.Boolean;
-using EGLenum = System.Int32;
-using EGLint = System.Int32;
-using GLsizeiptr = System.UInt32;
-using GLbitfield = System.UInt32;
-using GLenum = System.Int32;
-using GLboolean = System.Boolean;
-using GLsizei = System.Int32;
-using GLclampf = System.Single;
-using GLfloat = System.Single;
-using GLuint = System.UInt32;
-using GLint = System.Int32;
-using GLchar = System.Byte;
-using GLubyte = System.Byte;
 using GLintptr = System.IntPtr;
-using EGLConfig = System.IntPtr;
-using EGLContext = System.IntPtr;
-using EGLDisplay = System.IntPtr;
-using EGLSurface = System.IntPtr;
-using EGLClientBuffer = System.IntPtr;
-using EGLNativeDisplayType = System.IntPtr;
-using EGLNativeWindowType = System.IntPtr;
-using EGLNativePixmapType = System.IntPtr;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnassignedReadonlyField
@@ -79,7 +56,7 @@ namespace ScePSPPlatform.GL
                     {
                         if (Field.FieldType == typeof(int))
                         {
-                            Constants[(int) Field.GetValue(null)] = Field.Name;
+                            Constants[(int)Field.GetValue(null)] = Field.Name;
                         }
                     }
                 }

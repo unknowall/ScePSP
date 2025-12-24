@@ -1,5 +1,5 @@
-﻿using System;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
+using System;
 
 namespace ScePSP.Hle.Modules.http
 {
@@ -36,7 +36,7 @@ namespace ScePSP.Hle.Modules.http
         /// <returns>0 on success, less than 0 on error.</returns>
         [HlePspNotImplemented]
         [HlePspFunction(NID = 0x0282A3BD, FirmwareVersion = 150)]
-        public int sceHttpGetContentLength(int requestid, ulong*contentlength)
+        public int sceHttpGetContentLength(int requestid, ulong* contentlength)
         {
             throw new NotImplementedException();
         }
@@ -226,7 +226,7 @@ namespace ScePSP.Hle.Modules.http
         /// <returns>A request ID on success, less than 0 on error.</returns>
         [HlePspNotImplemented]
         [HlePspFunction(NID = 0x47347B50, FirmwareVersion = 150)]
-        public int sceHttpCreateRequest(int connectionid, PspHttpMethod method, char*path, ulong contentlength)
+        public int sceHttpCreateRequest(int connectionid, PspHttpMethod method, char* path, ulong contentlength)
         {
             throw new NotImplementedException();
         }

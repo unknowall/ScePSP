@@ -1,5 +1,5 @@
-﻿using ScePSPPlatform.GL;
-using ScePSP.Core.Gpu.State;
+﻿using ScePSP.Core.Gpu.State;
+using ScePSPPlatform.GL;
 
 namespace ScePSP.Core.Gpu.Impl.Opengl.Modules
 {

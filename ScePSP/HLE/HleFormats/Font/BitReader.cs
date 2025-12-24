@@ -52,7 +52,7 @@ namespace ScePSP.Hle.Formats.Font
                 count -= readCount;
             }
 
-            return (uint) value;
+            return (uint)value;
         }
 
         public void SkipBits(int count)
@@ -63,7 +63,7 @@ namespace ScePSP.Hle.Formats.Font
 
         public int ReadBitsSigned(int count)
         {
-            int value = (int) ReadBits(count);
+            int value = (int)ReadBits(count);
             if ((value & (1 << count)) != 0)
             {
                 value |= ~((1 << count) - 1);
@@ -74,7 +74,7 @@ namespace ScePSP.Hle.Formats.Font
 
         public static uint ReadBitsAt(byte[] data, int offset, int count)
         {
-            var bitReader = new BitReader(data) {Position = offset};
+            var bitReader = new BitReader(data) { Position = offset };
             return bitReader.ReadBits(count);
         }
 

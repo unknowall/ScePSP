@@ -1,15 +1,15 @@
-﻿using System;
-using ScePSP.Core;
+﻿using ScePSP.Core;
 using ScePSP.Core.Components.Rtc;
 using ScePSP.Hle.Managers;
 using ScePSP.Utils;
+using System;
 
 namespace ScePSP.Hle.Modules.iofilemgr
 {
     public partial class IoFileMgrForUser
     {
         [Inject] PspRtc PspRtc;
-        
+
         [Inject] PspHleRunningConfig PspHleRunningConfig;
 
         [Inject] new HleThreadManager ThreadManager;

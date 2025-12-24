@@ -1,17 +1,17 @@
-﻿using System;
-using ScePSP.Core.Cpu.Emitter;
+﻿using SafeILGenerator.Ast;
 using SafeILGenerator.Ast.Nodes;
+using ScePSP.Core.Cpu.Assembler;
+using ScePSP.Core.Cpu.Dynarec.Ast;
+using ScePSP.Core.Cpu.Emitter;
+using ScePSP.Core.Cpu.Switch;
+using ScePSP.Core.Cpu.Table;
+using ScePSP.Core.Memory;
+using ScePSPUtils;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using ScePSPUtils;
-using ScePSP.Core.Cpu.Assembler;
-using ScePSP.Core.Cpu.Dynarec.Ast;
-using ScePSP.Core.Cpu.Switch;
-using ScePSP.Core.Cpu.Table;
-using ScePSP.Core.Memory;
-using SafeILGenerator.Ast;
 
 namespace ScePSP.Core.Cpu.Dynarec
 {
@@ -56,7 +56,7 @@ namespace ScePSP.Core.Cpu.Dynarec
                     return internalFunctionCompiler.CreateFunction();
             }
         }
-        
+
         internal class InternalFunctionCompiler
         {
             public static readonly Func<uint, CpuEmitter, AstNodeStm> CpuEmitterInstruction =
@@ -242,7 +242,7 @@ namespace ScePSP.Core.Cpu.Dynarec
 
                 while (true)
                 {
-                    HandleNewBranch:
+                HandleNewBranch:
                     var endOfBranchFound = false;
 
                     if (branchesToAnalyze.Count == 0) break;
@@ -466,7 +466,7 @@ namespace ScePSP.Core.Cpu.Dynarec
 
                     if (_cpuProcessor.NativeBreakpoints.Contains(_pc))
                     {
-                        nodes.AddStatement(_ast.Statement(_ast.CallStatic((Action) IsDebuggerPresentDebugBreak)));
+                        nodes.AddStatement(_ast.Statement(_ast.CallStatic((Action)IsDebuggerPresentDebugBreak)));
                     }
 
                     TryPutLabelAt(_pc, nodes);

@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ScePSP.Core.Types;
 using ScePSPUtils;
 using ScePSPUtils.Endian;
-using ScePSP.Core.Types;
+using System;
+using System.Collections.Generic;
 
 namespace ScePSP.Hle.Formats.audio
 {
@@ -82,7 +82,7 @@ namespace ScePSP.Hle.Formats.audio
         public Vag(byte* DataPointer, int DataLength)
         {
             //this.Data = Data;
-            var Header = *(Header*) DataPointer;
+            var Header = *(Header*)DataPointer;
             if (Header.Magic != 0)
             {
                 Console.Error.WriteLine("Error VAG Magic: {0:X}", Header.Magic);
@@ -107,7 +107,7 @@ namespace ScePSP.Hle.Formats.audio
             //ArrayUtils.HexDump(PointerUtils.PointerToByteArray(DataPointer, DataLength), 0xA0);
 
             SamplesCount = (DataLength - 0x10) * 56 / 16;
-            SamplesDecoder = new Decoder((Block*) &DataPointer[0x10], (DataLength - 0x10) / 16);
+            SamplesDecoder = new Decoder((Block*)&DataPointer[0x10], (DataLength - 0x10) / 16);
             //SamplesDecoder = Decoder.DecodeBlocksStream(Blocks).GetEnumerator();
 
             //SaveToWav("output.wav");
@@ -203,33 +203,33 @@ namespace ScePSP.Hle.Formats.audio
                 switch (Block.Type)
                 {
                     case Vag.Block.TypeEnum.LoopStart:
-                    {
-                        var CopyState = this.CurrentState;
-                        CopyState.BlockIndex--;
-                        LoopStack.Push(CopyState);
-                    }
+                        {
+                            var CopyState = this.CurrentState;
+                            CopyState.BlockIndex--;
+                            LoopStack.Push(CopyState);
+                        }
                         break;
 
                     case Vag.Block.TypeEnum.LoopEnd:
-                    {
-                        if (this.CurrentLoopCount++ < this.TotalLoopCount)
                         {
-                            this.CurrentState = LoopStack.Pop();
+                            if (this.CurrentLoopCount++ < this.TotalLoopCount)
+                            {
+                                this.CurrentState = LoopStack.Pop();
+                            }
+                            else
+                            {
+                                LoopStack.Pop();
+                            }
                         }
-                        else
-                        {
-                            LoopStack.Pop();
-                        }
-                    }
                         break;
 
                     case Vag.Block.TypeEnum.End:
                         this.ReachedEnd = true;
                         return;
 
-                    //default:
-                    //	//Console.Error.WriteLine("Not implemented: Vag.Block.Type: {0}", Block.Type);
-                    //	break;
+                        //default:
+                        //	//Console.Error.WriteLine("Not implemented: Vag.Block.Type: {0}", Block.Type);
+                        //	break;
                 }
                 DecodeBlock(Block);
             }
@@ -257,8 +257,8 @@ namespace ScePSP.Hle.Formats.audio
             public void DecodeBlock(Block Block)
             {
                 int SampleOffset = 0;
-                int ShiftFactor = (int) BitUtils.Extract(Block.Modificator, 0, 4);
-                int PredictIndex = (int) BitUtils.Extract(Block.Modificator, 4, 4) % Vag.VAG_f.Length;
+                int ShiftFactor = (int)BitUtils.Extract(Block.Modificator, 0, 4);
+                int PredictIndex = (int)BitUtils.Extract(Block.Modificator, 4, 4) % Vag.VAG_f.Length;
                 //if (predict_nr > VAG_f.length) predict_nr = 0; 
 
                 // @TODO: maybe we can change << 12 >> shift_factor for "<< (12 - shift_factor)"
@@ -276,13 +276,13 @@ namespace ScePSP.Hle.Formats.audio
                     var DataByte = Block.Data[n];
 
                     DecodedBlockSamples[SampleOffset++] =
-                        HandleSampleKeepHistory((short) ((((uint) DataByte >> 0) & 0xF) << 12) >> ShiftFactor);
+                        HandleSampleKeepHistory((short)((((uint)DataByte >> 0) & 0xF) << 12) >> ShiftFactor);
                     DecodedBlockSamples[SampleOffset++] =
-                        HandleSampleKeepHistory((short) ((((uint) DataByte >> 4) & 0xF) << 12) >> ShiftFactor);
+                        HandleSampleKeepHistory((short)((((uint)DataByte >> 4) & 0xF) << 12) >> ShiftFactor);
                 }
             }
 
-            
+
             private short HandleSampleKeepHistory(int UnpackedSample)
             {
                 short Sample = HandleSample(UnpackedSample);
@@ -291,14 +291,14 @@ namespace ScePSP.Hle.Formats.audio
                 return Sample;
             }
 
-            
+
             private short HandleSample(int UnpackedSample)
             {
                 int Sample = 0;
                 Sample += UnpackedSample * 1;
-                Sample += (int) (this.CurrentState.History1 * Predict1) / 64;
-                Sample += (int) (this.CurrentState.History2 * Predict2) / 64;
-                return (short) MathUtils.FastClamp(Sample, short.MinValue, short.MaxValue);
+                Sample += (int)(this.CurrentState.History1 * Predict1) / 64;
+                Sample += (int)(this.CurrentState.History2 * Predict2) / 64;
+                return (short)MathUtils.FastClamp(Sample, short.MinValue, short.MaxValue);
             }
         }
 

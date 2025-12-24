@@ -38,10 +38,10 @@ namespace ScePSPUtils.Drawing
             InternalAdd(ref r, ref g, ref b, ref a, colors);
             if (l == 0) l = 1;
             return Color.FromArgb(
-                (byte) (a / l),
-                (byte) (r / l),
-                (byte) (g / l),
-                (byte) (b / l)
+                (byte)(a / l),
+                (byte)(r / l),
+                (byte)(g / l),
+                (byte)(b / l)
             );
         }
 
@@ -54,10 +54,10 @@ namespace ScePSPUtils.Drawing
         public static Color Average(Color color1, Color color2)
         {
             return Color.FromArgb(
-                (byte) ((color1.A + color2.A) / 2),
-                (byte) ((color1.R + color2.R) / 2),
-                (byte) ((color1.G + color2.G) / 2),
-                (byte) ((color1.B + color2.B) / 2)
+                (byte)((color1.A + color2.A) / 2),
+                (byte)((color1.R + color2.R) / 2),
+                (byte)((color1.G + color2.G) / 2),
+                (byte)((color1.B + color2.B) / 2)
             );
         }
 
@@ -70,7 +70,7 @@ namespace ScePSPUtils.Drawing
         {
             int r = 0, g = 0, b = 0, a = 0;
             InternalAdd(ref r, ref g, ref b, ref a, colors);
-            return Color.FromArgb((byte) a, (byte) r, (byte) g, (byte) b);
+            return Color.FromArgb((byte)a, (byte)r, (byte)g, (byte)b);
         }
 
         /// <summary>
@@ -82,10 +82,10 @@ namespace ScePSPUtils.Drawing
         public static Color Add(Color color1, Color color2)
         {
             return Color.FromArgb(
-                (byte) (color1.A + color2.A),
-                (byte) (color1.R + color2.R),
-                (byte) (color1.G + color2.G),
-                (byte) (color1.B + color2.B)
+                (byte)(color1.A + color2.A),
+                (byte)(color1.R + color2.R),
+                (byte)(color1.G + color2.G),
+                (byte)(color1.B + color2.B)
             );
         }
 
@@ -98,10 +98,10 @@ namespace ScePSPUtils.Drawing
         public static Color Substract(Color colorLeft, Color colorRight)
         {
             return Color.FromArgb(
-                (byte) (colorLeft.A - colorRight.A),
-                (byte) (colorLeft.R - colorRight.R),
-                (byte) (colorLeft.G - colorRight.G),
-                (byte) (colorLeft.B - colorRight.B)
+                (byte)(colorLeft.A - colorRight.A),
+                (byte)(colorLeft.R - colorRight.R),
+                (byte)(colorLeft.G - colorRight.G),
+                (byte)(colorLeft.B - colorRight.B)
             );
         }
 
@@ -132,10 +132,10 @@ namespace ScePSPUtils.Drawing
         public static Color Encode(ColorFormat colorFormat, uint value)
         {
             return Color.FromArgb(
-                (int) BitUtils.ExtractScaled(value, colorFormat.Alpha.Offset, colorFormat.Alpha.Size, 255),
-                (int) BitUtils.ExtractScaled(value, colorFormat.Red.Offset, colorFormat.Red.Size, 255),
-                (int) BitUtils.ExtractScaled(value, colorFormat.Green.Offset, colorFormat.Green.Size, 255),
-                (int) BitUtils.ExtractScaled(value, colorFormat.Blue.Offset, colorFormat.Blue.Size, 255)
+                (int)BitUtils.ExtractScaled(value, colorFormat.Alpha.Offset, colorFormat.Alpha.Size, 255),
+                (int)BitUtils.ExtractScaled(value, colorFormat.Red.Offset, colorFormat.Red.Size, 255),
+                (int)BitUtils.ExtractScaled(value, colorFormat.Green.Offset, colorFormat.Green.Size, 255),
+                (int)BitUtils.ExtractScaled(value, colorFormat.Blue.Offset, colorFormat.Blue.Size, 255)
             );
         }
 
@@ -162,8 +162,8 @@ namespace ScePSPUtils.Drawing
         /// <returns></returns>
         public static Color Mix(Color color1, Color color2, double step)
         {
-            var weightSum = (int) ushort.MaxValue;
-            var weight2 = (int) (weightSum * step);
+            var weightSum = (int)ushort.MaxValue;
+            var weight2 = (int)(weightSum * step);
             var weight1 = weightSum - weight2;
             return Mix(color1, color2, weightSum, weight1, weight2);
         }

@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using ScePSPUtils;
-using ScePSP.Core.Cpu;
+﻿using ScePSP.Core.Cpu;
 using ScePSP.Hle.Formats;
 using ScePSP.Hle.Loader;
-using ScePSPUtils.Extensions;
 using ScePSP.Hle.Managers;
 using ScePSP.Utils;
+using ScePSPUtils;
+using ScePSPUtils.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ScePSP.Hle
 {
@@ -38,7 +38,7 @@ namespace ScePSP.Hle
     public class HleModuleGuest : HleModule
     {
         private static Logger Logger = Logger.GetLogger(nameof(HleModuleGuest));
-        
+
         public int ID;
 
         public string Name => ModuleInfo.Name;
@@ -78,7 +78,7 @@ namespace ScePSP.Hle
 
             CpuProcessor.Memory.WriteSafe(CallAddress + 0,
                 SyscallInfo.NativeCallSyscallOpCode); // syscall NativeCallSyscallCode
-            CpuProcessor.Memory.WriteSafe(CallAddress + 4, (uint) ModuleManager.AllocDelegateSlot(
+            CpuProcessor.Memory.WriteSafe(CallAddress + 4, (uint)ModuleManager.AllocDelegateSlot(
                 Action: CreateDelegate(
                     ModuleManager: ModuleManager,
                     Module: NativeFunction.Module,
@@ -171,7 +171,7 @@ namespace ScePSP.Hle
                     var DefaultEntry = new HleFunctionEntry()
                     {
                         NID = 0x00000000,
-                        Name = CStringFormater.Sprintf("__<unknown:0x%08X>", (int) NID),
+                        Name = CStringFormater.Sprintf("__<unknown:0x%08X>", (int)NID),
                         Description = "Unknown",
                         Module = null,
                         ModuleName = ModuleImports.Name,

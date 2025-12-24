@@ -1,5 +1,4 @@
 ﻿using ScePSP.Core.Components.Controller;
-using ScePSP.Core.Types;
 using ScePSP.Core.Types.Controller;
 using ScePSP.Hle.Attributes;
 
@@ -197,7 +196,7 @@ namespace ScePSP.Hle.Modules.ctrl
         /// <returns>&lt; 0 on error.</returns>
         [HlePspFunction(NID = 0x687660FA, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceCtrlGetIdleCancelThreshold(int*idlerest, int*idleback)
+        public int sceCtrlGetIdleCancelThreshold(int* idlerest, int* idleback)
         {
             return 0;
         }
@@ -223,7 +222,7 @@ namespace ScePSP.Hle.Modules.ctrl
         /// <returns>Return 0</returns>
         [HlePspFunction(NID = 0x02BAAD91, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceCtrlGetSamplingCycle(int*pcycle)
+        public int sceCtrlGetSamplingCycle(int* pcycle)
         {
             return 0;
         }

@@ -1,5 +1,5 @@
-﻿using System.Net.NetworkInformation;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
+using System.Net.NetworkInformation;
 
 namespace ScePSP.Hle.Modules.wlan
 {

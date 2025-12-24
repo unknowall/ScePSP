@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ScePSP.Hle.Vfs;
+using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using ScePSPUtils.Extensions;
-using ScePSP.Hle.Vfs;
 
 namespace ScePSP.Hle.Managers
 {

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScePSP.Utils;
+using System;
 using System.Timers;
-using ScePSP.Utils;
 
 namespace ScePSPUtils
 {
@@ -20,7 +20,7 @@ namespace ScePSPUtils
         {
             using (var timer = new Timer(4.0 * 1000))
             {
-                bool[] cancel = {false};
+                bool[] cancel = { false };
                 timer.Elapsed += (sender, e) =>
                 {
                     if (cancel[0]) return;

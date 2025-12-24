@@ -1,18 +1,18 @@
 ﻿//#define DEBUG_TEXTURE_CACHE
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using ScePSPUtils;
-using ScePSPUtils.Drawing;
-using ScePSPUtils.Drawing.Extensions;
-using ScePSPUtils.Extensions;
+using ScePSP.Core.Gpu.Impl.Opengl;
 using ScePSP.Core.Gpu.State;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
 using ScePSP.Inject;
-using ScePSP.Core.Gpu.Impl.Opengl;
 using ScePSP.Utils.Utils;
+using ScePSPUtils;
+using ScePSPUtils.Drawing;
+using ScePSPUtils.Drawing.Extensions;
+using ScePSPUtils.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 using Hashing = ScePSP.Utils.Hashing;
 
 namespace ScePSP.Core.Gpu
@@ -52,7 +52,7 @@ namespace ScePSP.Core.Gpu
                 BitmapUtils.TransferChannelsDataInterleaved(
                     Bitmap.GetFullRectangle(),
                     Bitmap,
-                    (byte*) DataPtr,
+                    (byte*)DataPtr,
                     BitmapUtils.Direction.FromDataToBitmap,
                     BitmapChannel.Red,
                     BitmapChannel.Green,
@@ -140,7 +140,7 @@ namespace ScePSP.Core.Gpu
             var ClutStart = ClutState.Start;
             var ClutDataStart = PixelFormatDecoder.GetPixelsSize(ClutFormat, ClutStart);
 
-            ulong Hash1 = TextureAddress | (ulong) ((ClutAddress + ClutDataStart) << 32);
+            ulong Hash1 = TextureAddress | (ulong)((ClutAddress + ClutDataStart) << 32);
             bool Recheck = false;
             if (Cache.TryGetValue(Hash1, out Texture))
             {
@@ -220,13 +220,13 @@ namespace ScePSP.Core.Gpu
 
                 try
                 {
-                    TexturePointer = (byte*) PspMemory.PspAddressToPointerSafe(TextureAddress);
-                    ClutPointer = (byte*) PspMemory.PspAddressToPointerSafe(ClutAddress);
+                    TexturePointer = (byte*)PspMemory.PspAddressToPointerSafe(TextureAddress);
+                    ClutPointer = (byte*)PspMemory.PspAddressToPointerSafe(ClutAddress);
                 }
                 catch (PspMemory.InvalidAddressException InvalidAddressException)
                 {
                     //throw InvalidAddressException;
-                    Console.WriteLine("PspMemory.InvalidAddressException: "+ InvalidAddressException);
+                    Console.WriteLine("PspMemory.InvalidAddressException: " + InvalidAddressException);
                 }
 
                 TextureCacheKey TextureCacheKey = new TextureCacheKey()
@@ -277,10 +277,10 @@ namespace ScePSP.Core.Gpu
                                 fixed (byte* SwizzlingBufferPointer = SwizzlingBuffer)
                                 {
                                     PointerUtils.Memcpy(SwizzlingBuffer, TexturePointer, TextureDataSize);
-                                    PixelFormatDecoder.UnswizzleInline(TextureFormat, (void*) SwizzlingBufferPointer,
+                                    PixelFormatDecoder.UnswizzleInline(TextureFormat, (void*)SwizzlingBufferPointer,
                                         BufferWidth, Height);
                                     PixelFormatDecoder.Decode(
-                                        TextureFormat, (void*) SwizzlingBufferPointer, TexturePixelsPointer,
+                                        TextureFormat, (void*)SwizzlingBufferPointer, TexturePixelsPointer,
                                         BufferWidth, Height,
                                         ClutPointer, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask,
                                         strideWidth: PixelFormatDecoder.GetPixelsSize(TextureFormat, TextureWidth)
@@ -290,7 +290,7 @@ namespace ScePSP.Core.Gpu
                             else
                             {
                                 PixelFormatDecoder.Decode(
-                                    TextureFormat, (void*) TexturePointer, TexturePixelsPointer, BufferWidth, Height,
+                                    TextureFormat, (void*)TexturePointer, TexturePixelsPointer, BufferWidth, Height,
                                     ClutPointer, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask,
                                     strideWidth: PixelFormatDecoder.GetPixelsSize(TextureFormat, TextureWidth)
                                 );

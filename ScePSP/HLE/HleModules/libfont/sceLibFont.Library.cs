@@ -1,9 +1,9 @@
-﻿using System;
+﻿using ScePSP.Hle.Formats.Font;
+using ScePSP.Hle.Managers;
+using ScePSPUtils;
+using System;
 using System.IO;
 using System.Linq;
-using ScePSPUtils;
-using ScePSP.Hle.Formats.Font;
-using ScePSP.Hle.Managers;
 
 namespace ScePSP.Hle.Modules.libfont
 {
@@ -77,7 +77,7 @@ namespace ScePSP.Hle.Modules.libfont
         [HlePspFunction(NID = 0x57FCB733, FirmwareVersion = 150)]
         public Font sceFontOpenUserFile(FontLibrary FontLibrary, string FileName, int Mode, uint* ErrorCode)
         {
-            var FontFileStream = HleIoManager.HleIoWrapper.Open(FileName, Vfs.HleIoFlags.Read, (Vfs.SceMode) Mode);
+            var FontFileStream = HleIoManager.HleIoWrapper.Open(FileName, Vfs.HleIoFlags.Read, (Vfs.SceMode)Mode);
             var PGF = new Pgf().Load(FontFileStream);
             var Font = new Font(FontLibrary, PGF);
             *ErrorCode = 0;

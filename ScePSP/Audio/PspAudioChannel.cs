@@ -1,9 +1,9 @@
-﻿using System;
+﻿using ScePSPUtils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using ScePSPUtils;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ScePSP.Core.Audio
 {
@@ -50,7 +50,7 @@ namespace ScePSP.Core.Audio
         /// </summary>
         public PspAudio.FormatEnum Format;
 
-        public TimeSpan BufferTimeLength => TimeSpan.FromSeconds((double) SampleCount / (double) Frequency);
+        public TimeSpan BufferTimeLength => TimeSpan.FromSeconds((double)SampleCount / (double)Frequency);
 
         private ProduceConsumeBuffer<short> Buffer = new ProduceConsumeBuffer<short>();
         private List<Tuple<long, Action>> BufferEvents = new List<Tuple<long, Action>>();
@@ -214,15 +214,15 @@ namespace ScePSP.Core.Audio
                     int Volume = (VolumeLeft + VolumeRight) / 2;
                     for (int n = 0; n < Samples.Length; n++)
                     {
-                        Samples[n + 0] = (short) ((int) SamplePointer[n + 0] * Volume / PspAudio.MaxVolume);
+                        Samples[n + 0] = (short)((int)SamplePointer[n + 0] * Volume / PspAudio.MaxVolume);
                     }
                 }
                 else
                 {
                     for (int n = 0; n < Samples.Length; n += 2)
                     {
-                        Samples[n + 0] = (short) ((int) SamplePointer[n + 0] * VolumeLeft / PspAudio.MaxVolume);
-                        Samples[n + 1] = (short) ((int) SamplePointer[n + 1] * VolumeRight / PspAudio.MaxVolume);
+                        Samples[n + 0] = (short)((int)SamplePointer[n + 0] * VolumeLeft / PspAudio.MaxVolume);
+                        Samples[n + 1] = (short)((int)SamplePointer[n + 1] * VolumeRight / PspAudio.MaxVolume);
                     }
                 }
             }

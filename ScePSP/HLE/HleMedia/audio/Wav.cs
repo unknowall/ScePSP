@@ -1,11 +1,11 @@
-﻿using System;
+﻿using ScePSP.Core.Types;
+using ScePSPUtils;
+using ScePSPUtils.Extensions;
+using ScePSPUtils.Streams;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using ScePSPUtils.Streams;
-using ScePSPUtils;
-using ScePSPUtils.Extensions;
-using ScePSP.Core.Types;
 
 namespace ScePSP.Hle.Formats.audio
 {
@@ -60,14 +60,14 @@ namespace ScePSP.Hle.Formats.audio
         protected void WriteChunk(string Name, Action Writer)
         {
             Stream.WriteStringz(Name, 4, Encoding.ASCII);
-            BinaryWriter.Write((uint) 0);
+            BinaryWriter.Write((uint)0);
             var ChunkSizeStream = SliceStream.CreateWithLength(Stream, Stream.Position - 4, 4);
             var BackPosition = Stream.Position;
             {
                 Writer();
             }
             var ChunkLength = Stream.Position - BackPosition;
-            new BinaryWriter(ChunkSizeStream).Write((uint) ChunkLength);
+            new BinaryWriter(ChunkSizeStream).Write((uint)ChunkLength);
         }
 
         public void WriteWave(string FileName, StereoShortSoundSample[] Samples)

@@ -13,14 +13,14 @@
             {
                 fixed (uint* LowPtr = &Low)
                 {
-                    return *(long*) LowPtr;
+                    return *(long*)LowPtr;
                 }
             }
             set
             {
                 fixed (uint* LowPtr = &Low)
                 {
-                    *(long*) LowPtr = value;
+                    *(long*)LowPtr = value;
                 }
             }
         }

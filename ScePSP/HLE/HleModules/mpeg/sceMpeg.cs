@@ -1,13 +1,13 @@
-﻿using System.Text;
-using ScePSPUtils;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
-using System;
-using System.IO;
+using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Formats.video;
-using ScePSP.Core.Memory;
 using ScePSP.Hle.Interop;
 using ScePSP.Hle.Managers;
+using ScePSPUtils;
+using System;
+using System.IO;
+using System.Text;
 
 namespace ScePSP.Hle.Modules.mpeg
 {
@@ -138,13 +138,13 @@ namespace ScePSP.Hle.Modules.mpeg
             else
             {
                 sceMpegRingbuffer->PacketsAvailable =
-                    (int) ((sceMpegRingbuffer->DataEnd.Address - sceMpegRingbuffer->Data.Address) /
+                    (int)((sceMpegRingbuffer->DataEnd.Address - sceMpegRingbuffer->Data.Address) /
                            sceMpegRingbuffer->PacketSize);
             }
 
             sceMpegRingbuffer->SceMpeg = Memory.PointerToPspPointer(sceMpegPointer);
 
-            SceMpeg* sceMpegData = (SceMpeg*) ((byte*) mpegData + 0x30);
+            SceMpeg* sceMpegData = (SceMpeg*)((byte*)mpegData + 0x30);
 
             sceMpegPointer->SceMpeg = Memory.PointerToPspPointer(sceMpegData);
 
@@ -161,7 +161,7 @@ namespace ScePSP.Hle.Modules.mpeg
 
             sceMpegRingbuffer->PacketsTotal = 0;
 
-            mpeg.ReadPackets = numPackets => (int) HleInterop.ExecuteFunctionNow(sceMpegRingbuffer->Callback,
+            mpeg.ReadPackets = numPackets => (int)HleInterop.ExecuteFunctionNow(sceMpegRingbuffer->Callback,
                 sceMpegRingbuffer->Data,
                 numPackets, sceMpegRingbuffer->CallbackParameter);
 
@@ -250,7 +250,7 @@ namespace ScePSP.Hle.Modules.mpeg
             ringbuffer->PacketsAvailable = 0; // set later
             ringbuffer->PacketSize = RingBufferPacketSize;
             ringbuffer->Data = data;
-            ringbuffer->DataEnd = (uint) (data + ringbuffer->PacketsTotal * ringbuffer->PacketSize);
+            ringbuffer->DataEnd = (uint)(data + ringbuffer->PacketsTotal * ringbuffer->PacketSize);
             ringbuffer->Callback = callback;
             ringbuffer->CallbackParameter = callbackParam;
             ringbuffer->SemaId = -1;
@@ -309,14 +309,14 @@ namespace ScePSP.Hle.Modules.mpeg
 
             numPackets = Math.Min(available, numPackets);
 
-            var sceMpegPointer = (SceMpegPointer*) ringbuffer->SceMpeg.GetPointer<SceMpegPointer>(Memory);
+            var sceMpegPointer = (SceMpegPointer*)ringbuffer->SceMpeg.GetPointer<SceMpegPointer>(Memory);
             var mpeg = GetMpeg(sceMpegPointer);
             var sceMpeg = sceMpegPointer->GetSceMpeg(Memory);
-            var mpegStreamPackets = (int) MathUtils.RequiredBlocks(sceMpeg->StreamSize, ringbuffer->PacketSize);
+            var mpegStreamPackets = (int)MathUtils.RequiredBlocks(sceMpeg->StreamSize, ringbuffer->PacketSize);
             var remainingPackets = Math.Max(0, mpegStreamPackets - ringbuffer->PacketsRead);
 
             var packetsAdded = mpeg.ReadPackets(numPackets);
-            var dataLength = (int) (packetsAdded * ringbuffer->PacketSize);
+            var dataLength = (int)(packetsAdded * ringbuffer->PacketSize);
             mpeg.WriteData(ringbuffer->Data.GetPointer(Memory, dataLength), dataLength);
 
             //
@@ -417,7 +417,7 @@ namespace ScePSP.Hle.Modules.mpeg
             var sceMpeg = mpegPointer->GetSceMpeg(Memory);
 
             mpeg.ParsePmfHeader(pmfHeader);
-            sceMpeg->StreamSize = (int) (uint) pmf.Header.StreamSize;
+            sceMpeg->StreamSize = (int)(uint)pmf.Header.StreamSize;
 
             offset = pmf.Header.StreamOffset;
             return 0;

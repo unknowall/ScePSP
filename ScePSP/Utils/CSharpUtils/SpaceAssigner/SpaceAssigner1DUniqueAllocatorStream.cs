@@ -1,6 +1,6 @@
-﻿using System.IO;
-using ScePSPUtils.Extensions;
+﻿using ScePSPUtils.Extensions;
 using ScePSPUtils.Streams;
+using System.IO;
 
 namespace ScePSPUtils.Ext.SpaceAssigner
 {

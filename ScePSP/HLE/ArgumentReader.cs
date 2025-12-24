@@ -1,6 +1,6 @@
-﻿using ScePSPUtils;
-using ScePSP.Core.Cpu;
+﻿using ScePSP.Core.Cpu;
 using ScePSP.Utils;
+using ScePSPUtils;
 
 namespace ScePSP
 {
@@ -33,7 +33,7 @@ namespace ScePSP
             {
                 var Low = CpuThreadState.Gpr[GprPosition + 0];
                 var High = CpuThreadState.Gpr[GprPosition + 1];
-                return (long) ((High << 32) | (Low << 0));
+                return (long)((High << 32) | (Low << 0));
             }
             finally
             {
@@ -43,7 +43,7 @@ namespace ScePSP
 
         public string LoadString()
         {
-            return PointerUtils.PtrToStringUtf8((byte*) CpuThreadState.GetMemoryPtr((uint) LoadInteger()));
+            return PointerUtils.PtrToStringUtf8((byte*)CpuThreadState.GetMemoryPtr((uint)LoadInteger()));
         }
 
         public float LoadFloat()

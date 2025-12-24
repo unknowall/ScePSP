@@ -1,7 +1,7 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using ScePSPUtils.Extensions;
 
 namespace ScePSPUtils
 {

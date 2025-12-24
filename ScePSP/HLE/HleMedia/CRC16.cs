@@ -20,7 +20,7 @@ public class CRC16 : HashAlgorithm
     public CRC16(ushort polynomial)
     {
         HashSizeValue = 16;
-        _crc16Table = (ushort[]) _crc16TablesCache[polynomial];
+        _crc16Table = (ushort[])_crc16TablesCache[polynomial];
         if (_crc16Table == null)
         {
             _crc16Table = CRC16._buildCRC16Table(polynomial);
@@ -58,8 +58,8 @@ public class CRC16 : HashAlgorithm
     {
         for (int i = 0; i < buffer.Length; i++)
         {
-            byte index = (byte) (_crc ^ buffer[i]);
-            _crc = (ushort) ((_crc >> 8) ^ _crc16Table[index]);
+            byte index = (byte)(_crc ^ buffer[i]);
+            _crc = (ushort)((_crc >> 8) ^ _crc16Table[index]);
         }
     }
 
@@ -67,10 +67,10 @@ public class CRC16 : HashAlgorithm
     protected override byte[] HashFinal()
     {
         byte[] finalHash = new byte[2];
-        ushort finalCRC = (ushort) (_crc ^ _allOnes);
+        ushort finalCRC = (ushort)(_crc ^ _allOnes);
 
-        finalHash[0] = (byte) ((finalCRC >> 0) & 0xFF);
-        finalHash[1] = (byte) ((finalCRC >> 8) & 0xFF);
+        finalHash[0] = (byte)((finalCRC >> 0) & 0xFF);
+        finalHash[1] = (byte)((finalCRC >> 8) & 0xFF);
 
         return finalHash;
     }
@@ -162,7 +162,7 @@ public class CRC16 : HashAlgorithm
             {
                 if (((value ^ temp) & 0x0001) != 0)
                 {
-                    value = (ushort) ((value >> 1) ^ polynomial);
+                    value = (ushort)((value >> 1) ^ polynomial);
                 }
                 else
                 {

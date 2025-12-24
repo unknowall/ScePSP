@@ -1,7 +1,7 @@
-﻿using ScePSPUtils;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
 using ScePSP.Hle.Modules.threadman;
+using ScePSPUtils;
 
 namespace ScePSP.Hle.Modules.usersystemlib
 {
@@ -237,7 +237,7 @@ namespace ScePSP.Hle.Modules.usersystemlib
         {
             try
             {
-                PointerUtils.Memset((byte*) Memory.PspAddressToPointerSafe(PspPointer, Size), (byte) Data, Size);
+                PointerUtils.Memset((byte*)Memory.PspAddressToPointerSafe(PspPointer, Size), (byte)Data, Size);
             }
             catch
             {
@@ -257,8 +257,8 @@ namespace ScePSP.Hle.Modules.usersystemlib
         {
             try
             {
-                var destination = (byte*) Memory.PspAddressToPointerSafe(destinationPointer, size);
-                var source = (byte*) Memory.PspAddressToPointerSafe(sourcePointer, size);
+                var destination = (byte*)Memory.PspAddressToPointerSafe(destinationPointer, size);
+                var source = (byte*)Memory.PspAddressToPointerSafe(sourcePointer, size);
                 PointerUtils.Memcpy(destination, source, size);
             }
             catch

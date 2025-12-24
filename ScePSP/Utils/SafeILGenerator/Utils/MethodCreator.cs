@@ -21,10 +21,10 @@ namespace SafeILGenerator.Utils
                 delegateType.GetParameters().Select(parameter => parameter.ParameterType).ToArray(),
                 module,
                 true
-                //skipVisibility: false
+            //skipVisibility: false
             );
             createMethod(dynamicMethod);
-            return (TDelegate) (object) dynamicMethod.CreateDelegate(typeof(TDelegate));
+            return (TDelegate)(object)dynamicMethod.CreateDelegate(typeof(TDelegate));
         }
 
         public static TDelegate CreateMethodInClass<TDelegate>(Module module, string name, bool disableOptimizations,
@@ -50,29 +50,29 @@ namespace SafeILGenerator.Utils
             if (disableOptimizations)
             {
                 method.SetCustomAttribute(new CustomAttributeBuilder(
-                    typeof(MethodImplAttribute).GetConstructor(new[] {typeof(MethodImplOptions)}) ??
+                    typeof(MethodImplAttribute).GetConstructor(new[] { typeof(MethodImplOptions) }) ??
                     throw new Exception(),
-                    new object[] {MethodImplOptions.NoOptimization | MethodImplOptions.NoInlining})
+                    new object[] { MethodImplOptions.NoOptimization | MethodImplOptions.NoInlining })
                 );
             }
             else
             {
                 method.SetCustomAttribute(new CustomAttributeBuilder(
-                    typeof(MethodImplAttribute).GetConstructor(new[] {typeof(MethodImplOptions)}) ??
+                    typeof(MethodImplAttribute).GetConstructor(new[] { typeof(MethodImplOptions) }) ??
                     throw new Exception(),
                     new object[] { })
                 );
             }
 
             method.SetCustomAttribute(new CustomAttributeBuilder(
-                typeof(TargetedPatchingOptOutAttribute).GetConstructor(new[] {typeof(string)}) ?? throw new Exception(),
-                new object[] {"Performance critical to inline across NGen image boundaries"}));
+                typeof(TargetedPatchingOptOutAttribute).GetConstructor(new[] { typeof(string) }) ?? throw new Exception(),
+                new object[] { "Performance critical to inline across NGen image boundaries" }));
 
             createMethod(method);
             var createdType = type.CreateType();
             var runtimeMethod = createdType.GetMethod(dynamicMethodName);
 
-            return (TDelegate) (object) runtimeMethod.CreateDelegate(typeof(TDelegate));
+            return (TDelegate)(object)runtimeMethod.CreateDelegate(typeof(TDelegate));
         }
     }
 }

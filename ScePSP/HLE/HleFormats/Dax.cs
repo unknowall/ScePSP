@@ -1,7 +1,7 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.IO;
 using System.IO.Compression;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Hle.Formats
 {
@@ -168,7 +168,7 @@ namespace ScePSP.Hle.Formats
         /// <summary>
         /// Total number of blocks in the file
         /// </summary>
-        public int NumberOfBlocks => (int) Header.TotalBlocks;
+        public int NumberOfBlocks => (int)Header.TotalBlocks;
 
         /// <summary>
         /// Uncompressed length of the file.
@@ -186,7 +186,7 @@ namespace ScePSP.Hle.Formats
             var blockLength = blockEnd - blockStart;
 
             Stream.Position = blockStart;
-            return Stream.ReadBytes((int) blockLength);
+            return Stream.ReadBytes((int)blockLength);
         }
 
         /// <summary>
@@ -203,7 +203,7 @@ namespace ScePSP.Hle.Formats
             if (!Blocks[block].IsCompressed)
                 return In;
 
-            return new DeflateStream(new MemoryStream(In.Concat(new byte[] {0x00})),
+            return new DeflateStream(new MemoryStream(In.Concat(new byte[] { 0x00 })),
                 CompressionMode.Decompress).ReadAll();
         }
 
@@ -215,7 +215,7 @@ namespace ScePSP.Hle.Formats
         {
             var segments = new ArraySegment<byte>[count];
             for (var n = 0; n < count; n++)
-                segments[n] = new ArraySegment<byte>(ReadBlockDecompressed((uint) (block + n)));
+                segments[n] = new ArraySegment<byte>(ReadBlockDecompressed((uint)(block + n)));
             return segments;
         }
     }

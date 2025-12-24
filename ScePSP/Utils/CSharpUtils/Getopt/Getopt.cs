@@ -27,7 +27,7 @@ namespace ScePSPUtils.Getopt
         /// <summary>
         /// 
         /// </summary>
-        public string[] SopportedSwitches = {"/", "-", "--"};
+        public string[] SopportedSwitches = { "/", "-", "--" };
 
         /// <summary>
         /// 
@@ -98,7 +98,7 @@ namespace ScePSPUtils.Getopt
         /// <param name="action"></param>
         public void AddRule<T>(string name, Action<T> action)
         {
-            AddRule(new[] {name}, action);
+            AddRule(new[] { name }, action);
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace ScePSPUtils.Getopt
         /// <param name="action"></param>
         public void AddRule(string name, Action action)
         {
-            AddRule(new[] {name}, action);
+            AddRule(new[] { name }, action);
         }
 
         /// <summary>

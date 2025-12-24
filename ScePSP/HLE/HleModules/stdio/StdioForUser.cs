@@ -1,7 +1,7 @@
 ﻿using ScePSP.Hle.Attributes;
+using ScePSP.Hle.Managers;
 using ScePSP.Hle.Modules.iofilemgr;
 using ScePSP.Hle.Vfs;
-using ScePSP.Hle.Managers;
 
 namespace ScePSP.Hle.Modules.stdio
 {
@@ -77,7 +77,7 @@ namespace ScePSP.Hle.Modules.stdio
         [HlePspNotImplemented]
         public StdHandle sceKernelStdoutReopen(string File, HleIoFlags Flags, Vfs.SceMode Mode)
         {
-            StdOut = (StdHandle) IoFileMgrForUser.sceIoOpen(File, Flags, Mode);
+            StdOut = (StdHandle)IoFileMgrForUser.sceIoOpen(File, Flags, Mode);
             //Console.WriteLine("StdOut: {0}", StdOut);
             return StdOut;
         }
@@ -93,7 +93,7 @@ namespace ScePSP.Hle.Modules.stdio
         [HlePspNotImplemented]
         public StdHandle sceKernelStderrReopen(string File, HleIoFlags Flags, Vfs.SceMode Mode)
         {
-            StdError = (StdHandle) IoFileMgrForUser.sceIoOpen(File, Flags, Mode);
+            StdError = (StdHandle)IoFileMgrForUser.sceIoOpen(File, Flags, Mode);
             return StdError;
         }
     }

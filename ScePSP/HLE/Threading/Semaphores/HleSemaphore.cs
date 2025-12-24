@@ -1,9 +1,9 @@
-﻿using System;
+﻿using ScePSP.Core;
+using ScePSPUtils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ScePSPUtils;
-using ScePSP.Core;
 
 namespace ScePSP.Hle.Threading.Semaphores
 {

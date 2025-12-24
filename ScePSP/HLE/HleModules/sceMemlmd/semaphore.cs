@@ -1,5 +1,5 @@
-﻿using System;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
+using System;
 using Kirk = ScePSP.Core.Components.Crypto.Kirk;
 
 namespace ScePSP.Hle.Modules.kirk

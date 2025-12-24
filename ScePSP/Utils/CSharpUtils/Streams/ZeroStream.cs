@@ -69,7 +69,7 @@ namespace ScePSPUtils.Streams
         /// <returns></returns>
         public override int Read(byte[] buffer, int offset, int count)
         {
-            var readed = Math.Min(count, (int) (Length - Position));
+            var readed = Math.Min(count, (int)(Length - Position));
             for (var n = 0; n < count; n++) buffer[offset + n] = ValueToRepeat;
             Position += readed;
             return readed;

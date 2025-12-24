@@ -1,6 +1,6 @@
-﻿using System.IO;
-using ScePSP.Hle.Vfs;
+﻿using ScePSP.Hle.Vfs;
 using System.Collections.Generic;
+using System.IO;
 
 namespace System
 {

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScePSPUtils;
+using System;
 using System.Collections.Generic;
-using ScePSPUtils;
 
 namespace ScePSP.Core.Components.Rtc
 {
@@ -19,7 +19,7 @@ namespace ScePSP.Core.Components.Rtc
 
         public TimeSpan Elapsed => CurrentDateTime - StartDateTime;
         public TimeSpan UnixTimeStampTS => CurrentDateTime - new DateTime(1970, 1, 1);
-        public uint UnixTimeStamp => (uint) UnixTimeStampTS.TotalSeconds;
+        public uint UnixTimeStamp => (uint)UnixTimeStampTS.TotalSeconds;
         public PspRtc() => Start();
 
         public void Start()
@@ -41,7 +41,7 @@ namespace ScePSP.Core.Components.Rtc
 
             lock (Timers)
             {
-                RetryLoop:
+            RetryLoop:
                 foreach (var timer in Timers)
                 {
                     lock (timer)

@@ -132,7 +132,7 @@ namespace ScePSPUtils.Ext.SpaceAssigner
                     left = baseSpace;
                 }
 
-                return new[] {left, right}.Where(space => space != null && space.Length > 0).ToArray();
+                return new[] { left, right }.Where(space => space != null && space.Length > 0).ToArray();
             }
 
             /// <summary>
@@ -183,7 +183,7 @@ namespace ScePSPUtils.Ext.SpaceAssigner
             /// </summary>
             /// <param name="obj"></param>
             /// <returns></returns>
-            public int GetHashCode(Space obj) => (int) obj.Min ^ (int) obj.Max;
+            public int GetHashCode(Space obj) => (int)obj.Min ^ (int)obj.Max;
 
             /// <summary>
             /// 
@@ -210,7 +210,7 @@ namespace ScePSPUtils.Ext.SpaceAssigner
             /// 
             /// </summary>
             /// <returns></returns>
-            public override int GetHashCode() => (int) (Min ^ Max);
+            public override int GetHashCode() => (int)(Min ^ Max);
         }
 
         protected SortedSet<Space> AvailableSpaces;

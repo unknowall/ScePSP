@@ -1,10 +1,10 @@
-﻿using System;
+﻿using ScePSP.Hle.Attributes;
+using ScePSP.Hle.Managers;
+using ScePSPUtils;
+using ScePSPUtils.Endian;
+using System;
 using System.Net;
 using System.Net.Sockets;
-using ScePSP.Hle.Attributes;
-using ScePSP.Hle.Managers;
-using ScePSPUtils.Endian;
-using ScePSPUtils;
 
 namespace ScePSP.Hle.Modules.pspnet
 {
@@ -95,7 +95,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="AddressLength"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xDB094E1B, FirmwareVersion = 150)]
-        public int sceNetInetAccept(int SocketId, SockAddr*Address, socklen_t*AddressLength)
+        public int sceNetInetAccept(int SocketId, SockAddr* Address, socklen_t* AddressLength)
         {
             throw new NotImplementedException();
         }
@@ -108,7 +108,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="AddressLength"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x1A33F9AE, FirmwareVersion = 150)]
-        public int sceNetInetBind(int SocketId, SockAddr*Address, socklen_t AddressLength)
+        public int sceNetInetBind(int SocketId, SockAddr* Address, socklen_t AddressLength)
         {
             throw new NotImplementedException();
         }
@@ -142,7 +142,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="addrlen"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x410B34AA, FirmwareVersion = 150)]
-        public int sceNetInetConnect(int SocketId, sockaddr_in*serv_addr, socklen_t addrlen)
+        public int sceNetInetConnect(int SocketId, sockaddr_in* serv_addr, socklen_t addrlen)
         {
             var Socket = Sockets.Get(SocketId);
             Console.WriteLine("{0}", serv_addr->sin_addr);
@@ -178,7 +178,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="optlen"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x4A114C7C, FirmwareVersion = 150)]
-        public int sceNetInetGetsockopt(int s, int level, int optname, void*optval, socklen_t*optlen)
+        public int sceNetInetGetsockopt(int s, int level, int optname, void* optval, socklen_t* optlen)
         {
             throw new NotImplementedException();
         }
@@ -219,7 +219,7 @@ namespace ScePSP.Hle.Modules.pspnet
             var Socket = Sockets.Get(SocketId);
             var RecvBuffer = new byte[BufferLength];
             int Received = Socket.Receive(RecvBuffer, Flags);
-            PointerUtils.Memcpy((byte*) BufferPointer, RecvBuffer, Received);
+            PointerUtils.Memcpy((byte*)BufferPointer, RecvBuffer, Received);
             return Received;
         }
 
@@ -270,7 +270,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="Flags"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x7AA671BC, FirmwareVersion = 150)]
-        public int sceNetInetSend(int SocketId, void*BufferPointer, int BufferLength, SocketFlags Flags)
+        public int sceNetInetSend(int SocketId, void* BufferPointer, int BufferLength, SocketFlags Flags)
         {
             var Socket = Sockets.Get(SocketId);
             return Socket.Send(ArrayUtils.CreateArray<byte>(BufferPointer, BufferLength), Flags);
@@ -287,8 +287,8 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="ToLength"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x05038FC7, FirmwareVersion = 150)]
-        public int sceNetInetSendto(int SocketId, void*BufferPointer, int BufferLength, SocketFlags SocketFlags,
-            sockaddr_in*To, socklen_t ToLength)
+        public int sceNetInetSendto(int SocketId, void* BufferPointer, int BufferLength, SocketFlags SocketFlags,
+            sockaddr_in* To, socklen_t ToLength)
         {
             var Socket = Sockets.Get(SocketId);
             return Socket.SendTo(ArrayUtils.CreateArray<byte>(BufferPointer, BufferLength), SocketFlags,
@@ -315,7 +315,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <returns></returns>
         [HlePspFunction(NID = 0x2FE71FE7, FirmwareVersion = 150)]
         public int sceNetInetSetsockopt(int SocketId, SocketOptionLevel SocketOptionLevel,
-            SocketOptionName SocketOptionName, void*OptionValue, int OptionValueLength)
+            SocketOptionName SocketOptionName, void* OptionValue, int OptionValueLength)
         {
             var Socket = Sockets.Get(SocketId);
             Socket.SetSocketOption(SocketOptionLevel, SocketOptionName,

@@ -1,11 +1,11 @@
-﻿using System;
+﻿using ScePSPUtils;
+using ScePSPUtils.Endian;
+using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using ScePSPUtils;
-using ScePSPUtils.Endian;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Hle.Formats
 {
@@ -27,7 +27,7 @@ namespace ScePSP.Hle.Formats
             while (!directoryStream.Eof())
             {
                 //writefln("%08X : %08X : %08X", directoryStream.position, directoryStart, directoryLength);
-                var directoryRecordSize = (byte) directoryStream.ReadByte();
+                var directoryRecordSize = (byte)directoryStream.ReadByte();
 
                 // Even if a directory spans multiple sectors, the directory entries are not permitted to cross the sector boundary (unlike the path table).
                 // Where there is not enough space to record an entire directory entry at the end of a sector, that sector is zero-padded and the next
@@ -204,7 +204,7 @@ namespace ScePSP.Hle.Formats
                 for (var n = 0; n < size; n++)
                 {
                     value *= 10;
-                    value += (char) dataPtr[offset + n] - '0';
+                    value += (char)dataPtr[offset + n] - '0';
                 }
             }
             return value;
@@ -216,7 +216,7 @@ namespace ScePSP.Hle.Formats
             {
                 for (int n = size - 1; n >= 0; n--)
                 {
-                    dataPtr[offset + n] = (byte) ((char) (value % 10) + '0');
+                    dataPtr[offset + n] = (byte)((char)(value % 10) + '0');
                     value /= 10;
                 }
             }
@@ -508,7 +508,7 @@ namespace ScePSP.Hle.Formats
             return childIsoNode;
         }
 
-        public Stream Open() => Iso.Stream.SliceWithLength((long) DirectoryRecord.Offset, DirectoryRecord.Size);
+        public Stream Open() => Iso.Stream.SliceWithLength((long)DirectoryRecord.Offset, DirectoryRecord.Size);
 
         /*
         void saveTo(string outFileName = null)

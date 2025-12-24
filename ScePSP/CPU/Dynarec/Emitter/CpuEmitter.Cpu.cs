@@ -1,7 +1,7 @@
-﻿using System;
-using ScePSP.Core.Cpu.Table;
-using SafeILGenerator.Ast;
+﻿using SafeILGenerator.Ast;
 using SafeILGenerator.Ast.Nodes;
+using ScePSP.Core.Cpu.Table;
+using System;
 
 namespace ScePSP.Core.Cpu.Emitter
 {
@@ -58,20 +58,20 @@ namespace ScePSP.Core.Cpu.Emitter
         /////////////////////////////////////////////////////////////////////////////////////////////////
         [InstructionName(InstructionNames.Sll)]
         public AstNodeStm Sll() =>
-            _ast.AssignGpr(Rd, _ast.Binary(_ast.GPR_u(Rt), "<<", _ast.Immediate((uint) _instruction.Pos)));
+            _ast.AssignGpr(Rd, _ast.Binary(_ast.GPR_u(Rt), "<<", _ast.Immediate((uint)_instruction.Pos)));
 
         [InstructionName(InstructionNames.Sra)]
         public AstNodeStm Sra() =>
-            _ast.AssignGpr(Rd, _ast.Binary(_ast.GPR_s(Rt), ">>", _ast.Immediate((int) _instruction.Pos)));
+            _ast.AssignGpr(Rd, _ast.Binary(_ast.GPR_s(Rt), ">>", _ast.Immediate((int)_instruction.Pos)));
 
         [InstructionName(InstructionNames.Srl)]
         public AstNodeStm Srl() =>
-            _ast.AssignGpr(Rd, _ast.Binary(_ast.GPR_u(Rt), ">>", _ast.Immediate((uint) _instruction.Pos)));
+            _ast.AssignGpr(Rd, _ast.Binary(_ast.GPR_u(Rt), ">>", _ast.Immediate((uint)_instruction.Pos)));
 
         [InstructionName(InstructionNames.Rotr)]
         public AstNodeStm Rotr() => _ast.AssignGpr(Rd,
-            _ast.CallStatic((Func<uint, int, uint>) CpuEmitterUtils._rotr_impl, _ast.GPR_u(Rt),
-                _ast.Immediate((int) _instruction.Pos)));
+            _ast.CallStatic((Func<uint, int, uint>)CpuEmitterUtils._rotr_impl, _ast.GPR_u(Rt),
+                _ast.Immediate((int)_instruction.Pos)));
 
         [InstructionName(InstructionNames.Sllv)]
         public AstNodeStm Sllv() => _ast.AssignGpr(Rd, _ast.Binary(_ast.GPR_u(Rt), "<<", _ast.GPR_u(Rs) & 31));
@@ -84,7 +84,7 @@ namespace ScePSP.Core.Cpu.Emitter
 
         [InstructionName(InstructionNames.Rotrv)]
         public AstNodeStm Rotrv() => _ast.AssignGpr(Rd,
-            _ast.CallStatic((Func<uint, int, uint>) CpuEmitterUtils._rotr_impl, _ast.GPR_u(Rt), _ast.GPR_s(Rs)));
+            _ast.CallStatic((Func<uint, int, uint>)CpuEmitterUtils._rotr_impl, _ast.GPR_u(Rt), _ast.GPR_s(Rs)));
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // Set Less Than (Immediate) (Unsigned).
@@ -105,7 +105,7 @@ namespace ScePSP.Core.Cpu.Emitter
         // Load Upper Immediate.
         /////////////////////////////////////////////////////////////////////////////////////////////////
         [InstructionName(InstructionNames.Lui)]
-        public AstNodeStm Lui() => _ast.AssignGpr(Rt, _ast.Binary(IMM_u(), "<<", _ast.Immediate((uint) 16)));
+        public AstNodeStm Lui() => _ast.AssignGpr(Rt, _ast.Binary(IMM_u(), "<<", _ast.Immediate((uint)16)));
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // Sign Extend Byte/Half word.
@@ -121,30 +121,30 @@ namespace ScePSP.Core.Cpu.Emitter
         /////////////////////////////////////////////////////////////////////////////////////////////////
         [InstructionName(InstructionNames.Bitrev)]
         public AstNodeStm Bitrev() => _ast.AssignGpr(Rd,
-            _ast.CallStatic((Func<uint, uint>) CpuEmitterUtils._bitrev_impl, _ast.GPR_u(Rt)));
+            _ast.CallStatic((Func<uint, uint>)CpuEmitterUtils._bitrev_impl, _ast.GPR_u(Rt)));
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // MAXimum/MINimum.
         /////////////////////////////////////////////////////////////////////////////////////////////////
         [InstructionName(InstructionNames.Max)]
         public AstNodeStm Max() => _ast.AssignGpr(Rd,
-            _ast.CallStatic((Func<int, int, int>) CpuEmitterUtils._max_impl, _ast.GPR_s(Rs), _ast.GPR_s(Rt)));
+            _ast.CallStatic((Func<int, int, int>)CpuEmitterUtils._max_impl, _ast.GPR_s(Rs), _ast.GPR_s(Rt)));
 
         [InstructionName(InstructionNames.Min)]
         public AstNodeStm Min() => _ast.AssignGpr(Rd,
-            _ast.CallStatic((Func<int, int, int>) CpuEmitterUtils._min_impl, _ast.GPR_s(Rs), _ast.GPR_s(Rt)));
+            _ast.CallStatic((Func<int, int, int>)CpuEmitterUtils._min_impl, _ast.GPR_s(Rs), _ast.GPR_s(Rt)));
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // DIVide (Unsigned).
         /////////////////////////////////////////////////////////////////////////////////////////////////
         [InstructionName(InstructionNames.Div)]
         public AstNodeStm Div() => _ast.Statement(_ast.CallStatic(
-            (Action<CpuThreadState, int, int>) CpuEmitterUtils._div_impl,
+            (Action<CpuThreadState, int, int>)CpuEmitterUtils._div_impl,
             _ast.CpuThreadStateExpr, _ast.GPR_s(Rs), _ast.GPR_s(Rt)));
 
         [InstructionName(InstructionNames.Divu)]
         public AstNodeStm Divu() => _ast.Statement(_ast.CallStatic(
-            (Action<CpuThreadState, uint, uint>) CpuEmitterUtils._divu_impl,
+            (Action<CpuThreadState, uint, uint>)CpuEmitterUtils._divu_impl,
             _ast.CpuThreadStateExpr, _ast.GPR_u(Rs), _ast.GPR_u(Rt)));
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -199,35 +199,35 @@ namespace ScePSP.Core.Cpu.Emitter
         /// </summary>
         [InstructionName(InstructionNames.Ext)]
         public AstNodeStm Ext() => _ast.AssignGpr(Rt,
-            _ast.CallStatic((Func<uint, int, int, uint>) CpuEmitterUtils._ext_impl, _ast.GPR_u(Rs),
-                _ast.Immediate((int) _instruction.Pos), _ast.Immediate((int) _instruction.SizeE)));
+            _ast.CallStatic((Func<uint, int, int, uint>)CpuEmitterUtils._ext_impl, _ast.GPR_u(Rs),
+                _ast.Immediate((int)_instruction.Pos), _ast.Immediate((int)_instruction.SizeE)));
 
         [InstructionName(InstructionNames.Ins)]
         public AstNodeStm Ins() => _ast.AssignGpr(Rt,
-            _ast.CallStatic((Func<uint, uint, int, int, uint>) CpuEmitterUtils._ins_impl, _ast.GPR_u(Rt),
-                _ast.GPR_u(Rs), _ast.Immediate((int) _instruction.Pos), _ast.Immediate((int) _instruction.SizeI)));
+            _ast.CallStatic((Func<uint, uint, int, int, uint>)CpuEmitterUtils._ins_impl, _ast.GPR_u(Rt),
+                _ast.GPR_u(Rs), _ast.Immediate((int)_instruction.Pos), _ast.Immediate((int)_instruction.SizeI)));
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // Count Leading Ones/Zeros in word.
         /////////////////////////////////////////////////////////////////////////////////////////////////
         [InstructionName(InstructionNames.Clz)]
         public AstNodeStm Clz() =>
-            _ast.AssignGpr(Rd, _ast.CallStatic((Func<uint, uint>) CpuEmitterUtils._clz_impl, _ast.GPR_u(Rs)));
+            _ast.AssignGpr(Rd, _ast.CallStatic((Func<uint, uint>)CpuEmitterUtils._clz_impl, _ast.GPR_u(Rs)));
 
         [InstructionName(InstructionNames.Clo)]
         public AstNodeStm Clo() =>
-            _ast.AssignGpr(Rd, _ast.CallStatic((Func<uint, uint>) CpuEmitterUtils._clo_impl, _ast.GPR_u(Rs)));
+            _ast.AssignGpr(Rd, _ast.CallStatic((Func<uint, uint>)CpuEmitterUtils._clo_impl, _ast.GPR_u(Rs)));
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // Word Swap Bytes Within Halfwords/Words.
         /////////////////////////////////////////////////////////////////////////////////////////////////
         [InstructionName(InstructionNames.Wsbh)]
         public AstNodeStm Wsbh() => _ast.AssignGpr(Rd,
-            _ast.CallStatic((Func<uint, uint>) CpuEmitterUtils._wsbh_impl, _ast.GPR_u(Rt)));
+            _ast.CallStatic((Func<uint, uint>)CpuEmitterUtils._wsbh_impl, _ast.GPR_u(Rt)));
 
         [InstructionName(InstructionNames.Wsbw)]
         public AstNodeStm Wsbw() => _ast.AssignGpr(Rd,
-            _ast.CallStatic((Func<uint, uint>) CpuEmitterUtils._wsbw_impl, _ast.GPR_u(Rt)));
+            _ast.CallStatic((Func<uint, uint>)CpuEmitterUtils._wsbw_impl, _ast.GPR_u(Rt)));
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // Move Control (From/To) Cop0
@@ -279,22 +279,22 @@ namespace ScePSP.Core.Cpu.Emitter
 
         [InstructionName(InstructionNames.Lwl)]
         public AstNodeStm Lwl() => _ast.AssignGpr(Rt,
-            _ast.CallStatic((Func<CpuThreadState, uint, int, uint, uint>) CpuEmitterUtils._lwl_exec,
+            _ast.CallStatic((Func<CpuThreadState, uint, int, uint, uint>)CpuEmitterUtils._lwl_exec,
                 _ast.CpuThreadStateExpr, _ast.GPR_u(Rs), IMM_s(), _ast.GPR_u(Rt)));
 
         [InstructionName(InstructionNames.Lwr)]
         public AstNodeStm Lwr() => _ast.AssignGpr(Rt,
-            _ast.CallStatic((Func<CpuThreadState, uint, int, uint, uint>) CpuEmitterUtils._lwr_exec,
+            _ast.CallStatic((Func<CpuThreadState, uint, int, uint, uint>)CpuEmitterUtils._lwr_exec,
                 _ast.CpuThreadStateExpr, _ast.GPR_u(Rs), IMM_s(), _ast.GPR_u(Rt)));
 
         [InstructionName(InstructionNames.Swl)]
         public AstNodeStm Swl() => _ast.Statement(_ast.CallStatic(
-            (Action<CpuThreadState, uint, int, uint>) CpuEmitterUtils._swl_exec,
+            (Action<CpuThreadState, uint, int, uint>)CpuEmitterUtils._swl_exec,
             _ast.CpuThreadStateExpr, _ast.GPR_u(Rs), IMM_s(), _ast.GPR_u(Rt)));
 
         [InstructionName(InstructionNames.Swr)]
         public AstNodeStm Swr() => _ast.Statement(_ast.CallStatic(
-            (Action<CpuThreadState, uint, int, uint>) CpuEmitterUtils._swr_exec,
+            (Action<CpuThreadState, uint, int, uint>)CpuEmitterUtils._swr_exec,
             _ast.CpuThreadStateExpr, _ast.GPR_u(Rs), IMM_s(), _ast.GPR_u(Rt)));
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -335,7 +335,7 @@ namespace ScePSP.Core.Cpu.Emitter
                 else
                 {
                     statements.AddStatement(_ast.Statement(_ast.CallInstance(_ast.CpuThreadStateExpr,
-                        (Action<uint>) CpuThreadState.Methods.SyscallNative, delegateId)));
+                        (Action<uint>)CpuThreadState.Methods.SyscallNative, delegateId)));
                 }
 
                 statements.AddStatement(_ast.Return());
@@ -348,25 +348,25 @@ namespace ScePSP.Core.Cpu.Emitter
                     _ast.AssignPc(_pc),
                     _ast.GetTickCall(true),
                     _ast.Statement(_ast.CallInstance(_ast.CpuThreadStateExpr,
-                        (Action<int>) CpuThreadState.Methods.Syscall,
-                        (int) _instruction.Code))
+                        (Action<int>)CpuThreadState.Methods.Syscall,
+                        (int)_instruction.Code))
                 );
             }
         }
 
         [InstructionName(InstructionNames.Cache)]
         public AstNodeStm Cache() => _ast.Statement(_ast.CallStatic(
-            (Action<CpuThreadState, uint, uint>) CpuEmitterUtils._cache_impl,
+            (Action<CpuThreadState, uint, uint>)CpuEmitterUtils._cache_impl,
             _ast.CpuThreadStateExpr, _pc, _instruction.Value));
 
         [InstructionName(InstructionNames.Sync)]
         public AstNodeStm Sync() => _ast.Statement(_ast.CallStatic(
-            (Action<CpuThreadState, uint, uint>) CpuEmitterUtils._sync_impl,
+            (Action<CpuThreadState, uint, uint>)CpuEmitterUtils._sync_impl,
             _ast.CpuThreadStateExpr, _pc, _instruction.Value));
 
         [InstructionName(InstructionNames.Break)]
         public AstNodeStm Break() => _ast.Statement(_ast.CallStatic(
-            (Action<CpuThreadState, uint, uint>) CpuEmitterUtils._break_impl,
+            (Action<CpuThreadState, uint, uint>)CpuEmitterUtils._break_impl,
             _ast.CpuThreadStateExpr, _pc, _instruction.Value));
 
         [InstructionName(InstructionNames.Dbreak)]

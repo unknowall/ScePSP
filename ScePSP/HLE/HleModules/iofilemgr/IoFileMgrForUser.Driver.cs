@@ -1,5 +1,5 @@
-﻿using System.Text;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Core.Memory;
+using System.Text;
 
 namespace ScePSP.Hle.Modules.iofilemgr
 {

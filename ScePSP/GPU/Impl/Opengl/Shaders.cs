@@ -2,8 +2,8 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 {
     public class Shaders
     {
-	    //language=c++
-	    static public string ShaderFrag = @"
+        //language=c++
+        static public string ShaderFrag = @"
 			//#ifndef GL_ES
 			//#version 330
 			//#endif
@@ -162,8 +162,8 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 			}
         ";
 
-	    //language=c++
-	    static public string ShaderVert = @"
+        //language=c++
+        static public string ShaderVert = @"
 			//#ifndef GL_ES
 			//#version 330
 			//#endif

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ScePSPUtils.Ext.Extensions;
+using ScePSPUtils.Extensions;
+using System;
 using System.IO;
 using System.Linq;
-using ScePSPUtils.Ext.Extensions;
-using ScePSPUtils.Extensions;
 
 namespace ScePSPUtils.Ext.Compression
 {
@@ -316,7 +316,7 @@ namespace ScePSPUtils.Ext.Compression
                     // Need another byte.
                     if (mask == 0)
                     {
-                        currentByte = (byte) input.ReadByte();
+                        currentByte = (byte)input.ReadByte();
                         mask = 0x80;
                     }
 
@@ -328,7 +328,7 @@ namespace ScePSPUtils.Ext.Compression
                     mask >>= 1;
                 }
 
-                output.WriteByte((byte) currentNode.Index);
+                output.WriteByte((byte)currentNode.Index);
             }
 
             output.Position = 0;

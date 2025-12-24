@@ -31,7 +31,7 @@ namespace cscodec
 
             var BitmapData = bi.LockBits(new System.Drawing.Rectangle(0, 0, bi.Width, bi.Height),
                 ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-            var Ptr = (int*) BitmapData.Scan0.ToPointer();
+            var Ptr = (int*)BitmapData.Scan0.ToPointer();
             for (int j = 0; j < f.imageHeight; j++)
             {
                 int off = j * f.imageWidth;
@@ -68,9 +68,9 @@ namespace cscodec
 
                         var c298 = 298 * c;
 
-                        byte red = (byte) MathUtils.Clamp((c298 + 409 * e + 128) >> 8, 0, 255);
-                        byte green = (byte) MathUtils.Clamp((c298 - 100 * d - 208 * e + 128) >> 8, 0, 255);
-                        byte blue = (byte) MathUtils.Clamp((c298 + 516 * d + 128) >> 8, 0, 255);
+                        byte red = (byte)MathUtils.Clamp((c298 + 409 * e + 128) >> 8, 0, 255);
+                        byte green = (byte)MathUtils.Clamp((c298 - 100 * d - 208 * e + 128) >> 8, 0, 255);
+                        byte blue = (byte)MathUtils.Clamp((c298 + 516 * d + 128) >> 8, 0, 255);
                         byte alpha = 255;
 
                         rgbPtr[lineOffLuma + x] = (alpha << 24) | (red << 16) | (green << 8) | (blue << 0);

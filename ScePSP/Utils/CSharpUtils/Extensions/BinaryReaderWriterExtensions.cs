@@ -70,8 +70,8 @@ namespace ScePSPUtils.Extensions
         /// <param name="endian"></param>
         public static void WriteEndian(this BinaryWriter binaryWriter, ushort value, Endianness endian)
         {
-            binaryWriter.Write((byte) ((value >> 8) & 0xFF));
-            binaryWriter.Write((byte) ((value >> 0) & 0xFF));
+            binaryWriter.Write((byte)((value >> 8) & 0xFF));
+            binaryWriter.Write((byte)((value >> 0) & 0xFF));
         }
 
         /// <summary>
@@ -82,10 +82,10 @@ namespace ScePSPUtils.Extensions
         /// <param name="endian"></param>
         public static void WriteEndian(this BinaryWriter binaryWriter, uint value, Endianness endian)
         {
-            binaryWriter.Write((byte) ((value >> 24) & 0xFF));
-            binaryWriter.Write((byte) ((value >> 16) & 0xFF));
-            binaryWriter.Write((byte) ((value >> 8) & 0xFF));
-            binaryWriter.Write((byte) ((value >> 0) & 0xFF));
+            binaryWriter.Write((byte)((value >> 24) & 0xFF));
+            binaryWriter.Write((byte)((value >> 16) & 0xFF));
+            binaryWriter.Write((byte)((value >> 8) & 0xFF));
+            binaryWriter.Write((byte)((value >> 0) & 0xFF));
         }
     }
 }

@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Numerics;
-using ScePSP.Core.Gpu.State;
-using ScePSPPlatform;
+﻿using ScePSP.Core.Gpu.State;
 using ScePSP.Utils;
+using System.Collections.Generic;
+using System.Numerics;
 
 namespace ScePSP.Core.Gpu.Formats
 {
@@ -68,14 +67,14 @@ namespace ScePSP.Core.Gpu.Formats
                     _wavefrontObjWriter.AddFaces(3, _primitiveIndices);
                     break;
                 case GuPrimitiveType.TriangleStrip:
-                {
-                    var indices = _primitiveIndices.ToArray();
-                    var triangleCount = indices.Length - 2;
-                    for (var n = 0; n < triangleCount; n++)
                     {
-                        _wavefrontObjWriter.AddFace(indices[n + 0], indices[n + 1], indices[n + 2]);
+                        var indices = _primitiveIndices.ToArray();
+                        var triangleCount = indices.Length - 2;
+                        for (var n = 0; n < triangleCount; n++)
+                        {
+                            _wavefrontObjWriter.AddFace(indices[n + 0], indices[n + 1], indices[n + 2]);
+                        }
                     }
-                }
                     break;
                 default:
                     _wavefrontObjWriter.StartComment("Can't handle primitive type: " + _currentPrimitiveType);

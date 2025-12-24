@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ScePSP.Utils;
+using ScePSPUtils;
+using System;
 using System.IO;
 using System.Linq;
-using ScePSPUtils;
-using ScePSP.Utils;
 using Kirk = ScePSP.Core.Components.Crypto.Kirk;
 
 namespace ScePSP.Hle.Formats
@@ -36,7 +36,7 @@ namespace ScePSP.Hle.Formats
             fixed (byte* buffer2 = gDataTmp) // aligned
             {
                 PointerUtils.Memcpy(buffer2 + 20, buffer1, 0xA0);
-                var pl2 = (uint*) buffer2;
+                var pl2 = (uint*)buffer2;
                 pl2[0] = 5;
                 pl2[1] = pl2[2] = 0;
                 pl2[3] = codeExtra;
@@ -69,7 +69,7 @@ namespace ScePSP.Hle.Formats
             fixed (byte* pbOut = pbOutBytes)
             {
                 //var headerPointer = (HeaderStruct*) pbIn;
-                Header = *(HeaderStruct*) pbIn;
+                Header = *(HeaderStruct*)pbIn;
                 var pti = GetTagInfo(Header.Tag);
 
                 if (showInfo)
@@ -83,7 +83,7 @@ namespace ScePSP.Hle.Formats
                 PointerUtils.Memset(pbOut, 0x55, 0x40);
 
                 // step3 demangle in place
-                var h7Header = (Kirk.KirkAes128CbcHeader*) &pbOut[0x2C];
+                var h7Header = (Kirk.KirkAes128CbcHeader*)&pbOut[0x2C];
                 h7Header->Mode = Kirk.KirkMode.DecryptCbc;
                 h7Header->Unknown4 = 0;
                 h7Header->Unknown8 = 0;
@@ -108,7 +108,7 @@ namespace ScePSP.Hle.Formats
 
                 for (var iXor = 0; iXor < 0x70; iXor++)
                 {
-                    pbOut[0x40 + iXor] = (byte) (pbOut[0x40 + iXor] ^ pti.Key[0x14 + iXor]);
+                    pbOut[0x40 + iXor] = (byte)(pbOut[0x40 + iXor] ^ pti.Key[0x14 + iXor]);
                 }
 
                 var ret = _kirk.HleUtilsBufferCopyWithRange(
@@ -123,7 +123,7 @@ namespace ScePSP.Hle.Formats
                     throw new Exception(CStringFormater.Sprintf("mangle#7 returned 0x%08X, ", ret));
 
                 for (var iXor = 0x6F; iXor >= 0; iXor--)
-                    pbOut[0x40 + iXor] = (byte) (pbOut[0x2C + iXor] ^ pti.Key[0x20 + iXor]);
+                    pbOut[0x40 + iXor] = (byte)(pbOut[0x2C + iXor] ^ pti.Key[0x20 + iXor]);
 
                 PointerUtils.Memset(pbOut + 0x80, 0, 0x30); // $40 bytes kept, clean up
 
@@ -147,7 +147,7 @@ namespace ScePSP.Hle.Formats
 
                 //File.WriteAllBytes("../../../TestInput/temp.bin", _pbOut);
 
-                var outputSize = *(int*) &pbIn[0xB0];
+                var outputSize = *(int*)&pbIn[0xB0];
 
                 return pbOutBytes.Slice(0, outputSize).ToArray();
             }
@@ -157,10 +157,10 @@ namespace ScePSP.Hle.Formats
         {
             buf[0] = 5;
             buf[1] = buf[2] = 0;
-            buf[3] = (uint) code;
-            buf[4] = (uint) size;
+            buf[3] = (uint)code;
+            buf[4] = (uint)size;
 
-            if (_kirk.HleUtilsBufferCopyWithRange((byte*) buf, size + 0x14, (byte*) buf, size + 0x14,
+            if (_kirk.HleUtilsBufferCopyWithRange((byte*)buf, size + 0x14, (byte*)buf, size + 0x14,
                     Kirk.CommandEnum.PspKirkCmdDecrypt) !=
                 Kirk.ResultEnum.Ok)
             {
@@ -187,11 +187,11 @@ namespace ScePSP.Hle.Formats
             fixed (byte* tmp3 = tmp3Bytes)
             {
                 //var headerPointer = (HeaderStruct*) inbuf;
-                Header = *(HeaderStruct*) inbuf;
+                Header = *(HeaderStruct*)inbuf;
                 var pti = GetTagInfo2(Header.Tag);
                 Console.WriteLine("{0}", pti);
 
-                var retsize = *(int*) &inbuf[0xB0];
+                var retsize = *(int*)&inbuf[0xB0];
 
                 PointerUtils.Memset(tmp1Bytes, 0, 0x150);
                 PointerUtils.Memset(tmp2Bytes, 0, 0x90 + 0x14);
@@ -221,10 +221,10 @@ namespace ScePSP.Hle.Formats
                         tmp2Bytes[0x14 + (i << 4) + j] = pti.Key[j];
                     }
 
-                    tmp2Bytes[0x14 + (i << 4)] = (byte) i;
+                    tmp2Bytes[0x14 + (i << 4)] = (byte)i;
                 }
 
-                if (Scramble((uint*) tmp2, 0x90, pti.Code) < 0)
+                if (Scramble((uint*)tmp2, 0x90, pti.Code) < 0)
                 {
                     throw new InvalidDataException("error in Scramble#1, ");
                 }
@@ -239,7 +239,7 @@ namespace ScePSP.Hle.Formats
 
                 PointerUtils.Memcpy(tmp3 + 0x14, outbuf + 0x5C, 0x60);
 
-                if (Scramble((uint*) tmp3, 0x60, pti.Code) < 0)
+                if (Scramble((uint*)tmp3, 0x60, pti.Code) < 0)
                 {
                     throw new InvalidDataException("error in Scramble#2, ");
                 }
@@ -250,7 +250,7 @@ namespace ScePSP.Hle.Formats
                 PointerUtils.Memset(outbuf + 0x18, 0, 0x58);
                 PointerUtils.Memcpy(outbuf + 0x04, outbuf, 0x04);
 
-                *(uint*) outbuf = 0x014C;
+                *(uint*)outbuf = 0x014C;
                 PointerUtils.Memcpy(outbuf + 0x08, tmp2, 0x10);
 
                 /* sha-1 */
@@ -270,21 +270,21 @@ namespace ScePSP.Hle.Formats
 
                 for (iXor = 0; iXor < 0x40; iXor++)
                 {
-                    tmp3[iXor + 0x14] = (byte) (outbuf[iXor + 0x80] ^ tmp2Bytes[iXor + 0x10]);
+                    tmp3[iXor + 0x14] = (byte)(outbuf[iXor + 0x80] ^ tmp2Bytes[iXor + 0x10]);
                 }
 
-                if (Scramble((uint*) tmp3, 0x40, pti.Code) != 0)
+                if (Scramble((uint*)tmp3, 0x40, pti.Code) != 0)
                 {
                     throw new InvalidDataException("error in Scramble#3, ");
                 }
 
                 for (iXor = 0x3F; iXor >= 0; iXor--)
                 {
-                    outbuf[iXor + 0x40] = (byte) (tmp3Bytes[iXor] ^ tmp2Bytes[iXor + 0x50]); // uns 8
+                    outbuf[iXor + 0x40] = (byte)(tmp3Bytes[iXor] ^ tmp2Bytes[iXor + 0x50]); // uns 8
                 }
 
                 PointerUtils.Memset(outbuf + 0x80, 0, 0x30);
-                *(uint*) &outbuf[0xA0] = 1;
+                *(uint*)&outbuf[0xA0] = 1;
 
                 PointerUtils.Memcpy(outbuf + 0xB0, outbuf + 0xC0, 0x10);
                 PointerUtils.Memset(outbuf + 0xC0, 0, 0x10);
@@ -333,7 +333,7 @@ namespace ScePSP.Hle.Formats
 
             return DecryptPrx(pbIn, showInfo);
         }
-        
+
         public struct HeaderStruct
         {
             /// <summary>
@@ -574,9 +574,9 @@ namespace ScePSP.Hle.Formats
                     Key != null ? BitConverter.ToString(Key) : "null", Code);
             }
         }
-        
+
         /////////////////////////////////////
-        
+
         public TagInfo[] GTagInfo = {
             // 1.x PRXs
             new TagInfo {Tag = 0x00000000, Ikey = GKey0, Code = 0x42},
@@ -766,7 +766,7 @@ namespace ScePSP.Hle.Formats
             0xA34D8C80, 0x962B235D, 0x3E420548, 0x09CF9FFE, 0xD4883F5C, 0xD90E9CB5,
             0x00AEF4E9, 0xF0886DE9, 0x62A58A5B, 0x52A55546, 0x971941B5, 0xF5B79FAC,
         };
-        
+
         ////////////////
         public TagInfo2[] GTagInfo2 =
         {

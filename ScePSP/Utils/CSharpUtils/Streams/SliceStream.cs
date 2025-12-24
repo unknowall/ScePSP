@@ -171,7 +171,7 @@ namespace ScePSPUtils.Streams
                 ParentStream.Position = ThisStart + Position;
                 if (Position + count > Length)
                 {
-                    count = (int) (Length - Position);
+                    count = (int)(Length - Position);
                 }
                 try
                 {

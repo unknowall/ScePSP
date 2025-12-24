@@ -1,7 +1,7 @@
-﻿using System;
+﻿using ScePSPUtils.Drawing.Extensions;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
-using ScePSPUtils.Drawing.Extensions;
 
 namespace ScePSPUtils.Drawing
 {
@@ -85,7 +85,7 @@ namespace ScePSPUtils.Drawing
                 }
             }
 
-            var pixelTotalDifferencePercentage = (double) compareResult.DifferentPixelCount * 100 /
+            var pixelTotalDifferencePercentage = (double)compareResult.DifferentPixelCount * 100 /
                                                  compareResult.TotalPixelCount;
             compareResult.Equal = pixelTotalDifferencePercentage < threshold;
 
@@ -208,7 +208,7 @@ namespace ScePSPUtils.Drawing
             bitmap.LockBitsUnlock(numberOfChannels == 1 ? PixelFormat.Format8bppIndexed : PixelFormat.Format32bppArgb,
                 bitmapData =>
                 {
-                    var bitmapDataScan0 = (byte*) bitmapData.Scan0.ToPointer();
+                    var bitmapDataScan0 = (byte*)bitmapData.Scan0.ToPointer();
                     var width = bitmap.Width;
                     var stride = bitmapData.Stride;
                     if (numberOfChannels == 1)
@@ -231,7 +231,7 @@ namespace ScePSPUtils.Drawing
                                 var inputPtr = bitmapDataScan0 + stride * y;
                                 if (numberOfChannels != 1)
                                 {
-                                    inputPtr = inputPtr + (int) channel;
+                                    inputPtr = inputPtr + (int)channel;
                                 }
                                 inputPtr += numberOfChannels * rectangleLeft;
                                 for (var x = rectangleLeft; x < rectangleRight; x++)
@@ -279,7 +279,7 @@ namespace ScePSPUtils.Drawing
                 {
                     for (var y = 0; y < bitmapData.Height; y++)
                     {
-                        var bitmapPtr = (byte*) bitmapData.Scan0.ToPointer() + bitmapData.Stride * y;
+                        var bitmapPtr = (byte*)bitmapData.Scan0.ToPointer() + bitmapData.Stride * y;
                         var dataPtr = newDataPtr + numberOfChannels * bitmapData.Width * y;
                         var z = 0;
                         for (var x = 0; x < bitmapData.Width; x++)
@@ -287,7 +287,7 @@ namespace ScePSPUtils.Drawing
                             for (var c = 0; c < numberOfChannels; c++)
                             {
                                 var dataPtrPtr = &dataPtr[z + c];
-                                var bitmapPtrPtr = &bitmapPtr[z + (int) channels[c]];
+                                var bitmapPtrPtr = &bitmapPtr[z + (int)channels[c]];
 
                                 if (direction == Direction.FromBitmapToData)
                                 {

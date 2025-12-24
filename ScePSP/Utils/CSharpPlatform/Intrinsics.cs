@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Security;
 
@@ -12,17 +11,17 @@ namespace ScePSPPlatform
     {
         public static readonly ByteSwap ByteSwap;
 
-        
+
         public static ushort Portable_ByteSwap_ushort(ushort Value)
         {
-            return (ushort) ((Value >> 8) | (Value << 8));
+            return (ushort)((Value >> 8) | (Value << 8));
         }
 
-        
+
         public static uint Portable_ByteSwap_uint(uint Value)
         {
-            return ((uint) Portable_ByteSwap_ushort((ushort) (Value >> 0)) << 16) |
-                   ((uint) Portable_ByteSwap_ushort((ushort) (Value >> 16)) << 0);
+            return ((uint)Portable_ByteSwap_ushort((ushort)(Value >> 0)) << 16) |
+                   ((uint)Portable_ByteSwap_ushort((ushort)(Value >> 16)) << 0);
         }
 
         [DllImport("Kernel32.dll")]
@@ -36,9 +35,9 @@ namespace ScePSPPlatform
             fixed (byte* FuncBodyPtr = FuncBody)
             {
                 var Heap = HeapCreate(0x00040000, FuncBody.Length, FuncBody.Length);
-                var Ptr = (byte*) HeapAlloc(Heap, 0x00000008, FuncBody.Length);
+                var Ptr = (byte*)HeapAlloc(Heap, 0x00000008, FuncBody.Length);
                 Marshal.Copy(FuncBody, 0, new IntPtr(Ptr), FuncBody.Length);
-                Func = (T) (object) Marshal.GetDelegateForFunctionPointer(new IntPtr(Ptr), typeof(T));
+                Func = (T)(object)Marshal.GetDelegateForFunctionPointer(new IntPtr(Ptr), typeof(T));
             }
         }
 

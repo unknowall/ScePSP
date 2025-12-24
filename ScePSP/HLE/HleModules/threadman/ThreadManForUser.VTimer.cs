@@ -1,5 +1,4 @@
-﻿using System;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Core.Memory;
 
 namespace ScePSP.Hle.Modules.threadman
 {
@@ -74,7 +73,7 @@ namespace ScePSP.Hle.Modules.threadman
         [HlePspFunction(NID = 0x034A921F, FirmwareVersion = 150)]
         public int sceKernelGetVTimerTime(VirtualTimer VirtualTimer, SceKernelSysClock* Time)
         {
-            return (int) VirtualTimer.ElapsedMicroseconds;
+            return (int)VirtualTimer.ElapsedMicroseconds;
         }
 
         /// <summary>

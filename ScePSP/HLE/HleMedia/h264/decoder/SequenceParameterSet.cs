@@ -203,8 +203,8 @@ namespace cscodec.h264.decoder
             sps.bitstream_restriction_flag = bitstream_restriction_flag;
             sps.num_reorder_frames = num_reorder_frames;
             sps.scaling_matrix_present = scaling_matrix_present;
-            sps.scaling_matrix4 = (int[][]) scaling_matrix4.Clone();
-            sps.scaling_matrix8 = (int[][]) scaling_matrix8.Clone();
+            sps.scaling_matrix4 = (int[][])scaling_matrix4.Clone();
+            sps.scaling_matrix8 = (int[][])scaling_matrix8.Clone();
             sps.nal_hrd_parameters_present_flag = nal_hrd_parameters_present_flag;
             sps.vcl_hrd_parameters_present_flag = vcl_hrd_parameters_present_flag;
             sps.pic_struct_present_flag = pic_struct_present_flag;

@@ -1,7 +1,7 @@
-﻿using System;
-using System.Text;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
 using ScePSPUtils;
+using System;
+using System.Text;
 
 namespace ScePSP.Hle.Modules.pspnet
 {
@@ -90,9 +90,9 @@ namespace ScePSP.Hle.Modules.pspnet
             var Parts = new string[6];
             for (int n = 0; n < 6; n++)
             {
-                Parts[n] = "%02X".Sprintf((uint) MacAddress[n]);
+                Parts[n] = "%02X".Sprintf((uint)MacAddress[n]);
             }
-            PointerUtils.StoreStringOnPtr(string.Join(":", Parts), Encoding.UTF8, (byte*) OutputString);
+            PointerUtils.StoreStringOnPtr(string.Join(":", Parts), Encoding.UTF8, (byte*)OutputString);
 
             return 0;
             //throw (new NotImplementedException());
@@ -111,7 +111,7 @@ namespace ScePSP.Hle.Modules.pspnet
         public int sceNetGetLocalEtherAddr(byte* Mac)
         {
             var Bytes = SelfMacAddress.GetAddressBytes();
-            for (int n = 0; n < 8; n++) Mac[n] = n < Bytes.Length ? Bytes[n] : (byte) 0;
+            for (int n = 0; n < 8; n++) Mac[n] = n < Bytes.Length ? Bytes[n] : (byte)0;
             return 0;
         }
 

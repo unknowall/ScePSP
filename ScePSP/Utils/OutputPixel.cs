@@ -27,7 +27,7 @@ namespace ScePSP.Core.Types
         }
 
         public static OutputPixel FromRgba(byte r, byte g, byte b, byte a) =>
-            new OutputPixel() {R = r, G = g, B = b, A = a};
+            new OutputPixel() { R = r, G = g, B = b, A = a };
 
         public OutputPixel Transform(Func<byte, byte, byte, byte, OutputPixel> action) => action(R, G, B, A);
 
@@ -44,10 +44,10 @@ namespace ScePSP.Core.Types
 
         public static OutputPixel operator &(OutputPixel c1, OutputPixel c2) => new OutputPixel
         {
-            R = (byte) (c1.R & c2.R),
-            G = (byte) (c1.G & c2.G),
-            B = (byte) (c1.B & c2.B),
-            A = (byte) (c1.A & c2.A),
+            R = (byte)(c1.R & c2.R),
+            G = (byte)(c1.G & c2.G),
+            B = (byte)(c1.B & c2.B),
+            A = (byte)(c1.A & c2.A),
         };
 
         public static bool operator ==(OutputPixel c1, OutputPixel c2) => c1.R == c2.R &&
@@ -60,7 +60,7 @@ namespace ScePSP.Core.Types
         public override bool Equals(object obj)
         {
             if (obj != null && obj.GetType() != typeof(OutputPixel)) return false;
-            return (OutputPixel) obj == this;
+            return (OutputPixel)obj == this;
         }
 
         public override int GetHashCode() => (R << 0) | (G << 8) | (B << 16) | (A << 24);

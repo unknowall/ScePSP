@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Formats.Font;
+using System;
+using System.Collections.Generic;
 
 namespace ScePSP.Hle.Modules.libfont
 {
@@ -87,7 +87,7 @@ namespace ScePSP.Hle.Modules.libfont
         }
 
         //public enum FontHandle : int { }
-        [HleUidPoolClass(NotFoundError = (SceKernelErrors) (-1))]
+        [HleUidPoolClass(NotFoundError = (SceKernelErrors)(-1))]
         public class Font : IHleUidPoolClass, IDisposable
         {
             public FontLibrary FontLibrary;
@@ -107,7 +107,7 @@ namespace ScePSP.Hle.Modules.libfont
 
             public IGlyph GetGlyph(ushort CharCode)
             {
-                return PGF.GetGlyph((char) CharCode, (char) FontLibrary.AlternateCharCode);
+                return PGF.GetGlyph((char)CharCode, (char)FontLibrary.AlternateCharCode);
             }
 
             public FontCharInfo GetCharInfo(ushort CharCode)

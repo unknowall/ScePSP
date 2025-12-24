@@ -1,13 +1,13 @@
-﻿using System;
+﻿using ScePSP.Core.Cpu;
+using ScePSP.Hle.Formats;
+using ScePSP.Hle.Managers;
+using ScePSPUtils;
+using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ScePSP.Hle.Formats;
-using ScePSP.Hle.Managers;
-using ScePSP.Core.Cpu;
-using ScePSPUtils;
 using System.Runtime.InteropServices;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Hle.Loader
 {
@@ -47,7 +47,7 @@ namespace ScePSP.Hle.Loader
             {
                 if (_relocOutput == null)
                 {
-//#if !DEBUG
+                    //#if !DEBUG
 #if true
                     //_RelocOutput = new StreamWriter(_RelocOutputStream = new MemoryStream());
                     _relocOutput = null;
@@ -150,7 +150,7 @@ namespace ScePSP.Hle.Loader
             else
             {
                 var moduleInfoAddress =
-                    (uint) (BaseAddress + (programHeader.PsysicalAddress & 0x7FFFFFFFL) - programHeader.Offset);
+                    (uint)(BaseAddress + (programHeader.PsysicalAddress & 0x7FFFFFFFL) - programHeader.Offset);
                 var size = Marshal.SizeOf(typeof(ElfPsp.ModuleInfo));
                 stream = ElfLoader.MemoryStream.SliceWithLength(moduleInfoAddress, size);
                 Logger.Info("LoadModuleInfo: 0x{0:X8}[{1}]", moduleInfoAddress, size);
@@ -272,8 +272,8 @@ namespace ScePSP.Hle.Loader
                 var instructionBefore = instruction;
 
                 var s = BaseAddress + pointeeBaseOffset;
-                var gpAddr = (int) (BaseAddress + reloc.PointerAddress);
-                var gpOffset = gpAddr - ((int) BaseAddress & 0xFFFF0000);
+                var gpAddr = (int)(BaseAddress + reloc.PointerAddress);
+                var gpOffset = gpAddr - ((int)BaseAddress & 0xFFFF0000);
 
                 //Console.WriteLine(Reloc.Type);
 
@@ -290,8 +290,8 @@ namespace ScePSP.Hle.Loader
                 {
                     // Tested on PSP: R_MIPS_NONE just returns 0.
                     case Elf.Reloc.TypeEnum.None: // 0
-                    {
-                    }
+                        {
+                        }
                         break;
                     /*
                 case Elf.Reloc.TypeEnum.Mips16: // 1
@@ -301,76 +301,76 @@ namespace ScePSP.Hle.Loader
                     break;
                     */
                     case Elf.Reloc.TypeEnum.Mips32: // 2
-                    {
-                        instruction.Value += s;
-                    }
+                        {
+                            instruction.Value += s;
+                        }
                         break;
                     case Elf.Reloc.TypeEnum.MipsRel32: // 3;
-                    {
-                        throw new NotImplementedException();
-                    }
+                        {
+                            throw new NotImplementedException();
+                        }
                     case Elf.Reloc.TypeEnum.Mips26: // 4
-                    {
-                        instruction.JumpReal = instruction.JumpReal + s;
-                    }
+                        {
+                            instruction.JumpReal = instruction.JumpReal + s;
+                        }
                         break;
                     case Elf.Reloc.TypeEnum.MipsHi16: // 5
-                    {
-                        hiValue = (ushort) instruction.Immu;
-                        deferredHi16.AddLast(relocatedPointerAddress);
-                    }
+                        {
+                            hiValue = (ushort)instruction.Immu;
+                            deferredHi16.AddLast(relocatedPointerAddress);
+                        }
                         break;
                     case Elf.Reloc.TypeEnum.MipsLo16: // 6
-                    {
-                        var a = instruction.Immu;
-
-                        instruction.Immu = ((uint) (hiValue << 16) | a & 0x0000FFFF) + s;
-
-                        // Process deferred R_MIPS_HI16
-                        foreach (var dataAddr2 in deferredHi16)
                         {
-                            var data2 = instructionReader[dataAddr2];
-                            var result = ((data2.Value & 0x0000FFFF) << 16) + a + s;
-                            // The low order 16 bits are always treated as a signed
-                            // value. Therefore, a negative value in the low order bits
-                            // requires an adjustment in the high order bits. We need
-                            // to make this adjustment in two ways: once for the bits we
-                            // took from the data, and once for the bits we are putting
-                            // back in to the data.
-                            if ((a & 0x8000) != 0)
+                            var a = instruction.Immu;
+
+                            instruction.Immu = ((uint)(hiValue << 16) | a & 0x0000FFFF) + s;
+
+                            // Process deferred R_MIPS_HI16
+                            foreach (var dataAddr2 in deferredHi16)
                             {
-                                result -= 0x10000;
+                                var data2 = instructionReader[dataAddr2];
+                                var result = ((data2.Value & 0x0000FFFF) << 16) + a + s;
+                                // The low order 16 bits are always treated as a signed
+                                // value. Therefore, a negative value in the low order bits
+                                // requires an adjustment in the high order bits. We need
+                                // to make this adjustment in two ways: once for the bits we
+                                // took from the data, and once for the bits we are putting
+                                // back in to the data.
+                                if ((a & 0x8000) != 0)
+                                {
+                                    result -= 0x10000;
+                                }
+                                if ((result & 0x8000) != 0)
+                                {
+                                    result += 0x10000;
+                                }
+                                data2.Immu = result >> 16;
+                                instructionReader[dataAddr2] = data2;
                             }
-                            if ((result & 0x8000) != 0)
-                            {
-                                result += 0x10000;
-                            }
-                            data2.Immu = result >> 16;
-                            instructionReader[dataAddr2] = data2;
+                            deferredHi16.Clear();
                         }
-                        deferredHi16.Clear();
-                    }
                         break;
                     case Elf.Reloc.TypeEnum.MipsGpRel16: // 7
-                    {
-                        /*
-                        int A = Instruction.IMM;
-                        int result;
-                        if (A == 0)
                         {
-                            result = (int)S - (int)GP_ADDR;
+                            /*
+                            int A = Instruction.IMM;
+                            int result;
+                            if (A == 0)
+                            {
+                                result = (int)S - (int)GP_ADDR;
+                            }
+                            else
+                            {
+                                result = (int)S + (int)GP_OFFSET + (int)(((A & 0x00008000) != 0) ? (((A & 0x00003FFF) + 0x4000) | 0xFFFF0000) : A) - (int)GP_ADDR;
+                            }
+                            if ((result < -32768) || (result > 32768))
+                            {
+                                Console.Error.WriteLine("Relocation overflow (R_MIPS_GPREL16) : '" + result + "'");
+                            }
+                            Instruction.IMMU = (uint)result;
+                            */
                         }
-                        else
-                        {
-                            result = (int)S + (int)GP_OFFSET + (int)(((A & 0x00008000) != 0) ? (((A & 0x00003FFF) + 0x4000) | 0xFFFF0000) : A) - (int)GP_ADDR;
-                        }
-                        if ((result < -32768) || (result > 32768))
-                        {
-                            Console.Error.WriteLine("Relocation overflow (R_MIPS_GPREL16) : '" + result + "'");
-                        }
-                        Instruction.IMMU = (uint)result;
-                        */
-                    }
                         break;
                     default:
                         throw new NotImplementedException($"Handling {reloc.Type} not implemented");
@@ -473,7 +473,7 @@ namespace ScePSP.Hle.Loader
                 {
                     var nid = functionNidReader.ReadUInt32();
                     var callAddress = functionAddressReader.ReadUInt32();
-                    hleModuleExports.Functions[nid] = new HleModuleImportsExports.Entry() {Address = callAddress};
+                    hleModuleExports.Functions[nid] = new HleModuleImportsExports.Entry() { Address = callAddress };
 
                     Logger.Info("  |  - FUNC: {0:X} : {1:X} : {2}", nid, callAddress,
                         Enum.GetName(typeof(SpecialFunctionNids), nid));
@@ -483,7 +483,7 @@ namespace ScePSP.Hle.Loader
                 {
                     var nid = variableNidReader.ReadUInt32();
                     var callAddress = variableAddressReader.ReadUInt32();
-                    hleModuleExports.Variables[nid] = new HleModuleImportsExports.Entry() {Address = callAddress};
+                    hleModuleExports.Variables[nid] = new HleModuleImportsExports.Entry() { Address = callAddress };
 
                     Logger.Info("  |  - VAR: {0:X} : {1:X} : {2}", nid, callAddress,
                         Enum.GetName(typeof(SpecialVariableNids), nid));
@@ -560,9 +560,9 @@ namespace ScePSP.Hle.Loader
                 for (var n = 0; n < moduleImport.FunctionCount; n++)
                 {
                     var nid = nidStreamReader.ReadUInt32();
-                    var callAddress = (uint) (moduleImport.CallAddress + n * 8);
+                    var callAddress = (uint)(moduleImport.CallAddress + n * 8);
 
-                    hleModuleImports.Functions[nid] = new HleModuleImportsExports.Entry() {Address = callAddress};
+                    hleModuleImports.Functions[nid] = new HleModuleImportsExports.Entry() { Address = callAddress };
                 }
 
                 HleModuleGuest.ModulesImports.Add(hleModuleImports);

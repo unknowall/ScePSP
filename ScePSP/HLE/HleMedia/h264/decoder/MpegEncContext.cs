@@ -163,7 +163,7 @@ namespace cscodec.h264.decoder
         public const int CODEC_FLAG_SVCD_SCAN_OFFSET = 0x40000000;
 
         ///< Will reserve space for SVCD scan offset user data.
-        public const int CODEC_FLAG_CLOSED_GOP = unchecked((int) 0x80000000);
+        public const int CODEC_FLAG_CLOSED_GOP = unchecked((int)0x80000000);
 
         public const int CODEC_FLAG2_FAST = 0x00000001;
 
@@ -1151,7 +1151,7 @@ namespace cscodec.h264.decoder
         {
             //ImgUtils imgutils = { &imgutils_class, log_offset, log_ctx };
 
-            if ((int) w > 0 && (int) h > 0 && (w + 128) * (long) (h + 128) < int.MaxValue / 8)
+            if ((int)w > 0 && (int)h > 0 && (w + 128) * (long)(h + 128) < int.MaxValue / 8)
                 return 0;
 
             //av_log(&imgutils, AV_LOG_ERROR, "Picture size %ux%u is invalid\n", w, h);
@@ -1461,10 +1461,10 @@ namespace cscodec.h264.decoder
                         return -1;
                 }
                 //pal[i] = b + (g<<8) + (r<<16);
-                pal[pal_offset + i * 4 + 0] = (byte) MathUtils.Clamp(b, 0, 255);
-                pal[pal_offset + i * 4 + 1] = (byte) MathUtils.Clamp(g, 0, 255);
-                pal[pal_offset + i * 4 + 2] = (byte) MathUtils.Clamp(r, 0, 255);
-                pal[pal_offset + i * 4 + 3] = (byte) MathUtils.Clamp(0x00, 0, 255); // a?	        
+                pal[pal_offset + i * 4 + 0] = (byte)MathUtils.Clamp(b, 0, 255);
+                pal[pal_offset + i * 4 + 1] = (byte)MathUtils.Clamp(g, 0, 255);
+                pal[pal_offset + i * 4 + 2] = (byte)MathUtils.Clamp(r, 0, 255);
+                pal[pal_offset + i * 4 + 3] = (byte)MathUtils.Clamp(0x00, 0, 255); // a?	        
             }
 
             return 0;
@@ -1538,7 +1538,7 @@ namespace cscodec.h264.decoder
                 h_chroma_shift = ImageUtils.av_pix_fmt_descriptors[pix_fmt].log2_chroma_w;
                 v_chroma_shift = ImageUtils.av_pix_fmt_descriptors[pix_fmt].log2_chroma_h;
 
-                int[] param = new int[] {w, h};
+                int[] param = new int[] { w, h };
                 avcodec_align_dimensions2(param, stride_align);
                 w = param[0];
                 h = param[1];
@@ -1601,7 +1601,7 @@ namespace cscodec.h264.decoder
                     buf.@base[i] = new byte[size[i] + 16];
                     if (buf.@base[i] == null) return -1;
                     //memset(buf.base[i], 128, size[i]);
-                    Arrays.Fill(buf.@base[i], 0, size[i], (byte) 128);
+                    Arrays.Fill(buf.@base[i], 0, size[i], (byte)128);
 
                     // no edge if EDGE EMU or not planar YUV
                     if ((this.flags & CODEC_FLAG_EMU_EDGE) != 0 || 0 == size[2])
@@ -1665,7 +1665,7 @@ namespace cscodec.h264.decoder
             */
 
             // TODO: get_buffer seems to capture only first component?
-            r = this.get_buffer((AVFrame) pic);
+            r = this.get_buffer((AVFrame)pic);
 
             if (r < 0 || 0 == pic.age || 0 == pic.type || null == pic.data_base[0])
             {
@@ -2180,7 +2180,7 @@ namespace cscodec.h264.decoder
             //this.codec_tag = ff_toupper4(this.codec_tag);
             //this.stream_codec_tag = ff_toupper4(this.stream_codec_tag);
 
-            this.coded_frame = (AVFrame) this.current_picture;
+            this.coded_frame = (AVFrame)this.current_picture;
 
             //FF_ALLOCZ_OR_GOTO(this.avctx, this.mb_index2xy, (this.mb_num+1)*sizeof(int), fail) //error ressilience code looks cleaner with this
             this.mb_index2xy = new int[this.mb_num + 1];
@@ -2341,7 +2341,7 @@ namespace cscodec.h264.decoder
         /* forget old pics after a seek */
         public void flush_dpb()
         {
-            H264Context h = (H264Context) this.priv_data;
+            H264Context h = (H264Context)this.priv_data;
             int i;
             for (i = 0; i < H264Context.MAX_DELAYED_PIC_COUNT; i++)
             {
@@ -2539,7 +2539,7 @@ namespace cscodec.h264.decoder
                 ff_xvmc_field_end(s);
             }else*/
             if ( //0==this.hwaccel
-                //&& 0==(this.codec->capabilities&CODEC_CAP_HWACCEL_VDPAU)
+                 //&& 0==(this.codec->capabilities&CODEC_CAP_HWACCEL_VDPAU)
                 0 != this.unrestricted_mv
                 && 0 != this.current_picture.reference
                 && 0 == this.intra_only
@@ -2562,7 +2562,7 @@ namespace cscodec.h264.decoder
             }
 
             // clear copies, to avoid confusion
-            this.coded_frame = (AVFrame) this.current_picture_ptr;
+            this.coded_frame = (AVFrame)this.current_picture_ptr;
         }
 
         public void avcodec_set_dimensions(int width, int height)

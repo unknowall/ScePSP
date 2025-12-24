@@ -1,9 +1,9 @@
 ﻿//#define DEBUG_MSG_PIPES
 
+using ScePSP.Core.Memory;
+using ScePSP.Hle.Managers;
 using System;
 using System.Collections.Generic;
-using ScePSP.Hle.Managers;
-using ScePSP.Core.Memory;
 
 namespace ScePSP.Hle.Modules.threadman
 {

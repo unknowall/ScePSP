@@ -382,9 +382,9 @@ namespace cscodec.av
             ret.qscale_type = qscale_type;
             ret.qstride = qstride;
             ret.quality = quality;
-            ret.ref_count = (int[][]) ref_count.Clone();
+            ret.ref_count = (int[][])ref_count.Clone();
             Array.Copy(ref_index, 0, ret.ref_index, 0, ref_index.Length);
-            ret.ref_poc = (int[][][]) ref_poc.Clone();
+            ret.ref_poc = (int[][][])ref_poc.Clone();
             ret.reference = reference;
             ret.reordered_opaque = reordered_opaque;
             ret.repeat_pict = repeat_pict;
@@ -435,7 +435,7 @@ namespace cscodec.av
         public static int build_def_list(AVFrame[] def_base, int def_offset, AVFrame[] in_base, int in_offset, int len,
             int is_long, int sel)
         {
-            int[] i = new int[] {0, 0};
+            int[] i = new int[] { 0, 0 };
             int index = 0;
 
             while (i[0] < len || i[1] < len)
@@ -467,7 +467,7 @@ namespace cscodec.av
             int i, best_poc;
             int out_i = 0;
 
-            for (;;)
+            for (; ; )
             {
                 best_poc = dir != 0 ? int.MinValue : int.MaxValue;
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime;
 
 namespace ScePSP.Core.Types
 {
@@ -10,7 +9,7 @@ namespace ScePSP.Core.Types
         public MonoShortSoundSample(short value) => Value = value;
 
         public static MonoShortSoundSample Mix(MonoShortSoundSample a, MonoShortSoundSample b) =>
-            new MonoShortSoundSample((short) ((a.Value + b.Value) / 2));
+            new MonoShortSoundSample((short)((a.Value + b.Value) / 2));
 
         public short MonoLeftRight
         {
@@ -39,12 +38,12 @@ namespace ScePSP.Core.Types
 
         public int MaxAmplitudeLeftRight
         {
-            get => Math.Min(short.MaxValue, Math.Max(Math.Abs((int) Left), Math.Abs((int) Right)));
+            get => Math.Min(short.MaxValue, Math.Max(Math.Abs((int)Left), Math.Abs((int)Right)));
         }
 
         public static StereoShortSoundSample Mix(StereoShortSoundSample a, StereoShortSoundSample b) =>
             new StereoShortSoundSample(Clamp((a.Left + b.Left) / 2), Clamp((a.Right + b.Right) / 2));
-        
+
         public static implicit operator StereoIntSoundSample(StereoShortSoundSample stereoShortSoundSample) =>
             new StereoIntSoundSample(stereoShortSoundSample.Left, stereoShortSoundSample.Right);
 
@@ -56,12 +55,12 @@ namespace ScePSP.Core.Types
                 Right = value;
             }
         }
-        
+
         public static short Clamp(int value)
         {
             if (value < short.MinValue) return short.MinValue;
             if (value > short.MaxValue) return short.MaxValue;
-            return (short) value;
+            return (short)value;
         }
 
         public StereoShortSoundSample ApplyVolumes(int leftVolume, int rightVolume)
@@ -91,13 +90,13 @@ namespace ScePSP.Core.Types
 
         public static StereoIntSoundSample operator +(StereoIntSoundSample a, StereoIntSoundSample b) =>
             new StereoIntSoundSample(a.Left + b.Left, a.Right + b.Right);
-        
+
         public static StereoIntSoundSample operator /(StereoIntSoundSample a, int div) =>
             new StereoIntSoundSample(a.Left / div, a.Right / div);
-        
+
         public static StereoIntSoundSample operator *(StereoIntSoundSample a, int mult) =>
             new StereoIntSoundSample(a.Left * mult, a.Right * mult);
-        
+
         public static implicit operator StereoShortSoundSample(StereoIntSoundSample stereoIntSoundSample) =>
             new StereoShortSoundSample(stereoIntSoundSample.Left, stereoIntSoundSample.Right);
 

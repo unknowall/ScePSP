@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ScePSPUtils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using ScePSPUtils;
 
 /// <summary>
 /// 
@@ -20,7 +20,7 @@ public static unsafe class ArrayExtensions
     {
         if (typeof(T) == typeof(byte[]))
         {
-            return (T[]) (object) ConcatBytes((byte[]) (object) left, (byte[]) (object) right);
+            return (T[])(object)ConcatBytes((byte[])(object)left, (byte[])(object)right);
         }
 
         var Return = new T[left.Length + right.Length];
@@ -56,8 +56,8 @@ public static unsafe class ArrayExtensions
         try
         {
             PointerUtils.Memcpy(
-                (byte*) outputHandle.AddrOfPinnedObject().ToPointer(),
-                (byte*) inputHandle.AddrOfPinnedObject().ToPointer(),
+                (byte*)outputHandle.AddrOfPinnedObject().ToPointer(),
+                (byte*)inputHandle.AddrOfPinnedObject().ToPointer(),
                 totalBytes
             );
         }
@@ -94,7 +94,7 @@ public static unsafe class ArrayExtensions
     /// <returns></returns>
     public static byte[] ConcatBytes(this byte[] first, params byte[][] others)
     {
-        return ConcatBytes(new[] {first}.Union(others).ToArray());
+        return ConcatBytes(new[] { first }.Union(others).ToArray());
     }
 
     /// <summary>

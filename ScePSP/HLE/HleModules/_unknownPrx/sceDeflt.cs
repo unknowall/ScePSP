@@ -1,9 +1,9 @@
-﻿using System;
-using System.IO;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
 using ScePSPUtils;
 using ScePSPUtils.Ext;
 using ScePSPUtils.Ext.Streams;
+using System;
+using System.IO;
 
 namespace ScePSP.Hle.Modules._unknownPrx
 {
@@ -217,7 +217,7 @@ namespace ScePSP.Hle.Modules._unknownPrx
 
             _Decompress(InStream, OutStream);
 
-            var OutLength = (int) OutStream.Position;
+            var OutLength = (int)OutStream.Position;
 
             if (Crc32Addr != null)
             {

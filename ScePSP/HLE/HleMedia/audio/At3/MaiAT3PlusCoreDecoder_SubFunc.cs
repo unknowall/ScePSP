@@ -1,5 +1,4 @@
-﻿using ScePSP.Hle.Media.audio.At3;
-using ScePSP.Hle.Media.audio.At3.SUB;
+﻿using ScePSP.Hle.Media.audio.At3.SUB;
 
 #pragma warning disable CS0675
 
@@ -11,7 +10,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoderSearchTableDes huff_table,
                 MaiBitReader mbr0) //ushort *table0, byte *table1, uint max_len,  MaiBitReader mbr0)
         {
-            uint value = (uint) mbr0.GetWithI32Buffer((int) huff_table.max_bit_len, false);
+            uint value = (uint)mbr0.GetWithI32Buffer((int)huff_table.max_bit_len, false);
             value = huff_table.table1[value];
             mbr0.GetWithI32Buffer(huff_table.table0[value * 2 + 1]);
             return value;
@@ -54,7 +53,7 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             if (chn_info.Table0FlagDataNum != 0)
             {
-                chn_info.Table0DataNum0 = (uint) mbr0.GetWithI32Buffer(5);
+                chn_info.Table0DataNum0 = (uint)mbr0.GetWithI32Buffer(5);
 
                 if (chn_info.Table0DataNum0 > chn_info.JointChnInfo.NumBandSplitedDeclared)
                 {
@@ -63,7 +62,7 @@ namespace ScePSP.Hle.Formats.audio.At3
 
                 if (chn_info.Table0FlagDataNum == 3)
                 {
-                    chn_info.Table0DataNum1 = (uint) mbr0.GetWithI32Buffer(2) + 1;
+                    chn_info.Table0DataNum1 = (uint)mbr0.GetWithI32Buffer(2) + 1;
                     if (chn_info.ChnFlag != 0) chn_info.Table0DataNum1 = chn_info.Table0DataNum1 - 1 + 3;
                 }
             }
@@ -95,7 +94,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                     for (uint a0 = chn_info.Table0DataNum0;
                         a0 < chn_info.JointChnInfo.NumBandSplitedDeclared;
                         a0++)
-                        chn_info.Table0[a0] = (uint) mbr0.GetWithI32Buffer(1);
+                        chn_info.Table0[a0] = (uint)mbr0.GetWithI32Buffer(1);
                 }
             }
             else if (chn_info.Table0FlagDataNum == 3)
@@ -174,7 +173,7 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             for (uint a0 = 0; a0 < chn_info.JointChnInfo.NumBandSplitedDeclared; a0++)
             {
-                chn_info.Table0[a0] = (uint) mbr0.GetWithI32Buffer(3);
+                chn_info.Table0[a0] = (uint)mbr0.GetWithI32Buffer(3);
             }
 
             return 0;
@@ -192,13 +191,13 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             if (chn_info.Table0DataNum0 != 0)
             {
-                var uk1c6d0 = (uint) mbr0.GetWithI32Buffer(5);
-                var uk1c6d4 = (uint) mbr0.GetWithI32Buffer(2);
-                var uk1c6d8 = (uint) mbr0.GetWithI32Buffer(3);
+                var uk1c6d0 = (uint)mbr0.GetWithI32Buffer(5);
+                var uk1c6d4 = (uint)mbr0.GetWithI32Buffer(2);
+                var uk1c6d8 = (uint)mbr0.GetWithI32Buffer(3);
 
                 for (uint a0 = 0; a0 < uk1c6d0; a0++)
                 {
-                    chn_info.Table0[a0] = (uint) mbr0.GetWithI32Buffer(3);
+                    chn_info.Table0[a0] = (uint)mbr0.GetWithI32Buffer(3);
                 }
 
                 if (0 == uk1c6d4)
@@ -212,7 +211,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                 {
                     for (uint a0 = uk1c6d0; a0 < chn_info.Table0DataNum0; a0++)
                     {
-                        chn_info.Table0[a0] = (uint) mbr0.GetWithI32Buffer((int) uk1c6d4) + uk1c6d8;
+                        chn_info.Table0[a0] = (uint)mbr0.GetWithI32Buffer((int)uk1c6d4) + uk1c6d8;
                     }
                 }
             }
@@ -357,10 +356,10 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             if (chn_info.Table0DataNum0 != 0)
             {
-                uint uk1c6f8 = (uint) mbr0.GetWithI32Buffer(1);
-                uint uk1c6e0 = (uint) mbr0.GetWithI32Buffer(1);
-                uint uk1c6f4 = (uint) mbr0.GetWithI32Buffer(3);
-                uint uk1c6f0 = (uint) mbr0.GetWithI32Buffer(4);
+                uint uk1c6f8 = (uint)mbr0.GetWithI32Buffer(1);
+                uint uk1c6e0 = (uint)mbr0.GetWithI32Buffer(1);
+                uint uk1c6f4 = (uint)mbr0.GetWithI32Buffer(3);
+                uint uk1c6f0 = (uint)mbr0.GetWithI32Buffer(4);
 
                 if (chn_info.Table0DataNum0 != 0)
                 {
@@ -386,11 +385,11 @@ namespace ScePSP.Hle.Formats.audio.At3
                 {
                     for (uint a0 = 0; a0 < chn_info.Table0DataNum0 >> 1; a0++)
                     {
-                        uint loc0 = (uint) mbr0.GetWithI32Buffer(1);
+                        uint loc0 = (uint)mbr0.GetWithI32Buffer(1);
 
                         if (0 == loc0)
                         {
-                            chn_info.Table0[a0 * 2] += (uint) MAPCDSF_getHuffValue(huff_table_now, mbr0);
+                            chn_info.Table0[a0 * 2] += (uint)MAPCDSF_getHuffValue(huff_table_now, mbr0);
                             chn_info.Table0[a0 * 2 + 1] += MAPCDSF_getHuffValue(huff_table_now, mbr0);
                         }
                     }
@@ -430,9 +429,9 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             if (chn_info.Table0DataNum0 > 0)
             {
-                uint huff_table_type0 = (uint) mbr0.GetWithI32Buffer(2);
+                uint huff_table_type0 = (uint)mbr0.GetWithI32Buffer(2);
 
-                chn_info.Table0[0] = (uint) mbr0.GetWithI32Buffer(3);
+                chn_info.Table0[0] = (uint)mbr0.GetWithI32Buffer(3);
 
                 for (uint a0 = 1; a0 < chn_info.Table0DataNum0; a0++)
                 {
@@ -465,7 +464,7 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             if (chn_info.Table0DataNum0 > 0)
             {
-                uint huff_table_type1 = (uint) mbr0.GetWithI32Buffer(2);
+                uint huff_table_type1 = (uint)mbr0.GetWithI32Buffer(2);
 
                 for (uint a0 = 0; a0 < chn_info.Table0DataNum0; a0++)
                 {
@@ -493,7 +492,7 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             if (chn_info.Table0DataNum0 != 0)
             {
-                uint uk1c6e0 = (uint) mbr0.GetWithI32Buffer(2);
+                uint uk1c6e0 = (uint)mbr0.GetWithI32Buffer(2);
 
                 MaiAT3PlusCoreDecoderSearchTableDes huff_table_now =
                     MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table0[uk1c6e0];
@@ -579,13 +578,13 @@ namespace ScePSP.Hle.Formats.audio.At3
             if (chn_info.JointChnInfo.NumBandSplitedUsed != 0)
             {
                 uint* tmptable = stackalloc uint[0x20];
-                tmptable[0] = (uint) chn_info.Uk1C718;
+                tmptable[0] = (uint)chn_info.Uk1C718;
                 for (uint a0 = 1;
                     a0 < MAPCDSF_initTable1_table_s0[chn_info.JointChnInfo.NumBandSplitedUsed - 1] + 1;
                     a0++)
                 {
                     tmptable[a0] =
-                        (uint) (chn_info.Uk1C718 - MAPCDSF_initTable1_table_s1[chn_info.Uk1C714 * 9 + a0 - 1]);
+                        (uint)(chn_info.Uk1C718 - MAPCDSF_initTable1_table_s1[chn_info.Uk1C714 * 9 + a0 - 1]);
                 }
 
                 for (uint a0 = 0; a0 < chn_info.JointChnInfo.NumBandSplitedUsed; a0++)
@@ -604,7 +603,7 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             for (uint a0 = 0; a0 < chn_info.JointChnInfo.NumBandSplitedUsed; a0++)
             {
-                chn_info.Table1[a0] = (uint) mbr0.GetWithI32Buffer(6);
+                chn_info.Table1[a0] = (uint)mbr0.GetWithI32Buffer(6);
             }
 
             return rs;
@@ -638,20 +637,20 @@ namespace ScePSP.Hle.Formats.audio.At3
 
                 for (uint a0 = 0; a0 < uk1c700; a0++)
                 {
-                    chn_info.Table1[a0] += (uint) mbr0.GetWithI32Buffer(4) - 7;
+                    chn_info.Table1[a0] += (uint)mbr0.GetWithI32Buffer(4) - 7;
                 }
 
                 if (uk1c704 != 0)
                 {
-                    for (uint a0 = (uint) uk1c700; a0 < chn_info.JointChnInfo.NumBandSplitedUsed; a0++)
+                    for (uint a0 = (uint)uk1c700; a0 < chn_info.JointChnInfo.NumBandSplitedUsed; a0++)
                     {
-                        chn_info.Table1[a0] += (uint) mbr0.GetWithI32Buffer(uk1c704);
+                        chn_info.Table1[a0] += (uint)mbr0.GetWithI32Buffer(uk1c704);
                     }
                 }
 
-                for (uint a0 = (uint) uk1c700; a0 < chn_info.JointChnInfo.NumBandSplitedUsed; a0++)
+                for (uint a0 = (uint)uk1c700; a0 < chn_info.JointChnInfo.NumBandSplitedUsed; a0++)
                 {
-                    chn_info.Table1[a0] += (uint) uk1c708;
+                    chn_info.Table1[a0] += (uint)uk1c708;
                 }
 
                 for (uint a0 = 0; a0 < chn_info.JointChnInfo.NumBandSplitedUsed; a0++)
@@ -669,21 +668,21 @@ namespace ScePSP.Hle.Formats.audio.At3
 
                 for (uint a0 = 0; a0 < uk1c700; a0++)
                 {
-                    chn_info.Table1[a0] = (uint) mbr0.GetWithI32Buffer(6);
+                    chn_info.Table1[a0] = (uint)mbr0.GetWithI32Buffer(6);
                 }
 
                 if (0 == uk1c704)
                 {
-                    for (uint a0 = (uint) uk1c700; a0 < chn_info.JointChnInfo.NumBandSplitedUsed; a0++)
+                    for (uint a0 = (uint)uk1c700; a0 < chn_info.JointChnInfo.NumBandSplitedUsed; a0++)
                     {
-                        chn_info.Table1[a0] = (uint) uk1c708;
+                        chn_info.Table1[a0] = (uint)uk1c708;
                     }
                 }
                 else
                 {
-                    for (uint a0 = (uint) uk1c700; a0 < chn_info.JointChnInfo.NumBandSplitedUsed; a0++)
+                    for (uint a0 = (uint)uk1c700; a0 < chn_info.JointChnInfo.NumBandSplitedUsed; a0++)
                     {
-                        chn_info.Table1[a0] = (uint) (mbr0.GetWithI32Buffer(uk1c704) + uk1c708);
+                        chn_info.Table1[a0] = (uint)(mbr0.GetWithI32Buffer(uk1c704) + uk1c708);
                     }
                 }
 
@@ -716,7 +715,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                     MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table1_2[uk1c70c];
                 for (uint a0 = 0; a0 < chn_info.JointChnInfo.NumBandSplitedUsed; a0++)
                 {
-                    uint value_tmp = (uint) MAPCDSF_getHuffValue(huff_table_now, mbr0);
+                    uint value_tmp = (uint)MAPCDSF_getHuffValue(huff_table_now, mbr0);
                     if ((value_tmp & 0x8) != 0) value_tmp |= 0xFFFFFFF0;
                     else value_tmp &= 0xF;
                     chn_info.Table1[a0] += value_tmp;
@@ -740,7 +739,7 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             int tmp3 = mbr0.GetWithI32Buffer(2);
 
-            uint huff_table_type2 = (uint) mbr0.GetWithI32Buffer(2);
+            uint huff_table_type2 = (uint)mbr0.GetWithI32Buffer(2);
 
             if (tmp3 == 3)
             {
@@ -750,7 +749,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                 MAPCDSF_initTable1(chn_info);
 
                 uint* table_tmp2x = stackalloc uint[0x40];
-                table_tmp2x[0] = (uint) mbr0.GetWithI32Buffer(4);
+                table_tmp2x[0] = (uint)mbr0.GetWithI32Buffer(4);
                 table_tmp2x[0] -= 8;
                 table_tmp2x[0] &= 0x3F;
 
@@ -758,7 +757,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                     MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table1_2[huff_table_type2];
                 for (uint a0 = 1; a0 < chn_info.JointChnInfo.NumBandSplitedUsed; a0++)
                 {
-                    uint value_tmp = (uint) MAPCDSF_getHuffValue(huff_table_now, mbr0);
+                    uint value_tmp = (uint)MAPCDSF_getHuffValue(huff_table_now, mbr0);
                     if ((value_tmp & 0x8) != 0) value_tmp |= 0xFFFFFFF0;
                     else value_tmp &= 0xF;
 
@@ -774,7 +773,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             }
             else
             {
-                chn_info.Table1[0] = (uint) mbr0.GetWithI32Buffer(6);
+                chn_info.Table1[0] = (uint)mbr0.GetWithI32Buffer(6);
 
                 for (uint a0 = 1; a0 < chn_info.JointChnInfo.NumBandSplitedUsed; a0++)
                 {
@@ -802,7 +801,7 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             int rs = 0;
 
-            uint huff_table_type3 = (uint) mbr0.GetWithI32Buffer(2);
+            uint huff_table_type3 = (uint)mbr0.GetWithI32Buffer(2);
 
             for (uint a0 = 0; a0 < chn_info.JointChnInfo.NumBandSplitedUsed; a0++)
             {
@@ -820,7 +819,7 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             int rs = 0;
 
-            uint huff_table_type3 = (uint) mbr0.GetWithI32Buffer(2);
+            uint huff_table_type3 = (uint)mbr0.GetWithI32Buffer(2);
 
             chn_info.Table1[0] = chn_info.ChnRef.Table1[0] +
                                  MAPCDSF_getHuffValue(
@@ -870,16 +869,16 @@ namespace ScePSP.Hle.Formats.audio.At3
             uint read_counter = chn_info.JointChnInfo.NumBandSplitedUsed;
             if (mbr0.GetWithI32Buffer(1) != 0)
             {
-                read_counter = (uint) mbr0.GetWithI32Buffer(5);
+                read_counter = (uint)mbr0.GetWithI32Buffer(5);
             }
 
             for (uint a0 = 0; a0 < read_counter; a0++)
             {
                 if (chn_info.CheckTable0[a0] == 1)
                     chn_info.Table2[a0] =
-                        (uint) mbr0.GetWithI32Buffer(chn_info.JointChnInfo.Var90 != 0 ? 3 : 2); //tmp4
+                        (uint)mbr0.GetWithI32Buffer(chn_info.JointChnInfo.Var90 != 0 ? 3 : 2); //tmp4
                 else if (chn_info.CheckTable0[a0] == 0) chn_info.Table2[a0] = 0;
-                else if (chn_info.CheckTable0[a0] == 2) chn_info.Table2[a0] = (uint) mbr0.GetWithI32Buffer(1);
+                else if (chn_info.CheckTable0[a0] == 2) chn_info.Table2[a0] = (uint)mbr0.GetWithI32Buffer(1);
                 else
                 {
                     rs = -12;
@@ -898,7 +897,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             uint read_counter = chn_info.JointChnInfo.NumBandSplitedUsed;
             if (mbr0.GetWithI32Buffer(1) != 0)
             {
-                read_counter = (uint) mbr0.GetWithI32Buffer(5);
+                read_counter = (uint)mbr0.GetWithI32Buffer(5);
             }
 
             for (uint a0 = 0; a0 < read_counter; a0++)
@@ -909,7 +908,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                             MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table2[chn_info.JointChnInfo.Var90],
                             mbr0); //tmp4
                 else if (chn_info.CheckTable0[a0] == 0) chn_info.Table2[a0] = 0;
-                else if (chn_info.CheckTable0[a0] == 2) chn_info.Table2[a0] = (uint) mbr0.GetWithI32Buffer(1);
+                else if (chn_info.CheckTable0[a0] == 2) chn_info.Table2[a0] = (uint)mbr0.GetWithI32Buffer(1);
                 else
                 {
                     rs = -13;
@@ -928,7 +927,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             uint read_counter = chn_info.JointChnInfo.NumBandSplitedUsed;
             if (mbr0.GetWithI32Buffer(1) != 0)
             {
-                read_counter = (uint) mbr0.GetWithI32Buffer(5);
+                read_counter = (uint)mbr0.GetWithI32Buffer(5);
             }
 
             MaiAT3PlusCoreDecoderSearchTableDes huff_table_now0;
@@ -954,7 +953,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                     ptmp = chn_info.Table2[0];
                 }
                 else if (chn_info.CheckTable0[0] == 0) chn_info.Table2[0] = 0;
-                else if (chn_info.CheckTable0[0] == 2) chn_info.Table2[0] = (uint) mbr0.GetWithI32Buffer(1);
+                else if (chn_info.CheckTable0[0] == 2) chn_info.Table2[0] = (uint)mbr0.GetWithI32Buffer(1);
                 else
                 {
                     rs = -14;
@@ -971,7 +970,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                         ptmp = chn_info.Table2[a0];
                     }
                     else if (chn_info.CheckTable0[a0] == 0) chn_info.Table2[a0] = 0;
-                    else if (chn_info.CheckTable0[a0] == 2) chn_info.Table2[a0] = (uint) mbr0.GetWithI32Buffer(1);
+                    else if (chn_info.CheckTable0[a0] == 2) chn_info.Table2[a0] = (uint)mbr0.GetWithI32Buffer(1);
                     else
                     {
                         rs = -15;
@@ -1006,7 +1005,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             uint read_counter = chn_info.JointChnInfo.NumBandSplitedUsed;
             if (mbr0.GetWithI32Buffer(1) != 0)
             {
-                read_counter = (uint) mbr0.GetWithI32Buffer(5);
+                read_counter = (uint)mbr0.GetWithI32Buffer(5);
             }
 
             for (uint a0 = 0; a0 < read_counter; a0++)
@@ -1022,7 +1021,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                         .MAPCDSD_huff_table2_2[chn_info.JointChnInfo.Var90].mask;
                 }
                 else if (chn_info.CheckTable0[a0] == 0) chn_info.Table2[a0] = 0;
-                else if (chn_info.CheckTable0[a0] == 2) chn_info.Table2[a0] = (uint) mbr0.GetWithI32Buffer(1);
+                else if (chn_info.CheckTable0[a0] == 2) chn_info.Table2[a0] = (uint)mbr0.GetWithI32Buffer(1);
                 else
                 {
                     rs = -17;
@@ -1061,22 +1060,22 @@ namespace ScePSP.Hle.Formats.audio.At3
                     for (uint b1 = 0; b1 < huff_table_now.uk2; b1++)
                     {
                         uint value_now =
-                            (uint) (group_value >> (int) ((huff_table_now.uk2 - b1 - 1) * huff_table_now.uk6));
+                            (uint)(group_value >> (int)((huff_table_now.uk2 - b1 - 1) * huff_table_now.uk6));
                         value_now &= huff_table_now.mask;
 
                         if (0 == huff_table_now.uk5)
                         {
                             if ((value_now & (1 << (huff_table_now.uk6 - 1))) != 0)
-                                buf_to_read[tcounter0++] = (short) (value_now | ~((1 << huff_table_now.uk6) - 1));
+                                buf_to_read[tcounter0++] = (short)(value_now | ~((1 << huff_table_now.uk6) - 1));
                             else
-                                buf_to_read[tcounter0++] = (short) value_now;
+                                buf_to_read[tcounter0++] = (short)value_now;
                         }
                         else
                         {
                             if (value_now != 0 && mbr0.GetWithI32Buffer(1) != 0)
-                                buf_to_read[tcounter0++] = (short) ((short) value_now * -1);
+                                buf_to_read[tcounter0++] = (short)((short)value_now * -1);
                             else
-                                buf_to_read[tcounter0++] = (short) value_now;
+                                buf_to_read[tcounter0++] = (short)value_now;
                         }
                     }
                 }
@@ -1086,7 +1085,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                 uint tcounter0 = 0;
                 for (uint b0 = 0; b0 < num_to_read >> huff_table_now.uk4; b0 += huff_table_now.uk3)
                 {
-                    uint l320 = (uint) mbr0.GetWithI32Buffer(1);
+                    uint l320 = (uint)mbr0.GetWithI32Buffer(1);
                     if (0 == l320)
                     {
                         for (uint b1 = 0; b1 < huff_table_now.uk3 * huff_table_now.uk2; b1++)
@@ -1102,23 +1101,23 @@ namespace ScePSP.Hle.Formats.audio.At3
                             for (uint b1 = 0; b1 < huff_table_now.uk2; b1++)
                             {
                                 uint value_now =
-                                    (uint) (group_value >> (int) ((huff_table_now.uk2 - b1 - 1) * huff_table_now.uk6));
+                                    (uint)(group_value >> (int)((huff_table_now.uk2 - b1 - 1) * huff_table_now.uk6));
                                 value_now &= huff_table_now.mask;
 
                                 if (0 == huff_table_now.uk5)
                                 {
                                     if ((value_now & (1 << (huff_table_now.uk6 - 1))) != 0)
                                         buf_to_read[tcounter0++] =
-                                            (short) (value_now | ~((1 << huff_table_now.uk6) - 1));
+                                            (short)(value_now | ~((1 << huff_table_now.uk6) - 1));
                                     else
-                                        buf_to_read[tcounter0++] = (short) value_now;
+                                        buf_to_read[tcounter0++] = (short)value_now;
                                 }
                                 else
                                 {
                                     if (value_now != 0 && mbr0.GetWithI32Buffer(1) != 0)
-                                        buf_to_read[tcounter0++] = (short) ((short) value_now * -1);
+                                        buf_to_read[tcounter0++] = (short)((short)value_now * -1);
                                     else
-                                        buf_to_read[tcounter0++] = (short) value_now;
+                                        buf_to_read[tcounter0++] = (short)value_now;
                                 }
                             }
                         }
@@ -1154,7 +1153,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             for (uint a0 = 0; a0 < chn_info.Uk1B450; a0++)
             {
                 chn_info.AccDataNow.Table[a0].NumAcc =
-                    (int) MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_0[0], mbr0);
+                    (int)MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_0[0], mbr0);
             }
 
             return rs;
@@ -1166,12 +1165,12 @@ namespace ScePSP.Hle.Formats.audio.At3
             int rs = 0;
 
             chn_info.AccDataNow.Table[0].NumAcc =
-                (int) MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_0[0], mbr0);
+                (int)MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_0[0], mbr0);
 
             for (uint a0 = 1; a0 < chn_info.Uk1B450; a0++)
             {
                 chn_info.AccDataNow.Table[a0].NumAcc =
-                    (int) (chn_info.AccDataNow.Table[a0 - 1].NumAcc +
+                    (int)(chn_info.AccDataNow.Table[a0 - 1].NumAcc +
                            MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_1[0], mbr0));
                 chn_info.AccDataNow.Table[a0].NumAcc &= 0x7;
             }
@@ -1184,21 +1183,21 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             int rs = 0;
 
-            uint uk1b458 = (uint) mbr0.GetWithI32Buffer(2);
-            uint uk1b45c = (uint) mbr0.GetWithI32Buffer(3);
+            uint uk1b458 = (uint)mbr0.GetWithI32Buffer(2);
+            uint uk1b45c = (uint)mbr0.GetWithI32Buffer(3);
 
             if (uk1b458 != 0)
             {
                 for (uint a0 = 0; a0 < chn_info.Uk1B450; a0++)
                 {
-                    chn_info.AccDataNow.Table[a0].NumAcc = (int) (uk1b45c + mbr0.GetWithI32Buffer((int) uk1b458));
+                    chn_info.AccDataNow.Table[a0].NumAcc = (int)(uk1b45c + mbr0.GetWithI32Buffer((int)uk1b458));
                 }
             }
             else
             {
                 for (uint a0 = 0; a0 < chn_info.Uk1B450; a0++)
                 {
-                    chn_info.AccDataNow.Table[a0].NumAcc = (int) uk1b45c;
+                    chn_info.AccDataNow.Table[a0].NumAcc = (int)uk1b45c;
                 }
             }
 
@@ -1212,7 +1211,7 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             for (uint a0 = 0; a0 < chn_info.Uk1B450; a0++)
             {
-                chn_info.AccDataNow.Table[a0].NumAcc = (int) (
+                chn_info.AccDataNow.Table[a0].NumAcc = (int)(
                     chn_info.ChnRef.AccDataNow.Table[a0].NumAcc
                     + MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_1[0], mbr0)
                 );
@@ -1277,10 +1276,10 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             for (uint a0 = 0; a0 < chn_info.Uk1B450; a0++)
             {
-                for (uint a1 = 0; a1 < (uint) chn_info.AccDataNow.Table[a0].NumAcc; a1++)
+                for (uint a1 = 0; a1 < (uint)chn_info.AccDataNow.Table[a0].NumAcc; a1++)
                 {
                     chn_info.AccDataNow.Table[a0].Data1[a1] =
-                        (uint) mbr0.GetWithI32Buffer(4);
+                        (uint)mbr0.GetWithI32Buffer(4);
                 }
             }
 
@@ -1299,7 +1298,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                     chn_info.AccDataNow.Table[a0].Data1[0] =
                         MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_2[0], mbr0);
 
-                    for (uint a1 = 1; a1 < (uint) chn_info.AccDataNow.Table[a0].NumAcc; a1++)
+                    for (uint a1 = 1; a1 < (uint)chn_info.AccDataNow.Table[a0].NumAcc; a1++)
                     {
                         chn_info.AccDataNow.Table[a0].Data1[a1] =
                             chn_info.AccDataNow.Table[a0].Data1[a1 - 1]
@@ -1323,7 +1322,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             {
                 chn_info.AccDataNow.Table[0].Data1[0] =
                     MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_2[0], mbr0);
-                for (uint a1 = 1; a1 < (uint) chn_info.AccDataNow.Table[0].NumAcc; a1++)
+                for (uint a1 = 1; a1 < (uint)chn_info.AccDataNow.Table[0].NumAcc; a1++)
                 {
                     chn_info.AccDataNow.Table[0].Data1[a1] =
                         chn_info.AccDataNow.Table[0].Data1[a1 - 1]
@@ -1335,9 +1334,9 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             for (uint a0 = 1; a0 < chn_info.Uk1B450; a0++)
             {
-                for (uint a1 = 0; a1 < (uint) chn_info.AccDataNow.Table[a0].NumAcc; a1++)
+                for (uint a1 = 0; a1 < (uint)chn_info.AccDataNow.Table[a0].NumAcc; a1++)
                 {
-                    if (a1 < (uint) chn_info.AccDataNow.Table[a0 - 1].NumAcc)
+                    if (a1 < (uint)chn_info.AccDataNow.Table[a0 - 1].NumAcc)
                     {
                         chn_info.AccDataNow.Table[a0].Data1[a1] =
                             chn_info.AccDataNow.Table[a0 - 1].Data1[a1]
@@ -1366,17 +1365,17 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             int rs = 0;
 
-            uint uk1b464 = (uint) mbr0.GetWithI32Buffer(2);
-            uint uk1b468 = (uint) mbr0.GetWithI32Buffer(4);
+            uint uk1b464 = (uint)mbr0.GetWithI32Buffer(2);
+            uint uk1b468 = (uint)mbr0.GetWithI32Buffer(4);
 
             if (uk1b464 != 0)
             {
                 for (uint a0 = 0; a0 < chn_info.Uk1B450; a0++)
                 {
-                    for (uint a1 = 0; a1 < (uint) chn_info.AccDataNow.Table[a0].NumAcc; a1++)
+                    for (uint a1 = 0; a1 < (uint)chn_info.AccDataNow.Table[a0].NumAcc; a1++)
                     {
                         chn_info.AccDataNow.Table[a0].Data1[a1] =
-                            (uint) (uk1b468 + mbr0.GetWithI32Buffer((int) uk1b464));
+                            (uint)(uk1b468 + mbr0.GetWithI32Buffer((int)uk1b464));
                     }
                 }
             }
@@ -1384,7 +1383,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             {
                 for (uint a0 = 0; a0 < chn_info.Uk1B450; a0++)
                 {
-                    for (uint a1 = 0; a1 < (uint) chn_info.AccDataNow.Table[a0].NumAcc; a1++)
+                    for (uint a1 = 0; a1 < (uint)chn_info.AccDataNow.Table[a0].NumAcc; a1++)
                     {
                         chn_info.AccDataNow.Table[a0].Data1[a1] = uk1b468;
                     }
@@ -1401,9 +1400,9 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             for (uint a0 = 0; a0 < chn_info.Uk1B450; a0++)
             {
-                for (uint a1 = 0; a1 < (uint) chn_info.AccDataNow.Table[a0].NumAcc; a1++)
+                for (uint a1 = 0; a1 < (uint)chn_info.AccDataNow.Table[a0].NumAcc; a1++)
                 {
-                    if (a1 < (uint) chn_info.ChnRef.AccDataNow.Table[a0].NumAcc)
+                    if (a1 < (uint)chn_info.ChnRef.AccDataNow.Table[a0].NumAcc)
                     {
                         chn_info.AccDataNow.Table[a0].Data1[a1] =
                             chn_info.ChnRef.AccDataNow.Table[a0].Data1[a1]
@@ -1436,14 +1435,14 @@ namespace ScePSP.Hle.Formats.audio.At3
             {
                 if (chn_info.AccDataNow.Table[a0].NumAcc != 0)
                 {
-                    uint uk1b46c_x = (uint) mbr0.GetWithI32Buffer(1);
+                    uint uk1b46c_x = (uint)mbr0.GetWithI32Buffer(1);
 
                     if (uk1b46c_x != 0)
                     {
                         chn_info.AccDataNow.Table[a0].Data1[0] =
                             MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_2[0], mbr0);
 
-                        for (uint a1 = 1; a1 < (uint) chn_info.AccDataNow.Table[a0].NumAcc; a1++)
+                        for (uint a1 = 1; a1 < (uint)chn_info.AccDataNow.Table[a0].NumAcc; a1++)
                         {
                             chn_info.AccDataNow.Table[a0].Data1[a1] =
                                 chn_info.AccDataNow.Table[a0].Data1[a1 - 1]
@@ -1455,9 +1454,9 @@ namespace ScePSP.Hle.Formats.audio.At3
                     }
                     else
                     {
-                        for (uint a1 = 0; a1 < (uint) chn_info.AccDataNow.Table[a0].NumAcc; a1++)
+                        for (uint a1 = 0; a1 < (uint)chn_info.AccDataNow.Table[a0].NumAcc; a1++)
                         {
-                            if (a1 < (uint) chn_info.ChnRef.AccDataNow.Table[a0].NumAcc)
+                            if (a1 < (uint)chn_info.ChnRef.AccDataNow.Table[a0].NumAcc)
                             {
                                 chn_info.AccDataNow.Table[a0].Data1[a1] =
                                     chn_info.ChnRef.AccDataNow.Table[a0].Data1[a1];
@@ -1481,9 +1480,9 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             for (uint a0 = 0; a0 < chn_info.Uk1B450; a0++)
             {
-                for (uint a1 = 0; a1 < (uint) chn_info.AccDataNow.Table[a0].NumAcc; a1++)
+                for (uint a1 = 0; a1 < (uint)chn_info.AccDataNow.Table[a0].NumAcc; a1++)
                 {
-                    if (a1 < (uint) chn_info.ChnRef.AccDataNow.Table[a0].NumAcc)
+                    if (a1 < (uint)chn_info.ChnRef.AccDataNow.Table[a0].NumAcc)
                     {
                         chn_info.AccDataNow.Table[a0].Data1[a1] = chn_info.ChnRef.AccDataNow.Table[a0].Data1[a1];
                     }
@@ -1530,7 +1529,7 @@ namespace ScePSP.Hle.Formats.audio.At3
 
                 if (rs != 0) break;
 
-                for (int a1 = 0; a1 < (int) chn_info.AccDataNow.Table[a0].NumAcc - 1; a1++)
+                for (int a1 = 0; a1 < (int)chn_info.AccDataNow.Table[a0].NumAcc - 1; a1++)
                 {
                     if (chn_info.AccDataNow.Table[a0].Data1[a1] == chn_info.AccDataNow.Table[a0].Data1[a1 + 1])
                     {
@@ -1557,39 +1556,39 @@ namespace ScePSP.Hle.Formats.audio.At3
             }
             else
             {
-                if ((uint) chn_info.AccDataNow.Table[a0].Data0[a1 - 1] < 0xF)
+                if ((uint)chn_info.AccDataNow.Table[a0].Data0[a1 - 1] < 0xF)
                 {
                     chn_info.AccDataNow.Table[a0].Data0[a1] = mbr0.GetWithI32Buffer(5);
                 }
-                else if ((uint) chn_info.AccDataNow.Table[a0].Data0[a1 - 1] < 0x17)
+                else if ((uint)chn_info.AccDataNow.Table[a0].Data0[a1 - 1] < 0x17)
                 {
                     chn_info.AccDataNow.Table[a0].Data0[a1] =
                         chn_info.AccDataNow.Table[a0].Data0[a1 - 1]
                         + mbr0.GetWithI32Buffer(4)
                         + 1;
                 }
-                else if ((uint) chn_info.AccDataNow.Table[a0].Data0[a1 - 1] < 0x1B)
+                else if ((uint)chn_info.AccDataNow.Table[a0].Data0[a1 - 1] < 0x1B)
                 {
                     chn_info.AccDataNow.Table[a0].Data0[a1] =
                         chn_info.AccDataNow.Table[a0].Data0[a1 - 1]
                         + mbr0.GetWithI32Buffer(3)
                         + 1;
                 }
-                else if ((uint) chn_info.AccDataNow.Table[a0].Data0[a1 - 1] < 0x1D)
+                else if ((uint)chn_info.AccDataNow.Table[a0].Data0[a1 - 1] < 0x1D)
                 {
                     chn_info.AccDataNow.Table[a0].Data0[a1] =
                         chn_info.AccDataNow.Table[a0].Data0[a1 - 1]
                         + mbr0.GetWithI32Buffer(2)
                         + 1;
                 }
-                else if ((uint) chn_info.AccDataNow.Table[a0].Data0[a1 - 1] == 0x1D)
+                else if ((uint)chn_info.AccDataNow.Table[a0].Data0[a1 - 1] == 0x1D)
                 {
                     chn_info.AccDataNow.Table[a0].Data0[a1] =
                         chn_info.AccDataNow.Table[a0].Data0[a1 - 1]
                         + mbr0.GetWithI32Buffer(1)
                         + 1;
                 }
-                else if ((uint) chn_info.AccDataNow.Table[a0].Data0[a1 - 1] == 0x1E)
+                else if ((uint)chn_info.AccDataNow.Table[a0].Data0[a1 - 1] == 0x1E)
                 {
                     chn_info.AccDataNow.Table[a0].Data0[a1] = 0x1F;
                 }
@@ -1605,7 +1604,7 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             for (uint a0 = 0; a0 < chn_info.Uk1B450; a0++)
             {
-                for (uint a1 = 0; a1 < (uint) chn_info.AccDataNow.Table[a0].NumAcc; a1++)
+                for (uint a1 = 0; a1 < (uint)chn_info.AccDataNow.Table[a0].NumAcc; a1++)
                 {
                     MAPCDSF_parseACCDataMemberUsingBitRead(a0, a1, mbr0, chn_info);
                 }
@@ -1624,12 +1623,12 @@ namespace ScePSP.Hle.Formats.audio.At3
                 chn_info.AccDataNow.Table[a0].Data0[0] =
                     mbr0.GetWithI32Buffer(5);
 
-                for (uint a1 = 1; a1 < (uint) chn_info.AccDataNow.Table[a0].NumAcc; a1++)
+                for (uint a1 = 1; a1 < (uint)chn_info.AccDataNow.Table[a0].NumAcc; a1++)
                 {
                     MaiAT3PlusCoreDecoderSearchTableDes huff_table_now = null;
 
-                    if ((int) chn_info.AccDataNow.Table[a0].Data1[a1]
-                        - (int) chn_info.AccDataNow.Table[a0].Data1[a1 - 1]
+                    if ((int)chn_info.AccDataNow.Table[a0].Data1[a1]
+                        - (int)chn_info.AccDataNow.Table[a0].Data1[a1 - 1]
                         <= 0)
                     {
                         huff_table_now = MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_6[0];
@@ -1639,7 +1638,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                         huff_table_now = MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_7[0];
                     }
 
-                    chn_info.AccDataNow.Table[a0].Data0[a1] = (int) (
+                    chn_info.AccDataNow.Table[a0].Data0[a1] = (int)(
                         chn_info.AccDataNow.Table[a0].Data0[a1 - 1]
                         + MAPCDSF_getHuffValue(huff_table_now, mbr0)
                     );
@@ -1671,7 +1670,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             {
                 if (chn_info.AccDataNow.Table[a0 - 1].NumAcc != 0)
                 {
-                    chn_info.AccDataNow.Table[a0].Data0[0] = (int) (
+                    chn_info.AccDataNow.Table[a0].Data0[0] = (int)(
                         chn_info.AccDataNow.Table[a0 - 1].Data0[0]
                         + MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_8[0], mbr0)
                     );
@@ -1681,20 +1680,20 @@ namespace ScePSP.Hle.Formats.audio.At3
                 else
                 {
                     chn_info.AccDataNow.Table[a0].Data0[0] =
-                        (int) MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_8[0],
+                        (int)MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_8[0],
                             mbr0);
                 }
 
-                for (uint a1 = 1; a1 < (uint) chn_info.AccDataNow.Table[a0].NumAcc; a1++)
+                for (uint a1 = 1; a1 < (uint)chn_info.AccDataNow.Table[a0].NumAcc; a1++)
                 {
                     MaiAT3PlusCoreDecoderSearchTableDes huff_table_now = null;
 
                     uint check_value0 = 0;
-                    if (a1 >= (uint) chn_info.AccDataNow.Table[a0 - 1].NumAcc)
+                    if (a1 >= (uint)chn_info.AccDataNow.Table[a0 - 1].NumAcc)
                         check_value0 = 1;
 
-                    if ((int) chn_info.AccDataNow.Table[a0].Data1[a1]
-                        - (int) chn_info.AccDataNow.Table[a0].Data1[a1 - 1]
+                    if ((int)chn_info.AccDataNow.Table[a0].Data1[a1]
+                        - (int)chn_info.AccDataNow.Table[a0].Data1[a1 - 1]
                         <= 0)
                     {
                         if (check_value0 != 0)
@@ -1722,13 +1721,13 @@ namespace ScePSP.Hle.Formats.audio.At3
                     {
                         chn_info.AccDataNow.Table[a0].Data0[a1] =
                             chn_info.AccDataNow.Table[a0].Data0[a1 - 1]
-                            + (int) MAPCDSF_getHuffValue(huff_table_now, mbr0);
+                            + (int)MAPCDSF_getHuffValue(huff_table_now, mbr0);
                     }
                     else
                     {
                         chn_info.AccDataNow.Table[a0].Data0[a1] =
                             chn_info.AccDataNow.Table[a0 - 1].Data0[a1]
-                            + (int) MAPCDSF_getHuffValue(huff_table_now, mbr0);
+                            + (int)MAPCDSF_getHuffValue(huff_table_now, mbr0);
 
                         chn_info.AccDataNow.Table[a0].Data0[a1] &= 0x1F;
                     }
@@ -1743,7 +1742,7 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             int rs = 0;
 
-            for (uint a1 = 0; a1 < (uint) chn_info.AccDataNow.Table[0].NumAcc; a1++)
+            for (uint a1 = 0; a1 < (uint)chn_info.AccDataNow.Table[0].NumAcc; a1++)
             {
                 MAPCDSF_parseACCDataMemberUsingBitRead(0, a1, mbr0, chn_info);
             }
@@ -1761,15 +1760,15 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             int rs = 0;
 
-            uint uk1b4b0 = (uint) mbr0.GetWithI32Buffer(2) + 1;
-            uint uk1b4b4 = (uint) mbr0.GetWithI32Buffer(5);
+            uint uk1b4b0 = (uint)mbr0.GetWithI32Buffer(2) + 1;
+            uint uk1b4b4 = (uint)mbr0.GetWithI32Buffer(5);
 
             for (uint a0 = 0; a0 < chn_info.Uk1B450; a0++)
             {
-                for (uint a1 = 0; a1 < (uint) chn_info.AccDataNow.Table[a0].NumAcc; a1++)
+                for (uint a1 = 0; a1 < (uint)chn_info.AccDataNow.Table[a0].NumAcc; a1++)
                 {
-                    chn_info.AccDataNow.Table[a0].Data0[a1] = (int) (
-                        mbr0.GetWithI32Buffer((int) uk1b4b0)
+                    chn_info.AccDataNow.Table[a0].Data0[a1] = (int)(
+                        mbr0.GetWithI32Buffer((int)uk1b4b0)
                         + uk1b4b4
                         + a1
                     );
@@ -1788,7 +1787,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             {
                 if (chn_info.ChnRef.AccDataNow.Table[a0].NumAcc != 0)
                 {
-                    chn_info.AccDataNow.Table[a0].Data0[0] = (int) (
+                    chn_info.AccDataNow.Table[a0].Data0[0] = (int)(
                         chn_info.ChnRef.AccDataNow.Table[a0].Data0[0]
                         + MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_10[0], mbr0)
                     );
@@ -1797,17 +1796,17 @@ namespace ScePSP.Hle.Formats.audio.At3
                 }
                 else
                 {
-                    chn_info.AccDataNow.Table[a0].Data0[0] = (int) MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_10[0], mbr0);
+                    chn_info.AccDataNow.Table[a0].Data0[0] = (int)MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_10[0], mbr0);
                 }
 
-                for (uint a1 = 1; a1 < (uint) chn_info.AccDataNow.Table[a0].NumAcc; a1++)
+                for (uint a1 = 1; a1 < (uint)chn_info.AccDataNow.Table[a0].NumAcc; a1++)
                 {
                     uint check_value0 = 0;
-                    if (a1 >= (uint) chn_info.ChnRef.AccDataNow.Table[a0].NumAcc)
+                    if (a1 >= (uint)chn_info.ChnRef.AccDataNow.Table[a0].NumAcc)
                         check_value0 = 1;
 
-                    if ((int) chn_info.AccDataNow.Table[a0].Data1[a1]
-                        - (int) chn_info.AccDataNow.Table[a0].Data1[a1 - 1]
+                    if ((int)chn_info.AccDataNow.Table[a0].Data1[a1]
+                        - (int)chn_info.AccDataNow.Table[a0].Data1[a1 - 1]
                         <= 0)
                     {
                         MaiAT3PlusCoreDecoderSearchTableDes huff_table_now = null;
@@ -1823,7 +1822,7 @@ namespace ScePSP.Hle.Formats.audio.At3
 
                         if (0 == check_value0)
                         {
-                            chn_info.AccDataNow.Table[a0].Data0[a1] = (int) (
+                            chn_info.AccDataNow.Table[a0].Data0[a1] = (int)(
                                 chn_info.ChnRef.AccDataNow.Table[a0].Data0[a1]
                                 + MAPCDSF_getHuffValue(huff_table_now, mbr0)
                             );
@@ -1832,7 +1831,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                         }
                         else
                         {
-                            chn_info.AccDataNow.Table[a0].Data0[a1] = (int) (
+                            chn_info.AccDataNow.Table[a0].Data0[a1] = (int)(
                                 chn_info.AccDataNow.Table[a0].Data0[a1 - 1]
                                 + MAPCDSF_getHuffValue(huff_table_now, mbr0)
                             );
@@ -1854,7 +1853,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                         }
                         else
                         {
-                            chn_info.AccDataNow.Table[a0].Data0[a1] = (int) (
+                            chn_info.AccDataNow.Table[a0].Data0[a1] = (int)(
                                 chn_info.AccDataNow.Table[a0].Data0[a1 - 1]
                                 + MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_7[0],
                                     mbr0)
@@ -1889,12 +1888,12 @@ namespace ScePSP.Hle.Formats.audio.At3
             {
                 if (chn_info.AccDataNow.Table[a0].NumAcc != 0)
                 {
-                    if ((uint) chn_info.AccDataNow.Table[a0].NumAcc
-                        <= (uint) chn_info.ChnRef.AccDataNow.Table[a0].NumAcc
+                    if ((uint)chn_info.AccDataNow.Table[a0].NumAcc
+                        <= (uint)chn_info.ChnRef.AccDataNow.Table[a0].NumAcc
                         && 0 == mbr0.GetWithI32Buffer(1)
                     )
                     {
-                        for (uint a1 = 0; a1 < (uint) chn_info.AccDataNow.Table[a0].NumAcc; a1++)
+                        for (uint a1 = 0; a1 < (uint)chn_info.AccDataNow.Table[a0].NumAcc; a1++)
                         {
                             chn_info.AccDataNow.Table[a0].Data0[a1] =
                                 chn_info.ChnRef.AccDataNow.Table[a0].Data0[a1];
@@ -1917,9 +1916,9 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             for (uint a0 = 0; a0 < chn_info.Uk1B450; a0++)
             {
-                for (uint a1 = 0; a1 < (uint) chn_info.AccDataNow.Table[a0].NumAcc; a1++)
+                for (uint a1 = 0; a1 < (uint)chn_info.AccDataNow.Table[a0].NumAcc; a1++)
                 {
-                    if (a1 < (uint) chn_info.ChnRef.AccDataNow.Table[a0].NumAcc)
+                    if (a1 < (uint)chn_info.ChnRef.AccDataNow.Table[a0].NumAcc)
                     {
                         chn_info.AccDataNow.Table[a0].Data0[a1] = chn_info.ChnRef.AccDataNow.Table[a0].Data0[a1];
                     }
@@ -1968,7 +1967,7 @@ namespace ScePSP.Hle.Formats.audio.At3
 
                 if (rs != 0) break;
 
-                for (int a1 = 0; a1 < (int) chn_info.AccDataNow.Table[a0].NumAcc - 1; a1++)
+                for (int a1 = 0; a1 < (int)chn_info.AccDataNow.Table[a0].NumAcc - 1; a1++)
                 {
                     if (chn_info.AccDataNow.Table[a0].Data0[a1]
                         >=
@@ -1995,14 +1994,14 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             if (chn_info.ChnFlag == 0)
             {
-                for (uint a0 = 0; a0 < (uint) acc_table_to_use.Inner.Unk2; a0++)
+                for (uint a0 = 0; a0 < (uint)acc_table_to_use.Inner.Unk2; a0++)
                 {
                     chn_info.InnerPackTable0CheckTable[a0] = 1;
                 }
             }
             else
             {
-                for (uint a0 = 0; a0 < (uint) acc_table_to_use.Inner.Unk2; a0++)
+                for (uint a0 = 0; a0 < (uint)acc_table_to_use.Inner.Unk2; a0++)
                 {
                     if (0 == acc_table_to_use.Inner.TableUnk0.Data[a0])
                     {
@@ -2023,7 +2022,7 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             int rs = 0;
 
-            for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+            for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
             {
                 if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                 {
@@ -2058,7 +2057,7 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             int rs = 0;
 
-            for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+            for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
             {
                 if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                 {
@@ -2084,7 +2083,7 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             int rs = 0;
 
-            for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+            for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
             {
                 if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                 {
@@ -2100,12 +2099,12 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             int rs = 0;
 
-            for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+            for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
             {
                 if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                 {
                     chn_info.AccTableNow.Table[a0].NumUk =
-                        (int) MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_12[0],
+                        (int)MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_12[0],
                             mbr0);
                 }
             }
@@ -2118,16 +2117,16 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             int rs = 0;
 
-            for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+            for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
             {
                 if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                 {
-                    int atmp0 = (int) MAPCDSF_getHuffValue(
+                    int atmp0 = (int)MAPCDSF_getHuffValue(
                         MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_13[0], mbr0);
 
                     if ((atmp0 & 0x4) != 0)
                     {
-                        atmp0 |= unchecked((int) 0xFFFFFFF8);
+                        atmp0 |= unchecked((int)0xFFFFFFF8);
                     }
                     else
                     {
@@ -2148,7 +2147,7 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             int rs = 0;
 
-            for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+            for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
             {
                 if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                 {
@@ -2172,7 +2171,7 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             int rs = 0;
 
-            for (int a0 = 0; a0 < (int) table.NumUk; a0++)
+            for (int a0 = 0; a0 < (int)table.NumUk; a0++)
             {
                 if (0 == a0)
                 {
@@ -2290,18 +2289,18 @@ namespace ScePSP.Hle.Formats.audio.At3
             int rs = 0;
 
             uint uk1c730;
-            for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+            for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
             {
                 if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                 {
-                    if ((uint) chn_info.AccTableNow.Table[a0].NumUk <= 1)
+                    if ((uint)chn_info.AccTableNow.Table[a0].NumUk <= 1)
                     {
                         uk1c730 = 0;
                         MAPCDSF_calcACCTableTableUnk3ByLastValue(chn_info.AccTableNow.Table[a0], mbr0);
                     }
                     else
                     {
-                        uk1c730 = (uint) mbr0.GetWithI32Buffer(1);
+                        uk1c730 = (uint)mbr0.GetWithI32Buffer(1);
                         if (0 == uk1c730)
                         {
                             MAPCDSF_calcACCTableTableUnk3ByLastValue(chn_info.AccTableNow.Table[a0], mbr0);
@@ -2322,18 +2321,18 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             int rs = 0;
 
-            for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+            for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
             {
                 if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                 {
-                    for (uint a1 = 0; a1 < (uint) chn_info.AccTableNow.Table[a0].NumUk; a1++)
+                    for (uint a1 = 0; a1 < (uint)chn_info.AccTableNow.Table[a0].NumUk; a1++)
                     {
-                        int atmp0 = (int) MAPCDSF_getHuffValue(
+                        int atmp0 = (int)MAPCDSF_getHuffValue(
                             MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_14[0], mbr0);
-                        if ((atmp0 & 0x80) != 0) atmp0 |= unchecked((int) 0xFFFFFF00);
+                        if ((atmp0 & 0x80) != 0) atmp0 |= unchecked((int)0xFFFFFF00);
                         else atmp0 &= 0xFF;
 
-                        if (a1 < (uint) chn_info.ChnRef.AccTableNow.Table[a0].NumUk)
+                        if (a1 < (uint)chn_info.ChnRef.AccTableNow.Table[a0].NumUk)
                         {
                             chn_info.AccTableNow.Table[a0].Ptr0[a1].Unk3 =
                                 chn_info.ChnRef.AccTableNow.Table[a0].Ptr0[a1].Unk3 + atmp0;
@@ -2374,7 +2373,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             int* stmp34 = stackalloc int[0x80];
             int l22 = 0;
 
-            for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+            for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
             {
                 if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                 {
@@ -2443,7 +2442,7 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             if (0 == chn_info.AccTableNow.Inner.Unk1)
             {
-                for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+                for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
                 {
                     if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                     {
@@ -2462,7 +2461,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             }
             else
             {
-                for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+                for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
                 {
                     if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                     {
@@ -2483,14 +2482,14 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             if (0 == chn_info.AccTableNow.Inner.Unk1)
             {
-                for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+                for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
                 {
                     if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                     {
                         if (chn_info.AccTableNow.Table[a0].NumUk != 0)
                         {
                             chn_info.AccTableNow.Table[a0].Ptr0[0].Unk0 =
-                                (int) (0x18 + MAPCDSF_getHuffValue(
+                                (int)(0x18 + MAPCDSF_getHuffValue(
                                            MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_15[0], mbr0));
 
                             for (int a1 = 1; a1 < chn_info.AccTableNow.Table[a0].NumUk; a1++)
@@ -2504,14 +2503,14 @@ namespace ScePSP.Hle.Formats.audio.At3
             }
             else
             {
-                for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+                for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
                 {
                     if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                     {
                         for (int a1 = 0; a1 < chn_info.AccTableNow.Table[a0].NumUk; a1++)
                         {
                             chn_info.AccTableNow.Table[a0].Ptr0[a1].Unk0 =
-                                (int) (0x14 + MAPCDSF_getHuffValue(
+                                (int)(0x14 + MAPCDSF_getHuffValue(
                                            MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_16[0], mbr0));
                         }
                     }
@@ -2530,18 +2529,18 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             if (0 == chn_info.AccTableNow.Inner.Unk1)
             {
-                for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+                for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
                 {
                     if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                     {
                         if (chn_info.AccTableNow.Table[a0].NumUk > 0)
                         {
-                            int atmp0 = (int) MAPCDSF_getHuffValue(
+                            int atmp0 = (int)MAPCDSF_getHuffValue(
                                 MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_17[0], mbr0);
 
                             if ((atmp0 & 0x10) != 0)
                             {
-                                atmp0 |= unchecked((int) 0xFFFFFFE0);
+                                atmp0 |= unchecked((int)0xFFFFFFE0);
                             }
                             else
                             {
@@ -2571,18 +2570,18 @@ namespace ScePSP.Hle.Formats.audio.At3
             }
             else
             {
-                for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+                for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
                 {
                     if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                     {
                         for (int a1 = 0; a1 < chn_info.AccTableNow.Table[a0].NumUk; a1++)
                         {
-                            int atmp0 = (int) MAPCDSF_getHuffValue(
+                            int atmp0 = (int)MAPCDSF_getHuffValue(
                                 MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_17[0], mbr0);
 
                             if ((atmp0 & 0x10) != 0)
                             {
-                                atmp0 |= unchecked((int) 0xFFFFFFE0);
+                                atmp0 |= unchecked((int)0xFFFFFFE0);
                             }
                             else
                             {
@@ -2619,7 +2618,7 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             if (0 == chn_info.AccTableNow.Inner.Unk1)
             {
-                for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+                for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
                 {
                     if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                     {
@@ -2646,7 +2645,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             }
             else
             {
-                for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+                for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
                 {
                     if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                     {
@@ -2683,7 +2682,7 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             int rs = 0;
 
-            for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+            for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
             {
                 if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                 {
@@ -2702,14 +2701,14 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             int rs = 0;
 
-            for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+            for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
             {
                 if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                 {
                     if (chn_info.AccTableNow.Table[a0].NumUk == 1)
                     {
                         chn_info.AccTableNow.Table[a0].Ptr0[0].Unk1 =
-                            (int) MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_18[0],
+                            (int)MAPCDSF_getHuffValue(MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_18[0],
                                 mbr0);
                     }
                     else
@@ -2717,7 +2716,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                         for (int a1 = 0; a1 < chn_info.AccTableNow.Table[a0].NumUk; a1++)
                         {
                             chn_info.AccTableNow.Table[a0].Ptr0[a1].Unk1 =
-                                (int) MAPCDSF_getHuffValue(
+                                (int)MAPCDSF_getHuffValue(
                                     MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_19[0], mbr0);
                         }
                     }
@@ -2733,18 +2732,18 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             int l5 = 0;
 
-            for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+            for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
             {
                 if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                 {
                     for (int a1 = 0; a1 < chn_info.AccTableNow.Table[a0].NumUk; a1++)
                     {
-                        int atmp0 = (int) MAPCDSF_getHuffValue(
+                        int atmp0 = (int)MAPCDSF_getHuffValue(
                             MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_huff_table_global_20[0], mbr0);
 
                         if ((atmp0 & 0x4) != 0)
                         {
-                            atmp0 |= unchecked((int) 0xFFFFFFF8);
+                            atmp0 |= unchecked((int)0xFFFFFFF8);
                         }
                         else
                         {
@@ -2779,7 +2778,7 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             int l4 = 0;
 
-            for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+            for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
             {
                 if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                 {
@@ -2815,7 +2814,7 @@ namespace ScePSP.Hle.Formats.audio.At3
         {
             int rs = 0;
 
-            for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+            for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
             {
                 if (chn_info.InnerPackTable0CheckTable[a0] != 0)
                 {
@@ -2834,7 +2833,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             int rs = 0;
 
             int atmp0 = 0;
-            for (uint a0 = 0; a0 < (uint) chn_info.AccTableNow.Inner.Unk2; a0++)
+            for (uint a0 = 0; a0 < (uint)chn_info.AccTableNow.Inner.Unk2; a0++)
             {
                 chn_info.AccTableNow.Table[a0].Ptr0 = atmp0 + chn_info.AccTableNow.Inner.PtrToUseNow;
                 atmp0 += chn_info.AccTableNow.Table[a0].NumUk;
@@ -2845,7 +2844,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             uint tmp0 = 0;
             if (chn_info.ChnFlag == 1)
             {
-                tmp0 = (uint) mbr0.GetWithI32Buffer(1);
+                tmp0 = (uint)mbr0.GetWithI32Buffer(1);
             }
 
             MAPCDSF_splitePack_func_list0[tmp0](mbr0, chn_info);
@@ -2855,13 +2854,13 @@ namespace ScePSP.Hle.Formats.audio.At3
                 MAPCDSF_makeTable11C(mbr0, chn_info);
             }
 
-            uint tmp1 = (uint) mbr0.GetWithI32Buffer(chn_info.ChnFlag + 1);
+            uint tmp1 = (uint)mbr0.GetWithI32Buffer(chn_info.ChnFlag + 1);
 
             MAPCDSF_splitePack_func_list1[tmp1](mbr0, chn_info);
 
             if (chn_info.AccTableNow.Inner.Unk1 == 0)
             {
-                uint tmp2 = (uint) mbr0.GetWithI32Buffer(chn_info.ChnFlag + 1);
+                uint tmp2 = (uint)mbr0.GetWithI32Buffer(chn_info.ChnFlag + 1);
                 MAPCDSF_splitePack_func_list2[tmp2](mbr0, chn_info);
             }
 
@@ -2879,12 +2878,12 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             uint route_flag0 = 0;
 
-            if (chn_info.ChnFlag == 1) route_flag0 = (uint) mbr0.GetWithI32Buffer(1);
+            if (chn_info.ChnFlag == 1) route_flag0 = (uint)mbr0.GetWithI32Buffer(1);
 
             MAPCDSF_decodeACC6InnerSub0_func_list0[route_flag0](mbr0, chn_info);
 
             {
-                uint route_flag1 = (uint) mbr0.GetWithI32Buffer(chn_info.ChnFlag + 1);
+                uint route_flag1 = (uint)mbr0.GetWithI32Buffer(chn_info.ChnFlag + 1);
                 MAPCDSF_decodeACC6InnerSub0_func_list1[route_flag1](mbr0, chn_info);
             }
 

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.Linq;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Core.Cpu.VFpu
 {
@@ -80,7 +80,7 @@ namespace ScePSP.Core.Cpu.VFpu
         {
             switch (registerInfo.RegisterType)
             {
-                case VfpuRegisterType.Cell: return new[] {GetIndexCell(registerInfo)};
+                case VfpuRegisterType.Cell: return new[] { GetIndexCell(registerInfo) };
                 case VfpuRegisterType.Vector: return GetIndicesVector(registerInfo);
                 case VfpuRegisterType.Matrix: return GetIndicesMatrix(registerInfo).Compact();
                 default:

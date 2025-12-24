@@ -1,7 +1,7 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Hle.Managers
 {
@@ -9,7 +9,7 @@ namespace ScePSP.Hle.Managers
     {
         protected TKey LastId = default(TKey);
         protected Dictionary<TKey, TType> Items = new Dictionary<TKey, TType>();
-        protected SceKernelErrors OnKeyNotFoundError = unchecked((SceKernelErrors) 0xDEAD0017);
+        protected SceKernelErrors OnKeyNotFoundError = unchecked((SceKernelErrors)0xDEAD0017);
 
         public HleUidPoolSpecial()
         {
@@ -23,7 +23,7 @@ namespace ScePSP.Hle.Managers
             {
                 this.OnKeyNotFoundError = Attribute.NotFoundError;
             }
-            this.LastId = (TKey) (object) 1;
+            this.LastId = (TKey)(object)1;
         }
 
         public HleUidPoolSpecial(TKey FirstId)
@@ -42,10 +42,10 @@ namespace ScePSP.Hle.Managers
         {
             if (TKeyType.IsEnum)
             {
-                return (TKey) Enum.ToObject(typeof(TKey), Value);
+                return (TKey)Enum.ToObject(typeof(TKey), Value);
             }
-            if (TKeyType == typeof(int)) return (TKey) (object) (int) Value;
-            return (TKey) (object) Value;
+            if (TKeyType == typeof(int)) return (TKey)(object)(int)Value;
+            return (TKey)(object)Value;
         }
 
         public TType Set(TKey Id, TType Value)

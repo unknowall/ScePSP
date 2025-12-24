@@ -90,7 +90,7 @@ namespace ScePSPUtils.Extensions
         public static IEnumerable<TSource> OrderByNatural<TSource, TString>(this IEnumerable<TSource> items,
             Func<TSource, TString> selector)
         {
-            object Convert(string str) => int.TryParse(str, out int result) ? (object) result : str;
+            object Convert(string str) => int.TryParse(str, out int result) ? (object)result : str;
 
             return items.OrderBy(
                 item => Regex.Split(selector(item).ToString().Replace(" ", ""), "([0-9]+)").Select(Convert),

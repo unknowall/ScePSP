@@ -1,5 +1,5 @@
-﻿using System;
-using ScePSPPlatform.GL.Impl.Windows;
+﻿using ScePSPPlatform.GL.Impl.Windows;
+using System;
 
 namespace ScePSPPlatform.GL.Impl.Android
 {

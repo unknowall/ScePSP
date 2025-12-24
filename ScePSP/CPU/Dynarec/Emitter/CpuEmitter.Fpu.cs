@@ -1,7 +1,7 @@
-﻿using System;
-using SafeILGenerator.Ast.Nodes;
-using ScePSPUtils;
+﻿using SafeILGenerator.Ast.Nodes;
 using ScePSP.Core.Cpu.Table;
+using ScePSPUtils;
+using System;
 
 namespace ScePSP.Core.Cpu.Emitter
 {
@@ -28,11 +28,11 @@ namespace ScePSP.Core.Cpu.Emitter
         /////////////////////////////////////////////////////////////////////////////////////////////////
         [InstructionName(InstructionNames.SqrtS)]
         public AstNodeStm sqrt_s() =>
-            _ast.AssignFPR_F(Fd, _ast.CallStatic((Func<float, float>) MathFloat.Sqrt, _ast.Fpr(Fs)));
+            _ast.AssignFPR_F(Fd, _ast.CallStatic((Func<float, float>)MathFloat.Sqrt, _ast.Fpr(Fs)));
 
         [InstructionName(InstructionNames.AbsS)]
         public AstNodeStm abs_s() =>
-            _ast.AssignFPR_F(Fd, _ast.CallStatic((Func<float, float>) MathFloat.Abs, _ast.Fpr(Fs)));
+            _ast.AssignFPR_F(Fd, _ast.CallStatic((Func<float, float>)MathFloat.Abs, _ast.Fpr(Fs)));
 
         [InstructionName(InstructionNames.MovS)]
         public AstNodeStm mov_s() => _ast.AssignFPR_F(Fd, _ast.Fpr(Fs));
@@ -42,19 +42,19 @@ namespace ScePSP.Core.Cpu.Emitter
 
         [InstructionName(InstructionNames.TruncWS)]
         public AstNodeStm trunc_w_s() =>
-            _ast.AssignFPR_I(Fd, _ast.CallStatic((Func<float, int>) MathFloat.Cast, _ast.Fpr(Fs)));
+            _ast.AssignFPR_I(Fd, _ast.CallStatic((Func<float, int>)MathFloat.Cast, _ast.Fpr(Fs)));
 
         [InstructionName(InstructionNames.RoundWS)]
         public AstNodeStm round_w_s() =>
-            _ast.AssignFPR_I(Fd, _ast.CallStatic((Func<float, int>) MathFloat.Round, _ast.Fpr(Fs)));
+            _ast.AssignFPR_I(Fd, _ast.CallStatic((Func<float, int>)MathFloat.Round, _ast.Fpr(Fs)));
 
         [InstructionName(InstructionNames.CeilWS)]
         public AstNodeStm ceil_w_s() =>
-            _ast.AssignFPR_I(Fd, _ast.CallStatic((Func<float, int>) MathFloat.Ceil, _ast.Fpr(Fs)));
+            _ast.AssignFPR_I(Fd, _ast.CallStatic((Func<float, int>)MathFloat.Ceil, _ast.Fpr(Fs)));
 
         [InstructionName(InstructionNames.FloorWS)]
         public AstNodeStm floor_w_s() =>
-            _ast.AssignFPR_I(Fd, _ast.CallStatic((Func<float, int>) MathFloat.Floor, _ast.Fpr(Fs)));
+            _ast.AssignFPR_I(Fd, _ast.CallStatic((Func<float, int>)MathFloat.Floor, _ast.Fpr(Fs)));
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // Convert FS register (stored as an int) to float and stores the result on FD.
@@ -65,7 +65,7 @@ namespace ScePSP.Core.Cpu.Emitter
 
         [InstructionName(InstructionNames.CvtWS)]
         public AstNodeStm cvt_w_s() => _ast.AssignFPR_I(Fd,
-            _ast.CallStatic((Func<CpuThreadState, float, int>) CpuEmitterUtils._cvt_w_s_impl, _ast.CpuThreadStateExpr,
+            _ast.CallStatic((Func<CpuThreadState, float, int>)CpuEmitterUtils._cvt_w_s_impl, _ast.CpuThreadStateExpr,
                 _ast.Fpr(Fs)));
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,11 +73,11 @@ namespace ScePSP.Core.Cpu.Emitter
         /////////////////////////////////////////////////////////////////////////////////////////////////
         [InstructionName(InstructionNames.Mfc1)]
         public AstNodeStm Mfc1() => _ast.AssignGpr(Rt,
-            _ast.CallStatic((Func<float, int>) MathFloat.ReinterpretFloatAsInt, _ast.Fpr(Fs)));
+            _ast.CallStatic((Func<float, int>)MathFloat.ReinterpretFloatAsInt, _ast.Fpr(Fs)));
 
         [InstructionName(InstructionNames.Mtc1)]
         public AstNodeStm Mtc1() => _ast.AssignFPR_F(Fs,
-            _ast.CallStatic((Func<int, float>) MathFloat.ReinterpretIntAsFloat, _ast.GPR_s(Rt)));
+            _ast.CallStatic((Func<int, float>)MathFloat.ReinterpretIntAsFloat, _ast.GPR_s(Rt)));
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // Load Word to Cop1 floating point.
@@ -94,12 +94,12 @@ namespace ScePSP.Core.Cpu.Emitter
         /////////////////////////////////////////////////////////////////////////////////////////////////
         [InstructionName(InstructionNames.Cfc1)]
         public AstNodeStm Cfc1() => _ast.Statement(_ast.CallStatic(
-            (Action<CpuThreadState, int, int>) CpuEmitterUtils._cfc1_impl,
+            (Action<CpuThreadState, int, int>)CpuEmitterUtils._cfc1_impl,
             _ast.CpuThreadStateExpr, Rd, Rt));
 
         [InstructionName(InstructionNames.Ctc1)]
         public AstNodeStm Ctc1() => _ast.Statement(_ast.CallStatic(
-            (Action<CpuThreadState, int, int>) CpuEmitterUtils._ctc1_impl,
+            (Action<CpuThreadState, int, int>)CpuEmitterUtils._ctc1_impl,
             _ast.CpuThreadStateExpr, Rd, Rt));
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace ScePSP.Core.Cpu.Emitter
             //MipsMethodEmitter.LoadFPR(FT);
 
             return _ast.Statement(_ast.CallStatic(
-                (Action<CpuThreadState, float, float, bool, bool, bool, bool>) CpuEmitterUtils._comp_impl,
+                (Action<CpuThreadState, float, float, bool, bool, bool, bool>)CpuEmitterUtils._comp_impl,
                 _ast.CpuThreadStateExpr,
                 _ast.Fpr(Fs),
                 _ast.Fpr(Ft),
@@ -215,7 +215,7 @@ namespace ScePSP.Core.Cpu.Emitter
 
         [InstructionName(InstructionNames.CNgtS)]
         public AstNodeStm c_ngt_s() => _comp(7, 1);
-        
+
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // bc1(f/t)(l): Branch on C1 (False/True) (Likely)
         /////////////////////////////////////////////////////////////////////////////////////////////////

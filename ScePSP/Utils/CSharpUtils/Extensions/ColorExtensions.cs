@@ -14,7 +14,7 @@ namespace ScePSPUtils.Drawing.Extensions
         /// <returns></returns>
         public static ushort Encode565(this Color color)
         {
-            return (ushort) color.Encode(ColorFormats.Rgba5650);
+            return (ushort)color.Encode(ColorFormats.Rgba5650);
         }
 
         /// <summary>

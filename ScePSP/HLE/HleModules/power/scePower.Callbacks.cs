@@ -147,7 +147,7 @@ namespace ScePSP.Hle.Modules.power
             var Callback = CallbackManager.Callbacks.Get(CallbackId);
             var RegisteredCallback = HleCallback.Create(
                 "scePowerRegisterCallback", Callback.Function,
-                SlotIndex + 1, (int) GetPowerCallbackFlags(), Callback.Arguments[0]
+                SlotIndex + 1, (int)GetPowerCallbackFlags(), Callback.Arguments[0]
             );
 
             CallbackManager.ScheduleCallback(RegisteredCallback);

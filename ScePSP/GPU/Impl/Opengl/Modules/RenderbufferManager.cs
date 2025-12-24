@@ -1,12 +1,12 @@
-﻿using ScePSPPlatform.GL;
-using ScePSPPlatform.GL.Utils;
-using ScePSP.Core.Cpu;
+﻿using ScePSP.Core.Cpu;
 using ScePSP.Core.Gpu.State;
 using ScePSP.Core.Types;
+using ScePSPPlatform.GL;
+using ScePSPPlatform.GL.Utils;
+using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Core.Gpu.Impl.Opengl.Modules
 {

@@ -1,7 +1,7 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.IO;
 using System.Text;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Hle.Formats
 {

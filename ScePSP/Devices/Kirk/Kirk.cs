@@ -1,10 +1,10 @@
 ﻿//#define USE_DOTNET_CRYPTO
 
+using ScePSPUtils;
+using ScePSPUtils.Extensions;
 using System;
 using System.IO;
 using System.Security.Cryptography;
-using ScePSPUtils;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Core.Components.Crypto
 {
@@ -25,9 +25,9 @@ namespace ScePSP.Core.Components.Crypto
 
         byte[] fuseID = new byte[16]; // Emulate FUSEID	
 
-//#if !USE_DOTNET_CRYPTO
+        //#if !USE_DOTNET_CRYPTO
         Crypto.AesCtx _aesKirk1; //global
-//#endif
+                                 //#endif
 
         Random _random;
 
@@ -56,13 +56,13 @@ namespace ScePSP.Core.Components.Crypto
 
             fixed (byte* cmacHeaderHash = cmacHeaderHashBytes)
             fixed (byte* cmacDataHash = cmacDataHashBytes)
-//#if !USE_DOTNET_CRYPTO
+            //#if !USE_DOTNET_CRYPTO
             fixed (Crypto.AesCtx* aesKirk1Ptr = &_aesKirk1)
-//#endif
+            //#endif
             {
                 check_initialized();
 
-                Aes128CmacHeader* header = (Aes128CmacHeader*) outbuff;
+                Aes128CmacHeader* header = (Aes128CmacHeader*)outbuff;
 
                 Crypto.Memcpy(outbuff, inbuff, size);
 
@@ -72,7 +72,7 @@ namespace ScePSP.Core.Components.Crypto
                         $"Expected mode Cmd1 but found {header->Mode}");
                 }
 
-                HeaderKeys* keys = (HeaderKeys*) outbuff; //0-15 AES key, 16-31 CMAC key
+                HeaderKeys* keys = (HeaderKeys*)outbuff; //0-15 AES key, 16-31 CMAC key
 
                 //FILL PREDATA WITH RANDOM DATA
                 if (generateTrash) kirk_CMD14(outbuff + sizeof(Aes128CmacHeader), header->DataOffset);
@@ -126,7 +126,7 @@ namespace ScePSP.Core.Components.Crypto
             fixed (Crypto.AesCtx* aesKirk1Ptr = &_aesKirk1)
             {
                 check_initialized();
-                var header = *(Aes128CmacHeader*) inbuff;
+                var header = *(Aes128CmacHeader*)inbuff;
                 if (header.Mode != KirkMode.Cmd1)
                 {
                     //Console.Error.WriteLine("ResultEnum.PSP_KIRK_INVALID_MODE");
@@ -152,7 +152,7 @@ namespace ScePSP.Core.Components.Crypto
 #if USE_DOTNET_CRYPTO
 				DecryptAes(kirk1_key, inbuff, (byte*)&keys, 16 * 2); //decrypt AES & CMAC key to temp buffer
 #else
-                Crypto.AES_cbc_decrypt(aesKirk1Ptr, inbuff, (byte*) &keys, 16 * 2);
+                Crypto.AES_cbc_decrypt(aesKirk1Ptr, inbuff, (byte*)&keys, 16 * 2);
 #endif
 
                 // HOAX WARRING! I have no idea why the hash check on last IPL block fails, so there is an option to disable checking
@@ -195,7 +195,7 @@ namespace ScePSP.Core.Components.Crypto
         {
             check_initialized();
 
-            KirkAes128CbcHeader* header = (KirkAes128CbcHeader*) inbuff;
+            KirkAes128CbcHeader* header = (KirkAes128CbcHeader*)inbuff;
             if (header->Mode != KirkMode.EncryptCbc)
             {
                 throw new KirkException(ResultEnum.PspKirkInvalidMode);
@@ -225,7 +225,7 @@ namespace ScePSP.Core.Components.Crypto
         {
             check_initialized();
 
-            var header = (KirkAes128CbcHeader*) inbuff;
+            var header = (KirkAes128CbcHeader*)inbuff;
             if (header->Mode != KirkMode.DecryptCbc)
             {
                 throw new KirkException(ResultEnum.PspKirkInvalidMode);
@@ -272,7 +272,7 @@ namespace ScePSP.Core.Components.Crypto
             {
                 check_initialized();
 
-                Aes128CmacHeader header = *(Aes128CmacHeader*) inbuff;
+                Aes128CmacHeader header = *(Aes128CmacHeader*)inbuff;
 
                 if (!(header.Mode == KirkMode.Cmd1 || header.Mode == KirkMode.Cmd2 || header.Mode == KirkMode.Cmd3))
                 {
@@ -295,7 +295,7 @@ namespace ScePSP.Core.Components.Crypto
 #if USE_DOTNET_CRYPTO
 				DecryptAes(kirk1_key, inbuff, (byte *)&keys, 16 * 2);
 #else
-                Crypto.AES_cbc_decrypt(aesKirk1Ptr, inbuff, (byte*) &keys,
+                Crypto.AES_cbc_decrypt(aesKirk1Ptr, inbuff, (byte*)&keys,
                     32); //decrypt AES & CMAC key to temp buffer
 #endif
 
@@ -331,7 +331,7 @@ namespace ScePSP.Core.Components.Crypto
         public void kirk_CMD14(byte* output, int outputSize)
         {
             check_initialized();
-            for (var i = 0; i < outputSize; i++) output[i] = (byte) (_random.Next() & 0xFF);
+            for (var i = 0; i < outputSize; i++) output[i] = (byte)(_random.Next() & 0xFF);
         }
 
         /// <summary>
@@ -378,8 +378,8 @@ namespace ScePSP.Core.Components.Crypto
                 case 0x63: return Kirk7Key63;
                 case 0x64: return Kirk7Key64;
                 default: throw new NotImplementedException($"Invalid Key Type: 0x{keyType:X}");
-                //throw (new KirkException(KIRK_INVALID_SIZE));
-                //default: return (byte*)KIRK_INVALID_SIZE; break; //need to get the real error code for that, placeholder now :)
+                    //throw (new KirkException(KIRK_INVALID_SIZE));
+                    //default: return (byte*)KIRK_INVALID_SIZE; break; //need to get the real error code for that, placeholder now :)
             }
         }
 
@@ -423,7 +423,7 @@ namespace ScePSP.Core.Components.Crypto
         public int SceUtilsSetFuseId(void* fuse)
         {
             //PointerUtils.Memcpy(new ArraySegment<byte>(fuseID, 0, 16), (byte*)fuse);
-            PointerUtils.Memcpy(fuseID, (byte*) fuse, 16);
+            PointerUtils.Memcpy(fuseID, (byte*)fuse, 16);
             return 0;
         }
 
@@ -450,7 +450,7 @@ namespace ScePSP.Core.Components.Crypto
         /// <returns></returns>
         public void kirk_forge(byte* inbuff, int insize)
         {
-            var header = (Aes128CmacHeader*) inbuff;
+            var header = (Aes128CmacHeader*)inbuff;
             var cmacHeaderHashBytes = new byte[16];
             var cmacDataHashBytes = new byte[16];
 
@@ -477,7 +477,7 @@ namespace ScePSP.Core.Components.Crypto
 
                 HeaderKeys keys; //0-15 AES key, 16-31 CMAC key
 
-                Crypto.AES_cbc_decrypt(aesKirk1Ptr, inbuff, (byte*) &keys,
+                Crypto.AES_cbc_decrypt(aesKirk1Ptr, inbuff, (byte*)&keys,
                     32); //decrypt AES & CMAC key to temp buffer
                 Crypto.AesCtx cmacKey;
                 Crypto.AES_set_key(&cmacKey, keys.Cmac, 128);
@@ -545,7 +545,7 @@ namespace ScePSP.Core.Components.Crypto
         /// <returns></returns>
         public int SceUtilsBufferCopyWithRange(byte* Out, int outSize, byte* In, int inSize, int command)
         {
-            return (int) HleUtilsBufferCopyWithRange(Out, outSize, In, inSize, (CommandEnum) command);
+            return (int)HleUtilsBufferCopyWithRange(Out, outSize, In, inSize, (CommandEnum)command);
         }
 
         /// <summary>
@@ -676,7 +676,7 @@ namespace ScePSP.Core.Components.Crypto
             var outputArray = DecryptAes(inputArray, key);
             PointerUtils.ByteArrayToPointer(outputArray, output);
         }
-        
+
         /// <summary>
         /// PSP_KIRK_CMD_ECDSA_GEN_KEYS
         /// 
@@ -734,7 +734,7 @@ namespace ScePSP.Core.Components.Crypto
         {
             throw new NotImplementedException();
         }
-        
+
         /// <summary>
         /// SIZE: 0004
         /// </summary>
@@ -759,7 +759,7 @@ namespace ScePSP.Core.Components.Crypto
         {
             //CheckInitialized();
 
-            var header = (KirkSha1Header*) inputBuffer;
+            var header = (KirkSha1Header*)inputBuffer;
             if (inputSize == 0 || header->DataSize == 0)
             {
                 throw new KirkException(ResultEnum.PspKirkDataSizeIsZero);
@@ -777,12 +777,12 @@ namespace ScePSP.Core.Components.Crypto
             PointerUtils.Memcpy(outputBuffer, sha1Hash, sha1Hash.Length);
         }
 
-        #pragma warning disable SYSLIB0021
+#pragma warning disable SYSLIB0021
         public static byte[] Sha1(byte[] input)
         {
             return new SHA1CryptoServiceProvider().ComputeHash(input);
         }
-        #pragma warning restore SYSLIB0021
+#pragma warning restore SYSLIB0021
 
         // kirk1
         public byte[] Kirk1Key =
@@ -845,7 +845,7 @@ namespace ScePSP.Core.Components.Crypto
 
         public byte[] Kirk7Key64 =
             {0x03, 0xB3, 0x02, 0xE8, 0x5F, 0xF3, 0x81, 0xB1, 0x3B, 0x8D, 0xAA, 0x2A, 0x90, 0xFF, 0x5E, 0x61};
-        
+
         /// <summary>
         /// 
         /// </summary>

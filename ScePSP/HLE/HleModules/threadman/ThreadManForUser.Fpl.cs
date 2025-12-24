@@ -1,9 +1,9 @@
-﻿using System;
+﻿using ScePSP.Core.Memory;
+using ScePSP.Hle.Managers;
+using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using ScePSPUtils.Extensions;
-using ScePSP.Core.Memory;
-using ScePSP.Hle.Managers;
 
 namespace ScePSP.Hle.Modules.threadman
 {
@@ -66,7 +66,7 @@ namespace ScePSP.Hle.Modules.threadman
                 var Alignment = Options.Alignment;
                 if (Alignment == 0) Alignment = 4;
                 //if (Alignment == 0) Alignment = 0x1000;
-                if (Attributes != (FplAttributes) 0)
+                if (Attributes != (FplAttributes)0)
                 {
                     Console.Error.WriteLine("FPL: Unhandled Attribute : {0}", Attributes);
                     //throw (new NotImplementedException());
@@ -115,7 +115,7 @@ namespace ScePSP.Hle.Modules.threadman
 
             public uint GetAddressFromBlockIndex(int Index)
             {
-                return (uint) (MemoryPartition.Low + Index * BlockSize);
+                return (uint)(MemoryPartition.Low + Index * BlockSize);
             }
 
             public void Allocate(PspPointer* DataPointer, uint* Timeout, bool HandleCallbacks)

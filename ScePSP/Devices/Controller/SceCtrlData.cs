@@ -48,7 +48,7 @@ namespace ScePSP.Core.Types.Controller
         public float X
         {
             get => (Lx / 255.0f - 0.5f) * 2.0f;
-            set => Lx = (byte) ((value / 2.0f + 0.5f) * 255.0f).Clamp(0, 255);
+            set => Lx = (byte)((value / 2.0f + 0.5f) * 255.0f).Clamp(0, 255);
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace ScePSP.Core.Types.Controller
         public float Y
         {
             get => (Ly / 255.0f - 0.5f) * 2.0f;
-            set => Ly = (byte) ((value / 2.0f + 0.5f) * 255.0f).Clamp(0, 255);
+            set => Ly = (byte)((value / 2.0f + 0.5f) * 255.0f).Clamp(0, 255);
         }
 
         public void UpdateButtons(PspCtrlButtons buttons, bool pressed)

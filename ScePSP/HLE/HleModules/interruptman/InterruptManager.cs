@@ -1,6 +1,6 @@
-﻿using System;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
+using System;
 
 namespace ScePSP.Hle.Modules.interruptman
 {

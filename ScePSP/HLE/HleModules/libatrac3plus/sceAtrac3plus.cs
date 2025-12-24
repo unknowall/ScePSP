@@ -1,21 +1,20 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using ScePSPUtils;
-using ScePSPUtils.Endian;
+﻿using ScePSP.Core.Audio;
+using ScePSP.Core.Cpu;
+using ScePSP.Core.Memory;
+using ScePSP.Core.Types;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Formats.audio;
 using ScePSP.Hle.Managers;
+using ScePSP.Hle.Media.audio.At3;
 using ScePSP.Hle.Modules.audio;
-using ScePSP.Core.Audio;
-using ScePSP.Core.Memory;
-using ScePSP.Core.Cpu;
-using ScePSP.Hle.Formats.audio.At3;
-using System.Runtime.InteropServices;
+using ScePSPUtils;
+using ScePSPUtils.Endian;
 using ScePSPUtils.Extensions;
 using ScePSPUtils.Streams;
-using ScePSP.Core.Types;
-using ScePSP.Hle.Media.audio.At3;
+using System;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace ScePSP.Hle.Modules.libatrac3plus
 {
@@ -56,8 +55,8 @@ namespace ScePSP.Hle.Modules.libatrac3plus
             public OMAHeader(uint omaInfo)
             {
                 this.Magic = 0x45413301;
-                this.StructSize = (ushort) sizeof(OMAHeader);
-                this.Unknown0 = unchecked((ushort) -1);
+                this.StructSize = (ushort)sizeof(OMAHeader);
+                this.Unknown0 = unchecked((ushort)-1);
                 this.Unknown1 = 0x00000000;
                 this.Unknown2 = 0x010f5000;
                 this.Unknown3 = 0x00040000;
@@ -192,7 +191,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
 #if false
 									DecodedSamples =
 new ArrayWrapper<StereoShortSoundSample>(PointerUtils.ByteArrayToArray<StereoShortSoundSample>(ChunkStream.ReadAll()));
-								#else
+#else
                                 DecodedSamples =
                                     ChunkStream.ConvertToStreamStructCachedArrayWrapper<StereoShortSoundSample>(
                                         16 * 1024);
@@ -427,7 +426,7 @@ new ArrayWrapper<StereoShortSoundSample>(PointerUtils.ByteArrayToArray<StereoSho
                 get
                 {
                     if (this.BlockSize == 0) return -1;
-                    return (int) (this.DataStream.Available() / this.BlockSize);
+                    return (int)(this.DataStream.Available() / this.BlockSize);
                 }
             }
 
@@ -545,7 +544,7 @@ new ArrayWrapper<StereoShortSoundSample>(PointerUtils.ByteArrayToArray<StereoSho
         public int sceAtracGetBitrate(Atrac Atrac, out uint Bitrate)
         {
             //Bitrate = Atrac.Format.Bitrate;
-            uint _AtracBitrate = (uint) (Atrac.Format.BytesPerFrame * 352800 / 1000);
+            uint _AtracBitrate = (uint)(Atrac.Format.BytesPerFrame * 352800 / 1000);
             if (Atrac.CodecType == CodecType.PSP_MODE_AT_3_PLUS)
             {
                 _AtracBitrate = ((_AtracBitrate >> 11) + 8) & 0xFFFFFFF0;
@@ -1084,7 +1083,7 @@ new ArrayWrapper<StereoShortSoundSample>(PointerUtils.ByteArrayToArray<StereoSho
         [HlePspNotImplemented]
         public int sceAtracSetMOutHalfwayBufferAndGetID(void* halfBuffer, uint readSize, uint halfBufferSize)
         {
-            throw new SceKernelException((SceKernelErrors) (-1));
+            throw new SceKernelException((SceKernelErrors)(-1));
         }
 
         /// <summary>
@@ -1098,7 +1097,7 @@ new ArrayWrapper<StereoShortSoundSample>(PointerUtils.ByteArrayToArray<StereoSho
         [HlePspNotImplemented]
         public int sceAtracSetAA3HalfwayBufferAndGetID(void* halfBuffer, uint readSize, uint halfBufferSize)
         {
-            throw new SceKernelException((SceKernelErrors) (-1));
+            throw new SceKernelException((SceKernelErrors)(-1));
         }
 
         /// <summary>
@@ -1113,7 +1112,7 @@ new ArrayWrapper<StereoShortSoundSample>(PointerUtils.ByteArrayToArray<StereoSho
         [HlePspNotImplemented]
         public Atrac sceAtracSetAA3DataAndGetID(void* buffer, int bufferSize, int fileSize, uint metadataSizeAddr)
         {
-            throw new SceKernelException((SceKernelErrors) (-1));
+            throw new SceKernelException((SceKernelErrors)(-1));
         }
 
         /// <summary>

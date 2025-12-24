@@ -8,10 +8,10 @@ namespace cscodec.util
             int Length2 = In.GetLength(1);
             var Out = Create<T>(Length1, Length2);
             for (int a = 0; a < Length1; a++)
-            for (int b = 0; b < Length2; b++)
-            {
-                Out[a][b] = In[a, b];
-            }
+                for (int b = 0; b < Length2; b++)
+                {
+                    Out[a][b] = In[a, b];
+                }
             return Out;
         }
 
@@ -22,11 +22,11 @@ namespace cscodec.util
             int Length3 = In.GetLength(2);
             var Out = Create<T>(Length1, Length2, Length3);
             for (int a = 0; a < Length1; a++)
-            for (int b = 0; b < Length2; b++)
-            for (int c = 0; c < Length3; c++)
-            {
-                Out[a][b][c] = In[a, b, c];
-            }
+                for (int b = 0; b < Length2; b++)
+                    for (int c = 0; c < Length3; c++)
+                    {
+                        Out[a][b][c] = In[a, b, c];
+                    }
             return Out;
         }
 

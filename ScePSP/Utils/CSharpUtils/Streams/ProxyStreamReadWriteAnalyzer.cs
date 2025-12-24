@@ -1,8 +1,8 @@
 ﻿//#define DEBUG_ANALYZER
 
-using System.IO;
 using ScePSPUtils.Ext.SpaceAssigner;
 using ScePSPUtils.Streams;
+using System.IO;
 
 namespace ScePSPUtils.Ext.Streams
 {

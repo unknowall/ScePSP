@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using ScePSP.Core.Cpu;
+﻿using ScePSP.Core.Cpu;
 using ScePSP.Hle.Interop;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ScePSP.Hle.Managers
 {
@@ -83,10 +83,10 @@ namespace ScePSP.Hle.Managers
         /// <summary>
         /// 
         /// </summary>
-        private readonly HleInterruptHandler[] _interruptHandlers = new HleInterruptHandler[(int) PspInterrupts.Max];
+        private readonly HleInterruptHandler[] _interruptHandlers = new HleInterruptHandler[(int)PspInterrupts.Max];
 
         public HleInterruptHandler GetInterruptHandler(PspInterrupts pspInterrupt) =>
-            _interruptHandlers[(int) pspInterrupt];
+            _interruptHandlers[(int)pspInterrupt];
 
         private HleInterruptManager()
         {
@@ -94,7 +94,7 @@ namespace ScePSP.Hle.Managers
             {
                 _interruptHandlers[n] = new HleInterruptHandler(
                     this,
-                    (PspInterrupts) n,
+                    (PspInterrupts)n,
                     _hleCallbackManager
                 );
             }
@@ -149,7 +149,7 @@ namespace ScePSP.Hle.Managers
         {
             try
             {
-                return (uint) (Enabled ? 1 : 0);
+                return (uint)(Enabled ? 1 : 0);
             }
             finally
             {

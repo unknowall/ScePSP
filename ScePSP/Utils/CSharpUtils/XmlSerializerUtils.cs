@@ -20,7 +20,7 @@ namespace ScePSPUtils
 
             using (var xmlFile = File.OpenRead(fileName))
             {
-                return (TType) xmlSerializer.Deserialize(xmlFile);
+                return (TType)xmlSerializer.Deserialize(xmlFile);
             }
         }
 

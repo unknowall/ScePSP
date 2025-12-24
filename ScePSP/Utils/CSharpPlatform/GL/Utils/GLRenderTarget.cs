@@ -123,7 +123,7 @@ namespace ScePSPPlatform.GL.Utils
             }
             finally
             {
-                GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, (uint) OldFrameBuffer);
+                GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, (uint)OldFrameBuffer);
             }
         }
 

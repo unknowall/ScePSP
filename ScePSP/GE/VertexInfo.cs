@@ -1,8 +1,6 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Runtime.InteropServices;
 //using OpenTK;
-using ScePSPPlatform;
 
 namespace ScePSP.Core.Gpu
 {

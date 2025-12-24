@@ -1,10 +1,10 @@
-﻿using System;
+﻿using ScePSPUtils.Arrays;
+using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using ScePSPUtils.Arrays;
-using ScePSPUtils.Extensions;
 
 namespace ScePSPUtils.Streams
 {
@@ -65,7 +65,7 @@ namespace ScePSPUtils.Streams
         /// <summary>
         /// 
         /// </summary>
-        public int Length => Stream == null ? 0 : (int) (Stream.Length / StructSize);
+        public int Length => Stream == null ? 0 : (int)(Stream.Length / StructSize);
 
         IEnumerator<TType> IEnumerable<TType>.GetEnumerator()
         {

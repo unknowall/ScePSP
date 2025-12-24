@@ -3,11 +3,11 @@
 
 #define USE_DYNAMIC_METHOD
 
+using SafeILGenerator.Ast.Nodes;
+using SafeILGenerator.Utils;
+using ScePSP.Core.Cpu.Dynarec.Ast;
 using System;
 using System.Reflection;
-using SafeILGenerator.Ast.Nodes;
-using ScePSP.Core.Cpu.Dynarec.Ast;
-using SafeILGenerator.Utils;
 
 namespace ScePSP.Core.Cpu.Emitter
 {

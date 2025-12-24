@@ -1,7 +1,7 @@
-﻿using System;
+﻿using ScePSP.Core.Memory;
 using ScePSP.Hle.Attributes;
 using ScePSPUtils;
-using ScePSP.Core.Memory;
+using System;
 
 namespace ScePSP.Hle.Modules._unknownPrx
 {
@@ -57,7 +57,7 @@ namespace ScePSP.Hle.Modules._unknownPrx
         {
         }
 
-        [HleUidPoolClass(NotFoundError = (SceKernelErrors) (-1))]
+        [HleUidPoolClass(NotFoundError = (SceKernelErrors)(-1))]
         public class Mp3Stream : IDisposable, IHleUidPoolClass
         {
             public SceMp3InitArg* Mp3Arguments;
@@ -100,7 +100,7 @@ namespace ScePSP.Hle.Modules._unknownPrx
         {
             Mp3Stream.AddStreamData(
                 PointerUtils.PointerToByteArray(
-                    (byte*) Mp3Stream.Mp3Arguments->Mp3BufferPointer.GetPointer(Memory, Size), Size)
+                    (byte*)Mp3Stream.Mp3Arguments->Mp3BufferPointer.GetPointer(Memory, Size), Size)
             );
             return 0;
         }

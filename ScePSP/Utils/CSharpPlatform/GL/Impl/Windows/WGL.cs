@@ -145,7 +145,7 @@ namespace ScePSPPlatform.GL.Impl.Windows
         // PixelFormatDescriptor flags for use in ChoosePixelFormat only
         DepthDontcare = 0x20000000,
         DoublebufferDontcare = 0x40000000,
-        StereoDontcare = unchecked((int) 0x80000000)
+        StereoDontcare = unchecked((int)0x80000000)
     }
 
     //[DebuggerDisplay("{Width}x{Height}")]
@@ -319,7 +319,7 @@ namespace ScePSPPlatform.GL.Impl.Windows
         public IntPtr ClassName;
         public IntPtr IconSm;
 
-        public static readonly uint SizeInBytes = (uint) Marshal.SizeOf(default(ExtendedWindowClass));
+        public static readonly uint SizeInBytes = (uint)Marshal.SizeOf(default(ExtendedWindowClass));
     }
 
     public enum WindowClass : uint

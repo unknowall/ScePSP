@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using ScePSP.Core.Gpu.State;
+﻿using ScePSP.Core.Gpu.State;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Threading.Synchronization;
 using ScePSPUtils.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace ScePSP.Core.Gpu
 {
@@ -329,7 +329,7 @@ namespace ScePSP.Core.Gpu
         Const = 1,
         Slope = 2
     }
-    
+
     public enum SyncTypeEnum : byte
     {
         WaitForCompletion = 0,

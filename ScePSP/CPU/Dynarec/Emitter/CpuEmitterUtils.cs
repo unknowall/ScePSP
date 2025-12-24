@@ -1,26 +1,25 @@
-﻿using ScePSPUtils;
-using ScePSP.Core.Cpu.VFpu;
+﻿using ScePSP.Core.Cpu.VFpu;
+using ScePSPUtils;
 using System;
-using System.Runtime;
 
 namespace ScePSP.Core.Cpu.Emitter
 {
     public unsafe class CpuEmitterUtils
     {
-        
-        
+
+
         public static uint _rotr_impl(uint value, int offset) => (value >> offset) | (value << (32 - offset));
 
-        
-        
+
+
         public static int _max_impl(int left, int right) => left > right ? left : right;
 
-        
-        
+
+
         public static int _min_impl(int left, int right) => left < right ? left : right;
 
-        
-        
+
+
         public static uint _bitrev_impl(uint v)
         {
             v = ((v >> 1) & 0x55555555) | ((v & 0x55555555) << 1); // swap odd and even bits
@@ -31,8 +30,8 @@ namespace ScePSP.Core.Cpu.Emitter
             return v;
         }
 
-        
-        
+
+
         public static void _div_impl(CpuThreadState cpuThreadState, int left, int right)
         {
             if (right == 0)
@@ -52,34 +51,34 @@ namespace ScePSP.Core.Cpu.Emitter
             }
         }
 
-        
-        
+
+
         public static void _divu_impl(CpuThreadState cpuThreadState, uint left, uint right)
         {
             if (right == 0)
             {
-                cpuThreadState.Lo = (int) right;
-                cpuThreadState.Hi = (int) left;
+                cpuThreadState.Lo = (int)right;
+                cpuThreadState.Hi = (int)left;
             }
             else
             {
-                cpuThreadState.Lo = unchecked((int) (left / right));
-                cpuThreadState.Hi = unchecked((int) (left % right));
+                cpuThreadState.Lo = unchecked((int)(left / right));
+                cpuThreadState.Hi = unchecked((int)(left % right));
             }
         }
 
-        
-        
+
+
         public static uint _ext_impl(uint data, int pos, int size) => BitUtils.Extract(data, pos, size);
 
-        
-        
+
+
         public static uint _ins_impl(uint initialData, uint data, int pos, int size) =>
             BitUtils.Insert(initialData, pos, size, data);
 
         // http://aggregate.org/MAGIC/
-        
-        
+
+
         public static uint _clo_impl(uint x)
         {
             uint ret = 0;
@@ -91,16 +90,16 @@ namespace ScePSP.Core.Cpu.Emitter
             return ret;
         }
 
-        
-        
+
+
         public static uint _clz_impl(uint x) => _clo_impl(~x);
 
-        
-        
+
+
         public static uint _wsbh_impl(uint v) => ((v & 0xFF00FF00) >> 8) | ((v & 0x00FF00FF) << 8);
 
-        
-        
+
+
         public static uint _wsbw_impl(uint v) => ((v & 0xFF000000) >> 24) |
                                                  ((v & 0x00FF0000) >> 8) |
                                                  ((v & 0x0000FF00) << 8) |
@@ -111,10 +110,10 @@ namespace ScePSP.Core.Cpu.Emitter
             //Console.WriteLine("_cvt_w_s_impl: {0}", CpuThreadState.FPR[FS]);
             switch (cpuThreadState.Fcr31.Rm)
             {
-                case CpuThreadState.Fcr31Struct.TypeEnum.Rint: return (int) MathFloat.Rint(fs);
-                case CpuThreadState.Fcr31Struct.TypeEnum.Cast: return (int) MathFloat.Cast(fs);
-                case CpuThreadState.Fcr31Struct.TypeEnum.Ceil: return (int) MathFloat.Ceil(fs);
-                case CpuThreadState.Fcr31Struct.TypeEnum.Floor: return (int) MathFloat.Floor(fs);
+                case CpuThreadState.Fcr31Struct.TypeEnum.Rint: return (int)MathFloat.Rint(fs);
+                case CpuThreadState.Fcr31Struct.TypeEnum.Cast: return (int)MathFloat.Cast(fs);
+                case CpuThreadState.Fcr31Struct.TypeEnum.Ceil: return (int)MathFloat.Ceil(fs);
+                case CpuThreadState.Fcr31Struct.TypeEnum.Floor: return (int)MathFloat.Floor(fs);
             }
 
             throw new InvalidCastException("RM has an invalid value!!");
@@ -128,7 +127,7 @@ namespace ScePSP.Core.Cpu.Emitter
                 case 0: // readonly?
                     throw new NotImplementedException("_cfc1_impl.RD=0");
                 case 31:
-                    cpuThreadState.Gpr[rt] = (int) cpuThreadState.Fcr31.Value;
+                    cpuThreadState.Gpr[rt] = (int)cpuThreadState.Fcr31.Value;
                     break;
                 default: throw new Exception($"Unsupported CFC1({rd})");
             }
@@ -139,14 +138,14 @@ namespace ScePSP.Core.Cpu.Emitter
             switch (rd)
             {
                 case 31:
-                    cpuThreadState.Fcr31.Value = (uint) cpuThreadState.Gpr[rt];
+                    cpuThreadState.Fcr31.Value = (uint)cpuThreadState.Gpr[rt];
                     break;
                 default: throw new Exception($"Unsupported CFC1({rd})");
             }
         }
 
-        
-        
+
+
         public static void _comp_impl(CpuThreadState cpuThreadState, float s, float t, bool fcUnordererd,
             bool fcEqual, bool fcLess, bool fcInvQnan)
         {
@@ -190,59 +189,59 @@ namespace ScePSP.Core.Cpu.Emitter
             //Console.WriteLine("Not implemented 'sync' instruction at 0x{0:X8} with value 0x{1:X8}", PC, Value);
         }
 
-        private static readonly uint[] LwrMask = new uint[] {0x00000000, 0xFF000000, 0xFFFF0000, 0xFFFFFF00};
-        private static readonly int[] LwrShift = new int[] {0, 8, 16, 24};
+        private static readonly uint[] LwrMask = new uint[] { 0x00000000, 0xFF000000, 0xFFFF0000, 0xFFFFFF00 };
+        private static readonly int[] LwrShift = new int[] { 0, 8, 16, 24 };
 
-        private static readonly uint[] LwlMask = new uint[] {0x00FFFFFF, 0x0000FFFF, 0x000000FF, 0x00000000};
-        private static readonly int[] LwlShift = new int[] {24, 16, 8, 0};
+        private static readonly uint[] LwlMask = new uint[] { 0x00FFFFFF, 0x0000FFFF, 0x000000FF, 0x00000000 };
+        private static readonly int[] LwlShift = new int[] { 24, 16, 8, 0 };
 
-        
-        
+
+
         public static uint _lwl_exec(CpuThreadState cpuThreadState, uint rs, int offset, uint rt)
         {
             //Console.WriteLine("_lwl_exec");
-            var address = (uint) (rs + offset);
-            var addressAlign = (uint) address & 3;
-            var value = *(uint*) cpuThreadState.GetMemoryPtr(address & unchecked((uint) ~3));
-            return (uint) ((value << LwlShift[addressAlign]) | (rt & LwlMask[addressAlign]));
+            var address = (uint)(rs + offset);
+            var addressAlign = (uint)address & 3;
+            var value = *(uint*)cpuThreadState.GetMemoryPtr(address & unchecked((uint)~3));
+            return (uint)((value << LwlShift[addressAlign]) | (rt & LwlMask[addressAlign]));
         }
 
-        
-        
+
+
         public static uint _lwr_exec(CpuThreadState cpuThreadState, uint rs, int offset, uint rt)
         {
             //Console.WriteLine("_lwr_exec");
-            var address = (uint) (rs + offset);
-            var addressAlign = (uint) address & 3;
-            var value = *(uint*) cpuThreadState.GetMemoryPtr(address & unchecked((uint) ~3));
-            return (uint) ((value >> LwrShift[addressAlign]) | (rt & LwrMask[addressAlign]));
+            var address = (uint)(rs + offset);
+            var addressAlign = (uint)address & 3;
+            var value = *(uint*)cpuThreadState.GetMemoryPtr(address & unchecked((uint)~3));
+            return (uint)((value >> LwrShift[addressAlign]) | (rt & LwrMask[addressAlign]));
         }
 
-        private static readonly uint[] SwlMask = {0xFFFFFF00, 0xFFFF0000, 0xFF000000, 0x00000000};
-        private static readonly int[] SwlShift = {24, 16, 8, 0};
+        private static readonly uint[] SwlMask = { 0xFFFFFF00, 0xFFFF0000, 0xFF000000, 0x00000000 };
+        private static readonly int[] SwlShift = { 24, 16, 8, 0 };
 
-        private static readonly uint[] SwrMask = {0x00000000, 0x000000FF, 0x0000FFFF, 0x00FFFFFF};
-        private static readonly int[] SwrShift = {0, 8, 16, 24};
+        private static readonly uint[] SwrMask = { 0x00000000, 0x000000FF, 0x0000FFFF, 0x00FFFFFF };
+        private static readonly int[] SwrShift = { 0, 8, 16, 24 };
 
-        
-        
+
+
         public static void _swl_exec(CpuThreadState cpuThreadState, uint rs, int offset, uint rt)
         {
-            var address = (uint) (rs + offset);
-            var addressAlign = (uint) address & 3;
-            var addressPointer = (uint*) cpuThreadState.GetMemoryPtr(address & 0xFFFFFFFC);
+            var address = (uint)(rs + offset);
+            var addressAlign = (uint)address & 3;
+            var addressPointer = (uint*)cpuThreadState.GetMemoryPtr(address & 0xFFFFFFFC);
 
             *addressPointer = (rt >> SwlShift[addressAlign]) | (*addressPointer & SwlMask[addressAlign]);
         }
 
-        
-        
+
+
         public static void _swr_exec(CpuThreadState cpuThreadState, uint rs, int offset, uint rt)
         {
             //Console.WriteLine("_swr_exec");
-            var address = (uint) (rs + offset);
-            var addressAlign = (uint) address & 3;
-            var addressPointer = (uint*) cpuThreadState.GetMemoryPtr(address & 0xFFFFFFFC);
+            var address = (uint)(rs + offset);
+            var addressAlign = (uint)address & 3;
+            var addressPointer = (uint*)cpuThreadState.GetMemoryPtr(address & 0xFFFFFFFC);
 
             *addressPointer = (rt << SwrShift[addressAlign]) | (*addressPointer & SwrMask[addressAlign]);
         }
@@ -252,8 +251,8 @@ namespace ScePSP.Core.Cpu.Emitter
         {
             //Console.Error.WriteLine("+LLLLLLLLLLLLL {0:X8}", Address);
 
-            var k = (int) (3 - ((address >> 2) & 3));
-            address &= unchecked((uint) ~0xF);
+            var k = (int)(3 - ((address >> 2) & 3));
+            address &= unchecked((uint)~0xF);
 
             var r = stackalloc float*[4];
             r[0] = r0;
@@ -267,7 +266,7 @@ namespace ScePSP.Core.Cpu.Emitter
                 {
                     var ptr = r[j];
                     var memoryAddress = address;
-                    var memory = (float*) cpuThreadState.GetMemoryPtr(memoryAddress);
+                    var memory = (float*)cpuThreadState.GetMemoryPtr(memoryAddress);
 
                     //Console.Error.WriteLine("_lvl_svl_q({0}): {1:X8}: Reg({2:X8}) {3} Mem({4:X8})", j, memory_address, *(int*)ptr, Save ? "->" : "<-", *(int*)memory);
 
@@ -285,7 +284,7 @@ namespace ScePSP.Core.Cpu.Emitter
         {
             //Console.Error.WriteLine("+RRRRRRRRRRRRR {0:X8}", Address);
 
-            int k = (int) (4 - ((address >> 2) & 3));
+            int k = (int)(4 - ((address >> 2) & 3));
             //Address &= unchecked((uint)~0xF);
 
             var r = stackalloc float*[4];
@@ -300,7 +299,7 @@ namespace ScePSP.Core.Cpu.Emitter
                 {
                     var ptr = r[j];
                     var memoryAddress = address;
-                    var memory = (float*) cpuThreadState.GetMemoryPtr(memoryAddress);
+                    var memory = (float*)cpuThreadState.GetMemoryPtr(memoryAddress);
 
                     //Console.Error.WriteLine("_lvl_svr_q({0}): {1:X8}: Reg({2:X8}) {3} Mem({4:X8})", j, memory_address, *(int*)ptr, Save ? "->" : "<-", *(int*)memory);
 
@@ -327,13 +326,13 @@ namespace ScePSP.Core.Cpu.Emitter
             return BitConverter.ToInt32(data, 0);
         }
 
-        
-        public static float _vrndf1(CpuThreadState cpuThreadState) =>
-            (float) (cpuThreadState.Random.NextDouble() * 2.0f);
 
-        
+        public static float _vrndf1(CpuThreadState cpuThreadState) =>
+            (float)(cpuThreadState.Random.NextDouble() * 2.0f);
+
+
         public static float _vrndf2(CpuThreadState cpuThreadState) =>
-            (float) (cpuThreadState.Random.NextDouble() * 4.0f);
+            (float)(cpuThreadState.Random.NextDouble() * 4.0f);
 
         public static void _vpfxd_impl(CpuThreadState cpuThreadState, uint value) =>
             cpuThreadState.PrefixDestination.Value = value;
@@ -345,16 +344,16 @@ namespace ScePSP.Core.Cpu.Emitter
             cpuThreadState.PrefixTarget.Value = value;
 
         public static uint _vi2uc_impl(int x, int y, int z, int w) => 0
-                                                                      | (uint) (x < 0 ? 0 : (x >> 23) << 0)
-                                                                      | (uint) (y < 0 ? 0 : (y >> 23) << 8)
-                                                                      | (uint) (z < 0 ? 0 : (z >> 23) << 16)
-                                                                      | (uint) (w < 0 ? 0 : (w >> 23) << 24);
+                                                                      | (uint)(x < 0 ? 0 : (x >> 23) << 0)
+                                                                      | (uint)(y < 0 ? 0 : (y >> 23) << 8)
+                                                                      | (uint)(z < 0 ? 0 : (z >> 23) << 16)
+                                                                      | (uint)(w < 0 ? 0 : (w >> 23) << 24);
 
-        
+
         public static uint _vi2c_impl(uint x, uint y, uint z, uint w) =>
             ((x >> 24) << 0) | ((y >> 24) << 8) | ((z >> 24) << 16) | ((w >> 24) << 24) | 0;
 
-        
+
         public static int _vf2iz(float value, int imm5)
         {
             var scalabValue = MathFloat.Scalb(value, imm5);
@@ -362,21 +361,21 @@ namespace ScePSP.Core.Cpu.Emitter
             return double.IsNaN(doubleValue) ? 0x7FFFFFFF : doubleValue;
         }
 
-        
+
         public static uint _vi2s_impl(uint v1, uint v2) => ((v1 >> 16) << 0) |
                                                            ((v2 >> 16) << 16);
 
-        
-        public static float _vh2f_0(uint a) => HalfFloat.ToFloat((int) BitUtils.Extract(a, 0, 16));
 
-        
-        public static float _vh2f_1(uint a) => HalfFloat.ToFloat((int) BitUtils.Extract(a, 16, 16));
+        public static float _vh2f_0(uint a) => HalfFloat.ToFloat((int)BitUtils.Extract(a, 0, 16));
 
-        
+
+        public static float _vh2f_1(uint a) => HalfFloat.ToFloat((int)BitUtils.Extract(a, 16, 16));
+
+
         public static uint _vf2h_impl(float a, float b) =>
-            (uint) ((HalfFloat.FloatToHalfFloat(b) << 16) | (HalfFloat.FloatToHalfFloat(a) << 0));
+            (uint)((HalfFloat.FloatToHalfFloat(b) << 16) | (HalfFloat.FloatToHalfFloat(a) << 0));
 
-        
+
         public static int _vi2us_impl(int x, int y) => (x < 0 ? 0 : (x >> 15) << 0) |
                                                        (y < 0 ? 0 : (y >> 15) << 16);
 
@@ -390,7 +389,7 @@ namespace ScePSP.Core.Cpu.Emitter
                 case VfpuControlRegistersEnum.VfpuPfxd: return cpuThreadState.PrefixDestination.Value;
                 case VfpuControlRegistersEnum.VfpuCc: return cpuThreadState.VfrCcValue;
                 case VfpuControlRegistersEnum.VfpuRcx0:
-                    return (uint) MathFloat.ReinterpretFloatAsInt((float) new Random().NextDouble());
+                    return (uint)MathFloat.ReinterpretFloatAsInt((float)new Random().NextDouble());
                 case VfpuControlRegistersEnum.VfpuRcx1:
                 case VfpuControlRegistersEnum.VfpuRcx2:
                 case VfpuControlRegistersEnum.VfpuRcx3:
@@ -398,7 +397,7 @@ namespace ScePSP.Core.Cpu.Emitter
                 case VfpuControlRegistersEnum.VfpuRcx5:
                 case VfpuControlRegistersEnum.VfpuRcx6:
                 case VfpuControlRegistersEnum.VfpuRcx7:
-                    return (uint) MathFloat.ReinterpretFloatAsInt(1.0f);
+                    return (uint)MathFloat.ReinterpretFloatAsInt(1.0f);
                 default:
                     throw new NotImplementedException("_mfvc_impl: " + vfpuControlRegister);
             }
@@ -423,7 +422,7 @@ namespace ScePSP.Core.Cpu.Emitter
                     cpuThreadState.VfrCcValue = value;
                     return;
                 case VfpuControlRegistersEnum.VfpuRcx0:
-                    new Random((int) value);
+                    new Random((int)value);
                     return;
                 case VfpuControlRegistersEnum.VfpuRcx1:
                 case VfpuControlRegistersEnum.VfpuRcx2:

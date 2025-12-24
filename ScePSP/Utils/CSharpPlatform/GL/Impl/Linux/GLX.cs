@@ -118,7 +118,7 @@ namespace ScePSPPlatform.GL.Impl.Linux
         GREEN_SIZE = 9,
         X_RENDERABLE_SGIX = 0x8012,
         LARGEST_PBUFFER = 0x801C,
-        DONT_CARE = unchecked((int) 0xFFFFFFFF),
+        DONT_CARE = unchecked((int)0xFFFFFFFF),
         TRANSPARENT_ALPHA_VALUE_EXT = 0x28,
         PSEUDO_COLOR_EXT = 0x8004,
         USE_GL = 1,

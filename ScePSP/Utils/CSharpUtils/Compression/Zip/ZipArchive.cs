@@ -1,12 +1,12 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using ScePSPUtils.Streams;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
 using System.Text;
-using ScePSPUtils.Extensions;
-using ScePSPUtils.Streams;
 
 namespace ScePSPUtils.Ext.Compression.Zip
 {
@@ -291,22 +291,22 @@ namespace ScePSPUtils.Ext.Compression.Zip
                 */
                 // A.  Local file header:
                 case 0x0304:
-                {
-                    var localFileHeader = _stream.ReadStruct<LocalFileHeader>();
-                    _stream.Skip(localFileHeader.ExtraFieldLength);
-                    var name = _stream.ReadString(localFileHeader.FileNameLength, Encoding.UTF8);
-                    var compressedStream = _stream.ReadStream(localFileHeader.CompressedSize);
-                    var extraFieldStream = _stream.ReadStream(localFileHeader.ExtraFieldLength);
-
-                    Files.Add(name, new File
                     {
-                        ZipArchive = this,
-                        LocalFileHeader = localFileHeader,
-                        Name = name,
-                        CompressedStream = compressedStream,
-                        ExtraFieldStream = extraFieldStream
-                    });
-                }
+                        var localFileHeader = _stream.ReadStruct<LocalFileHeader>();
+                        _stream.Skip(localFileHeader.ExtraFieldLength);
+                        var name = _stream.ReadString(localFileHeader.FileNameLength, Encoding.UTF8);
+                        var compressedStream = _stream.ReadStream(localFileHeader.CompressedSize);
+                        var extraFieldStream = _stream.ReadStream(localFileHeader.ExtraFieldLength);
+
+                        Files.Add(name, new File
+                        {
+                            ZipArchive = this,
+                            LocalFileHeader = localFileHeader,
+                            Name = name,
+                            CompressedStream = compressedStream,
+                            ExtraFieldStream = extraFieldStream
+                        });
+                    }
                     break;
                 /*
                 // I.  End of central directory record:

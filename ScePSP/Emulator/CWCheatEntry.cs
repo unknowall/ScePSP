@@ -1,5 +1,5 @@
-﻿using ScePSPUtils;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Core.Memory;
+using ScePSPUtils;
 using System;
 using System.Collections.Generic;
 
@@ -11,7 +11,7 @@ namespace ScePSP
     /// <seealso cref="http://www.codemasters-project.net/guides/showentry.php?e=846"/>
     public struct CWCheatEntry
     {
-        byte OpCode => (byte) ((this.Code & 0xF0000000) >> 28);
+        byte OpCode => (byte)((this.Code & 0xF0000000) >> 28);
 
         public uint Code;
         public uint[] Values;
@@ -22,10 +22,10 @@ namespace ScePSP
             switch (OpCode)
             {
                 case 0x8:
-                    Values = new[] {List.Dequeue(), List.Dequeue(), List.Dequeue()};
+                    Values = new[] { List.Dequeue(), List.Dequeue(), List.Dequeue() };
                     break;
                 default:
-                    Values = new[] {List.Dequeue()};
+                    Values = new[] { List.Dequeue() };
                     break;
             }
         }
@@ -80,28 +80,28 @@ namespace ScePSP
                 {
                     // [t]8-bit Constant Write 0x0aaaaaaa 0x000000dd
                     case 0x0:
-                        PspMemory.WriteSafe(Address, (byte) BitUtils.Extract(Values[0], 0, 8));
+                        PspMemory.WriteSafe(Address, (byte)BitUtils.Extract(Values[0], 0, 8));
                         break;
                     // [t]16-bit Constant write 0x1aaaaaaa 0x0000dddd
                     case 0x1:
-                        PspMemory.WriteSafe(Address, (ushort) BitUtils.Extract(Values[0], 0, 16));
+                        PspMemory.WriteSafe(Address, (ushort)BitUtils.Extract(Values[0], 0, 16));
                         break;
                     // [t]32-bit Constant write 0x2aaaaaaa 0xdddddddd
                     case 0x2:
-                        PspMemory.WriteSafe(Address, (uint) BitUtils.Extract(Values[0], 0, 32));
+                        PspMemory.WriteSafe(Address, (uint)BitUtils.Extract(Values[0], 0, 32));
                         break;
                     // 32-bit Multi-Address Write/Value increase	0x4aaaaaaa 0xxxxxyyyy 0xdddddddd 0xIIIIIIII
                     case 0x4:
-                    {
-                        var Count = BitUtils.Extract(Values[0], 16, 16);
-                        var Increment = BitUtils.Extract(Values[0], 0, 16);
-                        var Value = BitUtils.Extract(Values[1], 0, 32);
-                        var IncrementValue = BitUtils.Extract(Values[2], 0, 32);
-                        for (int n = 0; n < Count; n++)
                         {
-                            PspMemory.WriteSafe((uint) (Address + n * Increment), (uint) (Value + IncrementValue * n));
+                            var Count = BitUtils.Extract(Values[0], 16, 16);
+                            var Increment = BitUtils.Extract(Values[0], 0, 16);
+                            var Value = BitUtils.Extract(Values[1], 0, 32);
+                            var IncrementValue = BitUtils.Extract(Values[2], 0, 32);
+                            for (int n = 0; n < Count; n++)
+                            {
+                                PspMemory.WriteSafe((uint)(Address + n * Increment), (uint)(Value + IncrementValue * n));
+                            }
                         }
-                    }
                         break;
                     case 0x8:
                         // 16-bit Multi-Address Write/Value increas	0x8aaaaaaa 0xxxxxyyyy 0x1000dddd 0xIIIIIIII
@@ -113,8 +113,8 @@ namespace ScePSP
                             var IncrementValue = BitUtils.Extract(Values[2], 0, 32);
                             for (int n = 0; n < Count; n++)
                             {
-                                PspMemory.WriteSafe((uint) (Address + n * Increment),
-                                    (ushort) (Value + IncrementValue * n));
+                                PspMemory.WriteSafe((uint)(Address + n * Increment),
+                                    (ushort)(Value + IncrementValue * n));
                             }
                         }
                         // 8-bit Multi-Address Write/Value increase	0x8aaaaaaa 0xxxxxyyyy 0x000000dd 0xIIIIIIII	
@@ -126,8 +126,8 @@ namespace ScePSP
                             var IncrementValue = BitUtils.Extract(Values[2], 0, 32);
                             for (int n = 0; n < Count; n++)
                             {
-                                PspMemory.WriteSafe((uint) (Address + n * Increment),
-                                    (byte) (Value + IncrementValue * n));
+                                PspMemory.WriteSafe((uint)(Address + n * Increment),
+                                    (byte)(Value + IncrementValue * n));
                             }
                         }
                         break;
@@ -138,21 +138,21 @@ namespace ScePSP
                     // 16-bit OR  - 0x7aaaaaaa 0x0001vvvv
                     // 8-bit  OR  - 0x7aaaaaaa 0x000000vv
                     case 0x7:
-                    {
-                        uint SubOpCode = (Values[0] >> 16) & 0xFFFF;
-                        uint SubValue = (Values[0] >> 0) & 0xFFFF;
-                        switch (SubOpCode)
                         {
-                            // 8-bit  OR  - 0x7aaaaaaa 0x000000vv
-                            case 0:
-                                PspMemory.WriteSafe(Address,
-                                    (byte) (PspMemory.ReadSafe<byte>(Address) | (SubValue & 0xFF)));
-                                break;
-                            default:
-                                Console.Error.WriteLine("Invalid CWCheatOpCode: 0x{0:X} : 0x{1:X}", OpCode, SubOpCode);
-                                break;
+                            uint SubOpCode = (Values[0] >> 16) & 0xFFFF;
+                            uint SubValue = (Values[0] >> 0) & 0xFFFF;
+                            switch (SubOpCode)
+                            {
+                                // 8-bit  OR  - 0x7aaaaaaa 0x000000vv
+                                case 0:
+                                    PspMemory.WriteSafe(Address,
+                                        (byte)(PspMemory.ReadSafe<byte>(Address) | (SubValue & 0xFF)));
+                                    break;
+                                default:
+                                    Console.Error.WriteLine("Invalid CWCheatOpCode: 0x{0:X} : 0x{1:X}", OpCode, SubOpCode);
+                                    break;
+                            }
                         }
-                    }
                         break;
                     default:
                         Console.Error.WriteLine("Invalid CWCheatOpCode: 0x{0:X}", OpCode);

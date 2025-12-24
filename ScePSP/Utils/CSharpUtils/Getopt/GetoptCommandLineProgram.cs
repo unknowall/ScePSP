@@ -1,9 +1,9 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using ScePSPUtils.Extensions;
 
 namespace ScePSPUtils.Getopt
 {

@@ -2,20 +2,19 @@
 
 using cscodec;
 using cscodec.h264.player;
-using ScePSPUtils;
+using ScePSP.Core.Components.Display;
 using ScePSP.Core.Gpu;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
 using ScePSP.Hle.Formats.video;
+using ScePSP.Utils.Utils;
+using ScePSPUtils;
+using ScePSPUtils.Drawing.Extensions;
+using ScePSPUtils.Extensions;
 using System;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
-using ScePSPUtils.Drawing.Extensions;
-using ScePSPUtils.Extensions;
-using ScePSP.Core.Components.Display;
-using ScePSP.Utils.Utils;
-using ScePSP.Core;
 
 namespace ScePSP.Hle.Modules.mpeg
 {
@@ -107,7 +106,7 @@ namespace ScePSP.Hle.Modules.mpeg
             //MpegAu.SceMpegAu.DecodeTimestampLow = MpegPsDemuxer.MpegTimestampPerSecond;
             //MpegAu.SceMpegAu.PresentationTimestampHigh = (uint)Info.pts.Value;
             //MpegAu.SceMpegAu.PresentationTimestampLow = MpegPsDemuxer.MpegTimestampPerSecond;
-            MpegAu.SceMpegAu.AuSize = (int) Info.Stream.Length;
+            MpegAu.SceMpegAu.AuSize = (int)Info.Stream.Length;
         }
 
         private bool DecodePsPacket()
@@ -158,7 +157,7 @@ namespace ScePSP.Hle.Modules.mpeg
             Console.Out.WriteLineColored(ConsoleColor.Cyan, "{0}: {1}", new IntPtr(DataPointer), DataLength);
             try
             {
-                var Data = PointerUtils.PointerToByteArray((byte*) DataPointer, DataLength);
+                var Data = PointerUtils.PointerToByteArray((byte*)DataPointer, DataLength);
                 //if (DumpStreams)
                 //    FileUtils.CreateAndAppendStream(ApplicationPaths.AssertPath + "/mpeg.stream", new MemoryStream(Data));
                 MpegStream.WriteBytes(Data);
@@ -217,7 +216,7 @@ namespace ScePSP.Hle.Modules.mpeg
                         var TempBufferPtr2 = TempBufferPtr;
                         Bitmap.LockBitsUnlock(PixelFormat.Format32bppArgb, (BitmapData) =>
                         {
-                            var InputBuffer = (OutputPixel*) BitmapData.Scan0.ToPointer();
+                            var InputBuffer = (OutputPixel*)BitmapData.Scan0.ToPointer();
                             int Count = Bitmap.Width * Bitmap.Height;
 
                             for (int n = 0; n < Count; n++)
@@ -232,7 +231,7 @@ namespace ScePSP.Hle.Modules.mpeg
                             PixelFormatDecoder.Encode(GuPixelFormat, InputBuffer, TempBufferPtr2,
                                 Bitmap.Width * Bitmap.Height);
                             PixelFormatDecoder.Encode(PspDisplay.CurrentInfo.PixelFormat, InputBuffer,
-                                (byte*) Memory.PspAddressToPointerSafe(PspDisplay.CurrentInfo.FrameAddress), 512,
+                                (byte*)Memory.PspAddressToPointerSafe(PspDisplay.CurrentInfo.FrameAddress), 512,
                                 Bitmap.Width, Bitmap.Height);
                             PspDisplay.CurrentInfo.PlayingVideo = true;
                         });
@@ -296,7 +295,7 @@ namespace ScePSP.Hle.Modules.mpeg
 
         public SceMpeg* GetSceMpeg(PspMemory PspMemory)
         {
-            return (SceMpeg*) PspMemory.PspPointerToPointerSafe(SceMpeg);
+            return (SceMpeg*)PspMemory.PspPointerToPointerSafe(SceMpeg);
         }
     }
 

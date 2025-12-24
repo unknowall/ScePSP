@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using SafeILGenerator.Ast;
 using ScePSP.Core.Cpu.Switch;
 using ScePSP.Core.Cpu.Table;
 using ScePSP.Core.Memory;
-using SafeILGenerator.Ast;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ScePSP.Core.Cpu.Assembler
 {
@@ -101,7 +101,7 @@ namespace ScePSP.Core.Cpu.Assembler
 
                 ProcessCallback = EmitLookupGenerator.GenerateSwitch<Func<uint, MipsDisassembler, Result>>("",
                     InstructionTable.All, instructionInfo => ast.Return(ast.CallStatic(
-                        (Func<uint, int, Result>) _InternalHandle,
+                        (Func<uint, int, Result>)_InternalHandle,
                         ast.Argument<uint>(0),
                         instructionInfo != null ? dictionary[instructionInfo] : -1
                     )));
@@ -111,7 +111,7 @@ namespace ScePSP.Core.Cpu.Assembler
             if (result.InstructionInfo == null)
             {
                 Console.Error.WriteLine(
-                    $"Instruction at 0x{pc:X8} with data 0x{(uint) instruction:X8} didn't generate a value");
+                    $"Instruction at 0x{pc:X8} with data 0x{(uint)instruction:X8} didn't generate a value");
                 result.InstructionInfo = InstructionTable.Unknown;
             }
             result.InstructionPc = pc;

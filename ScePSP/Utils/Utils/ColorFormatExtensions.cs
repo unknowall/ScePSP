@@ -1,5 +1,5 @@
-﻿using ScePSPUtils.Drawing;
-using ScePSP.Core.Types;
+﻿using ScePSP.Core.Types;
+using ScePSPUtils.Drawing;
 
 namespace ScePSP.Utils.Utils
 {

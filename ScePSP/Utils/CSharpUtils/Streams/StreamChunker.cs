@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.IO;
-using ScePSPUtils.Extensions;
 
 namespace ScePSPUtils.Streams
 {
@@ -121,7 +121,7 @@ namespace ScePSPUtils.Streams
             while (true)
             {
                 var tempBufferReaded = InputStream.Read(TempBuffer, 0,
-                    (int) Math.Min(TempBuffer.Length, maxReaded - totalCopied));
+                    (int)Math.Min(TempBuffer.Length, maxReaded - totalCopied));
                 if (tempBufferReaded > 0)
                 {
                     _buffer.Produce(TempBuffer, 0, tempBufferReaded);

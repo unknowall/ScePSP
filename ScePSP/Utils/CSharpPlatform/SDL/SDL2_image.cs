@@ -33,208 +33,211 @@ using System.Runtime.InteropServices;
 
 namespace SDL2
 {
-	public static class SDL_image
-	{
-		#region SDL2# Variables
+    public static class SDL_image
+    {
+        #region SDL2# Variables
 
-		/* Used by DllImport to load the native library. */
-		private const string nativeLibName = "SDL2_image";
+        /* Used by DllImport to load the native library. */
+        private const string nativeLibName = "SDL2_image";
 
-		#endregion
+        #endregion
 
-		#region SDL_image.h
+        #region SDL_image.h
 
-		/* Similar to the headers, this is the version we're expecting to be
+        /* Similar to the headers, this is the version we're expecting to be
 		 * running with. You will likely want to check this somewhere in your
 		 * program!
 		 */
-		public const int SDL_IMAGE_MAJOR_VERSION =	2;
-		public const int SDL_IMAGE_MINOR_VERSION =	0;
-		public const int SDL_IMAGE_PATCHLEVEL =		2;
+        public const int SDL_IMAGE_MAJOR_VERSION = 2;
+        public const int SDL_IMAGE_MINOR_VERSION = 0;
+        public const int SDL_IMAGE_PATCHLEVEL = 2;
 
-		[Flags]
-		public enum IMG_InitFlags
-		{
-			IMG_INIT_JPG =	0x00000001,
-			IMG_INIT_PNG =	0x00000002,
-			IMG_INIT_TIF =	0x00000004,
-			IMG_INIT_WEBP =	0x00000008
-		}
+        [Flags]
+        public enum IMG_InitFlags
+        {
+            IMG_INIT_JPG = 0x00000001,
+            IMG_INIT_PNG = 0x00000002,
+            IMG_INIT_TIF = 0x00000004,
+            IMG_INIT_WEBP = 0x00000008
+        }
 
-		public static void SDL_IMAGE_VERSION(out SDL.SDL_version X)
-		{
-			X.major = SDL_IMAGE_MAJOR_VERSION;
-			X.minor = SDL_IMAGE_MINOR_VERSION;
-			X.patch = SDL_IMAGE_PATCHLEVEL;
-		}
+        public static void SDL_IMAGE_VERSION(out SDL.SDL_version X)
+        {
+            X.major = SDL_IMAGE_MAJOR_VERSION;
+            X.minor = SDL_IMAGE_MINOR_VERSION;
+            X.patch = SDL_IMAGE_PATCHLEVEL;
+        }
 
-		[DllImport(nativeLibName, EntryPoint = "IMG_Linked_Version", CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr INTERNAL_IMG_Linked_Version();
-		public static SDL.SDL_version IMG_Linked_Version()
-		{
-			SDL.SDL_version result;
-			IntPtr result_ptr = INTERNAL_IMG_Linked_Version();
-			result = (SDL.SDL_version) Marshal.PtrToStructure(
-				result_ptr,
-				typeof(SDL.SDL_version)
-			);
-			return result;
-		}
+        [DllImport(nativeLibName, EntryPoint = "IMG_Linked_Version", CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr INTERNAL_IMG_Linked_Version();
+        public static SDL.SDL_version IMG_Linked_Version()
+        {
+            SDL.SDL_version result;
+            IntPtr result_ptr = INTERNAL_IMG_Linked_Version();
+            result = (SDL.SDL_version)Marshal.PtrToStructure(
+                result_ptr,
+                typeof(SDL.SDL_version)
+            );
+            return result;
+        }
 
-		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern int IMG_Init(IMG_InitFlags flags);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int IMG_Init(IMG_InitFlags flags);
 
-		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern void IMG_Quit();
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void IMG_Quit();
 
-		/* IntPtr refers to an SDL_Surface* */
-		[DllImport(nativeLibName, EntryPoint = "IMG_Load", CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr INTERNAL_IMG_Load(
-			byte[] file
-		);
-		public static IntPtr IMG_Load(string file)
-		{
-			return INTERNAL_IMG_Load(SDL.UTF8_ToNative(file));
-		}
+        /* IntPtr refers to an SDL_Surface* */
+        [DllImport(nativeLibName, EntryPoint = "IMG_Load", CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr INTERNAL_IMG_Load(
+            byte[] file
+        );
+        public static IntPtr IMG_Load(string file)
+        {
+            return INTERNAL_IMG_Load(SDL.UTF8_ToNative(file));
+        }
 
-		/* src refers to an SDL_RWops*, IntPtr to an SDL_Surface* */
-		/* THIS IS A PUBLIC RWops FUNCTION! */
-		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr IMG_Load_RW(
-			IntPtr src,
-			int freesrc
-		);
+        /* src refers to an SDL_RWops*, IntPtr to an SDL_Surface* */
+        /* THIS IS A PUBLIC RWops FUNCTION! */
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr IMG_Load_RW(
+            IntPtr src,
+            int freesrc
+        );
 
-		/* src refers to an SDL_RWops*, IntPtr to an SDL_Surface* */
-		/* THIS IS A PUBLIC RWops FUNCTION! */
-		[DllImport(nativeLibName, EntryPoint = "IMG_LoadTyped_RW", CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr INTERNAL_IMG_LoadTyped_RW(
-			IntPtr src,
-			int freesrc,
-			byte[] type
-		);
-		public static IntPtr IMG_LoadTyped_RW(
-			IntPtr src,
-			int freesrc,
-			string type
-		) {
-			return INTERNAL_IMG_LoadTyped_RW(
-				src,
-				freesrc,
-				SDL.UTF8_ToNative(type)
-			);
-		}
+        /* src refers to an SDL_RWops*, IntPtr to an SDL_Surface* */
+        /* THIS IS A PUBLIC RWops FUNCTION! */
+        [DllImport(nativeLibName, EntryPoint = "IMG_LoadTyped_RW", CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr INTERNAL_IMG_LoadTyped_RW(
+            IntPtr src,
+            int freesrc,
+            byte[] type
+        );
+        public static IntPtr IMG_LoadTyped_RW(
+            IntPtr src,
+            int freesrc,
+            string type
+        )
+        {
+            return INTERNAL_IMG_LoadTyped_RW(
+                src,
+                freesrc,
+                SDL.UTF8_ToNative(type)
+            );
+        }
 
-		/* IntPtr refers to an SDL_Texture*, renderer to an SDL_Renderer* */
-		[DllImport(nativeLibName, EntryPoint = "IMG_LoadTexture", CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr INTERNAL_IMG_LoadTexture(
-			IntPtr renderer,
-			byte[] file
-		);
-		public static IntPtr IMG_LoadTexture(
-			IntPtr renderer,
-			string file
-		) {
-			return INTERNAL_IMG_LoadTexture(
-				renderer,
-				SDL.UTF8_ToNative(file)
-			);
-		}
+        /* IntPtr refers to an SDL_Texture*, renderer to an SDL_Renderer* */
+        [DllImport(nativeLibName, EntryPoint = "IMG_LoadTexture", CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr INTERNAL_IMG_LoadTexture(
+            IntPtr renderer,
+            byte[] file
+        );
+        public static IntPtr IMG_LoadTexture(
+            IntPtr renderer,
+            string file
+        )
+        {
+            return INTERNAL_IMG_LoadTexture(
+                renderer,
+                SDL.UTF8_ToNative(file)
+            );
+        }
 
-		/* renderer refers to an SDL_Renderer*.
+        /* renderer refers to an SDL_Renderer*.
 		 * src refers to an SDL_RWops*.
 		 * IntPtr to an SDL_Texture*.
 		 */
-		/* THIS IS A PUBLIC RWops FUNCTION! */
-		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr IMG_LoadTexture_RW(
-			IntPtr renderer,
-			IntPtr src,
-			int freesrc
-		);
+        /* THIS IS A PUBLIC RWops FUNCTION! */
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr IMG_LoadTexture_RW(
+            IntPtr renderer,
+            IntPtr src,
+            int freesrc
+        );
 
-		/* renderer refers to an SDL_Renderer*.
+        /* renderer refers to an SDL_Renderer*.
 		 * src refers to an SDL_RWops*.
 		 * IntPtr to an SDL_Texture*.
 		 */
-		/* THIS IS A PUBLIC RWops FUNCTION! */
-		[DllImport(nativeLibName, EntryPoint = "IMG_LoadTextureTyped_RW", CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr INTERNAL_IMG_LoadTextureTyped_RW(
-			IntPtr renderer,
-			IntPtr src,
-			int freesrc,
-			byte[] type
-		);
-		public static IntPtr IMG_LoadTextureTyped_RW(
-			IntPtr renderer,
-			IntPtr src,
-			int freesrc,
-			string type
-		) {
-			return INTERNAL_IMG_LoadTextureTyped_RW(
-				renderer,
-				src,
-				freesrc,
-				SDL.UTF8_ToNative(type)
-			);
-		}
+        /* THIS IS A PUBLIC RWops FUNCTION! */
+        [DllImport(nativeLibName, EntryPoint = "IMG_LoadTextureTyped_RW", CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr INTERNAL_IMG_LoadTextureTyped_RW(
+            IntPtr renderer,
+            IntPtr src,
+            int freesrc,
+            byte[] type
+        );
+        public static IntPtr IMG_LoadTextureTyped_RW(
+            IntPtr renderer,
+            IntPtr src,
+            int freesrc,
+            string type
+        )
+        {
+            return INTERNAL_IMG_LoadTextureTyped_RW(
+                renderer,
+                src,
+                freesrc,
+                SDL.UTF8_ToNative(type)
+            );
+        }
 
-		/* IntPtr refers to an SDL_Surface* */
-		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr IMG_ReadXPMFromArray(
-			[In()] [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)]
-				string[] xpm
-		);
+        /* IntPtr refers to an SDL_Surface* */
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr IMG_ReadXPMFromArray(
+            [In()] [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)]
+                string[] xpm
+        );
 
-		/* surface refers to an SDL_Surface* */
-		[DllImport(nativeLibName, EntryPoint = "IMG_SavePNG", CallingConvention = CallingConvention.Cdecl)]
-		private static extern int INTERNAL_IMG_SavePNG(
-			IntPtr surface,
-			byte[] file
-		);
-		public static int IMG_SavePNG(IntPtr surface, string file)
-		{
-			return INTERNAL_IMG_SavePNG(
-				surface,
-				SDL.UTF8_ToNative(file)
-			);
-		}
+        /* surface refers to an SDL_Surface* */
+        [DllImport(nativeLibName, EntryPoint = "IMG_SavePNG", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int INTERNAL_IMG_SavePNG(
+            IntPtr surface,
+            byte[] file
+        );
+        public static int IMG_SavePNG(IntPtr surface, string file)
+        {
+            return INTERNAL_IMG_SavePNG(
+                surface,
+                SDL.UTF8_ToNative(file)
+            );
+        }
 
-		/* surface refers to an SDL_Surface*, dst to an SDL_RWops* */
-		/* THIS IS A PUBLIC RWops FUNCTION! */
-		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern int IMG_SavePNG_RW(
-			IntPtr surface,
-			IntPtr dst,
-			int freedst
-		);
+        /* surface refers to an SDL_Surface*, dst to an SDL_RWops* */
+        /* THIS IS A PUBLIC RWops FUNCTION! */
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int IMG_SavePNG_RW(
+            IntPtr surface,
+            IntPtr dst,
+            int freedst
+        );
 
-		/* surface refers to an SDL_Surface* */
-		[DllImport(nativeLibName, EntryPoint = "IMG_SaveJPG", CallingConvention = CallingConvention.Cdecl)]
-		private static extern int INTERNAL_IMG_SaveJPG(
-			IntPtr surface,
-			byte[] file,
-			int quality
-		);
-		public static int IMG_SaveJPG(IntPtr surface, string file, int quality)
-		{
-			return INTERNAL_IMG_SaveJPG(
-				surface,
-				SDL.UTF8_ToNative(file),
-				quality
-			);
-		}
+        /* surface refers to an SDL_Surface* */
+        [DllImport(nativeLibName, EntryPoint = "IMG_SaveJPG", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int INTERNAL_IMG_SaveJPG(
+            IntPtr surface,
+            byte[] file,
+            int quality
+        );
+        public static int IMG_SaveJPG(IntPtr surface, string file, int quality)
+        {
+            return INTERNAL_IMG_SaveJPG(
+                surface,
+                SDL.UTF8_ToNative(file),
+                quality
+            );
+        }
 
-		/* surface refers to an SDL_Surface*, dst to an SDL_RWops* */
-		/* THIS IS A PUBLIC RWops FUNCTION! */
-		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern int IMG_SaveJPG_RW(
-			IntPtr surface,
-			IntPtr dst,
-			int freedst,
-			int quality
-		);
+        /* surface refers to an SDL_Surface*, dst to an SDL_RWops* */
+        /* THIS IS A PUBLIC RWops FUNCTION! */
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int IMG_SaveJPG_RW(
+            IntPtr surface,
+            IntPtr dst,
+            int freedst,
+            int quality
+        );
 
-		#endregion
-	}
+        #endregion
+    }
 }

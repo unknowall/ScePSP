@@ -1,14 +1,14 @@
 ﻿//#define DEBUG_ELF_LOADER
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
+using ScePSP.Core.Memory;
 using ScePSP.Hle.Formats;
 using ScePSPUtils;
 using ScePSPUtils.Extensions;
-using ScePSP.Core.Memory;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace ScePSP.Hle.Loader
 {
@@ -18,8 +18,8 @@ namespace ScePSP.Hle.Loader
         public Stream MemoryStream;
         public MemoryPartition MemoryPartition;
         protected uint BaseAddress;
-        
-        static public Logger Logger = Logger.GetLogger(nameof(ElfLoader)); 
+
+        static public Logger Logger = Logger.GetLogger(nameof(ElfLoader));
 
         public Elf.HeaderStruct Header;
         public Elf.SectionHeader[] SectionHeaders;
@@ -102,7 +102,7 @@ namespace ScePSP.Hle.Loader
             foreach (var sectionHeader in SectionHeadersWithFlag(Elf.SectionHeader.FlagsSet.Allocate))
             {
                 lowest = Math.Min(lowest, BaseAddress + sectionHeader.Address);
-                highest = Math.Max(highest, (uint) (BaseAddress + sectionHeader.Address + sectionHeader.Size));
+                highest = Math.Max(highest, (uint)(BaseAddress + sectionHeader.Address + sectionHeader.Size));
             }
             foreach (var programHeader in ProgramHeaders)
             {

@@ -1,5 +1,5 @@
-﻿using System;
-using ScePSPUtils;
+﻿using ScePSPUtils;
+using System;
 
 namespace ScePSP.Hle.Formats
 {

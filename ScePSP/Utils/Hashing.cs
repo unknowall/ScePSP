@@ -1,6 +1,5 @@
-﻿using System;
-using System.Runtime.ExceptionServices;
-using ScePSPUtils;
+﻿using ScePSPUtils;
+using System;
 
 namespace ScePSP.Utils
 {
@@ -43,7 +42,7 @@ namespace ScePSP.Utils
 
             while (count >= 8)
             {
-                hash += *(ulong*) pointer + (ulong) (count << 31);
+                hash += *(ulong*)pointer + (ulong)(count << 31);
                 pointer += 8;
                 count -= 8;
             }

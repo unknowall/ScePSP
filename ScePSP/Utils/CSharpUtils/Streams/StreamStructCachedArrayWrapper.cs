@@ -1,10 +1,10 @@
-﻿using System;
+﻿using ScePSPUtils.Arrays;
+using ScePSPUtils.Threading;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
-using ScePSPUtils.Arrays;
-using ScePSPUtils.Threading;
 
 namespace ScePSPUtils.Streams
 {
@@ -127,7 +127,7 @@ namespace ScePSPUtils.Streams
         /// <summary>
         /// 
         /// </summary>
-        public int Length => (int) (_stream.Length / StructSize);
+        public int Length => (int)(_stream.Length / StructSize);
 
         /// <summary>
         /// 

@@ -1,5 +1,5 @@
-﻿using System;
-using ScePSPUtils.Extensions;
+﻿using ScePSPUtils.Extensions;
+using System;
 
 namespace ScePSP.Hle.Formats
 {
@@ -316,7 +316,7 @@ namespace ScePSP.Hle.Formats
             /// <summary>
             /// Type of relocation (R_TYPE)
             /// </summary>
-            public TypeEnum Type => (TypeEnum) ((Info >> 0) & 0xFF);
+            public TypeEnum Type => (TypeEnum)((Info >> 0) & 0xFF);
 
             public override string ToString()
             {

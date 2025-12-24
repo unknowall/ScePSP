@@ -1,12 +1,12 @@
-﻿using System;
+﻿using ScePSP.Core.Memory;
+using ScePSP.Hle.Managers;
+using ScePSP.Hle.Vfs;
+using ScePSPUtils;
+using ScePSPUtils.Extensions;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using ScePSPUtils;
-using ScePSPUtils.Extensions;
-using ScePSP.Core.Memory;
-using ScePSP.Hle.Vfs;
-using ScePSP.Hle.Managers;
 
 namespace ScePSP.Hle.Modules.utility
 {

@@ -1,10 +1,10 @@
-﻿using System;
+﻿using SafeILGenerator.Utils;
+using ScePSP.Core.Cpu;
+using ScePSPUtils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using ScePSP.Core.Cpu;
 using System.Reflection;
-using ScePSPUtils;
-using SafeILGenerator.Utils;
 
 namespace ScePSP.Hle.Managers
 {
@@ -100,11 +100,11 @@ namespace ScePSP.Hle.Managers
         {
             if (!HleModules.ContainsKey(Type))
             {
-                var HleModule = HleModules[Type] = (HleModuleHost) InjectContext.GetInstance(Type);
+                var HleModule = HleModules[Type] = (HleModuleHost)InjectContext.GetInstance(Type);
                 InjectContext.InjectDependencesTo(HleModule);
             }
 
-            return (HleModuleHost) HleModules[Type];
+            return (HleModuleHost)HleModules[Type];
         }
 
         public HleModuleHost GetModuleByName(string ModuleNameToFind)
@@ -120,7 +120,7 @@ namespace ScePSP.Hle.Managers
 
         public TType GetModule<TType>() where TType : HleModuleHost
         {
-            return (TType) GetModuleByType(typeof(TType));
+            return (TType)GetModuleByType(typeof(TType));
         }
 
         public Action<CpuThreadState> GetModuleDelegate<TType>(string FunctionName) where TType : HleModuleHost

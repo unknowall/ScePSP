@@ -1,5 +1,5 @@
-﻿using ScePSP.Hle.Attributes;
-using ScePSP.Core.Audio;
+﻿using ScePSP.Core.Audio;
+using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
 
 namespace ScePSP.Hle.Modules.audio

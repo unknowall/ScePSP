@@ -1,14 +1,14 @@
-﻿using System;
+﻿using ScePSP.Core.Cpu.Table;
+using ScePSP.Core.Cpu.VFpu;
+using ScePSP.Core.Memory;
+using ScePSPUtils;
+using ScePSPUtils.Arrays;
+using ScePSPUtils.Streams;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using ScePSP.Core.Cpu.Table;
-using ScePSP.Core.Cpu.VFpu;
-using ScePSP.Core.Memory;
-using ScePSPUtils;
-using ScePSPUtils.Streams;
-using ScePSPUtils.Arrays;
 
 namespace ScePSP.Core.Cpu.Assembler
 {
@@ -124,7 +124,7 @@ namespace ScePSP.Core.Cpu.Assembler
             }
             return output;
         }
-        
+
         protected Stream OutputStream;
         protected BinaryWriter BinaryWriter;
         protected BinaryReader BinaryReader;
@@ -183,8 +183,8 @@ namespace ScePSP.Core.Cpu.Assembler
             if (cosIndex == -1) throw new Exception("Didn't set cosine");
             if (sinIndex == -1) throw new Exception("Didn't set sine");
 
-            BitUtils.Insert(ref imm5, 0, 2, (uint) cosIndex);
-            BitUtils.Insert(ref imm5, 2, 2, (uint) sinIndex);
+            BitUtils.Insert(ref imm5, 0, 2, (uint)cosIndex);
+            BitUtils.Insert(ref imm5, 2, 2, (uint)sinIndex);
             BitUtils.Insert(ref imm5, 4, 1, negatedSin ? 1U : 0U);
             //Console.WriteLine(Format);
             //throw (new NotImplementedException("ParseVfprRotate"));
@@ -294,12 +294,12 @@ namespace ScePSP.Core.Cpu.Assembler
             }
 
             vfpuPrefix.SourceConstant(index, isConstant);
-            vfpuPrefix.SourceIndex(index, (uint) setIndex);
+            vfpuPrefix.SourceIndex(index, (uint)setIndex);
         }
 
         public static uint ParseVfprConstantName(string registerName)
         {
-            return (uint) VfpuConstants.GetConstantIndexByName(registerName);
+            return (uint)VfpuConstants.GetConstantIndexByName(registerName);
         }
 
         public class ParseVfprOffsetInfo
@@ -360,7 +360,7 @@ namespace ScePSP.Core.Cpu.Assembler
             line = line.Trim();
             if (line.Length == 0) return new Instruction[] { };
             int vfpuSize = 0;
-            var lineTokens = line.Split(new[] {' ', '\t'}, 2);
+            var lineTokens = line.Split(new[] { ' ', '\t' }, 2);
             var instructionName = lineTokens[0].ToLower();
             InstructionInfo instructionInfo;
 
@@ -443,12 +443,12 @@ namespace ScePSP.Core.Cpu.Assembler
                             instruction.Vt51 = ParseVfprName(vfpuSize, value);
                             break;
                         case "%Y":
-                        {
-                            var info = ParseVfprOffset(vfpuSize, value);
-                            if (info.Offset % 4 != 0) throw new Exception("Offset must be multiple of 4");
-                            instruction.Imm14 = info.Offset / 4;
-                            instruction.Rs = info.Rs;
-                        }
+                            {
+                                var info = ParseVfprOffset(vfpuSize, value);
+                                if (info.Offset % 4 != 0) throw new Exception("Offset must be multiple of 4");
+                                instruction.Imm14 = info.Offset / 4;
+                                instruction.Rs = info.Rs;
+                            }
                             break;
 
                         // VFPU: prefixes (source/target)
@@ -456,24 +456,24 @@ namespace ScePSP.Core.Cpu.Assembler
                         case "%vp1":
                         case "%vp2":
                         case "%vp3":
-                        {
-                            var index = int.Parse(key.Substr(-1));
-                            VfpuPrefix vfpuPrefix = instruction.Value;
-                            ParseAndUpdateVfprSourceTargetPrefix(index, value, ref vfpuPrefix);
-                            instruction.Value = vfpuPrefix;
-                        }
+                            {
+                                var index = int.Parse(key.Substr(-1));
+                                VfpuPrefix vfpuPrefix = instruction.Value;
+                                ParseAndUpdateVfprSourceTargetPrefix(index, value, ref vfpuPrefix);
+                                instruction.Value = vfpuPrefix;
+                            }
                             break;
                         // VFPU: prefixes (destination)
                         case "%vp4":
                         case "%vp5":
                         case "%vp6":
                         case "%vp7":
-                        {
-                            var index = int.Parse(key.Substr(-1)) - 4;
-                            VfpuDestinationPrefix vfpuPrefix = instruction.Value;
-                            ParseAndUpdateVfprDestinationPrefix(index, value, ref vfpuPrefix);
-                            instruction.Value = vfpuPrefix;
-                        }
+                            {
+                                var index = int.Parse(key.Substr(-1)) - 4;
+                                VfpuDestinationPrefix vfpuPrefix = instruction.Value;
+                                ParseAndUpdateVfprDestinationPrefix(index, value, ref vfpuPrefix);
+                                instruction.Value = vfpuPrefix;
+                            }
                             break;
 
                         //case "%xs": Instruction.VD = ParseVfprName(VfpuSize, Value); break;
@@ -502,13 +502,13 @@ namespace ScePSP.Core.Cpu.Assembler
                             break;
 
                         case "%a":
-                            instruction.Pos = (uint) ParseIntegerConstant(value);
+                            instruction.Pos = (uint)ParseIntegerConstant(value);
                             break;
                         case "%ne":
-                            instruction.SizeE = (uint) ParseIntegerConstant(value);
+                            instruction.SizeE = (uint)ParseIntegerConstant(value);
                             break;
                         case "%ni":
-                            instruction.SizeI = (uint) ParseIntegerConstant(value);
+                            instruction.SizeI = (uint)ParseIntegerConstant(value);
                             break;
 
                         case "%p":
@@ -517,14 +517,14 @@ namespace ScePSP.Core.Cpu.Assembler
 
                         case "%c":
                         case "%C":
-                            instruction.Code = (uint) ParseIntegerConstant(value);
+                            instruction.Code = (uint)ParseIntegerConstant(value);
                             break;
                         case "%vi":
                         case "%i":
                             instruction.Imm = ParseIntegerConstant(value);
                             break;
                         case "%I":
-                            instruction.Immu = (uint) ParseIntegerConstant(value);
+                            instruction.Immu = (uint)ParseIntegerConstant(value);
                             break;
 
                         case "%j":
@@ -560,43 +560,43 @@ namespace ScePSP.Core.Cpu.Assembler
                 }
                 */
                 pc += 4;
-                return new[] {instruction};
+                return new[] { instruction };
             }
             else
             {
                 switch (instructionName)
                 {
                     case "nop":
-                    {
-                        //return AssembleInstructions(ref PC, "sll r0, r0, r0");
-                        return AssembleInstructions(ref pc, "and r0, r0, r0", patches);
-                    }
+                        {
+                            //return AssembleInstructions(ref PC, "sll r0, r0, r0");
+                            return AssembleInstructions(ref pc, "and r0, r0, r0", patches);
+                        }
                     case "b":
-                    {
-                        var info = Matcher("%O", lineTokens[1]);
-                        return AssembleInstructions(ref pc, $"beq r0, r0, {info["%O"]}", patches);
-                    }
+                        {
+                            var info = Matcher("%O", lineTokens[1]);
+                            return AssembleInstructions(ref pc, $"beq r0, r0, {info["%O"]}", patches);
+                        }
                     case "li":
-                    {
-                        var info = Matcher("%d, %i", lineTokens[1]);
-                        var destReg = info["%d"];
-                        var value = ParseIntegerConstant(info["%i"]);
-                        // Needs LUI
-                        if ((short) value != value)
                         {
-                            var list = new List<Instruction>();
-                            list.AddRange(AssembleInstructions(ref pc,
-                                "lui " + destReg + ", " + ((value >> 16) & 0xFFFF), patches));
-                            list.AddRange(AssembleInstructions(ref pc,
-                                "ori " + destReg + ", " + destReg + ", " + (value & 0xFFFF), patches));
-                            //Console.WriteLine(List.ToJson());
-                            return list.ToArray();
+                            var info = Matcher("%d, %i", lineTokens[1]);
+                            var destReg = info["%d"];
+                            var value = ParseIntegerConstant(info["%i"]);
+                            // Needs LUI
+                            if ((short)value != value)
+                            {
+                                var list = new List<Instruction>();
+                                list.AddRange(AssembleInstructions(ref pc,
+                                    "lui " + destReg + ", " + ((value >> 16) & 0xFFFF), patches));
+                                list.AddRange(AssembleInstructions(ref pc,
+                                    "ori " + destReg + ", " + destReg + ", " + (value & 0xFFFF), patches));
+                                //Console.WriteLine(List.ToJson());
+                                return list.ToArray();
+                            }
+                            else
+                            {
+                                return AssembleInstructions(ref pc, "addi " + destReg + ", r0, " + value, patches);
+                            }
                         }
-                        else
-                        {
-                            return AssembleInstructions(ref pc, "addi " + destReg + ", r0, " + value, patches);
-                        }
-                    }
                     default:
                         throw new InvalidOperationException("Unknown instruction type '" + instructionName + "'");
                 }
@@ -646,13 +646,13 @@ namespace ScePSP.Core.Cpu.Assembler
             foreach (var line in lines.Split('\n').Select(str => str.Trim()).Where(str => str.Length > 0))
             {
                 // Strip comments.
-                var parts = line.Split(new[] {";", "#"}, 2, StringSplitOptions.None);
+                var parts = line.Split(new[] { ";", "#" }, 2, StringSplitOptions.None);
                 var realLine = parts[0].Trim();
 
                 // Directive
                 if (line[0] == '.')
                 {
-                    var lineTokens = line.Split(new[] {' ', '\t'}, 2);
+                    var lineTokens = line.Split(new[] { ' ', '\t' }, 2);
                     switch (lineTokens[0])
                     {
                         case ".code":
@@ -667,12 +667,12 @@ namespace ScePSP.Core.Cpu.Assembler
                     // Label
                     if (realLine.EndsWith(":"))
                     {
-                        labels[realLine.Substr(0, -1).Trim()] = (uint) OutputStream.Position;
+                        labels[realLine.Substr(0, -1).Trim()] = (uint)OutputStream.Position;
                     }
                     // Instruction
                     else
                     {
-                        var pc = (uint) OutputStream.Position;
+                        var pc = (uint)OutputStream.Position;
                         var instructions = AssembleInstructions(ref pc, realLine, patches);
                         foreach (var instruction in instructions)
                         {
@@ -692,12 +692,12 @@ namespace ScePSP.Core.Cpu.Assembler
                 var labelAddress = labels[patch.LabelName];
 
                 OutputStream.Position = patch.Address;
-                var instruction = (Instruction) BinaryReader.ReadUInt32();
+                var instruction = (Instruction)BinaryReader.ReadUInt32();
                 {
                     switch (patch.Type)
                     {
                         case AssemblerPatchType.Rel16:
-                            instruction.Imm = ((int) labelAddress - (int) patch.Address - 4) / 4;
+                            instruction.Imm = ((int)labelAddress - (int)patch.Address - 4) / 4;
                             break;
                         case AssemblerPatchType.Abs26:
                             instruction.JumpBits = (labelAddress & PspMemory.MemoryMask) / 4;

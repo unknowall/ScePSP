@@ -1,15 +1,15 @@
 ﻿using ScePSP.Hle.Managers;
+using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Hle
 {
     public class HleUidPoolClassAttribute : Attribute
     {
-        public SceKernelErrors NotFoundError = (SceKernelErrors) (-1);
+        public SceKernelErrors NotFoundError = (SceKernelErrors)(-1);
         public int FirstItem = 1;
         public bool ReuseIds = false;
     }
@@ -125,7 +125,7 @@ namespace ScePSP.Hle.Managers
                 }
                 else
                 {
-                    throw new SceKernelException((SceKernelErrors) (-1));
+                    throw new SceKernelException((SceKernelErrors)(-1));
                 }
             }
 
@@ -189,7 +189,7 @@ namespace ScePSP.Hle.Managers
 
         public IEnumerable<TType> List<TType>()
         {
-            return _GetTypePool(typeof(TType)).List().Select(Item => (TType) Item);
+            return _GetTypePool(typeof(TType)).List().Select(Item => (TType)Item);
         }
 
         public void Remove(Type Type, int Index)

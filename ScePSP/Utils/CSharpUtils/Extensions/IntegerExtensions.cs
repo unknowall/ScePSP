@@ -11,7 +11,7 @@
         /// <param name="value"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public static byte RotateLeft(this byte value, int count) => (byte) ((value << count) | (value >> (8 - count)));
+        public static byte RotateLeft(this byte value, int count) => (byte)((value << count) | (value >> (8 - count)));
 
         /// <summary>
         /// 
@@ -20,7 +20,7 @@
         /// <param name="count"></param>
         /// <returns></returns>
         public static byte RotateRight(this byte value, int count) =>
-            (byte) ((value >> count) | (value << (8 - count)));
+            (byte)((value >> count) | (value << (8 - count)));
 
         /// <summary>
         /// 
@@ -78,7 +78,7 @@
         public static uint ExtractUnsigned(this ushort value, int offset, int count)
         {
             var mask = (1 << count) - 1;
-            return (uint) ((value >> offset) & mask);
+            return (uint)((value >> offset) & mask);
         }
 
         /// <summary>
@@ -92,7 +92,7 @@
         public static uint ExtractUnsignedScale(this ushort value, int offset, int count, int scale)
         {
             var mask = (1 << count) - 1;
-            return (uint) (value.ExtractUnsigned(offset, count) * scale / mask);
+            return (uint)(value.ExtractUnsigned(offset, count) * scale / mask);
         }
     }
 }

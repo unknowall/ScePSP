@@ -1,6 +1,6 @@
-﻿using System;
-using ScePSP.Core.Cpu;
+﻿using ScePSP.Core.Cpu;
 using ScePSP.Hle.Interop;
+using System;
 
 namespace ScePSP.Hle
 {
@@ -34,7 +34,7 @@ namespace ScePSP.Hle
 
         public static HleCallback Create(string Name, uint Function, params object[] Arguments)
         {
-            return new HleCallback() {Name = Name, Function = Function, Arguments = Arguments};
+            return new HleCallback() { Name = Name, Function = Function, Arguments = Arguments };
         }
 
         public void SetArgumentsToCpuThreadState(CpuThreadState CpuThreadState)

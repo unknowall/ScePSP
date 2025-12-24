@@ -8,7 +8,7 @@ namespace cscodec.h264.decoder
         public PMbInfo(int _type, int _partition_count)
         {
             type = _type;
-            partition_count = (short) _partition_count;
+            partition_count = (short)_partition_count;
         }
     }
 }

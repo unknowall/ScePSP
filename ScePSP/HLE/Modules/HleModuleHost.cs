@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using ScePSP.Core.Cpu;
+﻿using ScePSP.Core.Cpu;
 using ScePSP.Core.Memory;
 using ScePSPUtils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace ScePSP.Hle
 {
@@ -83,8 +83,8 @@ namespace ScePSP.Hle
                     var MethodInfo in
                     new MethodInfo[0]
                         .Concat(this.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance))
-                    //.Concat(this.GetType().GetMethods(BindingFlags.NonPublic))
-                    //.Concat(this.GetType().GetMethods(BindingFlags.Public))
+                //.Concat(this.GetType().GetMethods(BindingFlags.NonPublic))
+                //.Concat(this.GetType().GetMethods(BindingFlags.Public))
                 )
                 {
                     var Attributes = MethodInfo.GetCustomAttributes(typeof(HlePspFunctionAttribute), true)
@@ -128,7 +128,7 @@ namespace ScePSP.Hle
         public static string StringFromAddress(CpuThreadState CpuThreadState, uint Address)
         {
             if (Address == 0) return null;
-            return PointerUtils.PtrToString((byte*) CpuThreadState.GetMemoryPtr(Address), Encoding.UTF8);
+            return PointerUtils.PtrToString((byte*)CpuThreadState.GetMemoryPtr(Address), Encoding.UTF8);
         }
 
         private struct ParamInfo

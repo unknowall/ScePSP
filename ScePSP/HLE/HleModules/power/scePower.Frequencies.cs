@@ -45,7 +45,7 @@ namespace ScePSP.Hle.Modules.power
         [HlePspFunction(NID = 0xB1A52C83, FirmwareVersion = 150)]
         public float scePowerGetCpuClockFrequencyFloat()
         {
-            return (float) scePowerGetCpuClockFrequency();
+            return (float)scePowerGetCpuClockFrequency();
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace ScePSP.Hle.Modules.power
         [HlePspFunction(NID = 0x9BADB3EB, FirmwareVersion = 150)]
         public float scePowerGetBusClockFrequencyFloat()
         {
-            return (float) scePowerGetBusClockFrequency();
+            return (float)scePowerGetBusClockFrequency();
         }
 
         /// <summary>

@@ -1,13 +1,13 @@
-﻿using System;
+﻿using SafeILGenerator.Ast;
+using SafeILGenerator.Ast.Nodes;
+using ScePSP.Core.Cpu.Table;
+using ScePSP.Core.Cpu.VFpu;
+using ScePSPUtils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using SafeILGenerator.Ast.Nodes;
-using ScePSP.Core.Cpu.VFpu;
-using ScePSPUtils;
-using ScePSP.Core.Cpu.Table;
-using SafeILGenerator.Ast;
 
 namespace ScePSP.Core.Cpu.Emitter
 {
@@ -136,8 +136,8 @@ namespace ScePSP.Core.Cpu.Emitter
             var dest = VecVd;
             var src = CelVs;
 
-            AstNodeExpr sine = _ast.CallStatic((Func<float, float>) MathFloat.SinV1, src.Get());
-            AstNodeExpr cosine = _ast.CallStatic((Func<float, float>) MathFloat.CosV1, src.Get());
+            AstNodeExpr sine = _ast.CallStatic((Func<float, float>)MathFloat.SinV1, src.Get());
+            AstNodeExpr cosine = _ast.CallStatic((Func<float, float>)MathFloat.CosV1, src.Get());
             if (negateSin) sine = -sine;
 
             //Console.WriteLine("{0},{1},{2}", CosIndex, SinIndex, NegateSin);
@@ -171,7 +171,7 @@ namespace ScePSP.Core.Cpu.Emitter
 
         [InstructionName(InstructionNames.Vabs)]
         public AstNodeStm Vabs() =>
-            VecVd.SetVector(index => _ast.CallStatic((Func<float, float>) MathFloat.Abs, VecVs[index]), _pc);
+            VecVd.SetVector(index => _ast.CallStatic((Func<float, float>)MathFloat.Abs, VecVs[index]), _pc);
 
         [InstructionName(InstructionNames.Vneg)]
         public AstNodeStm Vneg() => VecVd.SetVector(index => -VecVs[index], _pc);
@@ -181,7 +181,7 @@ namespace ScePSP.Core.Cpu.Emitter
 
         [InstructionName(InstructionNames.Vsgn)]
         public AstNodeStm Vsgn() =>
-            VecVd.SetVector(index => _ast.CallStatic((Func<float, float>) MathFloat.Sign, VecVs[index]), _pc);
+            VecVd.SetVector(index => _ast.CallStatic((Func<float, float>)MathFloat.Sign, VecVs[index]), _pc);
 
         [InstructionName(InstructionNames.Vrcp)]
         public AstNodeStm Vrcp() => VecVd.SetVector(index => 1f / VecVs[index], _pc);
@@ -192,50 +192,50 @@ namespace ScePSP.Core.Cpu.Emitter
         // OP_V_INTERNAL_IN_N!(1, "1.0f / sqrt(v)");
         // vcst: Vfpu ConSTant
         [InstructionName(InstructionNames.Vsqrt)]
-        public AstNodeStm Vsqrt() => _vfpu_call_ff((Func<float, float>) MathFloat.Sqrt);
+        public AstNodeStm Vsqrt() => _vfpu_call_ff((Func<float, float>)MathFloat.Sqrt);
 
         [InstructionName(InstructionNames.Vrsq)]
-        public AstNodeStm Vrsq() => _vfpu_call_ff((Func<float, float>) MathFloat.RSqrt);
+        public AstNodeStm Vrsq() => _vfpu_call_ff((Func<float, float>)MathFloat.RSqrt);
 
         [InstructionName(InstructionNames.Vsin)]
-        public AstNodeStm Vsin() => _vfpu_call_ff((Func<float, float>) MathFloat.SinV1);
+        public AstNodeStm Vsin() => _vfpu_call_ff((Func<float, float>)MathFloat.SinV1);
 
         [InstructionName(InstructionNames.Vcos)]
-        public AstNodeStm Vcos() => _vfpu_call_ff((Func<float, float>) MathFloat.CosV1);
+        public AstNodeStm Vcos() => _vfpu_call_ff((Func<float, float>)MathFloat.CosV1);
 
         [InstructionName(InstructionNames.Vexp2)]
-        public AstNodeStm Vexp2() => _vfpu_call_ff((Func<float, float>) MathFloat.Exp2);
+        public AstNodeStm Vexp2() => _vfpu_call_ff((Func<float, float>)MathFloat.Exp2);
 
         [InstructionName(InstructionNames.Vlog2)]
-        public AstNodeStm Vlog2() => _vfpu_call_ff((Func<float, float>) MathFloat.Log2);
+        public AstNodeStm Vlog2() => _vfpu_call_ff((Func<float, float>)MathFloat.Log2);
 
         [InstructionName(InstructionNames.Vasin)]
-        public AstNodeStm Vasin() => _vfpu_call_ff((Func<float, float>) MathFloat.AsinV1);
+        public AstNodeStm Vasin() => _vfpu_call_ff((Func<float, float>)MathFloat.AsinV1);
 
         [InstructionName(InstructionNames.Vnrcp)]
-        public AstNodeStm Vnrcp() => _vfpu_call_ff((Func<float, float>) MathFloat.NRcp);
+        public AstNodeStm Vnrcp() => _vfpu_call_ff((Func<float, float>)MathFloat.NRcp);
 
         [InstructionName(InstructionNames.Vnsin)]
-        public AstNodeStm Vnsin() => _vfpu_call_ff((Func<float, float>) MathFloat.NSinV1);
+        public AstNodeStm Vnsin() => _vfpu_call_ff((Func<float, float>)MathFloat.NSinV1);
 
         [InstructionName(InstructionNames.Vrexp2)]
-        public AstNodeStm Vrexp2() => _vfpu_call_ff((Func<float, float>) MathFloat.RExp2);
+        public AstNodeStm Vrexp2() => _vfpu_call_ff((Func<float, float>)MathFloat.RExp2);
 
         [InstructionName(InstructionNames.Vsat0)]
-        public AstNodeStm Vsat0() => _vfpu_call_ff((Func<float, float>) MathFloat.Vsat0);
+        public AstNodeStm Vsat0() => _vfpu_call_ff((Func<float, float>)MathFloat.Vsat0);
 
         [InstructionName(InstructionNames.Vsat1)]
-        public AstNodeStm Vsat1() => _vfpu_call_ff((Func<float, float>) MathFloat.Vsat1);
+        public AstNodeStm Vsat1() => _vfpu_call_ff((Func<float, float>)MathFloat.Vsat1);
 
         // Vector -> Cell operations
         [InstructionName(InstructionNames.Vcst)]
         public AstNodeStm Vcst() =>
-            CelVd.Set(VfpuConstants.GetConstantValueByIndex((int) _instruction.Imm5).Value, _pc);
+            CelVd.Set(VfpuConstants.GetConstantValueByIndex((int)_instruction.Imm5).Value, _pc);
 
         [InstructionName(InstructionNames.Vhdp)]
         public AstNodeStm Vhdp()
         {
-            var vectorSize = (uint) OneTwo;
+            var vectorSize = (uint)OneTwo;
             return CelVd.Set(_Aggregate(0f, (aggregate, index) =>
                 aggregate + VecVt[index] * (index == vectorSize - 1 ? 1f : VecVs[index])
             ), _pc);
@@ -284,11 +284,11 @@ namespace ScePSP.Core.Cpu.Emitter
         // Vfpu MINimum/MAXium/ADD/SUB/DIV/MUL
         [InstructionName(InstructionNames.Vmin)]
         public AstNodeStm Vmin() => VecVd.SetVector(
-            index => _ast.CallStatic((Func<float, float, float>) MathFloat.Min, VecVs[index], VecVt[index]), _pc);
+            index => _ast.CallStatic((Func<float, float, float>)MathFloat.Min, VecVs[index], VecVt[index]), _pc);
 
         [InstructionName(InstructionNames.Vmax)]
         public AstNodeStm Vmax() => VecVd.SetVector(
-            index => _ast.CallStatic((Func<float, float, float>) MathFloat.Max, VecVs[index], VecVt[index]), _pc);
+            index => _ast.CallStatic((Func<float, float, float>)MathFloat.Max, VecVs[index], VecVt[index]), _pc);
 
         [InstructionName(InstructionNames.Vadd)]
         public AstNodeStm Vadd() => VecVd.SetVector(index => VecVs[index] + VecVt[index], _pc);
@@ -308,7 +308,7 @@ namespace ScePSP.Core.Cpu.Emitter
 
         // Vfpu load Integer IMmediate
         [InstructionName(InstructionNames.Viim)]
-        public AstNodeStm Viim() => CelVtNoPrefix.Set((float) _instruction.Imm, _pc);
+        public AstNodeStm Viim() => CelVtNoPrefix.Set((float)_instruction.Imm, _pc);
 
         [InstructionName(InstructionNames.Vdet)]
         public AstNodeStm Vdet()
@@ -348,11 +348,11 @@ namespace ScePSP.Core.Cpu.Emitter
                 switch (index)
                 {
                     case 0:
-                        return _ast.CallStatic((Func<float, float, float, float>) MathFloat.Clamp, 1f - vvs[0], 0f, 1f);
-                    case 1: return _ast.CallStatic((Func<float, float, float, float>) MathFloat.Clamp, vvs[0], 0f, 1f);
+                        return _ast.CallStatic((Func<float, float, float, float>)MathFloat.Clamp, 1f - vvs[0], 0f, 1f);
+                    case 1: return _ast.CallStatic((Func<float, float, float, float>)MathFloat.Clamp, vvs[0], 0f, 1f);
                     case 2:
-                        return _ast.CallStatic((Func<float, float, float, float>) MathFloat.Clamp, 1f - vvs[1], 0f, 1f);
-                    case 3: return _ast.CallStatic((Func<float, float, float, float>) MathFloat.Clamp, vvs[1], 0f, 1f);
+                        return _ast.CallStatic((Func<float, float, float, float>)MathFloat.Clamp, 1f - vvs[1], 0f, 1f);
+                    case 3: return _ast.CallStatic((Func<float, float, float, float>)MathFloat.Clamp, vvs[1], 0f, 1f);
                     default: throw new NotImplementedException("vsocp: " + index);
                 }
             }, _pc);
@@ -383,7 +383,7 @@ namespace ScePSP.Core.Cpu.Emitter
 
         [InstructionName(InstructionNames.Vwbn)]
         public AstNodeStm Vwbn() => VecVd.SetVector(
-            index => _ast.CallStatic((Func<float, int, float>) _vwbn_impl, VecVs[index], (int) _instruction.Imm8),
+            index => _ast.CallStatic((Func<float, int, float>)_vwbn_impl, VecVs[index], (int)_instruction.Imm8),
             _pc);
 
         [InstructionName(InstructionNames.Vnop)]
@@ -506,10 +506,10 @@ namespace ScePSP.Core.Cpu.Emitter
             {
                 switch (index)
                 {
-                    case 0: return _ast.CallStatic((Func<float, float, float>) MathFloat.Min, vvs[0], vvs[1]);
-                    case 1: return _ast.CallStatic((Func<float, float, float>) MathFloat.Max, vvs[0], vvs[1]);
-                    case 2: return _ast.CallStatic((Func<float, float, float>) MathFloat.Min, vvs[2], vvs[3]);
-                    case 3: return _ast.CallStatic((Func<float, float, float>) MathFloat.Max, vvs[2], vvs[3]);
+                    case 0: return _ast.CallStatic((Func<float, float, float>)MathFloat.Min, vvs[0], vvs[1]);
+                    case 1: return _ast.CallStatic((Func<float, float, float>)MathFloat.Max, vvs[0], vvs[1]);
+                    case 2: return _ast.CallStatic((Func<float, float, float>)MathFloat.Min, vvs[2], vvs[3]);
+                    case 3: return _ast.CallStatic((Func<float, float, float>)MathFloat.Max, vvs[2], vvs[3]);
                     default: throw new InvalidOperationException("vsrt1.Assert!");
                 }
             }, _pc);
@@ -528,10 +528,10 @@ namespace ScePSP.Core.Cpu.Emitter
             {
                 switch (index)
                 {
-                    case 0: return _ast.CallStatic((Func<float, float, float>) MathFloat.Min, vvs[0], vvs[3]);
-                    case 1: return _ast.CallStatic((Func<float, float, float>) MathFloat.Min, vvs[1], vvs[2]);
-                    case 2: return _ast.CallStatic((Func<float, float, float>) MathFloat.Max, vvs[1], vvs[2]);
-                    case 3: return _ast.CallStatic((Func<float, float, float>) MathFloat.Max, vvs[0], vvs[3]);
+                    case 0: return _ast.CallStatic((Func<float, float, float>)MathFloat.Min, vvs[0], vvs[3]);
+                    case 1: return _ast.CallStatic((Func<float, float, float>)MathFloat.Min, vvs[1], vvs[2]);
+                    case 2: return _ast.CallStatic((Func<float, float, float>)MathFloat.Max, vvs[1], vvs[2]);
+                    case 3: return _ast.CallStatic((Func<float, float, float>)MathFloat.Max, vvs[0], vvs[3]);
                     default: throw new InvalidOperationException("vsrt2.Assert!");
                 }
             }, _pc);
@@ -550,10 +550,10 @@ namespace ScePSP.Core.Cpu.Emitter
             {
                 switch (index)
                 {
-                    case 0: return _ast.CallStatic((Func<float, float, float>) MathFloat.Max, vvs[0], vvs[1]);
-                    case 1: return _ast.CallStatic((Func<float, float, float>) MathFloat.Min, vvs[0], vvs[1]);
-                    case 2: return _ast.CallStatic((Func<float, float, float>) MathFloat.Max, vvs[2], vvs[3]);
-                    case 3: return _ast.CallStatic((Func<float, float, float>) MathFloat.Min, vvs[2], vvs[3]);
+                    case 0: return _ast.CallStatic((Func<float, float, float>)MathFloat.Max, vvs[0], vvs[1]);
+                    case 1: return _ast.CallStatic((Func<float, float, float>)MathFloat.Min, vvs[0], vvs[1]);
+                    case 2: return _ast.CallStatic((Func<float, float, float>)MathFloat.Max, vvs[2], vvs[3]);
+                    case 3: return _ast.CallStatic((Func<float, float, float>)MathFloat.Min, vvs[2], vvs[3]);
                     default: throw new InvalidOperationException("vsrt3.Assert!");
                 }
             }, _pc);
@@ -572,10 +572,10 @@ namespace ScePSP.Core.Cpu.Emitter
             {
                 switch (index)
                 {
-                    case 0: return _ast.CallStatic((Func<float, float, float>) MathFloat.Max, vvs[0], vvs[3]);
-                    case 1: return _ast.CallStatic((Func<float, float, float>) MathFloat.Max, vvs[1], vvs[2]);
-                    case 2: return _ast.CallStatic((Func<float, float, float>) MathFloat.Min, vvs[1], vvs[2]);
-                    case 3: return _ast.CallStatic((Func<float, float, float>) MathFloat.Min, vvs[0], vvs[3]);
+                    case 0: return _ast.CallStatic((Func<float, float, float>)MathFloat.Max, vvs[0], vvs[3]);
+                    case 1: return _ast.CallStatic((Func<float, float, float>)MathFloat.Max, vvs[1], vvs[2]);
+                    case 2: return _ast.CallStatic((Func<float, float, float>)MathFloat.Min, vvs[1], vvs[2]);
+                    case 3: return _ast.CallStatic((Func<float, float, float>)MathFloat.Min, vvs[0], vvs[3]);
                     default: throw new InvalidOperationException("vsrt4.Assert!");
                 }
             }, _pc);
@@ -586,7 +586,7 @@ namespace ScePSP.Core.Cpu.Emitter
 
         [InstructionName(InstructionNames.Vavg)]
         public AstNodeStm Vavg() =>
-            CelVd.Set(_Aggregate(0f, (value, index) => value + VecVs[index]) / (float) OneTwo, _pc);
+            CelVd.Set(_Aggregate(0f, (value, index) => value + VecVs[index]) / (float)OneTwo, _pc);
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // Prefixes
@@ -616,22 +616,22 @@ namespace ScePSP.Core.Cpu.Emitter
 
         [InstructionName(InstructionNames.Vrnds)]
         public AstNodeStm Vrnds() => _ast.Statement(_ast.CallStatic(
-            (Action<CpuThreadState, int>) CpuEmitterUtils._vrnds,
+            (Action<CpuThreadState, int>)CpuEmitterUtils._vrnds,
             _ast.CpuThreadStateExpr));
 
         [InstructionName(InstructionNames.Vrndi)]
         public AstNodeStm Vrndi() => VecVdI.SetVector(
-            index => _ast.CallStatic((Func<CpuThreadState, int>) CpuEmitterUtils._vrndi, _ast.CpuThreadStateExpr),
+            index => _ast.CallStatic((Func<CpuThreadState, int>)CpuEmitterUtils._vrndi, _ast.CpuThreadStateExpr),
             _pc);
 
         [InstructionName(InstructionNames.Vrndf1)]
         public AstNodeStm Vrndf1() => VecVd.SetVector(
-            index => _ast.CallStatic((Func<CpuThreadState, float>) CpuEmitterUtils._vrndf1, _ast.CpuThreadStateExpr),
+            index => _ast.CallStatic((Func<CpuThreadState, float>)CpuEmitterUtils._vrndf1, _ast.CpuThreadStateExpr),
             _pc);
 
         [InstructionName(InstructionNames.Vrndf2)]
         public AstNodeStm Vrndf2() => VecVd.SetVector(
-            index => _ast.CallStatic((Func<CpuThreadState, float>) CpuEmitterUtils._vrndf2, _ast.CpuThreadStateExpr),
+            index => _ast.CallStatic((Func<CpuThreadState, float>)CpuEmitterUtils._vrndf2, _ast.CpuThreadStateExpr),
             _pc);
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -653,7 +653,7 @@ namespace ScePSP.Core.Cpu.Emitter
 
             return dest.SetMatrix((column, row) =>
             {
-                var adder = (AstNodeExpr) _ast.Immediate(0f);
+                var adder = (AstNodeExpr)_ast.Immediate(0f);
                 for (var n = 0; n < vectorSize; n++)
                 {
                     adder += target[column, n] * src[row, n];
@@ -758,7 +758,7 @@ namespace ScePSP.Core.Cpu.Emitter
         {
             var vecVs = Vec(Vs, VType.VuInt, 4);
             return CelVdU.Set(
-                _ast.CallStatic((Func<uint, uint, uint, uint, uint>) CpuEmitterUtils._vi2c_impl, vecVs[0], vecVs[1],
+                _ast.CallStatic((Func<uint, uint, uint, uint, uint>)CpuEmitterUtils._vi2c_impl, vecVs[0], vecVs[1],
                     vecVs[2], vecVs[3]), _pc);
         }
 
@@ -767,7 +767,7 @@ namespace ScePSP.Core.Cpu.Emitter
         {
             var vecVs = Vec(Vs, VType.VInt, 4);
             return CelVdU.Set(
-                _ast.CallStatic((Func<int, int, int, int, uint>) CpuEmitterUtils._vi2uc_impl, vecVs[0], vecVs[1],
+                _ast.CallStatic((Func<int, int, int, int, uint>)CpuEmitterUtils._vi2uc_impl, vecVs[0], vecVs[1],
                     vecVs[2], vecVs[3]), _pc);
         }
 
@@ -790,8 +790,8 @@ namespace ScePSP.Core.Cpu.Emitter
         public AstNodeStm Vi2F()
         {
             return VecVd.SetVector(
-                index => _ast.CallStatic((Func<float, int, float>) MathFloat.Scalb, _ast.Cast<float>(VecVsI[index]),
-                    -(int) _instruction.Imm5), _pc);
+                index => _ast.CallStatic((Func<float, int, float>)MathFloat.Scalb, _ast.Cast<float>(VecVsI[index]),
+                    -(int)_instruction.Imm5), _pc);
         }
 
         private AstNodeStm _vf2i_dnu(Func<float, int> roundingFunc)
@@ -800,9 +800,9 @@ namespace ScePSP.Core.Cpu.Emitter
                     _ast.CallStatic(
                         roundingFunc,
                         _ast.CallStatic(
-                            (Func<float, int, float>) MathFloat.Scalb,
+                            (Func<float, int, float>)MathFloat.Scalb,
                             VecVs[index],
-                            (int) _instruction.Imm5
+                            (int)_instruction.Imm5
                         )
                     )
                 , _pc);
@@ -820,9 +820,9 @@ namespace ScePSP.Core.Cpu.Emitter
         [InstructionName(InstructionNames.Vf2Iz)]
         public AstNodeStm Vf2Iz() => VecVdI.SetVector(index =>
                 _ast.CallStatic(
-                    (Func<float, int, int>) CpuEmitterUtils._vf2iz,
+                    (Func<float, int, int>)CpuEmitterUtils._vf2iz,
                     VecVs[index],
-                    (int) _instruction.Imm5
+                    (int)_instruction.Imm5
                 )
             , _pc);
 
@@ -832,7 +832,7 @@ namespace ScePSP.Core.Cpu.Emitter
             var vectorSize = OneTwo;
             return _Vector(Vd, VType.VuInt, vectorSize / 2)
                     .SetVector(index => _ast.CallStatic(
-                        (Func<uint, uint, uint>) CpuEmitterUtils._vi2s_impl,
+                        (Func<uint, uint, uint>)CpuEmitterUtils._vi2s_impl,
                         VecVsU[index * 2 + 0],
                         VecVsU[index * 2 + 1]
                     ), _pc)
@@ -846,7 +846,7 @@ namespace ScePSP.Core.Cpu.Emitter
             var vecVs = Vec(Vs, VType.VFloat, OneTwo);
             return vecVd.SetVector(index =>
                     _ast.CallStatic(
-                        (Func<float, float, uint>) CpuEmitterUtils._vf2h_impl,
+                        (Func<float, float, uint>)CpuEmitterUtils._vf2h_impl,
                         vecVs[index * 2 + 0],
                         vecVs[index * 2 + 1]
                     )
@@ -860,8 +860,8 @@ namespace ScePSP.Core.Cpu.Emitter
             var vecVs = Vec(Vs, VType.VuInt, OneTwo);
             return vecVd.SetVector(index => _ast.CallStatic(
                 index % 2 == 0
-                    ? (Func<uint, float>) CpuEmitterUtils._vh2f_0
-                    : (Func<uint, float>) CpuEmitterUtils._vh2f_1,
+                    ? (Func<uint, float>)CpuEmitterUtils._vh2f_0
+                    : (Func<uint, float>)CpuEmitterUtils._vh2f_1,
                 vecVs[index / 2]
             ), _pc);
         }
@@ -872,7 +872,7 @@ namespace ScePSP.Core.Cpu.Emitter
             var vectorSize = OneTwo;
             return _Vector(Vd, VType.VInt, vectorSize / 2)
                     .SetVector(index => _ast.CallStatic(
-                        (Func<int, int, int>) CpuEmitterUtils._vi2us_impl,
+                        (Func<int, int, int>)CpuEmitterUtils._vi2us_impl,
                         VecVsI[index * 2 + 0],
                         VecVsI[index * 2 + 1]
                     ), _pc)
@@ -892,9 +892,9 @@ namespace ScePSP.Core.Cpu.Emitter
         public AstNodeStm Mtvc()
         {
             return _ast.Statement(_ast.CallStatic(
-                (Action<CpuThreadState, VfpuControlRegistersEnum, uint>) CpuEmitterUtils._mtvc_impl,
+                (Action<CpuThreadState, VfpuControlRegistersEnum, uint>)CpuEmitterUtils._mtvc_impl,
                 _ast.CpuThreadStateExpr,
-                _ast.Cast<VfpuControlRegistersEnum>((int) (_instruction.Imm7 + 128), false),
+                _ast.Cast<VfpuControlRegistersEnum>((int)(_instruction.Imm7 + 128), false),
                 CelVdU.Get()
             ));
             //_mtvc_impl
@@ -905,9 +905,9 @@ namespace ScePSP.Core.Cpu.Emitter
         /// </summary>
         [InstructionName(InstructionNames.Mfvc)]
         public AstNodeStm Mfvc() => _ast.AssignGpr(Rt, _ast.CallStatic(
-            (Func<CpuThreadState, VfpuControlRegistersEnum, uint>) CpuEmitterUtils._mfvc_impl,
+            (Func<CpuThreadState, VfpuControlRegistersEnum, uint>)CpuEmitterUtils._mfvc_impl,
             _ast.CpuThreadStateExpr,
-            _ast.Cast<VfpuControlRegistersEnum>((int) (_instruction.Imm7 + 128), false)
+            _ast.Cast<VfpuControlRegistersEnum>((int)(_instruction.Imm7 + 128), false)
         ));
 
         // Move From/to Vfpu (C?)_
@@ -944,7 +944,7 @@ namespace ScePSP.Core.Cpu.Emitter
         {
             var register = _instruction.Vt51;
             var methodInfo = left
-                    ? (LvlSvlQDelegate) CpuEmitterUtils._lvl_svl_q
+                    ? (LvlSvlQDelegate)CpuEmitterUtils._lvl_svl_q
                     : CpuEmitterUtils._lvr_svr_q
                 ;
 
@@ -979,7 +979,7 @@ namespace ScePSP.Core.Cpu.Emitter
 
         [InstructionName(InstructionNames.SvS)]
         public AstNodeStm sv_s() => _ast.MemorySetValue<float>(_memory, Address_RS_IMM14(), _Cell(Vt52).Get());
-        
+
         public enum ConditionEnum
         {
             VcFl = 0,
@@ -1005,7 +1005,7 @@ namespace ScePSP.Core.Cpu.Emitter
         {
             var vectorSize = _instruction.OneTwo;
             var cond = _instruction.Imm4;
-            var cond2 = (ConditionEnum) cond;
+            var cond2 = (ConditionEnum)cond;
             //bool NormalFlag = (Cond & 8) == 0;
             //bool NotFlag = (Cond & 4) != 0;
             //uint TypeFlag = (Cond & 3);
@@ -1043,7 +1043,7 @@ namespace ScePSP.Core.Cpu.Emitter
                             break;
                         //case ConditionEnum.VC_LE: Expr = ast.Binary(Left, "<=", Right); break;
                         case ConditionEnum.VcLe:
-                            expr = _ast.CallStatic((Func<float, float, bool>) MathFloat.IsLessOrEqualsThan, left,
+                            expr = _ast.CallStatic((Func<float, float, bool>)MathFloat.IsLessOrEqualsThan, left,
                                 right);
                             break;
 
@@ -1055,7 +1055,7 @@ namespace ScePSP.Core.Cpu.Emitter
                             break;
                         //case ConditionEnum.VC_GE: Expr = ast.Binary(Left, ">=", Right); break;
                         case ConditionEnum.VcGe:
-                            expr = _ast.CallStatic((Func<float, float, bool>) MathFloat.IsGreatOrEqualsThan, left,
+                            expr = _ast.CallStatic((Func<float, float, bool>)MathFloat.IsGreatOrEqualsThan, left,
                                 right);
                             break;
                         case ConditionEnum.VcGt:
@@ -1066,27 +1066,27 @@ namespace ScePSP.Core.Cpu.Emitter
                             expr = _ast.Binary(_ast.Binary(left, "==", 0.0f), "||", _ast.Binary(left, "==", -0.0f));
                             break;
                         case ConditionEnum.VcEn:
-                            expr = _ast.CallStatic((Func<float, bool>) MathFloat.IsNan, left);
+                            expr = _ast.CallStatic((Func<float, bool>)MathFloat.IsNan, left);
                             break;
                         case ConditionEnum.VcEi:
-                            expr = _ast.CallStatic((Func<float, bool>) MathFloat.IsInfinity, left);
+                            expr = _ast.CallStatic((Func<float, bool>)MathFloat.IsInfinity, left);
                             break;
                         case ConditionEnum.VcEs:
-                            expr = _ast.CallStatic((Func<float, bool>) MathFloat.IsNanOrInfinity, left);
+                            expr = _ast.CallStatic((Func<float, bool>)MathFloat.IsNanOrInfinity, left);
                             break; // Tekken Dark Resurrection
 
                         case ConditionEnum.VcNz:
                             expr = _ast.Binary(left, "!=", 0f);
                             break;
                         case ConditionEnum.VcNn:
-                            expr = _ast.Unary("!", _ast.CallStatic((Func<float, bool>) MathFloat.IsNan, left));
+                            expr = _ast.Unary("!", _ast.CallStatic((Func<float, bool>)MathFloat.IsNan, left));
                             break;
                         case ConditionEnum.VcNi:
-                            expr = _ast.Unary("!", _ast.CallStatic((Func<float, bool>) MathFloat.IsInfinity, left));
+                            expr = _ast.Unary("!", _ast.CallStatic((Func<float, bool>)MathFloat.IsInfinity, left));
                             break;
                         case ConditionEnum.VcNs:
                             expr = _ast.Unary("!",
-                                _ast.CallStatic((Func<float, bool>) MathFloat.IsNanOrInfinity, left));
+                                _ast.CallStatic((Func<float, bool>)MathFloat.IsNanOrInfinity, left));
                             break;
 
                         default: throw new InvalidOperationException();
@@ -1107,21 +1107,21 @@ namespace ScePSP.Core.Cpu.Emitter
 
         [InstructionName(InstructionNames.Vslt)]
         public AstNodeStm Vslt() => VecVd.SetVector(
-            index => _ast.CallStatic((Func<float, float, float>) CpuEmitterUtils._vslt_impl, VecVs[index],
+            index => _ast.CallStatic((Func<float, float, float>)CpuEmitterUtils._vslt_impl, VecVs[index],
                 VecVt[index]), _pc);
 
         [InstructionName(InstructionNames.Vsge)]
         public AstNodeStm Vsge() => VecVd.SetVector(
-            index => _ast.CallStatic((Func<float, float, float>) CpuEmitterUtils._vsge_impl, VecVs[index],
+            index => _ast.CallStatic((Func<float, float, float>)CpuEmitterUtils._vsge_impl, VecVs[index],
                 VecVt[index]), _pc);
 
         [InstructionName(InstructionNames.Vscmp)]
         public AstNodeStm Vscmp() => VecVd.SetVector(
-            index => _ast.CallStatic((Func<float, float, float>) MathFloat.Sign2, VecVs[index], VecVt[index]), _pc);
+            index => _ast.CallStatic((Func<float, float, float>)MathFloat.Sign2, VecVs[index], VecVt[index]), _pc);
 
         public AstNodeStm _vcmovtf(bool True)
         {
-            var register = (int) _instruction.Imm3;
+            var register = (int)_instruction.Imm3;
 
             Func<int, AstNodeExpr> vcc = index =>
             {
@@ -1163,7 +1163,7 @@ namespace ScePSP.Core.Cpu.Emitter
 
         private AstNodeStm _bvtf(bool True)
         {
-            var register = (int) _instruction.Imm3;
+            var register = (int)_instruction.Imm3;
             AstNodeExpr branchExpr = _ast.Vcc(register);
             if (!True) branchExpr = _ast.Unary("!", branchExpr);
             return AssignBranchFlag(branchExpr);
@@ -1180,12 +1180,12 @@ namespace ScePSP.Core.Cpu.Emitter
 
         [InstructionName(InstructionNames.Bvtl)]
         public AstNodeStm Bvtl() => Bvt();
-        
-        
+
+
         ////////
         ///
-        
-         private void _call_debug_vfpu()
+
+        private void _call_debug_vfpu()
         {
             throw new NotImplementedException("_call_debug_vfpu");
             //MipsMethodEmitter.CallMethodWithCpuThreadStateAsFirstArgument(this.GetType(), "_debug_vfpu");
@@ -1313,9 +1313,9 @@ namespace ScePSP.Core.Cpu.Emitter
                     // Value.
                     else
                     {
-                        astNodeExpr = _GetVRegRef(indices[(int) prefix.SourceIndex(prefixIndex)]);
+                        astNodeExpr = _GetVRegRef(indices[(int)prefix.SourceIndex(prefixIndex)]);
                         if (prefix.SourceAbsolute(prefixIndex))
-                            astNodeExpr = Ast.CallStatic((Func<float, float>) MathFloat.Abs, astNodeExpr);
+                            astNodeExpr = Ast.CallStatic((Func<float, float>)MathFloat.Abs, astNodeExpr);
                     }
 
                     if (prefix.SourceNegate(prefixIndex)) astNodeExpr = Ast.Unary("-", astNodeExpr);
@@ -1364,14 +1364,14 @@ namespace ScePSP.Core.Cpu.Emitter
                         {
                             if (VType == CpuEmitter.VType.VFloat)
                             {
-                                astNodeExpr = Ast.CallStatic((Func<float, float, float, float>) MathFloat.Clamp,
-                                    astNodeExpr, (float) min, (float) max);
+                                astNodeExpr = Ast.CallStatic((Func<float, float, float, float>)MathFloat.Clamp,
+                                    astNodeExpr, (float)min, (float)max);
                             }
                             else
                             {
                                 astNodeExpr = Ast.Cast(GetVTypeType(),
-                                    Ast.CallStatic((Func<int, int, int, int>) MathFloat.ClampInt, astNodeExpr,
-                                        (int) min, (int) max));
+                                    Ast.CallStatic((Func<int, int, int, int>)MathFloat.ClampInt, astNodeExpr,
+                                        (int)min, (int)max));
                             }
                         }
                     }
@@ -1411,7 +1411,7 @@ namespace ScePSP.Core.Cpu.Emitter
                 _index = VfpuUtils.GetIndexCell(vReg.Reg);
             }
 
-            public AstNodeExpr Get() => GetRegApplyPrefix(new[] {_index}, 0, 0);
+            public AstNodeExpr Get() => GetRegApplyPrefix(new[] { _index }, 0, 0);
 
             public AstNodeStm Set(AstNodeExpr value, uint pc, [CallerMemberName] string calledFrom = "") =>
                 _ast.Statements(
@@ -1513,13 +1513,13 @@ namespace ScePSP.Core.Cpu.Emitter
                 var statements = new List<AstNodeStm>();
 
                 for (var row = 0; row < VectorSize; row++)
-                for (var column = 0; column < VectorSize; column++)
-                {
-                    statements.Add(Set(column, row, generator(column, row)));
-                }
+                    for (var column = 0; column < VectorSize; column++)
+                    {
+                        statements.Add(Set(column, row, generator(column, row)));
+                    }
 
                 for (var row = 0; row < VectorSize; row++)
-                for (var column = 0; column < VectorSize; column++) statements.Add(Set2(column, row, pc, calledFrom));
+                    for (var column = 0; column < VectorSize; column++) statements.Add(Set2(column, row, pc, calledFrom));
                 return _ast.Statements(statements);
             }
         }

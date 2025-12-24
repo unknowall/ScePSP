@@ -23,7 +23,7 @@
             /// <summary>
             /// 
             /// </summary>
-            public uint Mask => (uint) ((1 << Size) - 1);
+            public uint Mask => (uint)((1 << Size) - 1);
 
             /// <summary>
             /// 
@@ -62,14 +62,14 @@
             /// </summary>
             /// <param name="value"></param>
             /// <returns></returns>
-            public byte ExtractToByte(uint value) => (byte) (Extract(value) * 255 / Mask);
+            public byte ExtractToByte(uint value) => (byte)(Extract(value) * 255 / Mask);
 
             /// <summary>
             /// 
             /// </summary>
             /// <param name="value"></param>
             /// <returns></returns>
-            public float ExtractToFloat(uint value) => Extract(value) / (float) Mask;
+            public float ExtractToFloat(uint value) => Extract(value) / (float)Mask;
         }
 
         /// <summary>
@@ -117,7 +117,7 @@
         /// </summary>
         public int[] Offsets
         {
-            get => new[] {Red.Offset, Green.Offset, Blue.Offset, Alpha.Offset};
+            get => new[] { Red.Offset, Green.Offset, Blue.Offset, Alpha.Offset };
             set
             {
                 Red.Offset = value[0];
@@ -132,7 +132,7 @@
         /// </summary>
         public int[] Sizes
         {
-            get => new[] {Red.Size, Green.Size, Blue.Size, Alpha.Size};
+            get => new[] { Red.Size, Green.Size, Blue.Size, Alpha.Size };
             set
             {
                 Red.Size = value[0];

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime;
 
 namespace ScePSPUtils
 {
@@ -13,8 +12,8 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float Abs(float value)
         {
             // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -27,13 +26,13 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static int Cast(float value)
         {
             if (float.IsNegativeInfinity(value)) return int.MinValue;
             if (float.IsInfinity(value) || float.IsNaN(value)) return int.MaxValue;
-            return (int) value;
+            return (int)value;
         }
 
         /// <summary>
@@ -41,13 +40,13 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static int Floor(float value)
         {
             if (float.IsNegativeInfinity(value)) return int.MinValue;
             if (float.IsInfinity(value) || float.IsNaN(value)) return int.MaxValue;
-            return (int) Math.Floor(value);
+            return (int)Math.Floor(value);
         }
 
         /// <summary>
@@ -55,13 +54,13 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static int Ceil(float value)
         {
             if (float.IsNegativeInfinity(value)) return int.MinValue;
             if (float.IsInfinity(value) || float.IsNaN(value)) return int.MaxValue;
-            return (int) Math.Ceiling(value);
+            return (int)Math.Ceiling(value);
         }
 
         /// <summary>
@@ -69,13 +68,13 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static int Round(float value)
         {
             if (float.IsNegativeInfinity(value)) return int.MinValue;
             if (float.IsInfinity(value) || float.IsNaN(value)) return int.MaxValue;
-            return (int) Math.Round(value);
+            return (int)Math.Round(value);
         }
 
         /// <summary>
@@ -85,8 +84,8 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float Rint(float value)
         {
             if (float.IsNegativeInfinity(value)) return int.MinValue;
@@ -99,11 +98,11 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static uint ReinterpretFloatAsUInt(float value)
         {
-            return *(uint*) &value;
+            return *(uint*)&value;
         }
 
         /// <summary>
@@ -111,11 +110,11 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float ReinterpretUIntAsFloat(uint value)
         {
-            return *(float*) &value;
+            return *(float*)&value;
         }
 
         /// <summary>
@@ -123,11 +122,11 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static int ReinterpretFloatAsInt(float value)
         {
-            return *(int*) &value;
+            return *(int*)&value;
         }
 
         /// <summary>
@@ -135,11 +134,11 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float ReinterpretIntAsFloat(int value)
         {
-            return *(float*) &value;
+            return *(float*)&value;
         }
 
         /// <summary>
@@ -147,11 +146,11 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="angle"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float Cos(float angle)
         {
-            return (float) Math.Cos(angle);
+            return (float)Math.Cos(angle);
         }
 
         /// <summary>
@@ -159,11 +158,11 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="angle"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float Sin(float angle)
         {
-            return (float) Math.Sin(angle);
+            return (float)Math.Sin(angle);
         }
 
         /// <summary>
@@ -171,22 +170,22 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="angleV1"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float CosV1(float angleV1)
         {
             return Cos(angleV1 * Pi2);
         }
 
-        private const float Pi2 = (float) (Math.PI / 2f);
+        private const float Pi2 = (float)(Math.PI / 2f);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="angleV1"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float SinV1(float angleV1)
         {
             return Sin(angleV1 * Pi2);
@@ -199,8 +198,8 @@ namespace ScePSPUtils
         /// <param name="min"></param>
         /// <param name="max"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float Clamp(float value, float min, float max)
         {
             // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -219,8 +218,8 @@ namespace ScePSPUtils
         /// <param name="min"></param>
         /// <param name="max"></param>
         /// <returns></returns>
-        
-        
+
+
         public static int ClampInt(int value, int min, int max)
         {
             if (value < min) value = min;
@@ -233,11 +232,11 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float Sqrt(float value)
         {
-            return (float) Math.Sqrt(value);
+            return (float)Math.Sqrt(value);
         }
 
         /// <summary>
@@ -246,11 +245,11 @@ namespace ScePSPUtils
         /// <param name="value"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float Scalb(float value, int count)
         {
-            return (float) (value * Math.Pow(2.0f, count));
+            return (float)(value * Math.Pow(2.0f, count));
         }
 
         /// <summary>
@@ -258,8 +257,8 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float Sign(float value)
         {
             // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -279,8 +278,8 @@ namespace ScePSPUtils
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float Min(float left, float right)
         {
             //var ILeft = MathFloat.ReinterpretFloatAsUInt(Left);
@@ -294,8 +293,8 @@ namespace ScePSPUtils
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float Max(float left, float right)
         {
             return Math.Max(left, right);
@@ -306,8 +305,8 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static bool IsNan(float value)
         {
             //return float.IsNaN(Value);
@@ -319,8 +318,8 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static bool IsInfinity(float value)
         {
             return float.IsInfinity(value);
@@ -331,8 +330,8 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float RSqrt(float value)
         {
             return 1.0f / Sqrt(value);
@@ -343,11 +342,11 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float Asin(float value)
         {
-            return (float) Math.Asin(value);
+            return (float)Math.Asin(value);
         }
 
         /// <summary>
@@ -355,8 +354,8 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float AsinV1(float value)
         {
             return Asin(value) / Pi2;
@@ -367,8 +366,8 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float Vsat0(float value)
         {
             return Clamp(value, 0.0f, 1.0f);
@@ -379,8 +378,8 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float Vsat1(float value)
         {
             return float.IsNaN(value) ? value : Clamp(value, -1.0f, 1.0f);
@@ -391,11 +390,11 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float Log2(float value)
         {
-            return (float) (Math.Log(value) / Math.Log(2.0f));
+            return (float)(Math.Log(value) / Math.Log(2.0f));
         }
 
         /// <summary>
@@ -403,11 +402,11 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float Exp2(float value)
         {
-            return (float) Math.Pow(2.0, value);
+            return (float)Math.Pow(2.0, value);
         }
 
         /// <summary>
@@ -415,8 +414,8 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float NRcp(float value)
         {
             return -(1.0f / value);
@@ -427,8 +426,8 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="angle"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float NSinV1(float angle)
         {
             var value = SinV1(angle);
@@ -442,11 +441,11 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float RExp2(float value)
         {
-            return (float) (1.0 / Math.Pow(2.0, value));
+            return (float)(1.0 / Math.Pow(2.0, value));
         }
 
         /// <summary>
@@ -454,8 +453,8 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static bool IsNanOrInfinity(float value)
         {
             return IsNan(value) || float.IsInfinity(value);
@@ -466,8 +465,8 @@ namespace ScePSPUtils
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        
-        
+
+
         public static bool IsZero(float value)
         {
             if (IsNan(value)) return false;
@@ -484,8 +483,8 @@ namespace ScePSPUtils
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        
-        
+
+
         public static bool IsEquals(float left, float right)
         {
             if (IsNan(left) || IsNan(right)) return false;
@@ -499,8 +498,8 @@ namespace ScePSPUtils
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        
-        
+
+
         public static bool IsLessThan(float left, float right)
         {
             if (IsNan(left) || IsNan(right)) return false;
@@ -513,8 +512,8 @@ namespace ScePSPUtils
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        
-        
+
+
         public static bool IsLessOrEqualsThan(float left, float right)
         {
             if (IsNan(left) || IsNan(right)) return false;
@@ -527,8 +526,8 @@ namespace ScePSPUtils
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        
-        
+
+
         public static bool IsGreatOrEqualsThan(float left, float right)
         {
             if (IsNan(left) || IsNan(right)) return false;
@@ -541,8 +540,8 @@ namespace ScePSPUtils
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        
-        
+
+
         public static float Sign2(float left, float right)
         {
             var a = left - right;

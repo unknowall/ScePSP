@@ -19,9 +19,9 @@ namespace ScePSPUtils
 
         public static ushort PtrToShort_BE(void* ptr)
         {
-            var bytes = (byte*) ptr;
+            var bytes = (byte*)ptr;
             //return (ushort)((bytes[1] << 8) | (bytes[0] << 8));
-            return (ushort) ((bytes[0] << 8) | (bytes[1] << 0));
+            return (ushort)((bytes[0] << 8) | (bytes[1] << 0));
         }
 
         public static string PtrToString(byte* pointer, int length, Encoding encoding)
@@ -118,7 +118,7 @@ namespace ScePSPUtils
 
             if (Is64)
             {
-                while (maxLength >= 8 && *(ulong*) haystack == *(ulong*) needle)
+                while (maxLength >= 8 && *(ulong*)haystack == *(ulong*)needle)
                 {
                     match += 8;
                     haystack += 8;
@@ -127,7 +127,7 @@ namespace ScePSPUtils
                 }
             }
 
-            while (maxLength >= 4 && *(uint*) haystack == *(uint*) needle)
+            while (maxLength >= 4 && *(uint*)haystack == *(uint*)needle)
             {
                 match += 4;
                 haystack += 4;
@@ -159,15 +159,15 @@ namespace ScePSPUtils
 
             if (maxLength >= 4)
             {
-                var value2 = (ushort) ((value1 << 0) | (value1 << 8));
-                var value4 = ((uint) value2 << 0) | ((uint) value2 << 16);
+                var value2 = (ushort)((value1 << 0) | (value1 << 8));
+                var value4 = ((uint)value2 << 0) | ((uint)value2 << 16);
 
 
                 if (maxLength >= 8 && Is64)
                 {
-                    var value8 = ((ulong) value4 << 0) | ((ulong) value4 << 32);
+                    var value8 = ((ulong)value4 << 0) | ((ulong)value4 << 32);
 
-                    while (maxLength >= 8 && *(ulong*) haystack == value8)
+                    while (maxLength >= 8 && *(ulong*)haystack == value8)
                     {
                         match += 8;
                         haystack += 8;
@@ -175,7 +175,7 @@ namespace ScePSPUtils
                     }
                 }
 
-                while (maxLength >= 4 && *(uint*) haystack == value4)
+                while (maxLength >= 4 && *(uint*)haystack == value4)
                 {
                     match += 4;
                     haystack += 4;
@@ -193,12 +193,13 @@ namespace ScePSPUtils
             return match;
         }
 
-        public static void Memcpy(byte* destination, byte* source, int size) {
+        public static void Memcpy(byte* destination, byte* source, int size)
+        {
             //Buffer.MemoryCopy(source, destination, size, size);
             new Span<byte>(source, size).CopyTo(new Span<byte>(destination, size));
         }
 
-    public static byte[] PointerToByteArray(byte* pointer, int size)
+        public static byte[] PointerToByteArray(byte* pointer, int size)
         {
             var data = new byte[size];
             fixed (byte* dataPtr = data)
@@ -243,7 +244,7 @@ namespace ScePSPUtils
                     GetArrayPointer(outputArray,
                         (outputPointer) =>
                         {
-                            Memcpy((byte*) outputPointer.ToPointer(), (byte*) inputPointer.ToPointer(),
+                            Memcpy((byte*)outputPointer.ToPointer(), (byte*)inputPointer.ToPointer(),
                                 outputArray.Length);
                         });
                 });
@@ -265,7 +266,7 @@ namespace ScePSPUtils
                     GetArrayPointer(outputArray,
                         (outputPointer) =>
                         {
-                            Memcpy((byte*) outputPointer.ToPointer(), (byte*) inputPointer.ToPointer(),
+                            Memcpy((byte*)outputPointer.ToPointer(), (byte*)inputPointer.ToPointer(),
                                 inputArray.Length);
                         });
                 });
@@ -286,7 +287,7 @@ namespace ScePSPUtils
             GetArrayPointer(array,
                 (dataPointer) =>
                 {
-                    Memcpy((byte*) dataPointer.ToPointer(), (byte*) pointer,
+                    Memcpy((byte*)dataPointer.ToPointer(), (byte*)pointer,
                         arrayLength * Marshal.SizeOf(typeof(TType)));
                 });
 

@@ -15,7 +15,7 @@ namespace ScePSP.Utils
                 default: return 0f;
             }
         }
-        
+
         public static void Set(this Vector4 that, int index, float value)
         {
             switch (index)

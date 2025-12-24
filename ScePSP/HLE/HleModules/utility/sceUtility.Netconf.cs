@@ -1,5 +1,5 @@
-﻿using System.Text;
-using ScePSPUtils;
+﻿using ScePSPUtils;
+using System.Text;
 
 namespace ScePSP.Hle.Modules.utility
 {
@@ -44,7 +44,7 @@ namespace ScePSP.Hle.Modules.utility
                 {
                     fixed (byte* _asString = asString)
                     {
-                        return *(uint*) _asString;
+                        return *(uint*)_asString;
                     }
                 }
             }

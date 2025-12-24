@@ -1,11 +1,9 @@
-﻿using System.Runtime;
-
-namespace cscodec
+﻿namespace cscodec
 {
     public class MathUtils
     {
-        
-        
+
+
         public static int Clamp(int Value, int Min, int Max)
         {
             if (Value < Min) return Min;

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ScePSPUtils;
+using ScePSPUtils.Extensions;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using ScePSPUtils;
-using ScePSPUtils.Extensions;
 
 #pragma warning disable CS0675
 
@@ -70,16 +70,16 @@ namespace ScePSP.Hle.Formats.video
                 {
                     fixed (byte* buf = this.Bytes)
                     {
-                        return (ulong) (
-                            (ulong) ((buf[0] & 0x0E) << 29) |
-                            (ulong) ((PointerUtils.PtrToShort_BE(buf + 1) >> 1) << 15) |
-                            (ulong) (PointerUtils.PtrToShort_BE(buf + 3) >> 1)
+                        return (ulong)(
+                            (ulong)((buf[0] & 0x0E) << 29) |
+                            (ulong)((PointerUtils.PtrToShort_BE(buf + 1) >> 1) << 15) |
+                            (ulong)(PointerUtils.PtrToShort_BE(buf + 3) >> 1)
                         );
                     }
                 }
             }
 
-            public TimeSpan PresentationTimeSpan => TimeSpan.FromSeconds((double) Value / (double) MpegTimestampPerSecond);
+            public TimeSpan PresentationTimeSpan => TimeSpan.FromSeconds((double)Value / (double)MpegTimestampPerSecond);
 
             public override string ToString()
             {
@@ -141,8 +141,8 @@ namespace ScePSP.Hle.Formats.video
         {
             while (!Stream.Eof())
             {
-                var StartCode = (uint) GetNextPacketAndSync();
-                var ChunkCodeType = (ChunkType) StartCode;
+                var StartCode = (uint)GetNextPacketAndSync();
+                var ChunkCodeType = (ChunkType)StartCode;
                 //ConsoleUtils.SaveRestoreConsoleColor(ConsoleColor.Yellow, () => { Console.Error.WriteLine("ReadPacketizedElementaryStreamHeader: {0}: {1:X2}", (ChunkType)StartCode, StartCode); });
 
                 switch (ChunkCodeType)
@@ -181,7 +181,7 @@ namespace ScePSP.Hle.Formats.video
                     if (PacketStream.Length != PacketSize) throw new Exception("Didn't read the entire packet");
                     return new Packet()
                     {
-                        Type = (ChunkType) StartCode,
+                        Type = (ChunkType)StartCode,
                         Stream = PacketStream,
                     };
                 }
@@ -205,7 +205,7 @@ namespace ScePSP.Hle.Formats.video
 
         public PacketizedStream ParsePacketizedStream(Stream PacketStream)
         {
-            var c = (byte) PacketStream.ReadByte();
+            var c = (byte)PacketStream.ReadByte();
             //Console.WriteLine("c: 0x{0:X}", c);
 
             var PacketizedStream = default(PacketizedStream);
@@ -213,8 +213,8 @@ namespace ScePSP.Hle.Formats.video
             // mpeg 2 PES
             if ((c & 0xC0) == 0x80)
             {
-                var flags = (byte) PacketStream.ReadByte();
-                var header_len = (byte) PacketStream.ReadByte();
+                var flags = (byte)PacketStream.ReadByte();
+                var header_len = (byte)PacketStream.ReadByte();
                 var HeaderStream = PacketStream.ReadStreamCopy(header_len);
                 if (HeaderStream.Length != header_len) throw new Exception("Didn't read the entire packet");
 
@@ -249,7 +249,7 @@ namespace ScePSP.Hle.Formats.video
             Stream.Read(Out, 0, 2);
             byte Hi = Out[0];
             byte Lo = Out[1];
-            return (ushort) (((ushort) Hi << 8) | (ushort) Lo);
+            return (ushort)(((ushort)Hi << 8) | (ushort)Lo);
         }
 
         public ChunkType GetNextPacketAndSync()
@@ -259,13 +259,13 @@ namespace ScePSP.Hle.Formats.video
             while ((Byte = Stream.ReadByte()) != -1)
             {
                 Value <<= 8;
-                Value |= (byte) Byte;
+                Value |= (byte)Byte;
                 if ((Value & 0xFFFFFF00) == 0x00000100)
                 {
-                    return (ChunkType) Value;
+                    return (ChunkType)Value;
                 }
             }
-            return (ChunkType) 0xFFFFFFFF;
+            return (ChunkType)0xFFFFFFFF;
         }
 
         public void ReadStartPacket()

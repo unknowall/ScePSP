@@ -26,7 +26,7 @@ namespace ScePSP.Hle.Modules.threadman
         public int sceKernelCreateCallback(string Name, SceKernelCallbackFunction Function, uint Argument)
         {
             return CallbackManager.Callbacks.Create(
-                HleCallback.Create(Name, (uint) Function, Argument)
+                HleCallback.Create(Name, (uint)Function, Argument)
             );
         }
 

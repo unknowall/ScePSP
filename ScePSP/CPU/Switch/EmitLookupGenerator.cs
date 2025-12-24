@@ -1,13 +1,13 @@
-﻿using System;
+﻿using SafeILGenerator.Ast;
+using SafeILGenerator.Ast.Nodes;
+using ScePSP.Core.Cpu.Dynarec.Ast;
+using ScePSP.Core.Cpu.Table;
+using ScePSPUtils;
+using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using ScePSPUtils;
-using ScePSPUtils.Extensions;
-using ScePSP.Core.Cpu.Dynarec.Ast;
-using ScePSP.Core.Cpu.Table;
-using SafeILGenerator.Ast;
-using SafeILGenerator.Ast.Nodes;
 
 namespace ScePSP.Core.Cpu.Switch
 {
@@ -21,7 +21,8 @@ namespace ScePSP.Core.Cpu.Switch
         public static Action<uint, TType> GenerateSwitchDelegate<TType>(
             string name,
             IEnumerable<InstructionInfo> instructionInfoList
-        ) {
+        )
+        {
             return GenerateSwitch<Action<uint, TType>>(name, instructionInfoList, instructionInfo =>
             {
                 var instructionInfoName = instructionInfo != null ? instructionInfo.Name : "Default";

@@ -2,16 +2,16 @@
 
 //#define DISABLE_CALLBACKS
 
+using ScePSP.Core.Components.Display;
+using ScePSP.Core.Cpu;
+using ScePSP.Core.Gpu;
+using ScePSP.Hle.Interop;
+using ScePSPUtils;
+using ScePSPUtils.Threading;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using ScePSPUtils;
-using ScePSP.Core.Cpu;
-using ScePSP.Core.Components.Display;
-using ScePSPUtils.Threading;
-using ScePSP.Core.Gpu;
-using ScePSP.Hle.Interop;
 
 namespace ScePSP.Hle.Managers
 {
@@ -70,7 +70,7 @@ namespace ScePSP.Hle.Managers
                     "HleThreadManager:: IGpuConnector.Signal :: 0x{0:X8}, 0x{1:X8}, 0x{2:X8}, {3}, {4}",
                     CallbackData.SignalFunction, CallbackData.SignalArgument, PC, Signal, Behavior);
                 HleInterop.ExecuteFunctionNowLater(CallbackData.SignalFunction, ExecuteNow,
-                    new object[] {Signal, CallbackData.SignalArgument, PC});
+                    new object[] { Signal, CallbackData.SignalArgument, PC });
             }
             else
             {
@@ -86,7 +86,7 @@ namespace ScePSP.Hle.Managers
                 Console.Error.WriteLine("HleThreadManager:: IGpuConnector.Finish :: 0x{0:X8}, 0x{1:X8}, 0x{2:X8}, {3}",
                     CallbackData.FinishFunction, CallbackData.FinishArgument, PC, Arg);
                 HleInterop.ExecuteFunctionNowLater(CallbackData.FinishFunction, ExecuteNow,
-                    new object[] {Arg, CallbackData.FinishArgument, PC});
+                    new object[] { Arg, CallbackData.FinishArgument, PC });
             }
         }
 #pragma warning restore CS0162

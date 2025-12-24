@@ -20,11 +20,11 @@ namespace ScePSP.Core.Cpu
 
         public Instruction this[uint index]
         {
-            get => _instructions[(int) (index / 4)];
-            set => _instructions[(int) (index / 4)] = value;
+            get => _instructions[(int)(index / 4)];
+            set => _instructions[(int)(index / 4)] = value;
         }
 
-        public uint EndPc => (uint) ((_instructions.Length - 1) * 4);
+        public uint EndPc => (uint)((_instructions.Length - 1) * 4);
     }
 
     public class InstructionStreamReader : IInstructionReader
@@ -52,11 +52,11 @@ namespace ScePSP.Core.Cpu
             set
             {
                 Stream.Position = index;
-                BinaryWriter.Write((uint) value.Value);
+                BinaryWriter.Write((uint)value.Value);
             }
         }
 
 
-        public uint EndPc => (uint) (Stream.Length - 4);
+        public uint EndPc => (uint)(Stream.Length - 4);
     }
 }

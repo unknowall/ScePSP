@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
-using ScePSPUtils;
-using ScePSP.Core.Cpu;
+﻿using ScePSP.Core.Cpu;
 using ScePSP.Core.Memory;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Formats;
@@ -11,6 +7,10 @@ using ScePSP.Hle.Managers;
 using ScePSP.Hle.Modules.iofilemgr;
 using ScePSP.Hle.Modules.threadman;
 using ScePSP.Hle.Vfs;
+using ScePSPUtils;
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace ScePSP.Hle.Modules.modulemgr
 {
@@ -192,7 +192,7 @@ namespace ScePSP.Hle.Modules.modulemgr
                     MemoryManager.GetPartition(MemoryPartitions.Kernel0).Allocate(sizeof(SceModule));
 
                 var SceModulePtr =
-                    (SceModule*) Memory.PspAddressToPointerSafe(SceModulePartition.Low,
+                    (SceModule*)Memory.PspAddressToPointerSafe(SceModulePartition.Low,
                         Marshal.SizeOf(typeof(SceModule)));
 
                 SceModulePtr->Attributes = HleModuleGuest.ModuleInfo.ModuleAtributes;
@@ -266,7 +266,7 @@ namespace ScePSP.Hle.Modules.modulemgr
                 NewCpuThreadState.Gp = Module.InitInfo.Gp;
                 NewCpuThreadState.CallerModule = Module;
 
-                var ThreadId = (int) ThreadManForUser.sceKernelCreateThread(NewCpuThreadState, "ModuleThread",
+                var ThreadId = (int)ThreadManForUser.sceKernelCreateThread(NewCpuThreadState, "ModuleThread",
                     Module.InitInfo.Pc, 10, 1024, PspThreadAttributes.ClearStack, null);
                 ThreadManForUser.sceKernelStartThread(NewCpuThreadState, ThreadId, ArgumentsSize, ArgumentsPointer);
             }
@@ -355,7 +355,7 @@ namespace ScePSP.Hle.Modules.modulemgr
         [HlePspFunction(NID = 0xF0A26395, FirmwareVersion = 150)]
         public int sceKernelGetModuleId(CpuThreadState CpuThreadState)
         {
-            var Module = (HleModuleGuest) CpuThreadState.CallerModule;
+            var Module = (HleModuleGuest)CpuThreadState.CallerModule;
             return Module.ID;
         }
 

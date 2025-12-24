@@ -1,8 +1,8 @@
-﻿using System;
-using ScePSP.Hle.Attributes;
-using ScePSP.Core;
-using ScePSPUtils;
+﻿using ScePSP.Core;
 using ScePSP.Core.Components.Rtc;
+using ScePSP.Hle.Attributes;
+using ScePSPUtils;
+using System;
 
 namespace ScePSP.Hle.Modules.threadman
 {
@@ -30,7 +30,7 @@ namespace ScePSP.Hle.Modules.threadman
         [HlePspFunction(NID = 0x369ED59D, FirmwareVersion = 150)]
         public uint sceKernelGetSystemTimeLow()
         {
-            return (uint) sceKernelGetSystemTimeWide();
+            return (uint)sceKernelGetSystemTimeWide();
         }
 
         /// <summary>
@@ -83,8 +83,8 @@ namespace ScePSP.Hle.Modules.threadman
         [HlePspFunction(NID = 0xE1619D7C, FirmwareVersion = 150)]
         public int sceKernelSysClock2USecWide(long Clock, uint* Low, uint* High)
         {
-            if (Low != null) *Low = (uint) (Clock % 1000000);
-            if (High != null) *High = (uint) (Clock / 1000000);
+            if (Low != null) *Low = (uint)(Clock % 1000000);
+            if (High != null) *High = (uint)(Clock / 1000000);
             return 0;
         }
 

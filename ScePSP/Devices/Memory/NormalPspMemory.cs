@@ -59,11 +59,11 @@ namespace ScePSP.Core.Memory
                 VectorsHandle = GCHandle.Alloc(Vectors, GCHandleType.Pinned);
                 LogMainHandle = GCHandle.Alloc(LogMain, GCHandleType.Pinned);
 
-                ScratchPadPtr = (byte*) ScratchPadHandle.AddrOfPinnedObject().ToPointer();
-                FrameBufferPtr = (byte*) FrameBufferHandle.AddrOfPinnedObject().ToPointer();
-                MainPtr = (byte*) MainHandle.AddrOfPinnedObject().ToPointer();
-                VectorsPtr = (byte*) VectorsHandle.AddrOfPinnedObject().ToPointer();
-                LogMainPtr = (uint*) LogMainHandle.AddrOfPinnedObject().ToPointer();
+                ScratchPadPtr = (byte*)ScratchPadHandle.AddrOfPinnedObject().ToPointer();
+                FrameBufferPtr = (byte*)FrameBufferHandle.AddrOfPinnedObject().ToPointer();
+                MainPtr = (byte*)MainHandle.AddrOfPinnedObject().ToPointer();
+                VectorsPtr = (byte*)VectorsHandle.AddrOfPinnedObject().ToPointer();
+                LogMainPtr = (uint*)LogMainHandle.AddrOfPinnedObject().ToPointer();
 #else
 				ScratchPadPtr = (byte*)(Marshal.AllocHGlobal(ScratchPadSize).ToPointer());
 				FrameBufferPtr = (byte*)(Marshal.AllocHGlobal(FrameBufferSize).ToPointer());
@@ -159,54 +159,54 @@ namespace ScePSP.Core.Memory
                 {
                     /////// hp
                     case 0x00: //case 0b_00000:
-                    {
-                        if (Address < ScratchPadOffset)
                         {
-                            break;
-                        }
-                        uint Offset = Address - ScratchPadOffset;
+                            if (Address < ScratchPadOffset)
+                            {
+                                break;
+                            }
+                            uint Offset = Address - ScratchPadOffset;
 #if ADDITIONAL_CHECKS
-                        if (Offset >= ScratchPadSize) throw new Exception($"Outside! 0x{Address:X}");
+                            if (Offset >= ScratchPadSize) throw new Exception($"Outside! 0x{Address:X}");
 #endif
-                        return &ScratchPadPtr[Address - ScratchPadOffset];
-                    }
+                            return &ScratchPadPtr[Address - ScratchPadOffset];
+                        }
                     /////// hp
                     case 0x04: //case 0b_00100:
-                    {
-                        uint Offset = Address - FrameBufferOffset;
+                        {
+                            uint Offset = Address - FrameBufferOffset;
 #if ADDITIONAL_CHECKS
-                        if (Offset >= FrameBufferSize)
-                            throw new Exception($"Outside! 0x{Address:X}");
+                            if (Offset >= FrameBufferSize)
+                                throw new Exception($"Outside! 0x{Address:X}");
 #endif
 
-                        return &FrameBufferPtr[Offset];
-                    }
+                            return &FrameBufferPtr[Offset];
+                        }
                     /////// hp
                     case 0x08: //case 0b_01000:
                     case 0x09: //case 0b_01001:
                     case 0x0A: //case 0b_01010: // SLIM ONLY
                     case 0x0B: //case 0b_01011: // SLIM ONLY
-                    {
-                        uint Offset = Address - MainOffset;
+                        {
+                            uint Offset = Address - MainOffset;
 #if ADDITIONAL_CHECKS
-                        if (Offset >= MainSize) throw new Exception($"Outside! 0x{Address:X}");
+                            if (Offset >= MainSize) throw new Exception($"Outside! 0x{Address:X}");
 #endif
 
-                        return &MainPtr[Offset];
-                        //return &Main[Offset];
-                    }
+                            return &MainPtr[Offset];
+                            //return &Main[Offset];
+                        }
                     /////// hp
                     case 0x1F: //case 0b_011111
                     case 0x37: //case 0b_111111: // HO IO2
-                    {
-                        //return &Vectors[Address - 0x1fc00000];
-                        //return HardwareVectors
-                        uint Offset = Address - VectorsOffset;
+                        {
+                            //return &Vectors[Address - 0x1fc00000];
+                            //return HardwareVectors
+                            uint Offset = Address - VectorsOffset;
 #if ADDITIONAL_CHECKS
-                        if (Offset >= VectorsSize) throw new Exception($"Outside! 0x{Address:X}");
+                            if (Offset >= VectorsSize) throw new Exception($"Outside! 0x{Address:X}");
 #endif
-                        return &VectorsPtr[Offset];
-                    }
+                            return &VectorsPtr[Offset];
+                        }
                     case 0x1C: //case 0b_11100: // HW IO1
                         break;
                     default:

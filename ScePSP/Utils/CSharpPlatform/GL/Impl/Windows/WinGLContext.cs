@@ -1,10 +1,10 @@
-﻿using System;
+﻿using ScePSP.Core;
+using ScePSPPlatform.Library;
+using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Threading;
-using ScePSPPlatform.Library;
-using ScePSP.Core;
 
 namespace ScePSPPlatform.GL.Impl.Windows
 {
@@ -86,7 +86,7 @@ namespace ScePSPPlatform.GL.Impl.Windows
                 wc.ClassName = ClassName;
                 wc.Icon = IntPtr.Zero;
                 wc.IconSm = IntPtr.Zero;
-                wc.Cursor = LoadCursor(IntPtr.Zero, (IntPtr) CursorName.Arrow);
+                wc.Cursor = LoadCursor(IntPtr.Zero, (IntPtr)CursorName.Arrow);
                 ushort atom = RegisterClassEx(ref wc);
 
                 if (atom == 0)
@@ -154,7 +154,7 @@ namespace ScePSPPlatform.GL.Impl.Windows
             _dc = GetDC(_hWnd);
 
             var pfd = new PixelFormatDescriptor();
-            pfd.Size = (short) sizeof(PixelFormatDescriptor);
+            pfd.Size = (short)sizeof(PixelFormatDescriptor);
             pfd.Version = 1;
             pfd.Flags = PixelFormatDescriptorFlags.DrawToWindow | PixelFormatDescriptorFlags.SupportOpengl |
                         PixelFormatDescriptorFlags.Doublebuffer;
@@ -176,7 +176,7 @@ namespace ScePSPPlatform.GL.Impl.Windows
             _context = Wgl.wglCreateContext(_dc);
             if (_sharedContext != IntPtr.Zero)
             {
-                RetryShareLists:
+            RetryShareLists:
                 //Console.WriteLine("SharedContext!"); Console.ReadKey();
                 if (!Wgl.wglShareLists(_sharedContext, _context))
                 {
@@ -237,7 +237,7 @@ new int[] { (int)ArbCreateContext.MajorVersion, 3, (int)ArbCreateContext.MinorVe
                 var bitmapHeader = default(Bitmap);
                 var hBitmap = GetCurrentObject(_dc, 7);
                 GetObject(hBitmap, sizeof(Bitmap), &bitmapHeader);
-                return new GlContextSize {Width = (int) bitmapHeader.BmWidth, Height = (int) bitmapHeader.BmHeight};
+                return new GlContextSize { Width = (int)bitmapHeader.BmWidth, Height = (int)bitmapHeader.BmHeight };
             }
         }
 

@@ -1,10 +1,10 @@
-﻿using ScePSPUtils;
-using ScePSPUtils.Threading;
+﻿using SafeILGenerator.Ast.Generators;
 using ScePSP.Core.Cpu.Dynarec;
 using ScePSP.Core.Cpu.Dynarec.Ast;
 using ScePSP.Core.Cpu.Emitter;
 using ScePSP.Core.Memory;
-using SafeILGenerator.Ast.Generators;
+using ScePSPUtils;
+using ScePSPUtils.Threading;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +30,7 @@ namespace ScePSP.Core.Cpu.InstructionCache
         MethodCompilerThread _methodCompilerThread;
 
         void IInjectInitialize.Initialize() => _methodCompilerThread = new MethodCompilerThread(CpuProcessor, this);
-        
+
         public MethodCacheInfo GetForPc(uint pc)
         {
             if (_methodMapping.ContainsKey(pc))
@@ -42,10 +42,10 @@ namespace ScePSP.Core.Cpu.InstructionCache
                 var delegateGeneratorForPc = GeneratorIlInstance.GenerateDelegate<Action<CpuThreadState>>(
                     "MethodCache.DynamicCreateNewFunction", Ast.Statements(
                         Ast.Statement(Ast.CallInstance(Ast.CpuThreadStateExpr,
-                            (Action<MethodCacheInfo, uint>) CpuThreadState.Methods._MethodCacheInfo_SetInternal,
+                            (Action<MethodCacheInfo, uint>)CpuThreadState.Methods._MethodCacheInfo_SetInternal,
                             Ast.GetMethodCacheInfoAtPc(pc), pc)),
                         Ast.Statement(Ast.TailCall(Ast.CallInstance(Ast.GetMethodCacheInfoAtPc(pc),
-                            (Action<CpuThreadState>) MethodCacheInfo.Methods.CallDelegate, Ast.CpuThreadStateExpr))),
+                            (Action<CpuThreadState>)MethodCacheInfo.Methods.CallDelegate, Ast.CpuThreadStateExpr))),
                         Ast.Return()
                     ));
                 return _methodMapping[pc] = new MethodCacheInfo(this, delegateGeneratorForPc, pc);
@@ -65,7 +65,7 @@ namespace ScePSP.Core.Cpu.InstructionCache
             //Console.Error.WriteLine("[{0}]", MethodMapping);
             //Console.Error.WriteLine("[{0}]", MethodMapping.Values);
             foreach (var methodCacheInfo in _methodMapping.Values.ToArray())
-                //foreach (var MethodCacheInfo in MethodMapping.Values)
+            //foreach (var MethodCacheInfo in MethodMapping.Values)
             {
                 //Console.Error.WriteLine("[{0}]", MethodCacheInfo);
                 if (methodCacheInfo.MaxPc >= start && methodCacheInfo.MinPc <= end)
@@ -208,13 +208,13 @@ namespace ScePSP.Core.Cpu.InstructionCache
                         Console.WriteLine(
                             "({0}): (analyze: {1}, generateAST: {2}, optimize: {3}, generateIL: {4}, createDelegate: {5}, link: {6}): ({1}, {2}, {3}, {4}, {5}, {6}) : {7} ms",
                             (dynarecFunction.MaxPc - dynarecFunction.MinPc) / 4,
-                            (int) dynarecFunction.TimeAnalyzeBranches.TotalMilliseconds,
-                            (int) dynarecFunction.TimeGenerateAst.TotalMilliseconds,
-                            (int) dynarecFunction.TimeOptimize.TotalMilliseconds,
-                            (int) dynarecFunction.TimeGenerateIl.TotalMilliseconds,
-                            (int) dynarecFunction.TimeCreateDelegate.TotalMilliseconds,
-                            (int) dynarecFunction.TimeLinking.TotalMilliseconds,
-                            (int) (timeAstGeneration + dynarecFunction.TimeLinking).TotalMilliseconds
+                            (int)dynarecFunction.TimeAnalyzeBranches.TotalMilliseconds,
+                            (int)dynarecFunction.TimeGenerateAst.TotalMilliseconds,
+                            (int)dynarecFunction.TimeOptimize.TotalMilliseconds,
+                            (int)dynarecFunction.TimeGenerateIl.TotalMilliseconds,
+                            (int)dynarecFunction.TimeCreateDelegate.TotalMilliseconds,
+                            (int)dynarecFunction.TimeLinking.TotalMilliseconds,
+                            (int)(timeAstGeneration + dynarecFunction.TimeLinking).TotalMilliseconds
                         );
                     });
             }

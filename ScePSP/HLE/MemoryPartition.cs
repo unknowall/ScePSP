@@ -1,11 +1,11 @@
-﻿using System;
+﻿using ScePSP.Core.Memory;
+using ScePSPUtils;
+using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ScePSPUtils;
-using ScePSP.Core.Memory;
 using System.Runtime.InteropServices;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Hle
 {
@@ -39,7 +39,7 @@ namespace ScePSP.Hle
         public uint Low { get; protected set; }
         public uint High { get; protected set; }
 
-        public int Size => (int) (High - Low);
+        public int Size => (int)(High - Low);
 
         public MemoryPartition ParentPartition { get; private set; }
         private SortedSet<MemoryPartition> _ChildPartitions;
@@ -171,7 +171,7 @@ namespace ScePSP.Hle
 
         public MemoryPartition AllocateLowHigh(uint Low, uint High, string Name = "<Unknown>")
         {
-            return Allocate((int) (High - Low), Anchor.Set, Low, Name: Name);
+            return Allocate((int)(High - Low), Anchor.Set, Low, Name: Name);
         }
 
         public MemoryPartition AllocateLowSize(uint Low, int Size, string Name = "<Unknown>")
@@ -239,18 +239,18 @@ namespace ScePSP.Hle
                     {
                         default:
                         case Anchor.Low:
-                        {
-                            var Low = MathUtils.NextAligned(OldFreePartition.Low, Alignment);
-                            var High = (uint) (Low + Size);
-                            return AllocateLowHigh(Low, High);
-                        }
+                            {
+                                var Low = MathUtils.NextAligned(OldFreePartition.Low, Alignment);
+                                var High = (uint)(Low + Size);
+                                return AllocateLowHigh(Low, High);
+                            }
                         case Anchor.High:
-                        {
-                            var High = MathUtils.PrevAligned(OldFreePartition.High, Alignment);
-                            var Low = (uint) (High - Size);
-                            //Console.WriteLine("Low: {0:X}, High: {1:X}", Low, High);
-                            return AllocateLowHigh(Low, High);
-                        }
+                            {
+                                var High = MathUtils.PrevAligned(OldFreePartition.High, Alignment);
+                                var Low = (uint)(High - Size);
+                                //Console.WriteLine("Low: {0:X}, High: {1:X}", Low, High);
+                                return AllocateLowHigh(Low, High);
+                            }
                     }
                 }
 
@@ -261,23 +261,23 @@ namespace ScePSP.Hle
                     default:
                     case Anchor.Low:
                         _ChildPartitions.Add(NewPartiton = new MemoryPartition(InjectContext, OldFreePartition.Low,
-                            (uint) (OldFreePartition.Low + Size), true, ParentPartition: this, Name: Name));
-                        _ChildPartitions.Add(new MemoryPartition(InjectContext, (uint) (OldFreePartition.Low + Size),
+                            (uint)(OldFreePartition.Low + Size), true, ParentPartition: this, Name: Name));
+                        _ChildPartitions.Add(new MemoryPartition(InjectContext, (uint)(OldFreePartition.Low + Size),
                             OldFreePartition.High, false, ParentPartition: this, Name: "<Free>"));
                         break;
                     case Anchor.High:
                         _ChildPartitions.Add(NewPartiton = new MemoryPartition(InjectContext,
-                            (uint) (OldFreePartition.High - Size), OldFreePartition.High, true, ParentPartition: this,
+                            (uint)(OldFreePartition.High - Size), OldFreePartition.High, true, ParentPartition: this,
                             Name: Name));
                         _ChildPartitions.Add(new MemoryPartition(InjectContext, OldFreePartition.Low,
-                            (uint) (OldFreePartition.High - Size), false, ParentPartition: this, Name: "<Free>"));
+                            (uint)(OldFreePartition.High - Size), false, ParentPartition: this, Name: "<Free>"));
                         break;
                     case Anchor.Set:
                         _ChildPartitions.Add(new MemoryPartition(InjectContext, OldFreePartition.Low, Position, false,
                             ParentPartition: this, Name: "<Free>"));
                         _ChildPartitions.Add(NewPartiton = new MemoryPartition(InjectContext, Position,
-                            (uint) (Position + Size), true, ParentPartition: this, Name: Name));
-                        _ChildPartitions.Add(new MemoryPartition(InjectContext, (uint) (Position + Size),
+                            (uint)(Position + Size), true, ParentPartition: this, Name: Name));
+                        _ChildPartitions.Add(new MemoryPartition(InjectContext, (uint)(Position + Size),
                             OldFreePartition.High, false, ParentPartition: this, Name: "<Free>"));
                         break;
                 }

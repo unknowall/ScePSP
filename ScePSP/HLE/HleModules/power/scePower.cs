@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScePSP.Core.Components.Battery;
 using ScePSP.Hle.Attributes;
-using ScePSP.Core.Components.Battery;
+using System;
 
 namespace ScePSP.Hle.Modules.power
 {
@@ -380,7 +380,7 @@ namespace ScePSP.Hle.Modules.power
         [HlePspFunction(NID = 0x2085D15D, FirmwareVersion = 150)]
         public int scePowerGetBatteryLifePercent()
         {
-            return (int) (PspBattery.BatteryLifePercent * 100);
+            return (int)(PspBattery.BatteryLifePercent * 100);
         }
 
         /// <summary>

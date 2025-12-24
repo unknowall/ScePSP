@@ -9,8 +9,8 @@ namespace cscodec.h264.decoder
         public IMbInfo(int _type, int _pred_mode, int _cbp)
         {
             type = _type;
-            pred_mode = (short) _pred_mode;
-            cbp = (short) _cbp;
+            pred_mode = (short)_pred_mode;
+            cbp = (short)_cbp;
         }
     }
 }

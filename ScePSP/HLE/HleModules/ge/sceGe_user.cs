@@ -1,14 +1,13 @@
-﻿using System;
-using ScePSP.Hle.Attributes;
-using ScePSP.Core.Cpu;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Core.Cpu;
 using ScePSP.Core.Gpu;
-using ScePSP.Hle.Modules.sysmem;
 using ScePSP.Core.Gpu.State;
-using ScePSPUtils;
-using System.Collections.Generic;
+using ScePSP.Core.Memory;
+using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
-using System.Runtime.InteropServices;
+using ScePSP.Hle.Modules.sysmem;
+using ScePSPUtils;
+using System;
+using System.Collections.Generic;
 
 namespace ScePSP.Hle.Modules.ge
 {
@@ -53,7 +52,7 @@ namespace ScePSP.Hle.Modules.ge
         [HlePspNotImplemented]
         public int sceGeEdramGetSize()
         {
-            return (int) PspMemory.FrameBufferSegment.Size;
+            return (int)PspMemory.FrameBufferSegment.Size;
         }
 
         /// <summary>
@@ -182,7 +181,7 @@ namespace ScePSP.Hle.Modules.ge
                 {
                     if (currentList.Signal == SignalBehavior.PSP_GE_SIGNAL_HANDLER_PAUSE)
                     {
-                        return unchecked((int) SceKernelErrors.ERROR_BUSY);
+                        return unchecked((int)SceKernelErrors.ERROR_BUSY);
                     }
 
                     currentList.Status.SetValue(DisplayListStatusEnum.Drawing);
@@ -203,7 +202,7 @@ namespace ScePSP.Hle.Modules.ge
             {
                 if (SysMemUserForUser.sceKernelGetCompiledSdkVersion() >= 0x02000000)
                 {
-                    return unchecked((int) SceKernelErrors.ERROR_ALREADY);
+                    return unchecked((int)SceKernelErrors.ERROR_ALREADY);
                 }
                 return -1;
             }
@@ -211,7 +210,7 @@ namespace ScePSP.Hle.Modules.ge
             {
                 if (SysMemUserForUser.sceKernelGetCompiledSdkVersion() >= 0x02000000)
                 {
-                    return unchecked((int) 0x80000004);
+                    return unchecked((int)0x80000004);
                 }
                 return -1;
             }
@@ -272,7 +271,7 @@ namespace ScePSP.Hle.Modules.ge
                 GpuStateStruct.StructSizeInBytes,
                 Name: "GpuStateStruct"
             );
-            
+
             DefaultGpuStateData = GpuStateStructPartition.GetLowPointerSafe<uint>(GpuStateStruct.StructSizeInWords);
         }
 

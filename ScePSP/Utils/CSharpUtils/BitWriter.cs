@@ -1,5 +1,5 @@
-﻿using System.IO;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.IO;
 
 namespace ScePSPUtils
 {
@@ -45,11 +45,11 @@ namespace ScePSPUtils
         {
             Debug.Assert(value < 1 << length, "value does not fit in length");
 
-            var currentData = _data | checked((uint) value << _dataLength);
+            var currentData = _data | checked((uint)value << _dataLength);
             var currentLength = _dataLength + length;
             while (currentLength >= 8)
             {
-                BaseStream.WriteByte((byte) currentData);
+                BaseStream.WriteByte((byte)currentData);
                 currentData >>= 8;
                 currentLength -= 8;
             }
@@ -83,7 +83,7 @@ namespace ScePSPUtils
         {
             if (_dataLength > 0)
             {
-                BaseStream.WriteByte((byte) _data);
+                BaseStream.WriteByte((byte)_data);
 
                 _data = 0;
                 _dataLength = 0;

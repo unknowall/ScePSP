@@ -1,10 +1,10 @@
-﻿using System;
+﻿using ScePSP.Core.Components.Display;
+using ScePSP.Core.Components.Rtc;
 using ScePSP.Core.Cpu;
+using ScePSP.Core.Types;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
-using ScePSP.Core.Types;
-using ScePSP.Core.Components.Display;
-using ScePSP.Core.Components.Rtc;
+using System;
 
 namespace ScePSP.Hle.Modules.display
 {
@@ -49,35 +49,35 @@ namespace ScePSP.Hle.Modules.display
             //if (DisplayConfig.VerticalSynchronization && (Start || !PspDisplay.IsVblank))
             if (DisplayConfig.VerticalSynchronization)
             {
-                if(ThreadManager.Current != null)
-                ThreadManager.Current.SetWaitAndPrepareWakeUp(HleThread.WaitType.Display, "sceDisplayWaitVblankStart",
-                    null, (WakeUp) =>
-                    {
-                        Action Next = null;
-                        Action WakeUpRemoveCallback = () =>
+                if (ThreadManager.Current != null)
+                    ThreadManager.Current.SetWaitAndPrepareWakeUp(HleThread.WaitType.Display, "sceDisplayWaitVblankStart",
+                        null, (WakeUp) =>
                         {
-                            PspDisplay.VBlankCallback -= Next;
-                            WakeUp();
-                        };
-                        Next = () =>
-                        {
-                            if (!Start && PspDisplay.IsVblank)
+                            Action Next = null;
+                            Action WakeUpRemoveCallback = () =>
                             {
-                                WakeUpRemoveCallback();
-                            }
-                            else
+                                PspDisplay.VBlankCallback -= Next;
+                                WakeUp();
+                            };
+                            Next = () =>
                             {
-                                //CycleCount--;
-                                if (CycleCount-- <= 0)
+                                if (!Start && PspDisplay.IsVblank)
                                 {
-                                    Wait = 0;
                                     WakeUpRemoveCallback();
                                 }
-                            }
-                        };
-                        PspDisplay.VBlankCallback += Next;
-                        Next();
-                    }, HandleCallbacks: HandleCallbacks);
+                                else
+                                {
+                                    //CycleCount--;
+                                    if (CycleCount-- <= 0)
+                                    {
+                                        Wait = 0;
+                                        WakeUpRemoveCallback();
+                                    }
+                                }
+                            };
+                            PspDisplay.VBlankCallback += Next;
+                            Next();
+                        }, HandleCallbacks: HandleCallbacks);
             }
 
             return Wait;
@@ -161,7 +161,7 @@ namespace ScePSP.Hle.Modules.display
         //[HlePspNotImplemented]
         public float sceDisplayGetFramePerSec()
         {
-            return (float) (PspDisplay.ProcessedPixelsPerSecond * PspDisplay.CyclesPerPixel /
+            return (float)(PspDisplay.ProcessedPixelsPerSecond * PspDisplay.CyclesPerPixel /
                             (PspDisplay.PixelsInARow * PspDisplay.NumberOfRows));
         }
 
@@ -173,7 +173,7 @@ namespace ScePSP.Hle.Modules.display
         [HlePspNotImplemented(Notice = false)]
         public int sceDisplayGetAccumulatedHcount()
         {
-            return (int) (sceDisplayGetCurrentHcount() + sceDisplayGetVcount() * PspDisplay.HCountPerVblank);
+            return (int)(sceDisplayGetCurrentHcount() + sceDisplayGetVcount() * PspDisplay.HCountPerVblank);
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace ScePSP.Hle.Modules.display
         [HlePspFunction(NID = 0x9C6EAAD7, FirmwareVersion = 150)]
         public uint sceDisplayGetVcount()
         {
-            return (uint) PspDisplay.VblankCount;
+            return (uint)PspDisplay.VblankCount;
         }
 
         /// <summary>

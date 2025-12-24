@@ -36,7 +36,7 @@ namespace ScePSPUtils
 
                 if (b < 0) throw new Exception("Unexpected end of stream");
 
-                _readData |= checked((uint) b << _endPosition);
+                _readData |= checked((uint)b << _endPosition);
                 _endPosition += 8;
                 readBits -= 8;
             }
@@ -51,7 +51,7 @@ namespace ScePSPUtils
         {
             EnsureData(bitCount);
 
-            var result = (int) (_readData >> _startPosition) & ((1 << bitCount) - 1);
+            var result = (int)(_readData >> _startPosition) & ((1 << bitCount) - 1);
             _startPosition += bitCount;
             if (_endPosition == _startPosition)
             {

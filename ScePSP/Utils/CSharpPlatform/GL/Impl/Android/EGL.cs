@@ -1,13 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using EGLBoolean = System.Int32;
-using EGLenum = System.Int32;
-using EGLint = System.Int32;
-using EGLNativeDisplayType = System.Int32;
-using EGLConfig = System.Int32;
-using EGLContext = System.Int32;
-using EGLDisplay = System.Int32;
-using EGLSurface = System.Int32;
-using EGLClientBuffer = System.Int32;
 using EGLNativePixmapType = System.IntPtr;
 using EGLNativeWindowType = System.IntPtr;
 

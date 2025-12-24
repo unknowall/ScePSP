@@ -1,9 +1,9 @@
-﻿using System;
-using System.Drawing;
-using System.Drawing.Imaging;
+﻿using ScePSP.Core.Types;
 using ScePSPUtils.Drawing;
 using ScePSPUtils.Drawing.Extensions;
-using ScePSP.Core.Types;
+using System;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace ScePSP.Utils.Utils
 {
@@ -49,10 +49,10 @@ namespace ScePSP.Utils.Utils
             switch (BitsPerPixel)
             {
                 case 16:
-                    *(ushort*) (Address + position) = (ushort) value;
+                    *(ushort*)(Address + position) = (ushort)value;
                     break;
                 case 32:
-                    *(uint*) (Address + position) = value;
+                    *(uint*)(Address + position) = value;
                     break;
                 default: throw new NotImplementedException();
             }
@@ -81,10 +81,10 @@ namespace ScePSP.Utils.Utils
             switch (BitsPerPixel)
             {
                 case 16:
-                    value = *(ushort*) (Address + position);
+                    value = *(ushort*)(Address + position);
                     break;
                 case 32:
-                    value = *(uint*) (Address + position);
+                    value = *(uint*)(Address + position);
                     break;
                 default: throw new NotImplementedException();
             }
@@ -98,7 +98,7 @@ namespace ScePSP.Utils.Utils
             bitmap.LockBitsUnlock(PixelFormat.Format32bppArgb, (bitmapData) =>
             {
                 var count = Width * Height;
-                var output = (OutputPixel*) bitmapData.Scan0;
+                var output = (OutputPixel*)bitmapData.Scan0;
                 PixelFormatDecoder.Decode(
                     GuPixelFormat,
                     Address,

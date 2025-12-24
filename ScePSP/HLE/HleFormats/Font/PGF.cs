@@ -1,12 +1,12 @@
-﻿using System;
+﻿using ScePSPUtils;
+using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using ScePSPUtils;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Hle.Formats.Font
 {
@@ -156,12 +156,12 @@ namespace ScePSP.Hle.Formats.Font
             };
 
             GlyphIndex = glyphIndex;
-            UnicodeChar = (char) pgf.ReverseCharMap[glyphIndex];
+            UnicodeChar = (char)pgf.ReverseCharMap[glyphIndex];
 
             //int NextOffset = br.Position;
 
             //br.Position = NextOffset;
-            var shadowOffset = bitReader.Position + (int) bitReader.ReadBits(14) * 8;
+            var shadowOffset = bitReader.Position + (int)bitReader.ReadBits(14) * 8;
             if (_glyphType == GlyphFlags.FontPgfShadowglyph)
             {
                 bitReader.Position = shadowOffset;
@@ -172,7 +172,7 @@ namespace ScePSP.Hle.Formats.Font
             Height = bitReader.ReadBits(7);
             Left = bitReader.ReadBitsSigned(7);
             Top = bitReader.ReadBitsSigned(7);
-            Flags = (GlyphFlags) bitReader.ReadBits(6);
+            Flags = (GlyphFlags)bitReader.ReadBits(6);
 
             if (Flags.HasFlag(GlyphFlags.FontPgfCharglyph))
             {
@@ -186,7 +186,7 @@ namespace ScePSP.Hle.Formats.Font
                 AdvanceIndex = bitReader.ReadBits(8);
             }
 
-            DataByteOffset = (uint) (bitReader.Position / 8);
+            DataByteOffset = (uint)(bitReader.Position / 8);
 
             uint pixelIndex = 0;
             var numberOfPixels = Width * Height;
@@ -204,11 +204,11 @@ namespace ScePSP.Hle.Formats.Font
                 if (code < 8)
                 {
                     value = bitReader.ReadBits(4);
-                    count = (int) code + 1;
+                    count = (int)code + 1;
                 }
                 else
                 {
-                    count = 16 - (int) code;
+                    count = 16 - (int)code;
                 }
 
                 for (var n = 0; n < count && pixelIndex < numberOfPixels; n++)
@@ -231,7 +231,7 @@ namespace ScePSP.Hle.Formats.Font
                         y = pixelIndex % Height;
                     }
 
-                    Data[x + y * Width] = (byte) ((value << 0) | (value << 4));
+                    Data[x + y * Width] = (byte)((value << 0) | (value << 4));
                     pixelIndex++;
                 }
             }
@@ -256,7 +256,7 @@ namespace ScePSP.Hle.Formats.Font
         public Bitmap GetBitmap()
         {
             if (Width == 0 || Height == 0) return new Bitmap(1, 1);
-            var bitmap = new Bitmap((int) Width, (int) Height);
+            var bitmap = new Bitmap((int)Width, (int)Height);
             for (int y = 0, n = 0; y < Height; y++)
             {
                 for (var x = 0; x < Width; x++, n++)
@@ -394,7 +394,7 @@ namespace ScePSP.Hle.Formats.Font
         /// </summary>
         public fixed byte Pad[3];
     }
-    
+
     public unsafe class Pgf : IPgf
     {
         protected IGlyph[] Glyphs;
@@ -460,7 +460,7 @@ namespace ScePSP.Hle.Formats.Font
             if (Char > Header.LastGlyph) return -1;
             int glyphPos = Char - Header.FirstGlyph;
             //Console.WriteLine("Offset: {0}, Size: {1}", glyphPos * header.charMapBpe, header.charMapBpe);
-            return (int) BitReader.ReadBitsAt(PackedCharMap, glyphPos * Header.TableCharMapBpe, Header.TableCharMapBpe);
+            return (int)BitReader.ReadBitsAt(PackedCharMap, glyphPos * Header.TableCharMapBpe, Header.TableCharMapBpe);
         }
 
         protected static int BitsToBytesHighAligned(int bits) => ((bits + 31) & ~31) / 8;
@@ -502,7 +502,7 @@ namespace ScePSP.Hle.Formats.Font
             FileStream.Read(charData, 0, BytesLeft);
             */
 
-            CharData = fileStream.ReadBytes((int) (fileStream.Length - fileStream.Position));
+            CharData = fileStream.ReadBytes((int)(fileStream.Length - fileStream.Position));
 
             var numberOfCharacters = Header.TableCharPointerLength;
 
@@ -515,23 +515,23 @@ namespace ScePSP.Hle.Formats.Font
 
             foreach (var pair in BitReader.FixedBitReader(PackedShadowCharMap, Header.TableShadowMapBpe))
             {
-                var unicodeIndex = (int) pair.Key + Header.FirstGlyph;
-                var glyphIndex = (int) pair.Value;
+                var unicodeIndex = (int)pair.Key + Header.FirstGlyph;
+                var glyphIndex = (int)pair.Value;
                 ShadowCharMap[unicodeIndex] = glyphIndex;
                 ReverseShadowCharMap[glyphIndex] = unicodeIndex;
             }
 
             foreach (var pair in BitReader.FixedBitReader(PackedCharMap, Header.TableCharMapBpe))
             {
-                var unicodeIndex = (int) pair.Key + Header.FirstGlyph;
-                var glyphIndex = (int) pair.Value;
+                var unicodeIndex = (int)pair.Key + Header.FirstGlyph;
+                var glyphIndex = (int)pair.Value;
                 CharMap[unicodeIndex] = glyphIndex;
                 ReverseCharMap[glyphIndex] = unicodeIndex;
             }
 
             foreach (var pair in BitReader.FixedBitReader(PackedCharPointerTable, Header.TableCharPointerBpe))
             {
-                CharPointer[pair.Key] = (int) pair.Value;
+                CharPointer[pair.Key] = (int)pair.Value;
             }
 
             /*
@@ -598,7 +598,7 @@ namespace ScePSP.Hle.Formats.Font
             Attributes = 0,
             Expire = 0,
         };
-        
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
         public struct HeaderStruct
         {
@@ -879,13 +879,13 @@ namespace ScePSP.Hle.Formats.Font
 
         public float Value
         {
-            get => (float) (RawValue / Math.Pow(2, 6));
-            set => RawValue = (int) (value * Math.Pow(2, 6));
+            get => (float)(RawValue / Math.Pow(2, 6));
+            set => RawValue = (int)(value * Math.Pow(2, 6));
         }
 
         public static implicit operator float(Fixed266 that) => that.Value;
 
-        public static implicit operator Fixed266(float that) => new Fixed266 {Value = that};
+        public static implicit operator Fixed266(float that) => new Fixed266 { Value = that };
 
         public override string ToString() => Value.ToString(CultureInfo.InvariantCulture);
     }
@@ -1068,7 +1068,7 @@ namespace ScePSP.Hle.Formats.Font
         {
             if (obj == null) return false;
             if (obj.GetType() != typeof(HorizontalVerticalFloat)) return false;
-            return (HorizontalVerticalFloat) obj == this;
+            return (HorizontalVerticalFloat)obj == this;
         }
 
         // ReSharper disable NonReadonlyMemberInGetHashCode

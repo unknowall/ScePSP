@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using ScePSP.Hle.Threading.Semaphores;
+﻿using ScePSP.Core.Cpu;
 using ScePSP.Hle.Managers;
-using ScePSP.Core.Cpu;
+using ScePSP.Hle.Threading.Semaphores;
+using System;
+using System.Collections.Generic;
 
 namespace ScePSP.Hle.Modules.threadman
 {
@@ -14,7 +14,7 @@ namespace ScePSP.Hle.Modules.threadman
         {
             try
             {
-                return SemaphoreManager.Semaphores.Get((int) SemaphoreId);
+                return SemaphoreManager.Semaphores.Get((int)SemaphoreId);
             }
             catch (KeyNotFoundException)
             {
@@ -47,7 +47,7 @@ namespace ScePSP.Hle.Modules.threadman
                 HleSemaphore.SceKernelSemaInfo.CurrentCount = InitialCount;
                 HleSemaphore.SceKernelSemaInfo.MaximumCount = MaximumCount;
             }
-            return (SemaphoreId) SemaphoreManager.Semaphores.Create(HleSemaphore);
+            return (SemaphoreId)SemaphoreManager.Semaphores.Create(HleSemaphore);
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace ScePSP.Hle.Modules.threadman
         public int sceKernelDeleteSema(CpuThreadState CpuThreadState, SemaphoreId SemaphoreId)
         {
             var HleSemaphore = GetSemaphoreById(SemaphoreId);
-            SemaphoreManager.Semaphores.Remove((int) SemaphoreId);
+            SemaphoreManager.Semaphores.Remove((int)SemaphoreId);
             if (HleSemaphore.IncrementCount(HleSemaphore.SceKernelSemaInfo.MaximumCount) > 0)
             {
                 CpuThreadState.Yield();

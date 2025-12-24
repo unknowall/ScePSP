@@ -1,9 +1,9 @@
-﻿using System;
+﻿using ScePSP.Core;
+using ScePSP.Core.Components.Display;
+using System;
+using System.Drawing.Imaging;
 //using System.Drawing.Imaging;
 using System.Text;
-using ScePSP.Core;
-using ScePSP.Core.Components.Display;
-using System.Drawing.Imaging;
 
 namespace ScePSP.Hle.Vfs.Emulator
 {
@@ -142,7 +142,7 @@ namespace ScePSP.Hle.Vfs.Emulator
             }
 
             //Console.Error.WriteLine("     {0}", (EmulatorDevclEnum)Command);
-            switch ((EmulatorDevclEnum) Command)
+            switch ((EmulatorDevclEnum)Command)
             {
                 case EmulatorDevclEnum.GetHasDisplay:
                     ReinterpretSpan<int>(Output)[0] = DisplayConfig.Enabled ? 1 : 0;
@@ -164,7 +164,7 @@ namespace ScePSP.Hle.Vfs.Emulator
                     break;
                 default:
                     Console.Error.WriteLine("Unknown emulator command '{0}':0x{1:X} <- {2}", DeviceName, Command,
-                        (EmulatorDevclEnum) Command);
+                        (EmulatorDevclEnum)Command);
                     return -1;
             }
             return -1;

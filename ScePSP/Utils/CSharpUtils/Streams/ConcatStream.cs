@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.IO;
-using ScePSPUtils.Extensions;
 
 namespace ScePSPUtils.Streams
 {
@@ -87,7 +87,7 @@ namespace ScePSPUtils.Streams
             {
                 if (Position + count > Stream1.Length)
                 {
-                    var count1 = (int) (Stream1.Length - Position);
+                    var count1 = (int)(Stream1.Length - Position);
                     readed += Read(buffer, offset + readed, count1);
                     readed += Read(buffer, offset + readed, count - count1);
                 }

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Numerics;
-using ScePSPUtils.Drawing;
-using ScePSPUtils.Extensions;
-using ScePSP.Core.Gpu.State;
+﻿using ScePSP.Core.Gpu.State;
 using ScePSP.Core.Gpu.VertexReading;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
 using ScePSP.Rasterizer;
 using ScePSP.Utils;
+using ScePSPUtils.Drawing;
+using System;
+using System.Numerics;
 
 namespace ScePSP.Core.Gpu
 {
@@ -15,7 +14,7 @@ namespace ScePSP.Core.Gpu
     {
         [Inject] protected PspMemory Memory;
         [Inject] protected PspStoredConfig PspStoredConfig;
-        
+
         protected int _ScaleViewport = 2;
 
         internal event Action<int> OnScaleViewport;
@@ -118,40 +117,40 @@ namespace ScePSP.Core.Gpu
                 switch (PrimitiveType)
                 {
                     case GuPrimitiveType.Points:
-                    {
-                        for (var n = 0; n < vertexCount; n++) DrawPoint(vP[n]);
-                        break;
-                    }
+                        {
+                            for (var n = 0; n < vertexCount; n++) DrawPoint(vP[n]);
+                            break;
+                        }
                     case GuPrimitiveType.Lines:
-                    {
-                        for (var n = 0; n < vertexCount; n += 2) DrawLine(vP[n], vP[n + 1]);
-                        break;
-                    }
+                        {
+                            for (var n = 0; n < vertexCount; n += 2) DrawLine(vP[n], vP[n + 1]);
+                            break;
+                        }
                     case GuPrimitiveType.LineStrip:
-                    {
-                        for (var n = 1; n < vertexCount; n++) DrawLine(vP[n - 1], vP[n]);
-                        break;
-                    }
+                        {
+                            for (var n = 1; n < vertexCount; n++) DrawLine(vP[n - 1], vP[n]);
+                            break;
+                        }
                     case GuPrimitiveType.Triangles:
-                    {
-                        for (var n = 0; n < vertexCount; n += 3) DrawTriangle(vP[n + 0], vP[n + 1], vP[n + 2]);
-                        break;
-                    }
+                        {
+                            for (var n = 0; n < vertexCount; n += 3) DrawTriangle(vP[n + 0], vP[n + 1], vP[n + 2]);
+                            break;
+                        }
                     case GuPrimitiveType.TriangleStrip:
-                    {
-                        for (var n = 2; n < vertexCount; n++) DrawTriangle(vP[n - 2], vP[n - 1], vP[n]);
-                        break;
-                    }
+                        {
+                            for (var n = 2; n < vertexCount; n++) DrawTriangle(vP[n - 2], vP[n - 1], vP[n]);
+                            break;
+                        }
                     case GuPrimitiveType.TriangleFan:
-                    {
-                        for (var n = 2; n < vertexCount; n++) DrawTriangle(vP[0], vP[n - 1], vP[n]);
-                        break;
-                    }
+                        {
+                            for (var n = 2; n < vertexCount; n++) DrawTriangle(vP[0], vP[n - 1], vP[n]);
+                            break;
+                        }
                     case GuPrimitiveType.Sprites:
-                    {
-                        for (var n = 0; n < vertexCount; n += 2) DrawSprite(vP[n + 0], vP[n + 1]);
-                        break;
-                    }
+                        {
+                            for (var n = 0; n < vertexCount; n += 2) DrawSprite(vP[n + 0], vP[n + 1]);
+                            break;
+                        }
                     default:
                         Console.WriteLine($"Unsupported {PrimitiveType}");
                         break;
@@ -197,9 +196,9 @@ namespace ScePSP.Core.Gpu
 
 
         private VPoint Vector4ToPoint(Vector4 v, Vector4 n, Vector4 t, Vector4 color) =>
-            new VPoint(new RasterizerPoint((int) v.X, (int) v.Y), n, t, color);
+            new VPoint(new RasterizerPoint((int)v.X, (int)v.Y), n, t, color);
 
-        private uint[] colors = {0xFF0077FF, 0xFF00FFFF, 0xFF0000FF};
+        private uint[] colors = { 0xFF0077FF, 0xFF00FFFF, 0xFF0000FF };
 
         public struct VPoint
         {
@@ -325,7 +324,7 @@ namespace ScePSP.Core.Gpu
         public virtual void DrawVideo(uint FrameBufferAddress, OutputPixel* OutputPixel, int Width, int Height)
         {
         }
-        
+
         protected VertexInfo[] Vertices = new VertexInfo[ushort.MaxValue];
         protected VertexTypeStruct VertexType;
         protected byte* indexListByte;
@@ -354,7 +353,7 @@ namespace ScePSP.Core.Gpu
             vertexInfo = Vertices[indexListShort[index]];
 
         protected delegate void ReadVertexDelegate(int index, out VertexInfo vertexInfo);
-        
+
         protected void PreparePrim(GpuStateStruct GpuState, out uint totalVerticesWithoutMorphing, uint vertexCount, out uint morpingVertexCount)
         {
             totalVerticesWithoutMorphing = vertexCount;
@@ -362,9 +361,9 @@ namespace ScePSP.Core.Gpu
             readVertex = ReadVertex_Void_delegate;
             VertexReader.SetVertexTypeStruct(
                 VertexType,
-                (byte*) Memory.PspAddressToPointerSafe(GpuState.GetAddressRelativeToBaseOffset(GpuState.VertexAddress), 0)
+                (byte*)Memory.PspAddressToPointerSafe(GpuState.GetAddressRelativeToBaseOffset(GpuState.VertexAddress), 0)
             );
-            
+
             void* indexPointer = null;
             if (VertexType.Index != VertexTypeStruct.IndexEnum.Void)
             {
@@ -379,7 +378,7 @@ namespace ScePSP.Core.Gpu
                     break;
                 case VertexTypeStruct.IndexEnum.Byte:
                     readVertex = ReadVertex_Byte_delegate;
-                    indexListByte = (byte*) indexPointer;
+                    indexListByte = (byte*)indexPointer;
                     totalVerticesWithoutMorphing = 0;
                     if (indexListByte != null)
                     {
@@ -393,7 +392,7 @@ namespace ScePSP.Core.Gpu
                     break;
                 case VertexTypeStruct.IndexEnum.Short:
                     readVertex = ReadVertex_Short_delegate;
-                    indexListShort = (ushort*) indexPointer;
+                    indexListShort = (ushort*)indexPointer;
                     totalVerticesWithoutMorphing = 0;
                     //VertexCount--;
                     if (indexListShort != null)
@@ -412,11 +411,11 @@ namespace ScePSP.Core.Gpu
                     throw new NotImplementedException("VertexType.Index: " + VertexType.Index);
             }
             totalVerticesWithoutMorphing++;
-         
+
             // Fix missing geometry! At least!
             if (VertexType.Index == VertexTypeStruct.IndexEnum.Void)
             {
-                GpuState.VertexAddress += (uint) (VertexReader.VertexSize * vertexCount * morpingVertexCount);
+                GpuState.VertexAddress += (uint)(VertexReader.VertexSize * vertexCount * morpingVertexCount);
                 //GpuState->VertexAddress += (uint)(VertexReader.VertexSize * VertexCount);
             }
 

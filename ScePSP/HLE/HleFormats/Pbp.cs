@@ -1,9 +1,9 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Hle.Formats
 {
@@ -54,7 +54,7 @@ namespace ScePSP.Hle.Formats
                 throw new Exception("Not a PBP file");
             }
 
-            var offsets = Header.Offsets.Concat(new[] {(uint) stream.Length}).ToArray();
+            var offsets = Header.Offsets.Concat(new[] { (uint)stream.Length }).ToArray();
 
             for (int n = 0; n < 8; n++)
             {
@@ -64,11 +64,11 @@ namespace ScePSP.Hle.Formats
             return this;
         }
 
-        public bool ContainsKey(Types type) => Files.ContainsKey(Names[(int) type]);
+        public bool ContainsKey(Types type) => Files.ContainsKey(Names[(int)type]);
 
         public bool ContainsKey(string key) => Files.ContainsKey(key);
 
-        public Stream this[Types type] => Files[Names[(int) type]];
+        public Stream this[Types type] => Files[Names[(int)type]];
 
         public Stream this[string key] => Files[key];
     }

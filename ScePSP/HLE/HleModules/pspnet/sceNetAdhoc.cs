@@ -1,5 +1,5 @@
-﻿using System;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
+using System;
 
 namespace ScePSP.Hle.Modules.pspnet
 {
@@ -125,7 +125,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// </returns>
         [HlePspFunction(NID = 0xDFE53E03, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceNetAdhocPdpRecv(PDP PDP, byte*srcMacAddr, ushort*port, void*data, void*dataLength, uint timeout,
+        public int sceNetAdhocPdpRecv(PDP PDP, byte* srcMacAddr, ushort* port, void* data, void* dataLength, uint timeout,
             int nonblock)
         {
             //throw(new NotImplementedException());
@@ -140,7 +140,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <returns> on success, &lt; 0 on error</returns>
         [HlePspFunction(NID = 0xC7C1FC57, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceNetAdhocGetPdpStat(int*size, pdpStatStruct*stat)
+        public int sceNetAdhocGetPdpStat(int* size, pdpStatStruct* stat)
         {
             throw new NotImplementedException();
         }
@@ -153,7 +153,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <returns>0 on success, &lt; 0 on error.</returns>
         [HlePspFunction(NID = 0x7F75C338, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceNetAdhocGameModeCreateMaster(void*data, int size)
+        public int sceNetAdhocGameModeCreateMaster(void* data, int size)
         {
             throw new NotImplementedException();
         }
@@ -167,7 +167,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <returns>The id of the replica on success, &lt; 0 on error.</returns>
         [HlePspFunction(NID = 0x3278AB0C, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceNetAdhocGameModeCreateReplica(byte*mac, void*data, int size)
+        public int sceNetAdhocGameModeCreateReplica(byte* mac, void* data, int size)
         {
             throw new NotImplementedException();
         }

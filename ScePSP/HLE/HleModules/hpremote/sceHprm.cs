@@ -1,5 +1,5 @@
-﻿using System;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
+using System;
 
 namespace ScePSP.Hle.Modules.hpremote
 {

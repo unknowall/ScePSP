@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Numerics;
-using System.Threading.Tasks;
-using ScePSPUtils.Drawing;
-using ScePSPUtils.Extensions;
-using ScePSP.Core.Gpu.State;
-using ScePSP.Core.Types;
-using ScePSP.Rasterizer;
+﻿using ScePSP.Rasterizer;
 using ScePSP.Utils;
+using ScePSPUtils.Drawing;
+using System.Numerics;
 
 namespace ScePSP.Core.Gpu.Impl.Soft
 {
@@ -33,7 +25,7 @@ namespace ScePSP.Core.Gpu.Impl.Soft
                 //Console.WriteLine(triangle.P0.T);
                 if (VertexType.HasTexture)
                 {
-                    
+
                     var texA = LerpRatios(P0.T, P1.T, P2.T, a.Ratios);
                     var texB = LerpRatios(P0.T, P1.T, P2.T, b.Ratios);
                     //Console.WriteLine($"{P0.T} {P1.T} {P2.T} {a.Ratios} {b.Ratios} {texA} {texB}");
@@ -78,39 +70,39 @@ namespace ScePSP.Core.Gpu.Impl.Soft
 
         private uint* ScreenRow(int y)
         {
-            return (uint*) Memory.PspAddressToPointerSafe((uint) (DrawAddress + y * 512 * 4));
+            return (uint*)Memory.PspAddressToPointerSafe((uint)(DrawAddress + y * 512 * 4));
         }
 
         private void DrawRowFastSingleColor(int y, int x0, int x1, Rgba color)
         {
-            var ptr = (Rgba*) ScreenRow(y);
+            var ptr = (Rgba*)ScreenRow(y);
             for (var n = x0; n < x1; n++) ptr[n] = color;
         }
 
         private void DrawRowFastInterpolateTwoColors(int y, int x0, int x1, Vector4 c1, Vector4 c2)
         {
-            var ptr = (uint*) ScreenRow(y);
+            var ptr = (uint*)ScreenRow(y);
             for (var n = x0; n < x1; n++) ptr[n] = new RgbaFloat(Vector4.Lerp(c1, c2, n.RatioInRange(x0, x1))).Int;
         }
-        
+
         private void DrawRowFastTextureLookup(int y, int x0, int x1, Vector4 uv1, Vector4 uv2)
         {
-            var ptr = (uint*) ScreenRow(y);
+            var ptr = (uint*)ScreenRow(y);
             for (var n = x0; n < x1; n++) ptr[n] = TextureLookup(Vector4.Lerp(uv1, uv2, n.RatioInRange(x0, x1)));
         }
 
-        public uint TextureLookup(Vector4 pos) => TextureLookup((int) pos.X, (int) pos.Y); 
+        public uint TextureLookup(Vector4 pos) => TextureLookup((int)pos.X, (int)pos.Y);
 
         public uint TextureLookup(int x, int y) => *TextureLookupAddress(x, y);
 
-        public uint* TextureLookupAddress(Vector4 pos) => TextureLookupAddress((int) pos.X, (int) pos.Y);
-        
+        public uint* TextureLookupAddress(Vector4 pos) => TextureLookupAddress((int)pos.X, (int)pos.Y);
+
         public uint* TextureLookupAddress(int x, int y)
         {
             var textureMappingStateStruct = GpuState.TextureMappingState;
             var textureStateStruct = textureMappingStateStruct.TextureState;
             var mipmap = textureStateStruct.Mipmap0;
-            return (uint*) Memory.PspAddressToPointerSafe((uint)(mipmap.Address + (y * mipmap.BufferWidth + x) * 4));
+            return (uint*)Memory.PspAddressToPointerSafe((uint)(mipmap.Address + (y * mipmap.BufferWidth + x) * 4));
         }
 
     }

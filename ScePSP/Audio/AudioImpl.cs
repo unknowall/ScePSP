@@ -2,7 +2,7 @@
 
 namespace ScePSP.Core.Audio
 {
-    public abstract class PspAudioImpl : PspPluginImpl
+    public abstract class AudioImpl : PspPluginImpl
     {
         public abstract void Update(Action<short[]> ReadStream);
 

@@ -74,9 +74,9 @@ namespace cscodec.h264.decoder
             pps.constrained_intra_pred = constrained_intra_pred; ///< constrained_intra_pred_flag
             pps.redundant_pic_cnt_present = redundant_pic_cnt_present; ///< redundant_pic_cnt_present_flag
             pps.transform_8x8_mode = transform_8x8_mode; ///< transform_8x8_mode_flag
-            pps.scaling_matrix4 = (int[][]) scaling_matrix4.Clone();
-            pps.scaling_matrix8 = (int[][]) scaling_matrix8.Clone();
-            pps.chroma_qp_table = (int[][]) chroma_qp_table.Clone();
+            pps.scaling_matrix4 = (int[][])scaling_matrix4.Clone();
+            pps.scaling_matrix8 = (int[][])scaling_matrix8.Clone();
+            pps.chroma_qp_table = (int[][])chroma_qp_table.Clone();
             pps.chroma_qp_diff = chroma_qp_diff;
         }
     }

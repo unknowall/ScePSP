@@ -1,5 +1,5 @@
-﻿using System;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Core.Memory;
+using System;
 
 namespace ScePSP.Hle.Vfs.MemoryStick
 {
@@ -54,49 +54,49 @@ namespace ScePSP.Hle.Vfs.MemoryStick
         {
             //Console.Error.WriteLine("MemoryStick.IoDevctl: ({0}, 0x{1:X})", DeviceName, Command);
 
-            switch ((CommandType) Command)
+            switch ((CommandType)Command)
             {
                 case CommandType.CheckInserted:
-                {
-                    // 0 - Device is not assigned (callback not registered).
-                    // 1 - Device is assigned (callback registered).
-                    ReinterpretSpan<uint>(Output)[0] = 1;
-                    return 0;
-                }
+                    {
+                        // 0 - Device is not assigned (callback not registered).
+                        // 1 - Device is assigned (callback registered).
+                        ReinterpretSpan<uint>(Output)[0] = 1;
+                        return 0;
+                    }
                 case CommandType.MScmRegisterMSInsertEjectCallback:
-                {
-                    var CallbackId = ReinterpretSpan<int>(Input)[0];
-                    MemoryStickEventHandler.ScheduleCallback(CallbackId, 1, 1);
-                    //var Callback = CallbackManager.Callbacks.Get(CallbackId);
-                    //CallbackManager.ScheduleCallback(
-                    //	HleCallback.Create(
-                    //		"RegisterInjectEjectCallback",
-                    //		Callback.Function,
-                    //		new object[] {
-                    //			1, // a0
-                    //			1, // a1
-                    //			Callback.Arguments[0] // a2
-                    //		}
-                    //	)
-                    //);
+                    {
+                        var CallbackId = ReinterpretSpan<int>(Input)[0];
+                        MemoryStickEventHandler.ScheduleCallback(CallbackId, 1, 1);
+                        //var Callback = CallbackManager.Callbacks.Get(CallbackId);
+                        //CallbackManager.ScheduleCallback(
+                        //	HleCallback.Create(
+                        //		"RegisterInjectEjectCallback",
+                        //		Callback.Function,
+                        //		new object[] {
+                        //			1, // a0
+                        //			1, // a1
+                        //			Callback.Arguments[0] // a2
+                        //		}
+                        //	)
+                        //);
 
-                    return 0;
-                }
+                        return 0;
+                    }
                 case CommandType.GetMemoryStickCapacity:
-                {
-                    var SizeInfo = (SizeInfoStruct*) Memory.PspAddressToPointerSafe(ReinterpretSpan<uint>(Input)[0]);
-                    var MemoryStickSectorSize = 32 * 1024;
-                    //var TotalSpaceInBytes = 2L * 1024 * 1024 * 1024;
-                    var FreeSpaceInBytes = 1L * 1024 * 1024 * 1024;
-                    SizeInfo->SectorSize = 0x200;
-                    SizeInfo->SectorCount = (uint) (MemoryStickSectorSize / SizeInfo->SectorSize);
-                    SizeInfo->MaxClusters = (uint) (FreeSpaceInBytes * 95 / 100) /
-                                            (SizeInfo->SectorSize * SizeInfo->SectorCount);
-                    SizeInfo->FreeClusters = SizeInfo->MaxClusters;
-                    SizeInfo->MaxSectors = SizeInfo->MaxClusters;
+                    {
+                        var SizeInfo = (SizeInfoStruct*)Memory.PspAddressToPointerSafe(ReinterpretSpan<uint>(Input)[0]);
+                        var MemoryStickSectorSize = 32 * 1024;
+                        //var TotalSpaceInBytes = 2L * 1024 * 1024 * 1024;
+                        var FreeSpaceInBytes = 1L * 1024 * 1024 * 1024;
+                        SizeInfo->SectorSize = 0x200;
+                        SizeInfo->SectorCount = (uint)(MemoryStickSectorSize / SizeInfo->SectorSize);
+                        SizeInfo->MaxClusters = (uint)(FreeSpaceInBytes * 95 / 100) /
+                                                (SizeInfo->SectorSize * SizeInfo->SectorCount);
+                        SizeInfo->FreeClusters = SizeInfo->MaxClusters;
+                        SizeInfo->MaxSectors = SizeInfo->MaxClusters;
 
-                    return 0;
-                }
+                        return 0;
+                    }
                 case CommandType.MScmUnregisterMSInsertEjectCallback:
                     // Ignore.
                     return 0;

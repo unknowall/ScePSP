@@ -11,9 +11,9 @@ namespace ScePSP.Utils
             int _argumentIndex = 0;
             readonly object[] _arguments;
             public ArrayArgumentReader(object[] arguments) => _arguments = arguments;
-            int IArgumentReader.LoadInteger() => (int) long.Parse(_arguments[_argumentIndex++].ToString());
+            int IArgumentReader.LoadInteger() => (int)long.Parse(_arguments[_argumentIndex++].ToString());
             long IArgumentReader.LoadLong() => long.Parse(_arguments[_argumentIndex++].ToString());
-            string IArgumentReader.LoadString() => (string) _arguments[_argumentIndex++];
+            string IArgumentReader.LoadString() => (string)_arguments[_argumentIndex++];
             float IArgumentReader.LoadFloat() => float.Parse(_arguments[_argumentIndex++].ToString());
         }
 
@@ -50,26 +50,26 @@ namespace ScePSP.Utils
                         value = Convert.ToString(arguments.LoadInteger(), 2);
                         break;
                     case "c":
-                        value = "" + (char) arguments.LoadInteger();
+                        value = "" + (char)arguments.LoadInteger();
                         break;
                     case "d":
                         value = Convert.ToString(arguments.LoadInteger(), 10);
                         break;
                     case "u":
-                        value = Convert.ToString((uint) arguments.LoadInteger(), 10);
+                        value = Convert.ToString((uint)arguments.LoadInteger(), 10);
                         break;
                     case "f":
                         value = Convert.ToString(arguments.LoadFloat(), CultureInfo.DefaultThreadCurrentCulture);
                         break;
                     case "o":
-                        value = Convert.ToString((uint) arguments.LoadInteger(), 8);
+                        value = Convert.ToString((uint)arguments.LoadInteger(), 8);
                         break;
                     case "s":
                         value = arguments.LoadString();
                         break;
                     case "x":
                     case "X":
-                        value = Convert.ToString((uint) arguments.LoadInteger(), 16);
+                        value = Convert.ToString((uint)arguments.LoadInteger(), 16);
                         value = pType == "x" ? value.ToLowerInvariant() : value.ToUpperInvariant();
                         break;
                     default:

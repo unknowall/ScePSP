@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.IO;
-using ScePSPUtils.Extensions;
 
 namespace ScePSPUtils
 {
@@ -56,7 +56,7 @@ namespace ScePSPUtils
         /// <returns></returns>
         public BitWriter2 WriteBits(int count, int value)
         {
-            WriteBits(count, (uint) value);
+            WriteBits(count, (uint)value);
             return this;
         }
 
@@ -94,14 +94,14 @@ namespace ScePSPUtils
             switch (_byteCapacity)
             {
                 case 1:
-                    Stream.WriteByte((byte) _currentValue);
+                    Stream.WriteByte((byte)_currentValue);
                     break;
                 case 2:
-                    Stream.WriteStruct((ushort) _currentValue);
+                    Stream.WriteStruct((ushort)_currentValue);
                     break;
                 case 4:
                     // ReSharper disable once RedundantCast
-                    Stream.WriteStruct((uint) _currentValue);
+                    Stream.WriteStruct((uint)_currentValue);
                     break;
                 default:
                     throw new InvalidOperationException();

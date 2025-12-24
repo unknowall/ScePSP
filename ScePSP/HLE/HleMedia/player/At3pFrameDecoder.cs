@@ -1,7 +1,6 @@
-﻿using ScePSP.Hle.Formats.audio.At3;
+﻿using ScePSP.Hle.Media.audio.At3;
 using System;
 using System.IO;
-using ScePSP.Hle.Media.audio.At3;
 
 namespace cscodec.h264.player
 {

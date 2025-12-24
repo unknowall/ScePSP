@@ -1,6 +1,6 @@
-﻿using System.Runtime.InteropServices;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Core.Memory;
 using ScePSP.Hle.Formats.Font;
+using System.Runtime.InteropServices;
 
 namespace ScePSP.Hle.Modules.libfont
 {
@@ -51,7 +51,7 @@ namespace ScePSP.Hle.Modules.libfont
                 this.ShadowOption = ShadowOption;
                 this.FontStyle = new FontStyle()
                 {
-                    Size = new HorizontalVerticalFloat() {Horizontal = HorizontalSize, Vertical = VerticalSize,},
+                    Size = new HorizontalVerticalFloat() { Horizontal = HorizontalSize, Vertical = VerticalSize, },
                     Resolution =
                         new HorizontalVerticalFloat()
                         {

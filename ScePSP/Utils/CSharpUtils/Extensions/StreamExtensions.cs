@@ -1,10 +1,10 @@
-﻿using System;
+﻿using ScePSPUtils.Streams;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using ScePSPUtils.Streams;
 
 namespace ScePSPUtils.Extensions
 {
@@ -130,7 +130,7 @@ namespace ScePSPUtils.Extensions
                     if (!includeExpectedByte) break;
                 }
 
-                buffer.WriteByte((byte) b);
+                buffer.WriteByte((byte)b);
             }
             return buffer.ToArray();
         }
@@ -231,7 +231,7 @@ namespace ScePSPUtils.Extensions
         public static MemoryStream ReadStreamCopy(this Stream stream, long toRead = -1)
         {
             if (toRead == -1) toRead = stream.Available();
-            return new MemoryStream(stream.ReadBytes((int) toRead));
+            return new MemoryStream(stream.ReadBytes((int)toRead));
         }
 
         /// <summary>
@@ -354,7 +354,7 @@ namespace ScePSPUtils.Extensions
 
             var startPosition = stream.Position;
             var bytes = stream.ReadBytesUpTo(toRead);
-            var zeroIndex = Array.IndexOf(bytes, (byte) 0x00);
+            var zeroIndex = Array.IndexOf(bytes, (byte)0x00);
             if (zeroIndex == -1)
             {
                 if (continueReading)
@@ -401,7 +401,7 @@ namespace ScePSPUtils.Extensions
                             stream.Position + ".");
                     }
                     if (readed == 0) break;
-                    temp.WriteByte((byte) readed);
+                    temp.WriteByte((byte)readed);
                 }
                 return encoding.GetString(temp.ToArray());
             }
@@ -497,7 +497,7 @@ namespace ScePSPUtils.Extensions
         /// <returns></returns>
         public static Stream WriteZeroToAlign(this Stream stream, int align)
         {
-            stream.WriteZeroBytes((int) (MathUtils.Align(stream.Position, align) - stream.Position));
+            stream.WriteZeroBytes((int)(MathUtils.Align(stream.Position, align) - stream.Position));
             return stream;
         }
 
@@ -509,7 +509,7 @@ namespace ScePSPUtils.Extensions
         /// <returns></returns>
         public static Stream WriteZeroToOffset(this Stream stream, long offset)
         {
-            stream.WriteZeroBytes((int) (offset - stream.Position));
+            stream.WriteZeroBytes((int)(offset - stream.Position));
             return stream;
         }
 
@@ -567,7 +567,7 @@ namespace ScePSPUtils.Extensions
         public static T ReadStructPartially<T>(this Stream stream) where T : struct
         {
             var size = Marshal.SizeOf(typeof(T));
-            var bufferPartial = stream.ReadBytes(Math.Min((int) stream.Available(), size));
+            var bufferPartial = stream.ReadBytes(Math.Min((int)stream.Available(), size));
             byte[] buffer;
             if (bufferPartial.Length < size)
             {
@@ -635,7 +635,7 @@ namespace ScePSPUtils.Extensions
             var itemSize = Marshal.SizeOf(typeof(TType));
             var skipSize = entrySize == -1 ? 0 : entrySize - itemSize;
 
-            var maxCount = (uint) (stream.Length / (itemSize + skipSize));
+            var maxCount = (uint)(stream.Length / (itemSize + skipSize));
             if (allowReadLess)
             {
                 count = Math.Min(maxCount, count);
@@ -644,7 +644,7 @@ namespace ScePSPUtils.Extensions
             if (skipSize < 0)
                 throw new Exception("Invalid Size");
             if (skipSize == 0)
-                return StructUtils.BytesToStructArray<TType>(stream.ReadBytes((int) (itemSize * count)));
+                return StructUtils.BytesToStructArray<TType>(stream.ReadBytes((int)(itemSize * count)));
             var vector = new TType[count];
 
             for (var n = 0; n < count; n++)
@@ -667,7 +667,7 @@ namespace ScePSPUtils.Extensions
             var entrySize = Marshal.SizeOf(typeof(T));
             var bytesAvailable = stream.Available();
             //Console.WriteLine("BytesAvailable={0}/EntrySize={1}", BytesAvailable, EntrySize);
-            return stream.ReadStructVector<T>((uint) (bytesAvailable / entrySize));
+            return stream.ReadStructVector<T>((uint)(bytesAvailable / entrySize));
         }
 
         /// <summary>
@@ -725,7 +725,7 @@ namespace ScePSPUtils.Extensions
                 if (!stream.CanSeek)
                 {
                     if (count < 0) throw new NotImplementedException("Can't go back");
-                    stream.ReadBytes((int) count);
+                    stream.ReadBytes((int)count);
                 }
                 else
                 {
@@ -762,7 +762,7 @@ namespace ScePSPUtils.Extensions
         /// <param name="actionReport"></param>
         public static void CopyToFast(this Stream fromStream, Stream toStream, Action<long, long> actionReport = null)
         {
-            var bufferSize = (int) Math.Min(fromStream.Length, 2 * 1024 * 1024);
+            var bufferSize = (int)Math.Min(fromStream.Length, 2 * 1024 * 1024);
             var buffer = new byte[bufferSize];
             CopyToFast(fromStream, toStream, buffer, actionReport);
             //buffer = null;
@@ -850,7 +850,7 @@ namespace ScePSPUtils.Extensions
         /// <returns></returns>
         public static Stream FillStreamWithByte(this Stream stream, byte Byte)
         {
-            stream.WriteByteRepeated(Byte, (int) (stream.Length - stream.Position));
+            stream.WriteByteRepeated(Byte, (int)(stream.Length - stream.Position));
             return stream;
         }
 
@@ -878,7 +878,7 @@ namespace ScePSPUtils.Extensions
                 while (left > 0)
                 {
                     var toWrite = Math.Min(bytes.Length, left);
-                    stream.Write(bytes, 0, (int) toWrite);
+                    stream.Write(bytes, 0, (int)toWrite);
                     left -= toWrite;
                     current += toWrite;
                     progress(current, totalCount);
@@ -898,7 +898,7 @@ namespace ScePSPUtils.Extensions
         public static Stream WriteByteRepeatedTo(this Stream stream, byte Byte, long positionStop,
             Action<long, long> progress = null)
         {
-            return WriteByteRepeated(stream, Byte, (int) (positionStop - stream.Position), progress);
+            return WriteByteRepeated(stream, Byte, (int)(positionStop - stream.Position), progress);
         }
 
         /// <summary>
@@ -911,7 +911,7 @@ namespace ScePSPUtils.Extensions
         {
             do
             {
-                byte Byte = (byte) (value & 0x7F);
+                byte Byte = (byte)(value & 0x7F);
                 value >>= 7;
                 if (value != 0) Byte |= 0x80;
                 stream.WriteByte(Byte);
@@ -929,7 +929,7 @@ namespace ScePSPUtils.Extensions
         {
             do
             {
-                byte Byte = (byte) (value & 0x7F);
+                byte Byte = (byte)(value & 0x7F);
                 value >>= 7;
                 if (value != 0) Byte |= 0x80;
                 stream.WriteByte(Byte);
@@ -966,7 +966,7 @@ namespace ScePSPUtils.Extensions
             {
                 c = stream.ReadByte();
                 if (c == -1) throw new Exception("Incomplete VariableUintBit8Extends");
-                v |= ((uint) c & 0x7F) << shift;
+                v |= ((uint)c & 0x7F) << shift;
                 shift += 7;
             } while ((c & 0x80) != 0);
             return v;
@@ -986,7 +986,7 @@ namespace ScePSPUtils.Extensions
             {
                 c = stream.ReadByte();
                 if (c == -1) throw new Exception("Incomplete VariableUintBit8Extends");
-                v |= ((ulong) c & 0x7F) << shift;
+                v |= ((ulong)c & 0x7F) << shift;
                 shift += 7;
             } while ((c & 0x80) != 0);
             return v;
@@ -1024,7 +1024,7 @@ namespace ScePSPUtils.Extensions
                         {
                             break;
                         }
-                        yield return (byte) value;
+                        yield return (byte)value;
                     }
                 }
                 finally

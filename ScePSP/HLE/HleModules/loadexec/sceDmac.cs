@@ -1,5 +1,5 @@
-﻿using ScePSPUtils;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
+using ScePSPUtils;
 
 namespace ScePSP.Hle.Modules.loadexec
 {

@@ -1,34 +1,33 @@
-﻿using System;
+﻿using ScePSP.Core;
+using ScePSP.Core.Components.Rtc;
+using ScePSP.Core.Cpu;
+using ScePSP.Core.Cpu.Assembler;
+using ScePSP.Core.Memory;
+using ScePSP.Hle;
+using ScePSP.Hle.Formats;
+using ScePSP.Hle.Formats.Archive;
+using ScePSP.Hle.Interop;
+using ScePSP.Hle.Loader;
+using ScePSP.Hle.Managers;
+using ScePSP.Hle.Modules.ctrl;
+using ScePSP.Hle.Modules.display;
+using ScePSP.Hle.Modules.loadexec;
+using ScePSP.Hle.Modules.threadman;
+using ScePSP.Hle.Modules.utils;
+using ScePSP.Hle.Vfs;
+using ScePSP.Hle.Vfs.Emulator;
+using ScePSP.Hle.Vfs.Iso;
+using ScePSP.Hle.Vfs.Local;
+using ScePSP.Hle.Vfs.MemoryStick;
+using ScePSP.Hle.Vfs.Zip;
+using ScePSPUtils;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using ScePSPUtils;
-using ScePSP.Core;
-using ScePSP.Core.Cpu;
-using ScePSP.Core.Cpu.Assembler;
-using ScePSP.Core.Memory;
-using ScePSP.Hle;
-using ScePSP.Hle.Formats;
-using ScePSP.Hle.Loader;
-using ScePSP.Hle.Managers;
-using ScePSP.Hle.Modules.ctrl;
-using ScePSP.Hle.Modules.display;
-using ScePSP.Hle.Modules.emulator;
-using ScePSP.Hle.Modules.loadexec;
-using ScePSP.Hle.Modules.threadman;
-using ScePSP.Hle.Modules.utils;
-using ScePSP.Hle.Vfs;
-using ScePSP.Hle.Vfs.Local;
-using ScePSP.Hle.Vfs.MemoryStick;
-using ScePSP.Hle.Vfs.Iso;
-using ScePSP.Hle.Vfs.Zip;
-using ScePSP.Hle.Formats.Archive;
-using ScePSP.Core.Components.Rtc;
-using ScePSP.Hle.Interop;
-using ScePSP.Hle.Vfs.Emulator;
 
 namespace ScePSP.Runner.Components.Cpu
 {
@@ -110,7 +109,7 @@ namespace ScePSP.Runner.Components.Cpu
             HleIoManager.SetDriver("emulator:", HleIoDriverEmulator);
             HleIoManager.SetDriver("kemulator:", HleIoDriverEmulator);
 
-            HleIoManager.SetDriver("flash:", new HleIoDriverZip(new ZipArchive(ApplicationPaths.AssertPath+ "/flash0.zip")));
+            HleIoManager.SetDriver("flash:", new HleIoDriverZip(new ZipArchive(ApplicationPaths.AssertPath + "/flash0.zip")));
         }
 
         public IsoFile SetIso(string isoFile)
@@ -130,7 +129,7 @@ namespace ScePSP.Runner.Components.Cpu
             MemoryStickMountable.Mount(
                 "/PSP/GAME/virtual",
                 new HleIoDriverLocalFileSystem(virtualDirectory)
-                //.AsReadonlyHleIoDriver()
+            //.AsReadonlyHleIoDriver()
             );
         }
 
@@ -184,9 +183,9 @@ namespace ScePSP.Runner.Components.Cpu
             RegisterModuleSyscall<Hle.Modules.emulator.Emulator>(0x1017, "testArguments");
             //RegisterModuleSyscall<Emulator>(0x7777, "waitThreadForever");
             RegisterModuleSyscall<ThreadManForUser>(HleEmulatorSpecialAddresses.CODE_PTR_EXIT_THREAD_SYSCALL,
-                (Func<CpuThreadState, int>) new ThreadManForUser()._hle_sceKernelExitDeleteThread);
+                (Func<CpuThreadState, int>)new ThreadManForUser()._hle_sceKernelExitDeleteThread);
             RegisterModuleSyscall<Hle.Modules.emulator.Emulator>(HleEmulatorSpecialAddresses.CODE_PTR_FINALIZE_CALLBACK_SYSCALL,
-                (Action<CpuThreadState>) new Hle.Modules.emulator.Emulator().finalizeCallback);
+                (Action<CpuThreadState>)new Hle.Modules.emulator.Emulator().finalizeCallback);
         }
 
         void RegisterModuleSyscall<TType>(int syscallCode, Delegate Delegate) where TType : HleModuleHost
@@ -223,24 +222,24 @@ namespace ScePSP.Runner.Components.Cpu
                 switch (format)
                 {
                     case FormatDetector.SubType.Pbp:
-                    {
-                        var pbp = new Pbp().Load(loadStream);
-                        elfLoadStreamTry.Add(pbp[Pbp.Types.PspData]);
-                        Logger.TryCatch(() =>
                         {
-                            var paramSfo = new Psf().Load(pbp[Pbp.Types.ParamSfo]);
-
-                            if (paramSfo.EntryDictionary.ContainsKey("TITLE"))
+                            var pbp = new Pbp().Load(loadStream);
+                            elfLoadStreamTry.Add(pbp[Pbp.Types.PspData]);
+                            Logger.TryCatch(() =>
                             {
-                                title = (string) paramSfo.EntryDictionary["TITLE"];
-                            }
+                                var paramSfo = new Psf().Load(pbp[Pbp.Types.ParamSfo]);
 
-                            if (paramSfo.EntryDictionary.ContainsKey("PSP_SYSTEM_VER"))
-                            {
-                                HleConfig.FirmwareVersion = paramSfo.EntryDictionary["PSP_SYSTEM_VER"].ToString();
-                            }
-                        });
-                    }
+                                if (paramSfo.EntryDictionary.ContainsKey("TITLE"))
+                                {
+                                    title = (string)paramSfo.EntryDictionary["TITLE"];
+                                }
+
+                                if (paramSfo.EntryDictionary.ContainsKey("PSP_SYSTEM_VER"))
+                                {
+                                    HleConfig.FirmwareVersion = paramSfo.EntryDictionary["PSP_SYSTEM_VER"].ToString();
+                                }
+                            });
+                        }
                         break;
                     case FormatDetector.SubType.Elf:
                         elfLoadStreamTry.Add(loadStream);
@@ -248,42 +247,42 @@ namespace ScePSP.Runner.Components.Cpu
                     case FormatDetector.SubType.Dax:
                     case FormatDetector.SubType.Cso:
                     case FormatDetector.SubType.Iso:
-                    {
-                        arguments[0] = "disc0:/PSP/GAME/SYSDIR/EBOOT.BIN";
-
-                        var iso = SetIso(fileName);
-                        Logger.TryCatch(() =>
                         {
-                            var paramSfo = new Psf().Load(iso.Root.Locate("/PSP_GAME/PARAM.SFO").Open());
-                            title = (string) paramSfo.EntryDictionary["TITLE"];
-                        });
+                            arguments[0] = "disc0:/PSP/GAME/SYSDIR/EBOOT.BIN";
 
-                        string[] filesToTry = {
+                            var iso = SetIso(fileName);
+                            Logger.TryCatch(() =>
+                            {
+                                var paramSfo = new Psf().Load(iso.Root.Locate("/PSP_GAME/PARAM.SFO").Open());
+                                title = (string)paramSfo.EntryDictionary["TITLE"];
+                            });
+
+                            string[] filesToTry = {
                             "/PSP_GAME/SYSDIR/BOOT.BIN",
                             "/PSP_GAME/SYSDIR/EBOOT.BIN",
                             "/PSP_GAME/SYSDIR/EBOOT.OLD",
                         };
 
-                        foreach (var fileToTry in filesToTry)
-                        {
-                            try
+                            foreach (var fileToTry in filesToTry)
                             {
-                                elfLoadStreamTry.Add(iso.Root.Locate(fileToTry).Open());
+                                try
+                                {
+                                    elfLoadStreamTry.Add(iso.Root.Locate(fileToTry).Open());
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine(e);
+                                }
+                                //if (ElfLoadStream.Length != 0) break;
                             }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e);
-                            }
-                            //if (ElfLoadStream.Length != 0) break;
-                        }
 
-                        /*
-                        if (ElfLoadStream.Length == 0)
-                        {
-                            throw (new Exception(String.Format("{0} files are empty", String.Join(", ", FilesToTry))));
+                            /*
+                            if (ElfLoadStream.Length == 0)
+                            {
+                                throw (new Exception(String.Format("{0} files are empty", String.Join(", ", FilesToTry))));
+                            }
+                            */
                         }
-                        */
-                    }
                         break;
                     default:
                         throw new NotImplementedException("Can't load format '" + format + "'");
@@ -358,7 +357,7 @@ namespace ScePSP.Runner.Components.Cpu
                     currentCpuThreadState.Gp = hleModuleGuest.InitInfo.Gp;
                     currentCpuThreadState.CallerModule = hleModuleGuest;
 
-                    var threadId = (int) ThreadManForUser.sceKernelCreateThread(currentCpuThreadState, "<EntryPoint>",
+                    var threadId = (int)ThreadManForUser.sceKernelCreateThread(currentCpuThreadState, "<EntryPoint>",
                         hleModuleGuest.InitInfo.Pc, 10, 0x1000, PspThreadAttributes.ClearStack, null);
 
                     //var Thread = HleThreadManager.GetThreadById(ThreadId);
@@ -366,7 +365,7 @@ namespace ScePSP.Runner.Components.Cpu
                         argumentsPartition.Low);
                     //Console.WriteLine("RA: 0x{0:X}", CurrentCpuThreadState.RA);
                 }
-                
+
                 currentCpuThreadState.DumpRegisters(Logger.Output(Logger.Level.Info));
                 MemoryManager.GetPartition(MemoryPartitions.User).Dump(output: Logger.Output(Logger.Level.Info));
 

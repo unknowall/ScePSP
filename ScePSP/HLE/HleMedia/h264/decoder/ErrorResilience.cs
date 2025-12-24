@@ -104,7 +104,7 @@ namespace cscodec.h264.decoder
                     for (x = 0; x < 8; x++)
                     {
                         dest_y_base[dest_y_offset + x + (i & 1) * 8 + (y + (i >> 1) * 8) * s.linesize] =
-                            (byte) (dc / 8);
+                            (byte)(dc / 8);
                     }
                 }
             }
@@ -119,8 +119,8 @@ namespace cscodec.h264.decoder
                 int x;
                 for (x = 0; x < 8; x++)
                 {
-                    dest_cb_base[dest_cb_offset + x + y * s.uvlinesize] = (byte) (dcu / 8);
-                    dest_cr_base[dest_cr_offset + x + y * s.uvlinesize] = (byte) (dcv / 8);
+                    dest_cb_base[dest_cb_offset + x + y * s.uvlinesize] = (byte)(dcu / 8);
+                    dest_cr_base[dest_cr_offset + x + y * s.uvlinesize] = (byte)(dcv / 8);
                 }
             }
         }
@@ -186,8 +186,8 @@ namespace cscodec.h264.decoder
             {
                 for (b_x = 0; b_x < w; b_x++)
                 {
-                    int[] color = {1024, 1024, 1024, 1024};
-                    int[] distance = {9999, 9999, 9999, 9999};
+                    int[] color = { 1024, 1024, 1024, 1024 };
+                    int[] distance = { 9999, 9999, 9999, 9999 };
                     int mb_index, error, j;
                     long guess, weight_sum;
 
@@ -206,7 +206,7 @@ namespace cscodec.h264.decoder
                         int mb_index_j = (j >> is_luma) + (b_y >> is_luma) * s.mb_stride;
                         int error_j = s.error_status_table[mb_index_j];
                         int intra_j =
-                            7 & (int) s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_index_j];
+                            7 & (int)s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_index_j];
                         if (intra_j == 0 || 0 == (error_j & MpegEncContext.DC_ERROR))
                         {
                             color[0] = dc_base[dc_offset + j + b_y * stride];
@@ -221,7 +221,7 @@ namespace cscodec.h264.decoder
                         int mb_index_j = (j >> is_luma) + (b_y >> is_luma) * s.mb_stride;
                         int error_j = s.error_status_table[mb_index_j];
                         int intra_j =
-                            7 & (int) s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_index_j];
+                            7 & (int)s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_index_j];
                         if (intra_j == 0 || 0 == (error_j & MpegEncContext.DC_ERROR))
                         {
                             color[1] = dc_base[dc_offset + j + b_y * stride];
@@ -236,7 +236,7 @@ namespace cscodec.h264.decoder
                         int mb_index_j = (b_x >> is_luma) + (j >> is_luma) * s.mb_stride;
                         int error_j = s.error_status_table[mb_index_j];
                         int intra_j =
-                            7 & (int) s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_index_j];
+                            7 & (int)s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_index_j];
                         if (intra_j == 0 || 0 == (error_j & MpegEncContext.DC_ERROR))
                         {
                             color[2] = dc_base[dc_offset + b_x + j * stride];
@@ -251,7 +251,7 @@ namespace cscodec.h264.decoder
                         int mb_index_j = (b_x >> is_luma) + (j >> is_luma) * s.mb_stride;
                         int error_j = s.error_status_table[mb_index_j];
                         int intra_j =
-                            7 & (int) s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_index_j];
+                            7 & (int)s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_index_j];
                         if (intra_j == 0 || 0 == (error_j & MpegEncContext.DC_ERROR))
                         {
                             color[3] = dc_base[dc_offset + b_x + j * stride];
@@ -265,13 +265,13 @@ namespace cscodec.h264.decoder
                     for (j = 0; j < 4; j++)
                     {
                         long weight = 256 * 256 * 256 * 16 / distance[j];
-                        guess += weight * (long) color[j];
+                        guess += weight * (long)color[j];
                         weight_sum += weight;
                     }
                     guess = (guess + weight_sum / 2) / weight_sum;
 
                     // DebugTool.printDebugString("GUESS dc_base["+(b_x + b_y*stride)+"] = "+((int)guess)+"\n");
-                    dc_base[dc_offset + b_x + b_y * stride] = (int) guess;
+                    dc_base[dc_offset + b_x + b_y * stride] = (int)guess;
                 }
             }
         }
@@ -304,10 +304,10 @@ namespace cscodec.h264.decoder
                     int y;
                     int left_status = s.error_status_table[(b_x >> is_luma) + (b_y >> is_luma) * s.mb_stride];
                     int right_status = s.error_status_table[((b_x + 1) >> is_luma) + (b_y >> is_luma) * s.mb_stride];
-                    int left_intra = 7 & (int) s.current_picture.mb_type_base[
+                    int left_intra = 7 & (int)s.current_picture.mb_type_base[
                                          s.current_picture.mb_type_offset + (b_x >> is_luma) +
                                          (b_y >> is_luma) * s.mb_stride];
-                    int right_intra = 7 & (int) s.current_picture.mb_type_base[
+                    int right_intra = 7 & (int)s.current_picture.mb_type_base[
                                           s.current_picture.mb_type_offset + ((b_x + 1) >> is_luma) +
                                           (b_y >> is_luma) * s.mb_stride];
                     int left_damage = left_status &
@@ -350,24 +350,24 @@ namespace cscodec.h264.decoder
 
                         if (left_damage != 0)
                         {
-                            dst_base[dst_offset + offset + 7 + y * stride] = (byte) cm_base[
+                            dst_base[dst_offset + offset + 7 + y * stride] = (byte)cm_base[
                                 cm_offset + dst_base[dst_offset + offset + 7 + y * stride] + ((d * 7) >> 4)];
-                            dst_base[dst_offset + offset + 6 + y * stride] = (byte) cm_base[
+                            dst_base[dst_offset + offset + 6 + y * stride] = (byte)cm_base[
                                 cm_offset + dst_base[dst_offset + offset + 6 + y * stride] + ((d * 5) >> 4)];
-                            dst_base[dst_offset + offset + 5 + y * stride] = (byte) cm_base[
+                            dst_base[dst_offset + offset + 5 + y * stride] = (byte)cm_base[
                                 cm_offset + dst_base[dst_offset + offset + 5 + y * stride] + ((d * 3) >> 4)];
-                            dst_base[dst_offset + offset + 4 + y * stride] = (byte) cm_base[
+                            dst_base[dst_offset + offset + 4 + y * stride] = (byte)cm_base[
                                 cm_offset + dst_base[dst_offset + offset + 4 + y * stride] + ((d * 1) >> 4)];
                         }
                         if (right_damage != 0)
                         {
-                            dst_base[dst_offset + offset + 8 + y * stride] = (byte) cm_base[
+                            dst_base[dst_offset + offset + 8 + y * stride] = (byte)cm_base[
                                 cm_offset + dst_base[dst_offset + offset + 8 + y * stride] - ((d * 7) >> 4)];
-                            dst_base[dst_offset + offset + 9 + y * stride] = (byte) cm_base[
+                            dst_base[dst_offset + offset + 9 + y * stride] = (byte)cm_base[
                                 cm_offset + dst_base[dst_offset + offset + 9 + y * stride] - ((d * 5) >> 4)];
-                            dst_base[dst_offset + offset + 10 + y * stride] = (byte) cm_base[
+                            dst_base[dst_offset + offset + 10 + y * stride] = (byte)cm_base[
                                 cm_offset + dst_base[dst_offset + offset + 10 + y * stride] - ((d * 3) >> 4)];
-                            dst_base[dst_offset + offset + 11 + y * stride] = (byte) cm_base[
+                            dst_base[dst_offset + offset + 11 + y * stride] = (byte)cm_base[
                                 cm_offset + dst_base[dst_offset + offset + 11 + y * stride] - ((d * 1) >> 4)];
                         }
                     }
@@ -403,10 +403,10 @@ namespace cscodec.h264.decoder
                     int x;
                     int top_status = s.error_status_table[(b_x >> is_luma) + (b_y >> is_luma) * s.mb_stride];
                     int bottom_status = s.error_status_table[(b_x >> is_luma) + ((b_y + 1) >> is_luma) * s.mb_stride];
-                    int top_intra = 7 & (int) s.current_picture.mb_type_base[
+                    int top_intra = 7 & (int)s.current_picture.mb_type_base[
                                         s.current_picture.mb_type_offset + (b_x >> is_luma) +
                                         (b_y >> is_luma) * s.mb_stride];
-                    int bottom_intra = 7 & (int) s.current_picture.mb_type_base[
+                    int bottom_intra = 7 & (int)s.current_picture.mb_type_base[
                                            s.current_picture.mb_type_offset + (b_x >> is_luma) +
                                            ((b_y + 1) >> is_luma) * s.mb_stride];
                     int top_damage = top_status &
@@ -449,24 +449,24 @@ namespace cscodec.h264.decoder
 
                         if (0 != top_damage)
                         {
-                            dst_base[dst_offset + offset + x + 7 * stride] = (byte) cm_base[
+                            dst_base[dst_offset + offset + x + 7 * stride] = (byte)cm_base[
                                 cm_offset + dst_base[dst_offset + offset + x + 7 * stride] + ((d * 7) >> 4)];
-                            dst_base[dst_offset + offset + x + 6 * stride] = (byte) cm_base[
+                            dst_base[dst_offset + offset + x + 6 * stride] = (byte)cm_base[
                                 cm_offset + dst_base[dst_offset + offset + x + 6 * stride] + ((d * 5) >> 4)];
-                            dst_base[dst_offset + offset + x + 5 * stride] = (byte) cm_base[
+                            dst_base[dst_offset + offset + x + 5 * stride] = (byte)cm_base[
                                 cm_offset + dst_base[dst_offset + offset + x + 5 * stride] + ((d * 3) >> 4)];
-                            dst_base[dst_offset + offset + x + 4 * stride] = (byte) cm_base[
+                            dst_base[dst_offset + offset + x + 4 * stride] = (byte)cm_base[
                                 cm_offset + dst_base[dst_offset + offset + x + 4 * stride] + ((d * 1) >> 4)];
                         }
                         if (0 != bottom_damage)
                         {
-                            dst_base[dst_offset + offset + x + 8 * stride] = (byte) cm_base[
+                            dst_base[dst_offset + offset + x + 8 * stride] = (byte)cm_base[
                                 cm_offset + dst_base[dst_offset + offset + x + 8 * stride] - ((d * 7) >> 4)];
-                            dst_base[dst_offset + offset + x + 9 * stride] = (byte) cm_base[
+                            dst_base[dst_offset + offset + x + 9 * stride] = (byte)cm_base[
                                 cm_offset + dst_base[dst_offset + offset + x + 9 * stride] - ((d * 5) >> 4)];
-                            dst_base[dst_offset + offset + x + 10 * stride] = (byte) cm_base[
+                            dst_base[dst_offset + offset + x + 10 * stride] = (byte)cm_base[
                                 cm_offset + dst_base[dst_offset + offset + x + 10 * stride] - ((d * 3) >> 4)];
-                            dst_base[dst_offset + offset + x + 11 * stride] = (byte) cm_base[
+                            dst_base[dst_offset + offset + x + 11 * stride] = (byte)cm_base[
                                 cm_offset + dst_base[dst_offset + offset + x + 11 * stride] - ((d * 1) >> 4)];
                         }
                     }
@@ -513,7 +513,7 @@ namespace cscodec.h264.decoder
                     {
                         int mb_xy = mb_x + mb_y * s.mb_stride;
 
-                        if (0 != (7 & (int) s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_xy]))
+                        if (0 != (7 & (int)s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_xy]))
                             continue;
                         if (0 == (s.error_status_table[mb_xy] & MpegEncContext.MV_ERROR)) continue;
 
@@ -536,7 +536,7 @@ namespace cscodec.h264.decoder
                 return;
             }
 
-            for (depth = 0;; depth++)
+            for (depth = 0; ; depth++)
             {
                 int changed, pass, none_left;
 
@@ -777,15 +777,15 @@ namespace cscodec.h264.decoder
                             mv[0][0][1] = mv_predictor[best_pred][1];
 
                             for (i = 0; i < mot_step; i++)
-                            for (j = 0; j < mot_step; j++)
-                            {
-                                s.current_picture.motion_val_base[0][
-                                        s.current_picture.motion_val_offset[0] + mot_index + i + j * mot_stride][0]
-                                    = mv[0][0][0];
-                                s.current_picture.motion_val_base[0][
-                                        s.current_picture.motion_val_offset[0] + mot_index + i + j * mot_stride][1]
-                                    = mv[0][0][1];
-                            }
+                                for (j = 0; j < mot_step; j++)
+                                {
+                                    s.current_picture.motion_val_base[0][
+                                            s.current_picture.motion_val_offset[0] + mot_index + i + j * mot_stride][0]
+                                        = mv[0][0][0];
+                                    s.current_picture.motion_val_base[0][
+                                            s.current_picture.motion_val_offset[0] + mot_index + i + j * mot_stride][1]
+                                        = mv[0][0][1];
+                                }
 
                             decode_mb(s, @ref[best_pred]);
 
@@ -913,7 +913,7 @@ namespace cscodec.h264.decoder
                     }
                     else
                     {
-                        if (0 != (7 & (int) s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_xy]))
+                        if (0 != (7 & (int)s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_xy]))
                             is_intra_likely++;
                         else
                             is_intra_likely--;
@@ -1022,7 +1022,7 @@ namespace cscodec.h264.decoder
         {
             int i, mb_x, mb_y, error, error_type, dc_error, mv_error, ac_error;
             int distance;
-            int[] threshold_part = {100, 100, 100};
+            int[] threshold_part = { 100, 100, 100 };
             int threshold = 50;
             int is_intra_likely;
             int size = s.b8_stride * 2 * s.mb_height;
@@ -1259,7 +1259,7 @@ namespace cscodec.h264.decoder
                 for (i = 0; i < s.mb_num; i++)
                 {
                     int mb_xy = s.mb_index2xy[i];
-                    if (0 == (7 & (int) s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_xy]))
+                    if (0 == (7 & (int)s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_xy]))
                         s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_xy] =
                             H264Context.MB_TYPE_INTRA4x4;
                 }
@@ -1272,11 +1272,11 @@ namespace cscodec.h264.decoder
                 for (mb_x = 0; mb_x < s.mb_width; mb_x++)
                 {
                     int mb_xy = mb_x + mb_y * s.mb_stride;
-                    int mb_type = (int) s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_xy];
+                    int mb_type = (int)s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_xy];
                     int dir = s.last_picture.data_base[0] == null ? 1 : 0;
                     error = s.error_status_table[mb_xy];
 
-                    if (0 != (7 & (int) mb_type)) continue; //intra
+                    if (0 != (7 & (int)mb_type)) continue; //intra
                     if (0 != (error & MpegEncContext.MV_ERROR)) continue; //inter with damaged MV
                     if (0 == (error & MpegEncContext.AC_ERROR)) continue; //undamaged inter
 
@@ -1328,7 +1328,7 @@ namespace cscodec.h264.decoder
                     {
                         int xy = mb_x * 2 + mb_y * 2 * s.b8_stride;
                         int mb_xy = mb_x + mb_y * s.mb_stride;
-                        int mb_type = (int) s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_xy];
+                        int mb_type = (int)s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_xy];
                         error = s.error_status_table[mb_xy];
 
                         if (0 != (7 & mb_type)) continue;
@@ -1399,11 +1399,11 @@ namespace cscodec.h264.decoder
                     byte[] dest_y_base, dest_cb_base, dest_cr_base;
                     int dest_y_offset, dest_cb_offset, dest_cr_offset;
                     int mb_xy = mb_x + mb_y * s.mb_stride;
-                    int mb_type = (int) s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_xy];
+                    int mb_type = (int)s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_xy];
 
                     error = s.error_status_table[mb_xy];
 
-                    if (0 != (7 & (int) mb_type) && 0 != s.partitioned_frame) continue;
+                    if (0 != (7 & (int)mb_type) && 0 != s.partitioned_frame) continue;
                     //	            if(error&MV_ERROR) continue; //inter data damaged FIXME is this good?
 
                     dest_y_base = s.current_picture.data_base[0];
@@ -1437,8 +1437,8 @@ namespace cscodec.h264.decoder
                         int x;
                         for (x = 0; x < 8; x++)
                         {
-                            dcu += (sbyte) dest_cb_base[dest_cb_offset + x + y * s.uvlinesize];
-                            dcv += (sbyte) dest_cr_base[dest_cr_offset + x + y * s.uvlinesize];
+                            dcu += (sbyte)dest_cb_base[dest_cb_offset + x + y * s.uvlinesize];
+                            dcv += (sbyte)dest_cr_base[dest_cr_offset + x + y * s.uvlinesize];
                         }
                     }
                     dc_val_base[dc_val[1] + mb_x + mb_y * s.mb_stride] = (dcu + 4) >> 3;
@@ -1476,7 +1476,7 @@ namespace cscodec.h264.decoder
                     int dest_y_offset, dest_cb_offset, dest_cr_offset;
 
                     int mb_xy = mb_x + mb_y * s.mb_stride;
-                    int mb_type = (int) s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_xy];
+                    int mb_type = (int)s.current_picture.mb_type_base[s.current_picture.mb_type_offset + mb_xy];
 
                     error = s.error_status_table[mb_xy];
 

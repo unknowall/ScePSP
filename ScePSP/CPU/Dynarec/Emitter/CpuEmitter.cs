@@ -38,8 +38,8 @@ namespace ScePSP.Core.Cpu.Emitter
         private int Fd => _instruction.Fd;
         private int Fs => _instruction.Fs;
         private AstNodeExpr IMM_s() => _ast.Immediate(Imm);
-        private AstNodeExpr IMM_u() => _ast.Immediate((uint) (ushort) Imm);
-        private AstNodeExpr IMM_uex() => _ast.Immediate((uint) Imm);
+        private AstNodeExpr IMM_u() => _ast.Immediate((uint)(ushort)Imm);
+        private AstNodeExpr IMM_uex() => _ast.Immediate((uint)Imm);
 
         private AstNodeExpr Address_RS_IMM14(int offset = 0) =>
             _ast.Cast<uint>(_ast.Binary(_ast.GPR_s(Rs), "+", _instruction.Imm14 * 4 + offset), false);

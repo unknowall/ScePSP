@@ -79,7 +79,7 @@ namespace ScePSPUtils.Drawing.Distance
         /// <returns></returns>
         public char GetChar()
         {
-            var pos = (int) Distance;
+            var pos = (int)Distance;
             return Hex[Math.Min(pos, Hex.Length - 1)];
         }
 

@@ -171,7 +171,7 @@ namespace cscodec.h264.decoder
 
         static void Inc(ref byte V, short Inc)
         {
-            V = (byte) (V + Inc);
+            V = (byte)(V + Inc);
         }
 
         //	public void add_pixels8(uint8_t *restrict pixels, DCTELEM *block, int line_size)
@@ -210,7 +210,7 @@ namespace cscodec.h264.decoder
 
         public void clear_block(short[] block)
         {
-            Arrays.Fill(block, 0, 64, (short) 0);
+            Arrays.Fill(block, 0, 64, (short)0);
             //memset(block, 0, sizeof(DCTELEM)*64);
         }
 
@@ -220,13 +220,13 @@ namespace cscodec.h264.decoder
         public void clear_blocks(short[][] blocks, int first_block_index)
         {
             for (int i = 0; i < 6; i++)
-                Arrays.Fill(blocks[first_block_index], 0, 64, (short) 0);
+                Arrays.Fill(blocks[first_block_index], 0, 64, (short)0);
             //memset(blocks, 0, sizeof(DCTELEM)*6*64);
         }
 
         public void clear_blocks(short[] blocks)
         {
-            Arrays.Fill(blocks, 0, 6 * 64, (short) 0);
+            Arrays.Fill(blocks, 0, 6 * 64, (short)0);
             //memset(blocks, 0, sizeof(DCTELEM)*6*64);
         }
 
@@ -268,10 +268,10 @@ namespace cscodec.h264.decoder
             {
                 for (i = 0; i < h; i++)
                 {
-                    dst_base[dst_offset + 0] = (byte) OP_PUT(dst_base[dst_offset + 0],
+                    dst_base[dst_offset + 0] = (byte)OP_PUT(dst_base[dst_offset + 0],
                         A * src_base[src_offset + 0] + B * src_base[src_offset + 1] +
                         C * src_base[src_offset + stride + 0] + D * src_base[src_offset + stride + 1]);
-                    dst_base[dst_offset + 1] = (byte) OP_PUT(dst_base[dst_offset + 1],
+                    dst_base[dst_offset + 1] = (byte)OP_PUT(dst_base[dst_offset + 1],
                         A * src_base[src_offset + 1] + B * src_base[src_offset + 2] +
                         C * src_base[src_offset + stride + 1] + D * src_base[src_offset + stride + 2]);
                     dst_offset += stride;
@@ -284,9 +284,9 @@ namespace cscodec.h264.decoder
                 int step = C != 0 ? stride : 1;
                 for (i = 0; i < h; i++)
                 {
-                    dst_base[dst_offset + 0] = (byte) OP_PUT(dst_base[dst_offset + 0],
+                    dst_base[dst_offset + 0] = (byte)OP_PUT(dst_base[dst_offset + 0],
                         A * src_base[src_offset + 0] + E * src_base[src_offset + step + 0]);
-                    dst_base[dst_offset + 1] = (byte) OP_PUT(dst_base[dst_offset + 1],
+                    dst_base[dst_offset + 1] = (byte)OP_PUT(dst_base[dst_offset + 1],
                         A * src_base[src_offset + 1] + E * src_base[src_offset + step + 1]);
                     dst_offset += stride;
                     src_offset += stride;
@@ -310,16 +310,16 @@ namespace cscodec.h264.decoder
             {
                 for (i = 0; i < h; i++)
                 {
-                    dst_base[dst_offset + 0] = (byte) OP_PUT(dst_base[dst_offset + 0],
+                    dst_base[dst_offset + 0] = (byte)OP_PUT(dst_base[dst_offset + 0],
                         A * src_base[src_offset + 0] + B * src_base[src_offset + 1] +
                         C * src_base[src_offset + stride + 0] + D * src_base[src_offset + stride + 1]);
-                    dst_base[dst_offset + 1] = (byte) OP_PUT(dst_base[dst_offset + 1],
+                    dst_base[dst_offset + 1] = (byte)OP_PUT(dst_base[dst_offset + 1],
                         A * src_base[src_offset + 1] + B * src_base[src_offset + 2] +
                         C * src_base[src_offset + stride + 1] + D * src_base[src_offset + stride + 2]);
-                    dst_base[dst_offset + 2] = (byte) OP_PUT(dst_base[dst_offset + 2],
+                    dst_base[dst_offset + 2] = (byte)OP_PUT(dst_base[dst_offset + 2],
                         A * src_base[src_offset + 2] + B * src_base[src_offset + 3] +
                         C * src_base[src_offset + stride + 2] + D * src_base[src_offset + stride + 3]);
-                    dst_base[dst_offset + 3] = (byte) OP_PUT(dst_base[dst_offset + 3],
+                    dst_base[dst_offset + 3] = (byte)OP_PUT(dst_base[dst_offset + 3],
                         A * src_base[src_offset + 3] + B * src_base[src_offset + 4] +
                         C * src_base[src_offset + stride + 3] + D * src_base[src_offset + stride + 4]);
                     dst_offset += stride;
@@ -332,13 +332,13 @@ namespace cscodec.h264.decoder
                 int step = C != 0 ? stride : 1;
                 for (i = 0; i < h; i++)
                 {
-                    dst_base[dst_offset + 0] = (byte) OP_PUT(dst_base[dst_offset + 0],
+                    dst_base[dst_offset + 0] = (byte)OP_PUT(dst_base[dst_offset + 0],
                         A * src_base[src_offset + 0] + E * src_base[src_offset + step + 0]);
-                    dst_base[dst_offset + 1] = (byte) OP_PUT(dst_base[dst_offset + 1],
+                    dst_base[dst_offset + 1] = (byte)OP_PUT(dst_base[dst_offset + 1],
                         A * src_base[src_offset + 1] + E * src_base[src_offset + step + 1]);
-                    dst_base[dst_offset + 2] = (byte) OP_PUT(dst_base[dst_offset + 2],
+                    dst_base[dst_offset + 2] = (byte)OP_PUT(dst_base[dst_offset + 2],
                         A * src_base[src_offset + 2] + E * src_base[src_offset + step + 2]);
-                    dst_base[dst_offset + 3] = (byte) OP_PUT(dst_base[dst_offset + 3],
+                    dst_base[dst_offset + 3] = (byte)OP_PUT(dst_base[dst_offset + 3],
                         A * src_base[src_offset + 3] + E * src_base[src_offset + step + 3]);
                     dst_offset += stride;
                     src_offset += stride;
@@ -366,21 +366,21 @@ namespace cscodec.h264.decoder
                 {
                     for (i = 0; i < h; i++)
                     {
-                        dst[0] = (byte) OP_PUT(dst[0],
+                        dst[0] = (byte)OP_PUT(dst[0],
                             A * src[0] + B * src[1] + C * src[stride + 0] + D * src[stride + 1]);
-                        dst[1] = (byte) OP_PUT(dst[1],
+                        dst[1] = (byte)OP_PUT(dst[1],
                             A * src[1] + B * src[2] + C * src[stride + 1] + D * src[stride + 2]);
-                        dst[2] = (byte) OP_PUT(dst[2],
+                        dst[2] = (byte)OP_PUT(dst[2],
                             A * src[2] + B * src[3] + C * src[stride + 2] + D * src[stride + 3]);
-                        dst[3] = (byte) OP_PUT(dst[3],
+                        dst[3] = (byte)OP_PUT(dst[3],
                             A * src[3] + B * src[4] + C * src[stride + 3] + D * src[stride + 4]);
-                        dst[4] = (byte) OP_PUT(dst[4],
+                        dst[4] = (byte)OP_PUT(dst[4],
                             A * src[4] + B * src[5] + C * src[stride + 4] + D * src[stride + 5]);
-                        dst[5] = (byte) OP_PUT(dst[5],
+                        dst[5] = (byte)OP_PUT(dst[5],
                             A * src[5] + B * src[6] + C * src[stride + 5] + D * src[stride + 6]);
-                        dst[6] = (byte) OP_PUT(dst[6],
+                        dst[6] = (byte)OP_PUT(dst[6],
                             A * src[6] + B * src[7] + C * src[stride + 6] + D * src[stride + 7]);
-                        dst[7] = (byte) OP_PUT(dst[7],
+                        dst[7] = (byte)OP_PUT(dst[7],
                             A * src[7] + B * src[8] + C * src[stride + 7] + D * src[stride + 8]);
                         dst += stride;
                         src += stride;
@@ -392,14 +392,14 @@ namespace cscodec.h264.decoder
                     int step = C != 0 ? stride : 1;
                     for (i = 0; i < h; i++)
                     {
-                        dst[0] = (byte) OP_PUT(dst[0], A * src[0] + E * src[step + 0]);
-                        dst[1] = (byte) OP_PUT(dst[1], A * src[1] + E * src[step + 1]);
-                        dst[2] = (byte) OP_PUT(dst[2], A * src[2] + E * src[step + 2]);
-                        dst[3] = (byte) OP_PUT(dst[3], A * src[3] + E * src[step + 3]);
-                        dst[4] = (byte) OP_PUT(dst[4], A * src[4] + E * src[step + 4]);
-                        dst[5] = (byte) OP_PUT(dst[5], A * src[5] + E * src[step + 5]);
-                        dst[6] = (byte) OP_PUT(dst[6], A * src[6] + E * src[step + 6]);
-                        dst[7] = (byte) OP_PUT(dst[7], A * src[7] + E * src[step + 7]);
+                        dst[0] = (byte)OP_PUT(dst[0], A * src[0] + E * src[step + 0]);
+                        dst[1] = (byte)OP_PUT(dst[1], A * src[1] + E * src[step + 1]);
+                        dst[2] = (byte)OP_PUT(dst[2], A * src[2] + E * src[step + 2]);
+                        dst[3] = (byte)OP_PUT(dst[3], A * src[3] + E * src[step + 3]);
+                        dst[4] = (byte)OP_PUT(dst[4], A * src[4] + E * src[step + 4]);
+                        dst[5] = (byte)OP_PUT(dst[5], A * src[5] + E * src[step + 5]);
+                        dst[6] = (byte)OP_PUT(dst[6], A * src[6] + E * src[step + 6]);
+                        dst[7] = (byte)OP_PUT(dst[7], A * src[7] + E * src[step + 7]);
                         dst += stride;
                         src += stride;
                     }
@@ -423,10 +423,10 @@ namespace cscodec.h264.decoder
             {
                 for (i = 0; i < h; i++)
                 {
-                    dst_base[dst_offset + 0] = (byte) OP_AVG(dst_base[dst_offset + 0],
+                    dst_base[dst_offset + 0] = (byte)OP_AVG(dst_base[dst_offset + 0],
                         A * src_base[src_offset + 0] + B * src_base[src_offset + 1] +
                         C * src_base[src_offset + stride + 0] + D * src_base[src_offset + stride + 1]);
-                    dst_base[dst_offset + 1] = (byte) OP_AVG(dst_base[dst_offset + 1],
+                    dst_base[dst_offset + 1] = (byte)OP_AVG(dst_base[dst_offset + 1],
                         A * src_base[src_offset + 1] + B * src_base[src_offset + 2] +
                         C * src_base[src_offset + stride + 1] + D * src_base[src_offset + stride + 2]);
                     dst_offset += stride;
@@ -439,9 +439,9 @@ namespace cscodec.h264.decoder
                 int step = C != 0 ? stride : 1;
                 for (i = 0; i < h; i++)
                 {
-                    dst_base[dst_offset + 0] = (byte) OP_AVG(dst_base[dst_offset + 0],
+                    dst_base[dst_offset + 0] = (byte)OP_AVG(dst_base[dst_offset + 0],
                         A * src_base[src_offset + 0] + E * src_base[src_offset + step + 0]);
-                    dst_base[dst_offset + 1] = (byte) OP_AVG(dst_base[dst_offset + 1],
+                    dst_base[dst_offset + 1] = (byte)OP_AVG(dst_base[dst_offset + 1],
                         A * src_base[src_offset + 1] + E * src_base[src_offset + step + 1]);
                     dst_offset += stride;
                     src_offset += stride;
@@ -465,16 +465,16 @@ namespace cscodec.h264.decoder
             {
                 for (i = 0; i < h; i++)
                 {
-                    dst_base[dst_offset + 0] = (byte) OP_AVG(dst_base[dst_offset + 0],
+                    dst_base[dst_offset + 0] = (byte)OP_AVG(dst_base[dst_offset + 0],
                         A * src_base[src_offset + 0] + B * src_base[src_offset + 1] +
                         C * src_base[src_offset + stride + 0] + D * src_base[src_offset + stride + 1]);
-                    dst_base[dst_offset + 1] = (byte) OP_AVG(dst_base[dst_offset + 1],
+                    dst_base[dst_offset + 1] = (byte)OP_AVG(dst_base[dst_offset + 1],
                         A * src_base[src_offset + 1] + B * src_base[src_offset + 2] +
                         C * src_base[src_offset + stride + 1] + D * src_base[src_offset + stride + 2]);
-                    dst_base[dst_offset + 2] = (byte) OP_AVG(dst_base[dst_offset + 2],
+                    dst_base[dst_offset + 2] = (byte)OP_AVG(dst_base[dst_offset + 2],
                         A * src_base[src_offset + 2] + B * src_base[src_offset + 3] +
                         C * src_base[src_offset + stride + 2] + D * src_base[src_offset + stride + 3]);
-                    dst_base[dst_offset + 3] = (byte) OP_AVG(dst_base[dst_offset + 3],
+                    dst_base[dst_offset + 3] = (byte)OP_AVG(dst_base[dst_offset + 3],
                         A * src_base[src_offset + 3] + B * src_base[src_offset + 4] +
                         C * src_base[src_offset + stride + 3] + D * src_base[src_offset + stride + 4]);
                     dst_offset += stride;
@@ -487,13 +487,13 @@ namespace cscodec.h264.decoder
                 int step = C != 0 ? stride : 1;
                 for (i = 0; i < h; i++)
                 {
-                    dst_base[dst_offset + 0] = (byte) OP_AVG(dst_base[dst_offset + 0],
+                    dst_base[dst_offset + 0] = (byte)OP_AVG(dst_base[dst_offset + 0],
                         A * src_base[src_offset + 0] + E * src_base[src_offset + step + 0]);
-                    dst_base[dst_offset + 1] = (byte) OP_AVG(dst_base[dst_offset + 1],
+                    dst_base[dst_offset + 1] = (byte)OP_AVG(dst_base[dst_offset + 1],
                         A * src_base[src_offset + 1] + E * src_base[src_offset + step + 1]);
-                    dst_base[dst_offset + 2] = (byte) OP_AVG(dst_base[dst_offset + 2],
+                    dst_base[dst_offset + 2] = (byte)OP_AVG(dst_base[dst_offset + 2],
                         A * src_base[src_offset + 2] + E * src_base[src_offset + step + 2]);
-                    dst_base[dst_offset + 3] = (byte) OP_AVG(dst_base[dst_offset + 3],
+                    dst_base[dst_offset + 3] = (byte)OP_AVG(dst_base[dst_offset + 3],
                         A * src_base[src_offset + 3] + E * src_base[src_offset + step + 3]);
                     dst_offset += stride;
                     src_offset += stride;
@@ -515,28 +515,28 @@ namespace cscodec.h264.decoder
             {
                 for (i = 0; i < h; i++)
                 {
-                    dst_base[dst_offset + 0] = (byte) OP_AVG(dst_base[dst_offset + 0],
+                    dst_base[dst_offset + 0] = (byte)OP_AVG(dst_base[dst_offset + 0],
                         A * src_base[src_offset + 0] + B * src_base[src_offset + 1] +
                         C * src_base[src_offset + stride + 0] + D * src_base[src_offset + stride + 1]);
-                    dst_base[dst_offset + 1] = (byte) OP_AVG(dst_base[dst_offset + 1],
+                    dst_base[dst_offset + 1] = (byte)OP_AVG(dst_base[dst_offset + 1],
                         A * src_base[src_offset + 1] + B * src_base[src_offset + 2] +
                         C * src_base[src_offset + stride + 1] + D * src_base[src_offset + stride + 2]);
-                    dst_base[dst_offset + 2] = (byte) OP_AVG(dst_base[dst_offset + 2],
+                    dst_base[dst_offset + 2] = (byte)OP_AVG(dst_base[dst_offset + 2],
                         A * src_base[src_offset + 2] + B * src_base[src_offset + 3] +
                         C * src_base[src_offset + stride + 2] + D * src_base[src_offset + stride + 3]);
-                    dst_base[dst_offset + 3] = (byte) OP_AVG(dst_base[dst_offset + 3],
+                    dst_base[dst_offset + 3] = (byte)OP_AVG(dst_base[dst_offset + 3],
                         A * src_base[src_offset + 3] + B * src_base[src_offset + 4] +
                         C * src_base[src_offset + stride + 3] + D * src_base[src_offset + stride + 4]);
-                    dst_base[dst_offset + 4] = (byte) OP_AVG(dst_base[dst_offset + 4],
+                    dst_base[dst_offset + 4] = (byte)OP_AVG(dst_base[dst_offset + 4],
                         A * src_base[src_offset + 4] + B * src_base[src_offset + 5] +
                         C * src_base[src_offset + stride + 4] + D * src_base[src_offset + stride + 5]);
-                    dst_base[dst_offset + 5] = (byte) OP_AVG(dst_base[dst_offset + 5],
+                    dst_base[dst_offset + 5] = (byte)OP_AVG(dst_base[dst_offset + 5],
                         A * src_base[src_offset + 5] + B * src_base[src_offset + 6] +
                         C * src_base[src_offset + stride + 5] + D * src_base[src_offset + stride + 6]);
-                    dst_base[dst_offset + 6] = (byte) OP_AVG(dst_base[dst_offset + 6],
+                    dst_base[dst_offset + 6] = (byte)OP_AVG(dst_base[dst_offset + 6],
                         A * src_base[src_offset + 6] + B * src_base[src_offset + 7] +
                         C * src_base[src_offset + stride + 6] + D * src_base[src_offset + stride + 7]);
-                    dst_base[dst_offset + 7] = (byte) OP_AVG(dst_base[dst_offset + 7],
+                    dst_base[dst_offset + 7] = (byte)OP_AVG(dst_base[dst_offset + 7],
                         A * src_base[src_offset + 7] + B * src_base[src_offset + 8] +
                         C * src_base[src_offset + stride + 7] + D * src_base[src_offset + stride + 8]);
                     dst_offset += stride;
@@ -549,21 +549,21 @@ namespace cscodec.h264.decoder
                 int step = C != 0 ? stride : 1;
                 for (i = 0; i < h; i++)
                 {
-                    dst_base[dst_offset + 0] = (byte) OP_AVG(dst_base[dst_offset + 0],
+                    dst_base[dst_offset + 0] = (byte)OP_AVG(dst_base[dst_offset + 0],
                         A * src_base[src_offset + 0] + E * src_base[src_offset + step + 0]);
-                    dst_base[dst_offset + 1] = (byte) OP_AVG(dst_base[dst_offset + 1],
+                    dst_base[dst_offset + 1] = (byte)OP_AVG(dst_base[dst_offset + 1],
                         A * src_base[src_offset + 1] + E * src_base[src_offset + step + 1]);
-                    dst_base[dst_offset + 2] = (byte) OP_AVG(dst_base[dst_offset + 2],
+                    dst_base[dst_offset + 2] = (byte)OP_AVG(dst_base[dst_offset + 2],
                         A * src_base[src_offset + 2] + E * src_base[src_offset + step + 2]);
-                    dst_base[dst_offset + 3] = (byte) OP_AVG(dst_base[dst_offset + 3],
+                    dst_base[dst_offset + 3] = (byte)OP_AVG(dst_base[dst_offset + 3],
                         A * src_base[src_offset + 3] + E * src_base[src_offset + step + 3]);
-                    dst_base[dst_offset + 4] = (byte) OP_AVG(dst_base[dst_offset + 4],
+                    dst_base[dst_offset + 4] = (byte)OP_AVG(dst_base[dst_offset + 4],
                         A * src_base[src_offset + 4] + E * src_base[src_offset + step + 4]);
-                    dst_base[dst_offset + 5] = (byte) OP_AVG(dst_base[dst_offset + 5],
+                    dst_base[dst_offset + 5] = (byte)OP_AVG(dst_base[dst_offset + 5],
                         A * src_base[src_offset + 5] + E * src_base[src_offset + step + 5]);
-                    dst_base[dst_offset + 6] = (byte) OP_AVG(dst_base[dst_offset + 6],
+                    dst_base[dst_offset + 6] = (byte)OP_AVG(dst_base[dst_offset + 6],
                         A * src_base[src_offset + 6] + E * src_base[src_offset + step + 6]);
-                    dst_base[dst_offset + 7] = (byte) OP_AVG(dst_base[dst_offset + 7],
+                    dst_base[dst_offset + 7] = (byte)OP_AVG(dst_base[dst_offset + 7],
                         A * src_base[src_offset + 7] + E * src_base[src_offset + step + 7]);
                     dst_offset += stride;
                     src_offset += stride;
@@ -629,7 +629,7 @@ namespace cscodec.h264.decoder
             long remainder = (a ^ b) & 0x01010101L;
             a = a & ~remainder;
             b = b & ~remainder;
-            long ret = (long) ((ulong) (a + b) >> 1) + remainder;
+            long ret = (long)((ulong)(a + b) >> 1) + remainder;
             return ret;
         }
 
@@ -648,51 +648,51 @@ namespace cscodec.h264.decoder
                     long a, b, c;
                     //a= AV_RN32(&src1[i*src_stride1  ]);
                     //b= AV_RN32(&src2[i*src_stride2  ]);
-                    a = ((long) src1_base[src1_offset + i * src_stride1] << 0) |
-                        ((long) src1_base[src1_offset + i * src_stride1 + 1] << 8) |
-                        ((long) src1_base[src1_offset + i * src_stride1 + 2] << 16) |
-                        ((long) src1_base[src1_offset + i * src_stride1 + 3] << 24);
-                    b = ((long) src2_base[src2_offset + i * src_stride2] << 0) |
-                        ((long) src2_base[src2_offset + i * src_stride2 + 1] << 8) |
-                        ((long) src2_base[src2_offset + i * src_stride2 + 2] << 16) |
-                        ((long) src2_base[src2_offset + i * src_stride2 + 3] << 24);
-                    c = ((long) dst_base[dst_offset + i * dst_stride] << 0) |
-                        ((long) dst_base[dst_offset + i * dst_stride + 1] << 8) |
-                        ((long) dst_base[dst_offset + i * dst_stride + 2] << 16) |
-                        ((long) dst_base[dst_offset + i * dst_stride + 3] << 24);
+                    a = ((long)src1_base[src1_offset + i * src_stride1] << 0) |
+                        ((long)src1_base[src1_offset + i * src_stride1 + 1] << 8) |
+                        ((long)src1_base[src1_offset + i * src_stride1 + 2] << 16) |
+                        ((long)src1_base[src1_offset + i * src_stride1 + 3] << 24);
+                    b = ((long)src2_base[src2_offset + i * src_stride2] << 0) |
+                        ((long)src2_base[src2_offset + i * src_stride2 + 1] << 8) |
+                        ((long)src2_base[src2_offset + i * src_stride2 + 2] << 16) |
+                        ((long)src2_base[src2_offset + i * src_stride2 + 3] << 24);
+                    c = ((long)dst_base[dst_offset + i * dst_stride] << 0) |
+                        ((long)dst_base[dst_offset + i * dst_stride + 1] << 8) |
+                        ((long)dst_base[dst_offset + i * dst_stride + 2] << 16) |
+                        ((long)dst_base[dst_offset + i * dst_stride + 3] << 24);
                     if (opcode == 0) // PUT
                         c = rnd_avg32(a, b);
 
                     else // AVG
                         c = rnd_avg32(c, rnd_avg32(a, b));
 
-                    dst_base[dst_offset + i * dst_stride] = (byte) (c & 0x000000ffL);
-                    dst_base[dst_offset + i * dst_stride + 1] = (byte) ((ulong) (c & 0x0000ff00L) >> 8);
-                    dst_base[dst_offset + i * dst_stride + 2] = (byte) ((ulong) (c & 0x00ff0000L) >> 16);
-                    dst_base[dst_offset + i * dst_stride + 3] = (byte) ((ulong) (c & 0xff000000L) >> 24);
+                    dst_base[dst_offset + i * dst_stride] = (byte)(c & 0x000000ffL);
+                    dst_base[dst_offset + i * dst_stride + 1] = (byte)((ulong)(c & 0x0000ff00L) >> 8);
+                    dst_base[dst_offset + i * dst_stride + 2] = (byte)((ulong)(c & 0x00ff0000L) >> 16);
+                    dst_base[dst_offset + i * dst_stride + 3] = (byte)((ulong)(c & 0xff000000L) >> 24);
                     //a= AV_RN32(&src1[i*src_stride1+4]);
                     //b= AV_RN32(&src2[i*src_stride2+4]);
-                    a = ((long) src1_base[4 + src1_offset + i * src_stride1] << 0) |
-                        ((long) src1_base[4 + src1_offset + i * src_stride1 + 1] << 8) |
-                        ((long) src1_base[4 + src1_offset + i * src_stride1 + 2] << 16) |
-                        ((long) src1_base[4 + src1_offset + i * src_stride1 + 3] << 24);
-                    b = ((long) src2_base[4 + src2_offset + i * src_stride2] << 0) |
-                        ((long) src2_base[4 + src2_offset + i * src_stride2 + 1] << 8) |
-                        ((long) src2_base[4 + src2_offset + i * src_stride2 + 2] << 16) |
-                        ((long) src2_base[4 + src2_offset + i * src_stride2 + 3] << 24);
-                    c = ((long) dst_base[4 + dst_offset + i * dst_stride] << 0) |
-                        ((long) dst_base[4 + dst_offset + i * dst_stride + 1] << 8) |
-                        ((long) dst_base[4 + dst_offset + i * dst_stride + 2] << 16) |
-                        ((long) dst_base[4 + dst_offset + i * dst_stride + 3] << 24);
+                    a = ((long)src1_base[4 + src1_offset + i * src_stride1] << 0) |
+                        ((long)src1_base[4 + src1_offset + i * src_stride1 + 1] << 8) |
+                        ((long)src1_base[4 + src1_offset + i * src_stride1 + 2] << 16) |
+                        ((long)src1_base[4 + src1_offset + i * src_stride1 + 3] << 24);
+                    b = ((long)src2_base[4 + src2_offset + i * src_stride2] << 0) |
+                        ((long)src2_base[4 + src2_offset + i * src_stride2 + 1] << 8) |
+                        ((long)src2_base[4 + src2_offset + i * src_stride2 + 2] << 16) |
+                        ((long)src2_base[4 + src2_offset + i * src_stride2 + 3] << 24);
+                    c = ((long)dst_base[4 + dst_offset + i * dst_stride] << 0) |
+                        ((long)dst_base[4 + dst_offset + i * dst_stride + 1] << 8) |
+                        ((long)dst_base[4 + dst_offset + i * dst_stride + 2] << 16) |
+                        ((long)dst_base[4 + dst_offset + i * dst_stride + 3] << 24);
                     if (opcode == 0) // PUT
                         c = rnd_avg32(a, b);
                     else // AVG
                         c = rnd_avg32(c, rnd_avg32(a, b));
 
-                    dst_base[4 + dst_offset + i * dst_stride] = (byte) (c & 0x000000ffL);
-                    dst_base[4 + dst_offset + i * dst_stride + 1] = (byte) ((ulong) (c & 0x0000ff00L) >> 8);
-                    dst_base[4 + dst_offset + i * dst_stride + 2] = (byte) ((ulong) (c & 0x00ff0000L) >> 16);
-                    dst_base[4 + dst_offset + i * dst_stride + 3] = (byte) ((ulong) (c & 0xff000000L) >> 24);
+                    dst_base[4 + dst_offset + i * dst_stride] = (byte)(c & 0x000000ffL);
+                    dst_base[4 + dst_offset + i * dst_stride + 1] = (byte)((ulong)(c & 0x0000ff00L) >> 8);
+                    dst_base[4 + dst_offset + i * dst_stride + 2] = (byte)((ulong)(c & 0x00ff0000L) >> 16);
+                    dst_base[4 + dst_offset + i * dst_stride + 3] = (byte)((ulong)(c & 0xff000000L) >> 24);
                 } // for
             } // if
             else if (size == 4)
@@ -718,10 +718,10 @@ namespace cscodec.h264.decoder
                         c = rnd_avg32(a, b);
                     else // AVG
                         c = rnd_avg32(c, rnd_avg32(a, b));
-                    dst_base[dst_offset + i * dst_stride] = (byte) (c & 0x000000ffL);
-                    dst_base[dst_offset + i * dst_stride + 1] = (byte) ((ulong) (c & 0x0000ff00L) >> 8);
-                    dst_base[dst_offset + i * dst_stride + 2] = (byte) ((ulong) (c & 0x00ff0000L) >> 16);
-                    dst_base[dst_offset + i * dst_stride + 3] = (byte) ((ulong) (c & 0xff000000L) >> 24);
+                    dst_base[dst_offset + i * dst_stride] = (byte)(c & 0x000000ffL);
+                    dst_base[dst_offset + i * dst_stride + 1] = (byte)((ulong)(c & 0x0000ff00L) >> 8);
+                    dst_base[dst_offset + i * dst_stride + 2] = (byte)((ulong)(c & 0x00ff0000L) >> 16);
+                    dst_base[dst_offset + i * dst_stride + 3] = (byte)((ulong)(c & 0xff000000L) >> 24);
                 }
             } // if
             else if (size == 2)
@@ -740,8 +740,8 @@ namespace cscodec.h264.decoder
                         c = rnd_avg32(a, b);
                     else // AVG
                         c = rnd_avg32(c, rnd_avg32(a, b));
-                    dst_base[dst_offset + i * dst_stride] = (byte) (c & 0x000000ffL);
-                    dst_base[dst_offset + i * dst_stride + 1] = (byte) ((ulong) (c & 0x0000ff00L) >> 8);
+                    dst_base[dst_offset + i * dst_stride] = (byte)(c & 0x000000ffL);
+                    dst_base[dst_offset + i * dst_stride + 1] = (byte)((ulong)(c & 0x0000ff00L) >> 8);
                 }
             } // if
             else if (size == 16)
@@ -780,8 +780,8 @@ namespace cscodec.h264.decoder
                             long a = (src_base[src_offset] << 0) | (src_base[src_offset + 1] << 8);
                             long b = (dst_base[dst_offset] << 0) | (dst_base[dst_offset + 1] << 8);
                             b = rnd_avg32(b, a);
-                            dst_base[dst_offset] = (byte) (b & 0x000000ffL);
-                            dst_base[dst_offset + 1] = (byte) ((ulong) (b & 0x0000ff00L) >> 8);
+                            dst_base[dst_offset] = (byte)(b & 0x000000ffL);
+                            dst_base[dst_offset + 1] = (byte)((ulong)(b & 0x0000ff00L) >> 8);
                             dst_offset += stride;
                             src_offset += stride;
                         } // for
@@ -808,10 +808,10 @@ namespace cscodec.h264.decoder
                             long b = (dst_base[dst_offset] << 0) | (dst_base[dst_offset + 1] << 8) |
                                      (dst_base[dst_offset + 2] << 16) | (dst_base[dst_offset + 3] << 24);
                             b = rnd_avg32(b, a);
-                            dst_base[dst_offset] = (byte) (b & 0x000000ffL);
-                            dst_base[dst_offset + 1] = (byte) ((ulong) (b & 0x0000ff00L) >> 8);
-                            dst_base[dst_offset + 2] = (byte) ((ulong) (b & 0x00ff0000L) >> 16);
-                            dst_base[dst_offset + 3] = (byte) ((ulong) (b & 0xff000000L) >> 24);
+                            dst_base[dst_offset] = (byte)(b & 0x000000ffL);
+                            dst_base[dst_offset + 1] = (byte)((ulong)(b & 0x0000ff00L) >> 8);
+                            dst_base[dst_offset + 2] = (byte)((ulong)(b & 0x00ff0000L) >> 16);
+                            dst_base[dst_offset + 3] = (byte)((ulong)(b & 0xff000000L) >> 24);
                             dst_offset += stride;
                             src_offset += stride;
                         } // for
@@ -839,20 +839,20 @@ namespace cscodec.h264.decoder
                             long b = (dst_base[dst_offset] << 0) | (dst_base[dst_offset + 1] << 8) |
                                      (dst_base[dst_offset + 2] << 16) | (dst_base[dst_offset + 3] << 24);
                             b = rnd_avg32(b, a);
-                            dst_base[dst_offset] = (byte) (b & 0x000000ff);
-                            dst_base[dst_offset + 1] = (byte) ((ulong) (b & 0x0000ff00L) >> 8);
-                            dst_base[dst_offset + 2] = (byte) ((ulong) (b & 0x00ff0000L) >> 16);
-                            dst_base[dst_offset + 3] = (byte) ((ulong) (b & 0xff000000L) >> 24);
+                            dst_base[dst_offset] = (byte)(b & 0x000000ff);
+                            dst_base[dst_offset + 1] = (byte)((ulong)(b & 0x0000ff00L) >> 8);
+                            dst_base[dst_offset + 2] = (byte)((ulong)(b & 0x00ff0000L) >> 16);
+                            dst_base[dst_offset + 3] = (byte)((ulong)(b & 0xff000000L) >> 24);
 
                             a = (src_base[4 + src_offset] << 0) | (src_base[4 + src_offset + 1] << 8) |
                                 (src_base[4 + src_offset + 2] << 16) | (src_base[4 + src_offset + 3] << 24);
                             b = (dst_base[4 + dst_offset] << 0) | (dst_base[4 + dst_offset + 1] << 8) |
                                 (dst_base[4 + dst_offset + 2] << 16) | (dst_base[4 + dst_offset + 3] << 24);
                             b = rnd_avg32(b, a);
-                            dst_base[4 + dst_offset] = (byte) (b & 0x000000ffL);
-                            dst_base[4 + dst_offset + 1] = (byte) ((ulong) (b & 0x0000ff00L) >> 8);
-                            dst_base[4 + dst_offset + 2] = (byte) ((ulong) (b & 0x00ff0000L) >> 16);
-                            dst_base[4 + dst_offset + 3] = (byte) ((ulong) (b & 0xff000000L) >> 24);
+                            dst_base[4 + dst_offset] = (byte)(b & 0x000000ffL);
+                            dst_base[4 + dst_offset + 1] = (byte)((ulong)(b & 0x0000ff00L) >> 8);
+                            dst_base[4 + dst_offset + 2] = (byte)((ulong)(b & 0x00ff0000L) >> 16);
+                            dst_base[4 + dst_offset + 3] = (byte)((ulong)(b & 0xff000000L) >> 24);
 
                             dst_offset += stride;
                             src_offset += stride;
@@ -860,17 +860,17 @@ namespace cscodec.h264.decoder
                     } // if
                     break;
                 case 16:
-                {
-                    pixels_c(opcode, 8, dst_base, dst_offset, src_base, src_offset, stride, height);
-                    pixels_c(opcode, 8, dst_base, dst_offset + 8, src_base, src_offset + 8, stride, height);
-                    break;
-                }
+                    {
+                        pixels_c(opcode, 8, dst_base, dst_offset, src_base, src_offset, stride, height);
+                        pixels_c(opcode, 8, dst_base, dst_offset + 8, src_base, src_offset + 8, stride, height);
+                        break;
+                    }
             } // switch
         }
 
         public static int op_avg(int a, int b, byte[] cm_base, int cm_offset)
         {
-            return (int) ((a + cm_base[cm_offset + ((b + 16) >> 5)] + 1) >> 1);
+            return (int)((a + cm_base[cm_offset + ((b + 16) >> 5)] + 1) >> 1);
         }
 
         public static int op_put(int a, int b, byte[] cm_base, int cm_offset)
@@ -880,7 +880,7 @@ namespace cscodec.h264.decoder
 
         public static int op_avg2(int a, int b, byte[] cm_base, int cm_offset)
         {
-            return (int) ((a + cm_base[cm_offset + ((b + 512) >> 10)] + 1) >> 1);
+            return (int)((a + cm_base[cm_offset + ((b + 512) >> 10)] + 1) >> 1);
         }
 
         public static int op_put2(int a, int b, byte[] cm_base, int cm_offset)
@@ -894,166 +894,166 @@ namespace cscodec.h264.decoder
             switch (size)
             {
                 case 2:
-                {
-                    int h = 2;
-                    var cm_base = H264DSPContext.ff_cropTbl;
-                    var cm_offset = H264DSPContext.MAX_NEG_CROP;
-                    int i;
-                    for (i = 0; i < h; i++)
                     {
-                        if (opcode == 0)
+                        int h = 2;
+                        var cm_base = H264DSPContext.ff_cropTbl;
+                        var cm_offset = H264DSPContext.MAX_NEG_CROP;
+                        int i;
+                        for (i = 0; i < h; i++)
                         {
-                            // PUT
-                            dst_base[dst_offset + 0] = (byte) op_put(dst_base[dst_offset + 0],
-                                (src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
-                                (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3], cm_base, cm_offset);
-                            dst_base[dst_offset + 1] = (byte) op_put(dst_base[dst_offset + 1],
-                                (src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
-                                (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4], cm_base, cm_offset);
-                            dst_offset += dstStride;
+                            if (opcode == 0)
+                            {
+                                // PUT
+                                dst_base[dst_offset + 0] = (byte)op_put(dst_base[dst_offset + 0],
+                                    (src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
+                                    (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3], cm_base, cm_offset);
+                                dst_base[dst_offset + 1] = (byte)op_put(dst_base[dst_offset + 1],
+                                    (src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
+                                    (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4], cm_base, cm_offset);
+                                dst_offset += dstStride;
+                            }
+                            else
+                            {
+                                // AVG
+                                dst_base[dst_offset + 0] = (byte)op_avg(dst_base[dst_offset + 0],
+                                    (src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
+                                    (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3], cm_base, cm_offset);
+                                dst_base[dst_offset + 1] = (byte)op_avg(dst_base[dst_offset + 1],
+                                    (src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
+                                    (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4], cm_base, cm_offset);
+                                dst_offset += dstStride;
+                            } // if
+                            src_offset += srcStride;
                         }
-                        else
-                        {
-                            // AVG
-                            dst_base[dst_offset + 0] = (byte) op_avg(dst_base[dst_offset + 0],
-                                (src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
-                                (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3], cm_base, cm_offset);
-                            dst_base[dst_offset + 1] = (byte) op_avg(dst_base[dst_offset + 1],
-                                (src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
-                                (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4], cm_base, cm_offset);
-                            dst_offset += dstStride;
-                        } // if
-                        src_offset += srcStride;
-                    }
-                } // case
+                    } // case
                     break;
                 case 4:
-                {
-                    int h = 4;
-                    byte[] cm_base = H264DSPContext.ff_cropTbl;
-                    int cm_offset = H264DSPContext.MAX_NEG_CROP;
-                    int i;
-                    // DebugTool.printDebugString("h264_qpel4_h_lowpass:\n");
-                    for (i = 0; i < h; i++)
                     {
-                        if (opcode == 0)
+                        int h = 4;
+                        byte[] cm_base = H264DSPContext.ff_cropTbl;
+                        int cm_offset = H264DSPContext.MAX_NEG_CROP;
+                        int i;
+                        // DebugTool.printDebugString("h264_qpel4_h_lowpass:\n");
+                        for (i = 0; i < h; i++)
                         {
-                            // PUT
-                            dst_base[dst_offset + 0] = (byte) op_put(dst_base[dst_offset + 0],
-                                (src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
-                                (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3], cm_base, cm_offset);
-                            dst_base[dst_offset + 1] = (byte) op_put(dst_base[dst_offset + 1],
-                                (src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
-                                (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4], cm_base, cm_offset);
-                            dst_base[dst_offset + 2] = (byte) op_put(dst_base[dst_offset + 2],
-                                (src_base[src_offset + 2] + src_base[src_offset + 3]) * 20 -
-                                (src_base[src_offset + 1] + src_base[src_offset + 4]) * 5 + src_base[src_offset + 0] + src_base[src_offset + 5], cm_base, cm_offset);
-                            dst_base[dst_offset + 3] = (byte) op_put(dst_base[dst_offset + 3],
-                                (src_base[src_offset + 3] + src_base[src_offset + 4]) * 20 -
-                                (src_base[src_offset + 2] + src_base[src_offset + 5]) * 5 + src_base[src_offset + 1] + src_base[src_offset + 6], cm_base, cm_offset);
+                            if (opcode == 0)
+                            {
+                                // PUT
+                                dst_base[dst_offset + 0] = (byte)op_put(dst_base[dst_offset + 0],
+                                    (src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
+                                    (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3], cm_base, cm_offset);
+                                dst_base[dst_offset + 1] = (byte)op_put(dst_base[dst_offset + 1],
+                                    (src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
+                                    (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4], cm_base, cm_offset);
+                                dst_base[dst_offset + 2] = (byte)op_put(dst_base[dst_offset + 2],
+                                    (src_base[src_offset + 2] + src_base[src_offset + 3]) * 20 -
+                                    (src_base[src_offset + 1] + src_base[src_offset + 4]) * 5 + src_base[src_offset + 0] + src_base[src_offset + 5], cm_base, cm_offset);
+                                dst_base[dst_offset + 3] = (byte)op_put(dst_base[dst_offset + 3],
+                                    (src_base[src_offset + 3] + src_base[src_offset + 4]) * 20 -
+                                    (src_base[src_offset + 2] + src_base[src_offset + 5]) * 5 + src_base[src_offset + 1] + src_base[src_offset + 6], cm_base, cm_offset);
+                            }
+                            else
+                            {
+                                // AVG
+                                dst_base[dst_offset + 0] = (byte)op_avg(dst_base[dst_offset + 0],
+                                    (src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
+                                    (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3], cm_base, cm_offset);
+                                dst_base[dst_offset + 1] = (byte)op_avg(dst_base[dst_offset + 1],
+                                    (src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
+                                    (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4], cm_base, cm_offset);
+                                dst_base[dst_offset + 2] = (byte)op_avg(dst_base[dst_offset + 2],
+                                    (src_base[src_offset + 2] + src_base[src_offset + 3]) * 20 -
+                                    (src_base[src_offset + 1] + src_base[src_offset + 4]) * 5 + src_base[src_offset + 0] + src_base[src_offset + 5], cm_base, cm_offset);
+                                dst_base[dst_offset + 3] = (byte)op_avg(dst_base[dst_offset + 3],
+                                    (src_base[src_offset + 3] + src_base[src_offset + 4]) * 20 -
+                                    (src_base[src_offset + 2] + src_base[src_offset + 5]) * 5 + src_base[src_offset + 1] + src_base[src_offset + 6], cm_base, cm_offset);
+                            } // if
+                            dst_offset += dstStride;
+                            src_offset += srcStride;
                         }
-                        else
-                        {
-                            // AVG
-                            dst_base[dst_offset + 0] = (byte) op_avg(dst_base[dst_offset + 0],
-                                (src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
-                                (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3], cm_base, cm_offset);
-                            dst_base[dst_offset + 1] = (byte) op_avg(dst_base[dst_offset + 1],
-                                (src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
-                                (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4], cm_base, cm_offset);
-                            dst_base[dst_offset + 2] = (byte) op_avg(dst_base[dst_offset + 2],
-                                (src_base[src_offset + 2] + src_base[src_offset + 3]) * 20 -
-                                (src_base[src_offset + 1] + src_base[src_offset + 4]) * 5 + src_base[src_offset + 0] + src_base[src_offset + 5], cm_base, cm_offset);
-                            dst_base[dst_offset + 3] = (byte) op_avg(dst_base[dst_offset + 3],
-                                (src_base[src_offset + 3] + src_base[src_offset + 4]) * 20 -
-                                (src_base[src_offset + 2] + src_base[src_offset + 5]) * 5 + src_base[src_offset + 1] + src_base[src_offset + 6], cm_base, cm_offset);
-                        } // if
-                        dst_offset += dstStride;
-                        src_offset += srcStride;
-                    }
-                } // case
+                    } // case
                     break;
                 case 8:
-                {
-                    int h = 8;
-                    byte[] cm_base = H264DSPContext.ff_cropTbl;
-                    int cm_offset = H264DSPContext.MAX_NEG_CROP;
-                    int i;
-                    // DebugTool.printDebugString("h264_qpel8_h_lowpass:\n");
-                    for (i = 0; i < h; i++)
                     {
-                        if (opcode == 0)
+                        int h = 8;
+                        byte[] cm_base = H264DSPContext.ff_cropTbl;
+                        int cm_offset = H264DSPContext.MAX_NEG_CROP;
+                        int i;
+                        // DebugTool.printDebugString("h264_qpel8_h_lowpass:\n");
+                        for (i = 0; i < h; i++)
                         {
-                            // PUT
-                            dst_base[dst_offset + 0] = (byte) op_put(dst_base[dst_offset + 0],
-                                (src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
-                                (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3], cm_base, cm_offset);
-                            dst_base[dst_offset + 1] = (byte) op_put(dst_base[dst_offset + 1],
-                                (src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
-                                (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4], cm_base, cm_offset);
-                            dst_base[dst_offset + 2] = (byte) op_put(dst_base[dst_offset + 2],
-                                (src_base[src_offset + 2] + src_base[src_offset + 3]) * 20 -
-                                (src_base[src_offset + 1] + src_base[src_offset + 4]) * 5 + src_base[src_offset + 0] + src_base[src_offset + 5], cm_base, cm_offset);
-                            dst_base[dst_offset + 3] = (byte) op_put(dst_base[dst_offset + 3],
-                                (src_base[src_offset + 3] + src_base[src_offset + 4]) * 20 -
-                                (src_base[src_offset + 2] + src_base[src_offset + 5]) * 5 + src_base[src_offset + 1] + src_base[src_offset + 6], cm_base, cm_offset);
-                            dst_base[dst_offset + 4] = (byte) op_put(dst_base[dst_offset + 4],
-                                (src_base[src_offset + 4] + src_base[src_offset + 5]) * 20 -
-                                (src_base[src_offset + 3] + src_base[src_offset + 6]) * 5 + src_base[src_offset + 2] + src_base[src_offset + 7], cm_base, cm_offset);
-                            dst_base[dst_offset + 5] = (byte) op_put(dst_base[dst_offset + 5],
-                                (src_base[src_offset + 5] + src_base[src_offset + 6]) * 20 -
-                                (src_base[src_offset + 4] + src_base[src_offset + 7]) * 5 + src_base[src_offset + 3] + src_base[src_offset + 8], cm_base, cm_offset);
-                            dst_base[dst_offset + 6] = (byte) op_put(dst_base[dst_offset + 6],
-                                (src_base[src_offset + 6] + src_base[src_offset + 7]) * 20 -
-                                (src_base[src_offset + 5] + src_base[src_offset + 8]) * 5 + src_base[src_offset + 4] + src_base[src_offset + 9], cm_base, cm_offset);
-                            dst_base[dst_offset + 7] = (byte) op_put(dst_base[dst_offset + 7],
-                                (src_base[src_offset + 7] + src_base[src_offset + 8]) * 20 -
-                                (src_base[src_offset + 6] + src_base[src_offset + 9]) * 5 + src_base[src_offset + 5] + src_base[src_offset + 10], cm_base, cm_offset);
+                            if (opcode == 0)
+                            {
+                                // PUT
+                                dst_base[dst_offset + 0] = (byte)op_put(dst_base[dst_offset + 0],
+                                    (src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
+                                    (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3], cm_base, cm_offset);
+                                dst_base[dst_offset + 1] = (byte)op_put(dst_base[dst_offset + 1],
+                                    (src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
+                                    (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4], cm_base, cm_offset);
+                                dst_base[dst_offset + 2] = (byte)op_put(dst_base[dst_offset + 2],
+                                    (src_base[src_offset + 2] + src_base[src_offset + 3]) * 20 -
+                                    (src_base[src_offset + 1] + src_base[src_offset + 4]) * 5 + src_base[src_offset + 0] + src_base[src_offset + 5], cm_base, cm_offset);
+                                dst_base[dst_offset + 3] = (byte)op_put(dst_base[dst_offset + 3],
+                                    (src_base[src_offset + 3] + src_base[src_offset + 4]) * 20 -
+                                    (src_base[src_offset + 2] + src_base[src_offset + 5]) * 5 + src_base[src_offset + 1] + src_base[src_offset + 6], cm_base, cm_offset);
+                                dst_base[dst_offset + 4] = (byte)op_put(dst_base[dst_offset + 4],
+                                    (src_base[src_offset + 4] + src_base[src_offset + 5]) * 20 -
+                                    (src_base[src_offset + 3] + src_base[src_offset + 6]) * 5 + src_base[src_offset + 2] + src_base[src_offset + 7], cm_base, cm_offset);
+                                dst_base[dst_offset + 5] = (byte)op_put(dst_base[dst_offset + 5],
+                                    (src_base[src_offset + 5] + src_base[src_offset + 6]) * 20 -
+                                    (src_base[src_offset + 4] + src_base[src_offset + 7]) * 5 + src_base[src_offset + 3] + src_base[src_offset + 8], cm_base, cm_offset);
+                                dst_base[dst_offset + 6] = (byte)op_put(dst_base[dst_offset + 6],
+                                    (src_base[src_offset + 6] + src_base[src_offset + 7]) * 20 -
+                                    (src_base[src_offset + 5] + src_base[src_offset + 8]) * 5 + src_base[src_offset + 4] + src_base[src_offset + 9], cm_base, cm_offset);
+                                dst_base[dst_offset + 7] = (byte)op_put(dst_base[dst_offset + 7],
+                                    (src_base[src_offset + 7] + src_base[src_offset + 8]) * 20 -
+                                    (src_base[src_offset + 6] + src_base[src_offset + 9]) * 5 + src_base[src_offset + 5] + src_base[src_offset + 10], cm_base, cm_offset);
+                            }
+                            else
+                            {
+                                // AVG
+                                dst_base[dst_offset + 0] = (byte)op_avg(dst_base[dst_offset + 0],
+                                    (src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
+                                    (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3], cm_base, cm_offset);
+                                dst_base[dst_offset + 1] = (byte)op_avg(dst_base[dst_offset + 1],
+                                    (src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
+                                    (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4], cm_base, cm_offset);
+                                dst_base[dst_offset + 2] = (byte)op_avg(dst_base[dst_offset + 2],
+                                    (src_base[src_offset + 2] + src_base[src_offset + 3]) * 20 -
+                                    (src_base[src_offset + 1] + src_base[src_offset + 4]) * 5 + src_base[src_offset + 0] + src_base[src_offset + 5], cm_base, cm_offset);
+                                dst_base[dst_offset + 3] = (byte)op_avg(dst_base[dst_offset + 3],
+                                    (src_base[src_offset + 3] + src_base[src_offset + 4]) * 20 -
+                                    (src_base[src_offset + 2] + src_base[src_offset + 5]) * 5 + src_base[src_offset + 1] + src_base[src_offset + 6], cm_base, cm_offset);
+                                dst_base[dst_offset + 4] = (byte)op_avg(dst_base[dst_offset + 4],
+                                    (src_base[src_offset + 4] + src_base[src_offset + 5]) * 20 -
+                                    (src_base[src_offset + 3] + src_base[src_offset + 6]) * 5 + src_base[src_offset + 2] + src_base[src_offset + 7], cm_base, cm_offset);
+                                dst_base[dst_offset + 5] = (byte)op_avg(dst_base[dst_offset + 5],
+                                    (src_base[src_offset + 5] + src_base[src_offset + 6]) * 20 -
+                                    (src_base[src_offset + 4] + src_base[src_offset + 7]) * 5 + src_base[src_offset + 3] + src_base[src_offset + 8], cm_base, cm_offset);
+                                dst_base[dst_offset + 6] = (byte)op_avg(dst_base[dst_offset + 6],
+                                    (src_base[src_offset + 6] + src_base[src_offset + 7]) * 20 -
+                                    (src_base[src_offset + 5] + src_base[src_offset + 8]) * 5 + src_base[src_offset + 4] + src_base[src_offset + 9], cm_base, cm_offset);
+                                dst_base[dst_offset + 7] = (byte)op_avg(dst_base[dst_offset + 7],
+                                    (src_base[src_offset + 7] + src_base[src_offset + 8]) * 20 -
+                                    (src_base[src_offset + 6] + src_base[src_offset + 9]) * 5 + src_base[src_offset + 5] + src_base[src_offset + 10], cm_base, cm_offset);
+                            } // if
+                            dst_offset += dstStride;
+                            src_offset += srcStride;
                         }
-                        else
-                        {
-                            // AVG
-                            dst_base[dst_offset + 0] = (byte) op_avg(dst_base[dst_offset + 0],
-                                (src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
-                                (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3], cm_base, cm_offset);
-                            dst_base[dst_offset + 1] = (byte) op_avg(dst_base[dst_offset + 1],
-                                (src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
-                                (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4], cm_base, cm_offset);
-                            dst_base[dst_offset + 2] = (byte) op_avg(dst_base[dst_offset + 2],
-                                (src_base[src_offset + 2] + src_base[src_offset + 3]) * 20 -
-                                (src_base[src_offset + 1] + src_base[src_offset + 4]) * 5 + src_base[src_offset + 0] + src_base[src_offset + 5], cm_base, cm_offset);
-                            dst_base[dst_offset + 3] = (byte) op_avg(dst_base[dst_offset + 3],
-                                (src_base[src_offset + 3] + src_base[src_offset + 4]) * 20 -
-                                (src_base[src_offset + 2] + src_base[src_offset + 5]) * 5 + src_base[src_offset + 1] + src_base[src_offset + 6], cm_base, cm_offset);
-                            dst_base[dst_offset + 4] = (byte) op_avg(dst_base[dst_offset + 4],
-                                (src_base[src_offset + 4] + src_base[src_offset + 5]) * 20 -
-                                (src_base[src_offset + 3] + src_base[src_offset + 6]) * 5 + src_base[src_offset + 2] + src_base[src_offset + 7], cm_base, cm_offset);
-                            dst_base[dst_offset + 5] = (byte) op_avg(dst_base[dst_offset + 5],
-                                (src_base[src_offset + 5] + src_base[src_offset + 6]) * 20 -
-                                (src_base[src_offset + 4] + src_base[src_offset + 7]) * 5 + src_base[src_offset + 3] + src_base[src_offset + 8], cm_base, cm_offset);
-                            dst_base[dst_offset + 6] = (byte) op_avg(dst_base[dst_offset + 6],
-                                (src_base[src_offset + 6] + src_base[src_offset + 7]) * 20 -
-                                (src_base[src_offset + 5] + src_base[src_offset + 8]) * 5 + src_base[src_offset + 4] + src_base[src_offset + 9], cm_base, cm_offset);
-                            dst_base[dst_offset + 7] = (byte) op_avg(dst_base[dst_offset + 7],
-                                (src_base[src_offset + 7] + src_base[src_offset + 8]) * 20 -
-                                (src_base[src_offset + 6] + src_base[src_offset + 9]) * 5 + src_base[src_offset + 5] + src_base[src_offset + 10], cm_base, cm_offset);
-                        } // if
-                        dst_offset += dstStride;
-                        src_offset += srcStride;
-                    }
-                } // case
+                    } // case
                     break;
                 case 16:
-                {
-                    h264_qpel_h_lowpass(opcode, 8, dst_base, dst_offset, src_base, src_offset, dstStride, srcStride);
-                    h264_qpel_h_lowpass(opcode, 8, dst_base, dst_offset + 8, src_base, src_offset + 8, dstStride,
-                        srcStride);
-                    src_offset += 8 * srcStride;
-                    dst_offset += 8 * dstStride;
-                    h264_qpel_h_lowpass(opcode, 8, dst_base, dst_offset, src_base, src_offset, dstStride, srcStride);
-                    h264_qpel_h_lowpass(opcode, 8, dst_base, dst_offset + 8, src_base, src_offset + 8, dstStride,
-                        srcStride);
-                } // case
+                    {
+                        h264_qpel_h_lowpass(opcode, 8, dst_base, dst_offset, src_base, src_offset, dstStride, srcStride);
+                        h264_qpel_h_lowpass(opcode, 8, dst_base, dst_offset + 8, src_base, src_offset + 8, dstStride,
+                            srcStride);
+                        src_offset += 8 * srcStride;
+                        dst_offset += 8 * dstStride;
+                        h264_qpel_h_lowpass(opcode, 8, dst_base, dst_offset, src_base, src_offset, dstStride, srcStride);
+                        h264_qpel_h_lowpass(opcode, 8, dst_base, dst_offset + 8, src_base, src_offset + 8, dstStride,
+                            srcStride);
+                    } // case
                     break;
             } // switch
         }
@@ -1064,166 +1064,166 @@ namespace cscodec.h264.decoder
             switch (size)
             {
                 case 2:
-                {
-                    int w = 2;
-                    byte[] cm_base = H264DSPContext.ff_cropTbl;
-                    int cm_offset = H264DSPContext.MAX_NEG_CROP;
-                    int i;
-                    for (i = 0; i < w; i++)
                     {
-                        int srcB = src_base[src_offset + -2 * srcStride];
-                        int srcA = src_base[src_offset + -1 * srcStride];
-                        int src0 = src_base[src_offset + 0 * srcStride];
-                        int src1 = src_base[src_offset + 1 * srcStride];
-                        int src2 = src_base[src_offset + 2 * srcStride];
-                        int src3 = src_base[src_offset + 3 * srcStride];
-                        int src4 = src_base[src_offset + 4 * srcStride];
-                        if (opcode == 0)
+                        int w = 2;
+                        byte[] cm_base = H264DSPContext.ff_cropTbl;
+                        int cm_offset = H264DSPContext.MAX_NEG_CROP;
+                        int i;
+                        for (i = 0; i < w; i++)
                         {
-                            // PUT
-                            dst_base[dst_offset + 0 * dstStride] = (byte) op_put(dst_base[dst_offset + 0 * dstStride],
-                                (src0 + src1) * 20 - (srcA + src2) * 5 + srcB + src3, cm_base, cm_offset);
-                            dst_base[dst_offset + 1 * dstStride] = (byte) op_put(dst_base[dst_offset + 1 * dstStride],
-                                (src1 + src2) * 20 - (src0 + src3) * 5 + srcA + src4, cm_base, cm_offset);
+                            int srcB = src_base[src_offset + -2 * srcStride];
+                            int srcA = src_base[src_offset + -1 * srcStride];
+                            int src0 = src_base[src_offset + 0 * srcStride];
+                            int src1 = src_base[src_offset + 1 * srcStride];
+                            int src2 = src_base[src_offset + 2 * srcStride];
+                            int src3 = src_base[src_offset + 3 * srcStride];
+                            int src4 = src_base[src_offset + 4 * srcStride];
+                            if (opcode == 0)
+                            {
+                                // PUT
+                                dst_base[dst_offset + 0 * dstStride] = (byte)op_put(dst_base[dst_offset + 0 * dstStride],
+                                    (src0 + src1) * 20 - (srcA + src2) * 5 + srcB + src3, cm_base, cm_offset);
+                                dst_base[dst_offset + 1 * dstStride] = (byte)op_put(dst_base[dst_offset + 1 * dstStride],
+                                    (src1 + src2) * 20 - (src0 + src3) * 5 + srcA + src4, cm_base, cm_offset);
+                            }
+                            else
+                            {
+                                // AVG
+                                dst_base[dst_offset + 0 * dstStride] = (byte)op_avg(dst_base[dst_offset + 0 * dstStride],
+                                    (src0 + src1) * 20 - (srcA + src2) * 5 + srcB + src3, cm_base, cm_offset);
+                                dst_base[dst_offset + 1 * dstStride] = (byte)op_avg(dst_base[dst_offset + 1 * dstStride],
+                                    (src1 + src2) * 20 - (src0 + src3) * 5 + srcA + src4, cm_base, cm_offset);
+                            } // if
+                            dst_offset++;
+                            src_offset++;
                         }
-                        else
-                        {
-                            // AVG
-                            dst_base[dst_offset + 0 * dstStride] = (byte) op_avg(dst_base[dst_offset + 0 * dstStride],
-                                (src0 + src1) * 20 - (srcA + src2) * 5 + srcB + src3, cm_base, cm_offset);
-                            dst_base[dst_offset + 1 * dstStride] = (byte) op_avg(dst_base[dst_offset + 1 * dstStride],
-                                (src1 + src2) * 20 - (src0 + src3) * 5 + srcA + src4, cm_base, cm_offset);
-                        } // if
-                        dst_offset++;
-                        src_offset++;
-                    }
-                } // case
+                    } // case
                     break;
                 case 4:
-                {
-                    int w = 4;
-                    byte[] cm_base = H264DSPContext.ff_cropTbl;
-                    int cm_offset = H264DSPContext.MAX_NEG_CROP;
-                    int i;
-                    // DebugTool.printDebugString("h264_qpel4_v_lowpass:\n");
-                    for (i = 0; i < w; i++)
                     {
-                        int srcB = src_base[src_offset + -2 * srcStride];
-                        int srcA = src_base[src_offset + -1 * srcStride];
-                        int src0 = src_base[src_offset + 0 * srcStride];
-                        int src1 = src_base[src_offset + 1 * srcStride];
-                        int src2 = src_base[src_offset + 2 * srcStride];
-                        int src3 = src_base[src_offset + 3 * srcStride];
-                        int src4 = src_base[src_offset + 4 * srcStride];
-                        int src5 = src_base[src_offset + 5 * srcStride];
-                        int src6 = src_base[src_offset + 6 * srcStride];
-                        if (opcode == 0)
+                        int w = 4;
+                        byte[] cm_base = H264DSPContext.ff_cropTbl;
+                        int cm_offset = H264DSPContext.MAX_NEG_CROP;
+                        int i;
+                        // DebugTool.printDebugString("h264_qpel4_v_lowpass:\n");
+                        for (i = 0; i < w; i++)
                         {
-                            // PUT
-                            dst_base[dst_offset + 0 * dstStride] = (byte) op_put(dst_base[dst_offset + 0 * dstStride],
-                                (src0 + src1) * 20 - (srcA + src2) * 5 + srcB + src3, cm_base, cm_offset);
-                            dst_base[dst_offset + 1 * dstStride] = (byte) op_put(dst_base[dst_offset + 1 * dstStride],
-                                (src1 + src2) * 20 - (src0 + src3) * 5 + srcA + src4, cm_base, cm_offset);
-                            dst_base[dst_offset + 2 * dstStride] = (byte) op_put(dst_base[dst_offset + 2 * dstStride],
-                                (src2 + src3) * 20 - (src1 + src4) * 5 + src0 + src5, cm_base, cm_offset);
-                            dst_base[dst_offset + 3 * dstStride] = (byte) op_put(dst_base[dst_offset + 3 * dstStride],
-                                (src3 + src4) * 20 - (src2 + src5) * 5 + src1 + src6, cm_base, cm_offset);
+                            int srcB = src_base[src_offset + -2 * srcStride];
+                            int srcA = src_base[src_offset + -1 * srcStride];
+                            int src0 = src_base[src_offset + 0 * srcStride];
+                            int src1 = src_base[src_offset + 1 * srcStride];
+                            int src2 = src_base[src_offset + 2 * srcStride];
+                            int src3 = src_base[src_offset + 3 * srcStride];
+                            int src4 = src_base[src_offset + 4 * srcStride];
+                            int src5 = src_base[src_offset + 5 * srcStride];
+                            int src6 = src_base[src_offset + 6 * srcStride];
+                            if (opcode == 0)
+                            {
+                                // PUT
+                                dst_base[dst_offset + 0 * dstStride] = (byte)op_put(dst_base[dst_offset + 0 * dstStride],
+                                    (src0 + src1) * 20 - (srcA + src2) * 5 + srcB + src3, cm_base, cm_offset);
+                                dst_base[dst_offset + 1 * dstStride] = (byte)op_put(dst_base[dst_offset + 1 * dstStride],
+                                    (src1 + src2) * 20 - (src0 + src3) * 5 + srcA + src4, cm_base, cm_offset);
+                                dst_base[dst_offset + 2 * dstStride] = (byte)op_put(dst_base[dst_offset + 2 * dstStride],
+                                    (src2 + src3) * 20 - (src1 + src4) * 5 + src0 + src5, cm_base, cm_offset);
+                                dst_base[dst_offset + 3 * dstStride] = (byte)op_put(dst_base[dst_offset + 3 * dstStride],
+                                    (src3 + src4) * 20 - (src2 + src5) * 5 + src1 + src6, cm_base, cm_offset);
+                            }
+                            else
+                            {
+                                // AVG
+                                dst_base[dst_offset + 0 * dstStride] = (byte)op_avg(dst_base[dst_offset + 0 * dstStride],
+                                    (src0 + src1) * 20 - (srcA + src2) * 5 + srcB + src3, cm_base, cm_offset);
+                                dst_base[dst_offset + 1 * dstStride] = (byte)op_avg(dst_base[dst_offset + 1 * dstStride],
+                                    (src1 + src2) * 20 - (src0 + src3) * 5 + srcA + src4, cm_base, cm_offset);
+                                dst_base[dst_offset + 2 * dstStride] = (byte)op_avg(dst_base[dst_offset + 2 * dstStride],
+                                    (src2 + src3) * 20 - (src1 + src4) * 5 + src0 + src5, cm_base, cm_offset);
+                                dst_base[dst_offset + 3 * dstStride] = (byte)op_avg(dst_base[dst_offset + 3 * dstStride],
+                                    (src3 + src4) * 20 - (src2 + src5) * 5 + src1 + src6, cm_base, cm_offset);
+                            } // if
+                            dst_offset++;
+                            src_offset++;
                         }
-                        else
-                        {
-                            // AVG
-                            dst_base[dst_offset + 0 * dstStride] = (byte) op_avg(dst_base[dst_offset + 0 * dstStride],
-                                (src0 + src1) * 20 - (srcA + src2) * 5 + srcB + src3, cm_base, cm_offset);
-                            dst_base[dst_offset + 1 * dstStride] = (byte) op_avg(dst_base[dst_offset + 1 * dstStride],
-                                (src1 + src2) * 20 - (src0 + src3) * 5 + srcA + src4, cm_base, cm_offset);
-                            dst_base[dst_offset + 2 * dstStride] = (byte) op_avg(dst_base[dst_offset + 2 * dstStride],
-                                (src2 + src3) * 20 - (src1 + src4) * 5 + src0 + src5, cm_base, cm_offset);
-                            dst_base[dst_offset + 3 * dstStride] = (byte) op_avg(dst_base[dst_offset + 3 * dstStride],
-                                (src3 + src4) * 20 - (src2 + src5) * 5 + src1 + src6, cm_base, cm_offset);
-                        } // if
-                        dst_offset++;
-                        src_offset++;
-                    }
-                } // case
+                    } // case
                     break;
                 case 8:
-                {
-                    int w = 8;
-                    byte[] cm_base = H264DSPContext.ff_cropTbl;
-                    int cm_offset = H264DSPContext.MAX_NEG_CROP;
-                    int i;
-                    for (i = 0; i < w; i++)
                     {
-                        int srcB = src_base[src_offset + -2 * srcStride];
-                        int srcA = src_base[src_offset + -1 * srcStride];
-                        int src0 = src_base[src_offset + 0 * srcStride];
-                        int src1 = src_base[src_offset + 1 * srcStride];
-                        int src2 = src_base[src_offset + 2 * srcStride];
-                        int src3 = src_base[src_offset + 3 * srcStride];
-                        int src4 = src_base[src_offset + 4 * srcStride];
-                        int src5 = src_base[src_offset + 5 * srcStride];
-                        int src6 = src_base[src_offset + 6 * srcStride];
-                        int src7 = src_base[src_offset + 7 * srcStride];
-                        int src8 = src_base[src_offset + 8 * srcStride];
-                        int src9 = src_base[src_offset + 9 * srcStride];
-                        int src10 = src_base[src_offset + 10 * srcStride];
-                        // DebugTool.printDebugString("h264_qpel8_v_lowpass: src="+srcB+","+srcA+","+src0+","+src1+","+src2+","+src3+","+src4+","+src5+","+src6+","+src7+","+src8+","+src9+","+src10+",\n");
-                        if (opcode == 0)
+                        int w = 8;
+                        byte[] cm_base = H264DSPContext.ff_cropTbl;
+                        int cm_offset = H264DSPContext.MAX_NEG_CROP;
+                        int i;
+                        for (i = 0; i < w; i++)
                         {
-                            // PUT
-                            dst_base[dst_offset + 0 * dstStride] = (byte) op_put(dst_base[dst_offset + 0 * dstStride],
-                                (src0 + src1) * 20 - (srcA + src2) * 5 + srcB + src3, cm_base, cm_offset);
-                            dst_base[dst_offset + 1 * dstStride] = (byte) op_put(dst_base[dst_offset + 1 * dstStride],
-                                (src1 + src2) * 20 - (src0 + src3) * 5 + srcA + src4, cm_base, cm_offset);
-                            dst_base[dst_offset + 2 * dstStride] = (byte) op_put(dst_base[dst_offset + 2 * dstStride],
-                                (src2 + src3) * 20 - (src1 + src4) * 5 + src0 + src5, cm_base, cm_offset);
-                            dst_base[dst_offset + 3 * dstStride] = (byte) op_put(dst_base[dst_offset + 3 * dstStride],
-                                (src3 + src4) * 20 - (src2 + src5) * 5 + src1 + src6, cm_base, cm_offset);
-                            dst_base[dst_offset + 4 * dstStride] = (byte) op_put(dst_base[dst_offset + 4 * dstStride],
-                                (src4 + src5) * 20 - (src3 + src6) * 5 + src2 + src7, cm_base, cm_offset);
-                            dst_base[dst_offset + 5 * dstStride] = (byte) op_put(dst_base[dst_offset + 5 * dstStride],
-                                (src5 + src6) * 20 - (src4 + src7) * 5 + src3 + src8, cm_base, cm_offset);
-                            dst_base[dst_offset + 6 * dstStride] = (byte) op_put(dst_base[dst_offset + 6 * dstStride],
-                                (src6 + src7) * 20 - (src5 + src8) * 5 + src4 + src9, cm_base, cm_offset);
-                            dst_base[dst_offset + 7 * dstStride] = (byte) op_put(dst_base[dst_offset + 7 * dstStride],
-                                (src7 + src8) * 20 - (src6 + src9) * 5 + src5 + src10, cm_base, cm_offset);
+                            int srcB = src_base[src_offset + -2 * srcStride];
+                            int srcA = src_base[src_offset + -1 * srcStride];
+                            int src0 = src_base[src_offset + 0 * srcStride];
+                            int src1 = src_base[src_offset + 1 * srcStride];
+                            int src2 = src_base[src_offset + 2 * srcStride];
+                            int src3 = src_base[src_offset + 3 * srcStride];
+                            int src4 = src_base[src_offset + 4 * srcStride];
+                            int src5 = src_base[src_offset + 5 * srcStride];
+                            int src6 = src_base[src_offset + 6 * srcStride];
+                            int src7 = src_base[src_offset + 7 * srcStride];
+                            int src8 = src_base[src_offset + 8 * srcStride];
+                            int src9 = src_base[src_offset + 9 * srcStride];
+                            int src10 = src_base[src_offset + 10 * srcStride];
+                            // DebugTool.printDebugString("h264_qpel8_v_lowpass: src="+srcB+","+srcA+","+src0+","+src1+","+src2+","+src3+","+src4+","+src5+","+src6+","+src7+","+src8+","+src9+","+src10+",\n");
+                            if (opcode == 0)
+                            {
+                                // PUT
+                                dst_base[dst_offset + 0 * dstStride] = (byte)op_put(dst_base[dst_offset + 0 * dstStride],
+                                    (src0 + src1) * 20 - (srcA + src2) * 5 + srcB + src3, cm_base, cm_offset);
+                                dst_base[dst_offset + 1 * dstStride] = (byte)op_put(dst_base[dst_offset + 1 * dstStride],
+                                    (src1 + src2) * 20 - (src0 + src3) * 5 + srcA + src4, cm_base, cm_offset);
+                                dst_base[dst_offset + 2 * dstStride] = (byte)op_put(dst_base[dst_offset + 2 * dstStride],
+                                    (src2 + src3) * 20 - (src1 + src4) * 5 + src0 + src5, cm_base, cm_offset);
+                                dst_base[dst_offset + 3 * dstStride] = (byte)op_put(dst_base[dst_offset + 3 * dstStride],
+                                    (src3 + src4) * 20 - (src2 + src5) * 5 + src1 + src6, cm_base, cm_offset);
+                                dst_base[dst_offset + 4 * dstStride] = (byte)op_put(dst_base[dst_offset + 4 * dstStride],
+                                    (src4 + src5) * 20 - (src3 + src6) * 5 + src2 + src7, cm_base, cm_offset);
+                                dst_base[dst_offset + 5 * dstStride] = (byte)op_put(dst_base[dst_offset + 5 * dstStride],
+                                    (src5 + src6) * 20 - (src4 + src7) * 5 + src3 + src8, cm_base, cm_offset);
+                                dst_base[dst_offset + 6 * dstStride] = (byte)op_put(dst_base[dst_offset + 6 * dstStride],
+                                    (src6 + src7) * 20 - (src5 + src8) * 5 + src4 + src9, cm_base, cm_offset);
+                                dst_base[dst_offset + 7 * dstStride] = (byte)op_put(dst_base[dst_offset + 7 * dstStride],
+                                    (src7 + src8) * 20 - (src6 + src9) * 5 + src5 + src10, cm_base, cm_offset);
+                            }
+                            else
+                            {
+                                // AVG
+                                dst_base[dst_offset + 0 * dstStride] = (byte)op_avg(dst_base[dst_offset + 0 * dstStride],
+                                    (src0 + src1) * 20 - (srcA + src2) * 5 + srcB + src3, cm_base, cm_offset);
+                                dst_base[dst_offset + 1 * dstStride] = (byte)op_avg(dst_base[dst_offset + 1 * dstStride],
+                                    (src1 + src2) * 20 - (src0 + src3) * 5 + srcA + src4, cm_base, cm_offset);
+                                dst_base[dst_offset + 2 * dstStride] = (byte)op_avg(dst_base[dst_offset + 2 * dstStride],
+                                    (src2 + src3) * 20 - (src1 + src4) * 5 + src0 + src5, cm_base, cm_offset);
+                                dst_base[dst_offset + 3 * dstStride] = (byte)op_avg(dst_base[dst_offset + 3 * dstStride],
+                                    (src3 + src4) * 20 - (src2 + src5) * 5 + src1 + src6, cm_base, cm_offset);
+                                dst_base[dst_offset + 4 * dstStride] = (byte)op_avg(dst_base[dst_offset + 4 * dstStride],
+                                    (src4 + src5) * 20 - (src3 + src6) * 5 + src2 + src7, cm_base, cm_offset);
+                                dst_base[dst_offset + 5 * dstStride] = (byte)op_avg(dst_base[dst_offset + 5 * dstStride],
+                                    (src5 + src6) * 20 - (src4 + src7) * 5 + src3 + src8, cm_base, cm_offset);
+                                dst_base[dst_offset + 6 * dstStride] = (byte)op_avg(dst_base[dst_offset + 6 * dstStride],
+                                    (src6 + src7) * 20 - (src5 + src8) * 5 + src4 + src9, cm_base, cm_offset);
+                                dst_base[dst_offset + 7 * dstStride] = (byte)op_avg(dst_base[dst_offset + 7 * dstStride],
+                                    (src7 + src8) * 20 - (src6 + src9) * 5 + src5 + src10, cm_base, cm_offset);
+                            } // if
+                            dst_offset++;
+                            src_offset++;
                         }
-                        else
-                        {
-                            // AVG
-                            dst_base[dst_offset + 0 * dstStride] = (byte) op_avg(dst_base[dst_offset + 0 * dstStride],
-                                (src0 + src1) * 20 - (srcA + src2) * 5 + srcB + src3, cm_base, cm_offset);
-                            dst_base[dst_offset + 1 * dstStride] = (byte) op_avg(dst_base[dst_offset + 1 * dstStride],
-                                (src1 + src2) * 20 - (src0 + src3) * 5 + srcA + src4, cm_base, cm_offset);
-                            dst_base[dst_offset + 2 * dstStride] = (byte) op_avg(dst_base[dst_offset + 2 * dstStride],
-                                (src2 + src3) * 20 - (src1 + src4) * 5 + src0 + src5, cm_base, cm_offset);
-                            dst_base[dst_offset + 3 * dstStride] = (byte) op_avg(dst_base[dst_offset + 3 * dstStride],
-                                (src3 + src4) * 20 - (src2 + src5) * 5 + src1 + src6, cm_base, cm_offset);
-                            dst_base[dst_offset + 4 * dstStride] = (byte) op_avg(dst_base[dst_offset + 4 * dstStride],
-                                (src4 + src5) * 20 - (src3 + src6) * 5 + src2 + src7, cm_base, cm_offset);
-                            dst_base[dst_offset + 5 * dstStride] = (byte) op_avg(dst_base[dst_offset + 5 * dstStride],
-                                (src5 + src6) * 20 - (src4 + src7) * 5 + src3 + src8, cm_base, cm_offset);
-                            dst_base[dst_offset + 6 * dstStride] = (byte) op_avg(dst_base[dst_offset + 6 * dstStride],
-                                (src6 + src7) * 20 - (src5 + src8) * 5 + src4 + src9, cm_base, cm_offset);
-                            dst_base[dst_offset + 7 * dstStride] = (byte) op_avg(dst_base[dst_offset + 7 * dstStride],
-                                (src7 + src8) * 20 - (src6 + src9) * 5 + src5 + src10, cm_base, cm_offset);
-                        } // if
-                        dst_offset++;
-                        src_offset++;
-                    }
-                } // case
+                    } // case
                     break;
                 case 16:
-                {
-                    h264_qpel_v_lowpass(opcode, 8, dst_base, dst_offset, src_base, src_offset, dstStride, srcStride);
-                    h264_qpel_v_lowpass(opcode, 8, dst_base, dst_offset + 8, src_base, src_offset + 8, dstStride,
-                        srcStride);
-                    src_offset += 8 * srcStride;
-                    dst_offset += 8 * dstStride;
-                    h264_qpel_v_lowpass(opcode, 8, dst_base, dst_offset, src_base, src_offset, dstStride, srcStride);
-                    h264_qpel_v_lowpass(opcode, 8, dst_base, dst_offset + 8, src_base, src_offset + 8, dstStride,
-                        srcStride);
-                } // case
+                    {
+                        h264_qpel_v_lowpass(opcode, 8, dst_base, dst_offset, src_base, src_offset, dstStride, srcStride);
+                        h264_qpel_v_lowpass(opcode, 8, dst_base, dst_offset + 8, src_base, src_offset + 8, dstStride,
+                            srcStride);
+                        src_offset += 8 * srcStride;
+                        dst_offset += 8 * dstStride;
+                        h264_qpel_v_lowpass(opcode, 8, dst_base, dst_offset, src_base, src_offset, dstStride, srcStride);
+                        h264_qpel_v_lowpass(opcode, 8, dst_base, dst_offset + 8, src_base, src_offset + 8, dstStride,
+                            srcStride);
+                    } // case
                     break;
             } // switch
         }
@@ -1235,234 +1235,234 @@ namespace cscodec.h264.decoder
             switch (size)
             {
                 case 2:
-                {
-                    int h = 2;
-                    int w = 2;
-                    byte[] cm_base = H264DSPContext.ff_cropTbl;
-                    int cm_offset = H264DSPContext.MAX_NEG_CROP;
-                    int i;
-                    src_offset -= 2 * srcStride;
-                    for (i = 0; i < h + 5; i++)
                     {
-                        tmp_base[tmp_offset + 0] =
-                            (short) ((src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
-                                     (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3]);
-                        tmp_base[tmp_offset + 1] =
-                            (short) ((src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
-                                     (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4]);
-                        tmp_offset += tmpStride;
-                        src_offset += srcStride;
-                    }
-                    tmp_offset -= tmpStride * (h + 5 - 2);
-                    for (i = 0; i < w; i++)
-                    {
-                        int tmpB = tmp_base[tmp_offset + -2 * tmpStride];
-                        int tmpA = tmp_base[tmp_offset + -1 * tmpStride];
-                        int tmp0 = tmp_base[tmp_offset + 0 * tmpStride];
-                        int tmp1 = tmp_base[tmp_offset + 1 * tmpStride];
-                        int tmp2 = tmp_base[tmp_offset + 2 * tmpStride];
-                        int tmp3 = tmp_base[tmp_offset + 3 * tmpStride];
-                        int tmp4 = tmp_base[tmp_offset + 4 * tmpStride];
-                        if (opcode == 0)
+                        int h = 2;
+                        int w = 2;
+                        byte[] cm_base = H264DSPContext.ff_cropTbl;
+                        int cm_offset = H264DSPContext.MAX_NEG_CROP;
+                        int i;
+                        src_offset -= 2 * srcStride;
+                        for (i = 0; i < h + 5; i++)
                         {
-                            // PUT
-                            dst_base[dst_offset + 0 * dstStride] = (byte) op_put2(dst_base[dst_offset + 0 * dstStride],
-                                (tmp0 + tmp1) * 20 - (tmpA + tmp2) * 5 + tmpB + tmp3, cm_base, cm_offset);
-                            dst_base[dst_offset + 1 * dstStride] = (byte) op_put2(dst_base[dst_offset + 1 * dstStride],
-                                (tmp1 + tmp2) * 20 - (tmp0 + tmp3) * 5 + tmpA + tmp4, cm_base, cm_offset);
+                            tmp_base[tmp_offset + 0] =
+                                (short)((src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
+                                         (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3]);
+                            tmp_base[tmp_offset + 1] =
+                                (short)((src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
+                                         (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4]);
+                            tmp_offset += tmpStride;
+                            src_offset += srcStride;
                         }
-                        else
+                        tmp_offset -= tmpStride * (h + 5 - 2);
+                        for (i = 0; i < w; i++)
                         {
-                            // AVG
-                            dst_base[dst_offset + 0 * dstStride] = (byte) op_avg2(dst_base[dst_offset + 0 * dstStride],
-                                (tmp0 + tmp1) * 20 - (tmpA + tmp2) * 5 + tmpB + tmp3, cm_base, cm_offset);
-                            dst_base[dst_offset + 1 * dstStride] = (byte) op_avg2(dst_base[dst_offset + 1 * dstStride],
-                                (tmp1 + tmp2) * 20 - (tmp0 + tmp3) * 5 + tmpA + tmp4, cm_base, cm_offset);
-                        } // if
-                        dst_offset++;
-                        tmp_offset++;
-                    }
-                } // case
+                            int tmpB = tmp_base[tmp_offset + -2 * tmpStride];
+                            int tmpA = tmp_base[tmp_offset + -1 * tmpStride];
+                            int tmp0 = tmp_base[tmp_offset + 0 * tmpStride];
+                            int tmp1 = tmp_base[tmp_offset + 1 * tmpStride];
+                            int tmp2 = tmp_base[tmp_offset + 2 * tmpStride];
+                            int tmp3 = tmp_base[tmp_offset + 3 * tmpStride];
+                            int tmp4 = tmp_base[tmp_offset + 4 * tmpStride];
+                            if (opcode == 0)
+                            {
+                                // PUT
+                                dst_base[dst_offset + 0 * dstStride] = (byte)op_put2(dst_base[dst_offset + 0 * dstStride],
+                                    (tmp0 + tmp1) * 20 - (tmpA + tmp2) * 5 + tmpB + tmp3, cm_base, cm_offset);
+                                dst_base[dst_offset + 1 * dstStride] = (byte)op_put2(dst_base[dst_offset + 1 * dstStride],
+                                    (tmp1 + tmp2) * 20 - (tmp0 + tmp3) * 5 + tmpA + tmp4, cm_base, cm_offset);
+                            }
+                            else
+                            {
+                                // AVG
+                                dst_base[dst_offset + 0 * dstStride] = (byte)op_avg2(dst_base[dst_offset + 0 * dstStride],
+                                    (tmp0 + tmp1) * 20 - (tmpA + tmp2) * 5 + tmpB + tmp3, cm_base, cm_offset);
+                                dst_base[dst_offset + 1 * dstStride] = (byte)op_avg2(dst_base[dst_offset + 1 * dstStride],
+                                    (tmp1 + tmp2) * 20 - (tmp0 + tmp3) * 5 + tmpA + tmp4, cm_base, cm_offset);
+                            } // if
+                            dst_offset++;
+                            tmp_offset++;
+                        }
+                    } // case
                     break;
                 case 4:
-                {
-                    int h = 4;
-                    int w = 4;
-                    byte[] cm_base = H264DSPContext.ff_cropTbl;
-                    int cm_offset = H264DSPContext.MAX_NEG_CROP;
-                    int i;
-                    // DebugTool.printDebugString("h264_qpel4_hv_lowpass:\n");
-                    src_offset -= 2 * srcStride;
-                    for (i = 0; i < h + 5; i++)
                     {
-                        tmp_base[tmp_offset + 0] =
-                            (short) ((src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
-                                     (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3]);
-                        tmp_base[tmp_offset + 1] =
-                            (short) ((src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
-                                     (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4]);
-                        tmp_base[tmp_offset + 2] =
-                            (short) ((src_base[src_offset + 2] + src_base[src_offset + 3]) * 20 -
-                                     (src_base[src_offset + 1] + src_base[src_offset + 4]) * 5 + src_base[src_offset + 0] + src_base[src_offset + 5]);
-                        tmp_base[tmp_offset + 3] =
-                            (short) ((src_base[src_offset + 3] + src_base[src_offset + 4]) * 20 -
-                                     (src_base[src_offset + 2] + src_base[src_offset + 5]) * 5 + src_base[src_offset + 1] + src_base[src_offset + 6]);
-                        tmp_offset += tmpStride;
-                        src_offset += srcStride;
-                    }
-                    tmp_offset -= tmpStride * (h + 5 - 2);
-                    for (i = 0; i < w; i++)
-                    {
-                        int tmpB = tmp_base[tmp_offset + -2 * tmpStride];
-                        int tmpA = tmp_base[tmp_offset + -1 * tmpStride];
-                        int tmp0 = tmp_base[tmp_offset + 0 * tmpStride];
-                        int tmp1 = tmp_base[tmp_offset + 1 * tmpStride];
-                        int tmp2 = tmp_base[tmp_offset + 2 * tmpStride];
-                        int tmp3 = tmp_base[tmp_offset + 3 * tmpStride];
-                        int tmp4 = tmp_base[tmp_offset + 4 * tmpStride];
-                        int tmp5 = tmp_base[tmp_offset + 5 * tmpStride];
-                        int tmp6 = tmp_base[tmp_offset + 6 * tmpStride];
-                        if (opcode == 0)
+                        int h = 4;
+                        int w = 4;
+                        byte[] cm_base = H264DSPContext.ff_cropTbl;
+                        int cm_offset = H264DSPContext.MAX_NEG_CROP;
+                        int i;
+                        // DebugTool.printDebugString("h264_qpel4_hv_lowpass:\n");
+                        src_offset -= 2 * srcStride;
+                        for (i = 0; i < h + 5; i++)
                         {
-                            // PUT
-                            dst_base[dst_offset + 0 * dstStride] = (byte) op_put2(dst_base[dst_offset + 0 * dstStride],
-                                (tmp0 + tmp1) * 20 - (tmpA + tmp2) * 5 + tmpB + tmp3, cm_base, cm_offset);
-                            dst_base[dst_offset + 1 * dstStride] = (byte) op_put2(dst_base[dst_offset + 1 * dstStride],
-                                (tmp1 + tmp2) * 20 - (tmp0 + tmp3) * 5 + tmpA + tmp4, cm_base, cm_offset);
-                            dst_base[dst_offset + 2 * dstStride] = (byte) op_put2(dst_base[dst_offset + 2 * dstStride],
-                                (tmp2 + tmp3) * 20 - (tmp1 + tmp4) * 5 + tmp0 + tmp5, cm_base, cm_offset);
-                            dst_base[dst_offset + 3 * dstStride] = (byte) op_put2(dst_base[dst_offset + 3 * dstStride],
-                                (tmp3 + tmp4) * 20 - (tmp2 + tmp5) * 5 + tmp1 + tmp6, cm_base, cm_offset);
+                            tmp_base[tmp_offset + 0] =
+                                (short)((src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
+                                         (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3]);
+                            tmp_base[tmp_offset + 1] =
+                                (short)((src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
+                                         (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4]);
+                            tmp_base[tmp_offset + 2] =
+                                (short)((src_base[src_offset + 2] + src_base[src_offset + 3]) * 20 -
+                                         (src_base[src_offset + 1] + src_base[src_offset + 4]) * 5 + src_base[src_offset + 0] + src_base[src_offset + 5]);
+                            tmp_base[tmp_offset + 3] =
+                                (short)((src_base[src_offset + 3] + src_base[src_offset + 4]) * 20 -
+                                         (src_base[src_offset + 2] + src_base[src_offset + 5]) * 5 + src_base[src_offset + 1] + src_base[src_offset + 6]);
+                            tmp_offset += tmpStride;
+                            src_offset += srcStride;
                         }
-                        else
+                        tmp_offset -= tmpStride * (h + 5 - 2);
+                        for (i = 0; i < w; i++)
                         {
-                            // AVG
-                            dst_base[dst_offset + 0 * dstStride] = (byte) op_avg2(dst_base[dst_offset + 0 * dstStride],
-                                (tmp0 + tmp1) * 20 - (tmpA + tmp2) * 5 + tmpB + tmp3, cm_base, cm_offset);
-                            dst_base[dst_offset + 1 * dstStride] = (byte) op_avg2(dst_base[dst_offset + 1 * dstStride],
-                                (tmp1 + tmp2) * 20 - (tmp0 + tmp3) * 5 + tmpA + tmp4, cm_base, cm_offset);
-                            dst_base[dst_offset + 2 * dstStride] = (byte) op_avg2(dst_base[dst_offset + 2 * dstStride],
-                                (tmp2 + tmp3) * 20 - (tmp1 + tmp4) * 5 + tmp0 + tmp5, cm_base, cm_offset);
-                            dst_base[dst_offset + 3 * dstStride] = (byte) op_avg2(dst_base[dst_offset + 3 * dstStride],
-                                (tmp3 + tmp4) * 20 - (tmp2 + tmp5) * 5 + tmp1 + tmp6, cm_base, cm_offset);
-                        } // if
-                        dst_offset++;
-                        tmp_offset++;
-                    }
-                } // case
+                            int tmpB = tmp_base[tmp_offset + -2 * tmpStride];
+                            int tmpA = tmp_base[tmp_offset + -1 * tmpStride];
+                            int tmp0 = tmp_base[tmp_offset + 0 * tmpStride];
+                            int tmp1 = tmp_base[tmp_offset + 1 * tmpStride];
+                            int tmp2 = tmp_base[tmp_offset + 2 * tmpStride];
+                            int tmp3 = tmp_base[tmp_offset + 3 * tmpStride];
+                            int tmp4 = tmp_base[tmp_offset + 4 * tmpStride];
+                            int tmp5 = tmp_base[tmp_offset + 5 * tmpStride];
+                            int tmp6 = tmp_base[tmp_offset + 6 * tmpStride];
+                            if (opcode == 0)
+                            {
+                                // PUT
+                                dst_base[dst_offset + 0 * dstStride] = (byte)op_put2(dst_base[dst_offset + 0 * dstStride],
+                                    (tmp0 + tmp1) * 20 - (tmpA + tmp2) * 5 + tmpB + tmp3, cm_base, cm_offset);
+                                dst_base[dst_offset + 1 * dstStride] = (byte)op_put2(dst_base[dst_offset + 1 * dstStride],
+                                    (tmp1 + tmp2) * 20 - (tmp0 + tmp3) * 5 + tmpA + tmp4, cm_base, cm_offset);
+                                dst_base[dst_offset + 2 * dstStride] = (byte)op_put2(dst_base[dst_offset + 2 * dstStride],
+                                    (tmp2 + tmp3) * 20 - (tmp1 + tmp4) * 5 + tmp0 + tmp5, cm_base, cm_offset);
+                                dst_base[dst_offset + 3 * dstStride] = (byte)op_put2(dst_base[dst_offset + 3 * dstStride],
+                                    (tmp3 + tmp4) * 20 - (tmp2 + tmp5) * 5 + tmp1 + tmp6, cm_base, cm_offset);
+                            }
+                            else
+                            {
+                                // AVG
+                                dst_base[dst_offset + 0 * dstStride] = (byte)op_avg2(dst_base[dst_offset + 0 * dstStride],
+                                    (tmp0 + tmp1) * 20 - (tmpA + tmp2) * 5 + tmpB + tmp3, cm_base, cm_offset);
+                                dst_base[dst_offset + 1 * dstStride] = (byte)op_avg2(dst_base[dst_offset + 1 * dstStride],
+                                    (tmp1 + tmp2) * 20 - (tmp0 + tmp3) * 5 + tmpA + tmp4, cm_base, cm_offset);
+                                dst_base[dst_offset + 2 * dstStride] = (byte)op_avg2(dst_base[dst_offset + 2 * dstStride],
+                                    (tmp2 + tmp3) * 20 - (tmp1 + tmp4) * 5 + tmp0 + tmp5, cm_base, cm_offset);
+                                dst_base[dst_offset + 3 * dstStride] = (byte)op_avg2(dst_base[dst_offset + 3 * dstStride],
+                                    (tmp3 + tmp4) * 20 - (tmp2 + tmp5) * 5 + tmp1 + tmp6, cm_base, cm_offset);
+                            } // if
+                            dst_offset++;
+                            tmp_offset++;
+                        }
+                    } // case
                     break;
                 case 8:
-                {
-                    int h = 8;
-                    int w = 8;
-                    byte[] cm_base = H264DSPContext.ff_cropTbl;
-                    int cm_offset = H264DSPContext.MAX_NEG_CROP;
-                    int i;
-                    // DebugTool.printDebugString("h264_qpel8_hv_lowpass:\n");
-                    src_offset -= 2 * srcStride;
-                    for (i = 0; i < h + 5; i++)
                     {
-                        tmp_base[tmp_offset + 0] =
-                            (short) ((src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
-                                     (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3]);
-                        tmp_base[tmp_offset + 1] =
-                            (short) ((src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
-                                     (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4]);
-                        tmp_base[tmp_offset + 2] =
-                            (short) ((src_base[src_offset + 2] + src_base[src_offset + 3]) * 20 -
-                                     (src_base[src_offset + 1] + src_base[src_offset + 4]) * 5 + src_base[src_offset + 0] + src_base[src_offset + 5]);
-                        tmp_base[tmp_offset + 3] =
-                            (short) ((src_base[src_offset + 3] + src_base[src_offset + 4]) * 20 -
-                                     (src_base[src_offset + 2] + src_base[src_offset + 5]) * 5 + src_base[src_offset + 1] + src_base[src_offset + 6]);
-                        tmp_base[tmp_offset + 4] =
-                            (short) ((src_base[src_offset + 4] + src_base[src_offset + 5]) * 20 -
-                                     (src_base[src_offset + 3] + src_base[src_offset + 6]) * 5 + src_base[src_offset + 2] + src_base[src_offset + 7]);
-                        tmp_base[tmp_offset + 5] =
-                            (short) ((src_base[src_offset + 5] + src_base[src_offset + 6]) * 20 -
-                                     (src_base[src_offset + 4] + src_base[src_offset + 7]) * 5 + src_base[src_offset + 3] + src_base[src_offset + 8]);
-                        tmp_base[tmp_offset + 6] =
-                            (short) ((src_base[src_offset + 6] + src_base[src_offset + 7]) * 20 -
-                                     (src_base[src_offset + 5] + src_base[src_offset + 8]) * 5 + src_base[src_offset + 4] + src_base[src_offset + 9]);
-                        tmp_base[tmp_offset + 7] =
-                            (short) ((src_base[src_offset + 7] + src_base[src_offset + 8]) * 20 -
-                                     (src_base[src_offset + 6] + src_base[src_offset + 9]) * 5 + src_base[src_offset + 5] + src_base[src_offset + 10]);
-                        tmp_offset += tmpStride;
-                        src_offset += srcStride;
-                    }
-                    tmp_offset -= tmpStride * (h + 5 - 2);
-                    for (i = 0; i < w; i++)
-                    {
-                        int tmpB = tmp_base[tmp_offset + -2 * tmpStride];
-                        int tmpA = tmp_base[tmp_offset + -1 * tmpStride];
-                        int tmp0 = tmp_base[tmp_offset + 0 * tmpStride];
-                        int tmp1 = tmp_base[tmp_offset + 1 * tmpStride];
-                        int tmp2 = tmp_base[tmp_offset + 2 * tmpStride];
-                        int tmp3 = tmp_base[tmp_offset + 3 * tmpStride];
-                        int tmp4 = tmp_base[tmp_offset + 4 * tmpStride];
-                        int tmp5 = tmp_base[tmp_offset + 5 * tmpStride];
-                        int tmp6 = tmp_base[tmp_offset + 6 * tmpStride];
-                        int tmp7 = tmp_base[tmp_offset + 7 * tmpStride];
-                        int tmp8 = tmp_base[tmp_offset + 8 * tmpStride];
-                        int tmp9 = tmp_base[tmp_offset + 9 * tmpStride];
-                        int tmp10 = tmp_base[tmp_offset + 10 * tmpStride];
-                        if (opcode == 0)
+                        int h = 8;
+                        int w = 8;
+                        byte[] cm_base = H264DSPContext.ff_cropTbl;
+                        int cm_offset = H264DSPContext.MAX_NEG_CROP;
+                        int i;
+                        // DebugTool.printDebugString("h264_qpel8_hv_lowpass:\n");
+                        src_offset -= 2 * srcStride;
+                        for (i = 0; i < h + 5; i++)
                         {
-                            // PUT
-                            dst_base[dst_offset + 0 * dstStride] = (byte) op_put2(dst_base[dst_offset + 0 * dstStride],
-                                (tmp0 + tmp1) * 20 - (tmpA + tmp2) * 5 + tmpB + tmp3, cm_base, cm_offset);
-                            dst_base[dst_offset + 1 * dstStride] = (byte) op_put2(dst_base[dst_offset + 1 * dstStride],
-                                (tmp1 + tmp2) * 20 - (tmp0 + tmp3) * 5 + tmpA + tmp4, cm_base, cm_offset);
-                            dst_base[dst_offset + 2 * dstStride] = (byte) op_put2(dst_base[dst_offset + 2 * dstStride],
-                                (tmp2 + tmp3) * 20 - (tmp1 + tmp4) * 5 + tmp0 + tmp5, cm_base, cm_offset);
-                            dst_base[dst_offset + 3 * dstStride] = (byte) op_put2(dst_base[dst_offset + 3 * dstStride],
-                                (tmp3 + tmp4) * 20 - (tmp2 + tmp5) * 5 + tmp1 + tmp6, cm_base, cm_offset);
-                            dst_base[dst_offset + 4 * dstStride] = (byte) op_put2(dst_base[dst_offset + 4 * dstStride],
-                                (tmp4 + tmp5) * 20 - (tmp3 + tmp6) * 5 + tmp2 + tmp7, cm_base, cm_offset);
-                            dst_base[dst_offset + 5 * dstStride] = (byte) op_put2(dst_base[dst_offset + 5 * dstStride],
-                                (tmp5 + tmp6) * 20 - (tmp4 + tmp7) * 5 + tmp3 + tmp8, cm_base, cm_offset);
-                            dst_base[dst_offset + 6 * dstStride] = (byte) op_put2(dst_base[dst_offset + 6 * dstStride],
-                                (tmp6 + tmp7) * 20 - (tmp5 + tmp8) * 5 + tmp4 + tmp9, cm_base, cm_offset);
-                            dst_base[dst_offset + 7 * dstStride] = (byte) op_put2(dst_base[dst_offset + 7 * dstStride],
-                                (tmp7 + tmp8) * 20 - (tmp6 + tmp9) * 5 + tmp5 + tmp10, cm_base, cm_offset);
+                            tmp_base[tmp_offset + 0] =
+                                (short)((src_base[src_offset + 0] + src_base[src_offset + 1]) * 20 -
+                                         (src_base[src_offset + -1] + src_base[src_offset + 2]) * 5 + src_base[src_offset + -2] + src_base[src_offset + 3]);
+                            tmp_base[tmp_offset + 1] =
+                                (short)((src_base[src_offset + 1] + src_base[src_offset + 2]) * 20 -
+                                         (src_base[src_offset + 0] + src_base[src_offset + 3]) * 5 + src_base[src_offset + -1] + src_base[src_offset + 4]);
+                            tmp_base[tmp_offset + 2] =
+                                (short)((src_base[src_offset + 2] + src_base[src_offset + 3]) * 20 -
+                                         (src_base[src_offset + 1] + src_base[src_offset + 4]) * 5 + src_base[src_offset + 0] + src_base[src_offset + 5]);
+                            tmp_base[tmp_offset + 3] =
+                                (short)((src_base[src_offset + 3] + src_base[src_offset + 4]) * 20 -
+                                         (src_base[src_offset + 2] + src_base[src_offset + 5]) * 5 + src_base[src_offset + 1] + src_base[src_offset + 6]);
+                            tmp_base[tmp_offset + 4] =
+                                (short)((src_base[src_offset + 4] + src_base[src_offset + 5]) * 20 -
+                                         (src_base[src_offset + 3] + src_base[src_offset + 6]) * 5 + src_base[src_offset + 2] + src_base[src_offset + 7]);
+                            tmp_base[tmp_offset + 5] =
+                                (short)((src_base[src_offset + 5] + src_base[src_offset + 6]) * 20 -
+                                         (src_base[src_offset + 4] + src_base[src_offset + 7]) * 5 + src_base[src_offset + 3] + src_base[src_offset + 8]);
+                            tmp_base[tmp_offset + 6] =
+                                (short)((src_base[src_offset + 6] + src_base[src_offset + 7]) * 20 -
+                                         (src_base[src_offset + 5] + src_base[src_offset + 8]) * 5 + src_base[src_offset + 4] + src_base[src_offset + 9]);
+                            tmp_base[tmp_offset + 7] =
+                                (short)((src_base[src_offset + 7] + src_base[src_offset + 8]) * 20 -
+                                         (src_base[src_offset + 6] + src_base[src_offset + 9]) * 5 + src_base[src_offset + 5] + src_base[src_offset + 10]);
+                            tmp_offset += tmpStride;
+                            src_offset += srcStride;
                         }
-                        else
+                        tmp_offset -= tmpStride * (h + 5 - 2);
+                        for (i = 0; i < w; i++)
                         {
-                            // AVG
-                            dst_base[dst_offset + 0 * dstStride] = (byte) op_avg2(dst_base[dst_offset + 0 * dstStride],
-                                (tmp0 + tmp1) * 20 - (tmpA + tmp2) * 5 + tmpB + tmp3, cm_base, cm_offset);
-                            dst_base[dst_offset + 1 * dstStride] = (byte) op_avg2(dst_base[dst_offset + 1 * dstStride],
-                                (tmp1 + tmp2) * 20 - (tmp0 + tmp3) * 5 + tmpA + tmp4, cm_base, cm_offset);
-                            dst_base[dst_offset + 2 * dstStride] = (byte) op_avg2(dst_base[dst_offset + 2 * dstStride],
-                                (tmp2 + tmp3) * 20 - (tmp1 + tmp4) * 5 + tmp0 + tmp5, cm_base, cm_offset);
-                            dst_base[dst_offset + 3 * dstStride] = (byte) op_avg2(dst_base[dst_offset + 3 * dstStride],
-                                (tmp3 + tmp4) * 20 - (tmp2 + tmp5) * 5 + tmp1 + tmp6, cm_base, cm_offset);
-                            dst_base[dst_offset + 4 * dstStride] = (byte) op_avg2(dst_base[dst_offset + 4 * dstStride],
-                                (tmp4 + tmp5) * 20 - (tmp3 + tmp6) * 5 + tmp2 + tmp7, cm_base, cm_offset);
-                            dst_base[dst_offset + 5 * dstStride] = (byte) op_avg2(dst_base[dst_offset + 5 * dstStride],
-                                (tmp5 + tmp6) * 20 - (tmp4 + tmp7) * 5 + tmp3 + tmp8, cm_base, cm_offset);
-                            dst_base[dst_offset + 6 * dstStride] = (byte) op_avg2(dst_base[dst_offset + 6 * dstStride],
-                                (tmp6 + tmp7) * 20 - (tmp5 + tmp8) * 5 + tmp4 + tmp9, cm_base, cm_offset);
-                            dst_base[dst_offset + 7 * dstStride] = (byte) op_avg2(dst_base[dst_offset + 7 * dstStride],
-                                (tmp7 + tmp8) * 20 - (tmp6 + tmp9) * 5 + tmp5 + tmp10, cm_base, cm_offset);
-                        } // if
-                        dst_offset++;
-                        tmp_offset++;
-                    }
-                } // case
+                            int tmpB = tmp_base[tmp_offset + -2 * tmpStride];
+                            int tmpA = tmp_base[tmp_offset + -1 * tmpStride];
+                            int tmp0 = tmp_base[tmp_offset + 0 * tmpStride];
+                            int tmp1 = tmp_base[tmp_offset + 1 * tmpStride];
+                            int tmp2 = tmp_base[tmp_offset + 2 * tmpStride];
+                            int tmp3 = tmp_base[tmp_offset + 3 * tmpStride];
+                            int tmp4 = tmp_base[tmp_offset + 4 * tmpStride];
+                            int tmp5 = tmp_base[tmp_offset + 5 * tmpStride];
+                            int tmp6 = tmp_base[tmp_offset + 6 * tmpStride];
+                            int tmp7 = tmp_base[tmp_offset + 7 * tmpStride];
+                            int tmp8 = tmp_base[tmp_offset + 8 * tmpStride];
+                            int tmp9 = tmp_base[tmp_offset + 9 * tmpStride];
+                            int tmp10 = tmp_base[tmp_offset + 10 * tmpStride];
+                            if (opcode == 0)
+                            {
+                                // PUT
+                                dst_base[dst_offset + 0 * dstStride] = (byte)op_put2(dst_base[dst_offset + 0 * dstStride],
+                                    (tmp0 + tmp1) * 20 - (tmpA + tmp2) * 5 + tmpB + tmp3, cm_base, cm_offset);
+                                dst_base[dst_offset + 1 * dstStride] = (byte)op_put2(dst_base[dst_offset + 1 * dstStride],
+                                    (tmp1 + tmp2) * 20 - (tmp0 + tmp3) * 5 + tmpA + tmp4, cm_base, cm_offset);
+                                dst_base[dst_offset + 2 * dstStride] = (byte)op_put2(dst_base[dst_offset + 2 * dstStride],
+                                    (tmp2 + tmp3) * 20 - (tmp1 + tmp4) * 5 + tmp0 + tmp5, cm_base, cm_offset);
+                                dst_base[dst_offset + 3 * dstStride] = (byte)op_put2(dst_base[dst_offset + 3 * dstStride],
+                                    (tmp3 + tmp4) * 20 - (tmp2 + tmp5) * 5 + tmp1 + tmp6, cm_base, cm_offset);
+                                dst_base[dst_offset + 4 * dstStride] = (byte)op_put2(dst_base[dst_offset + 4 * dstStride],
+                                    (tmp4 + tmp5) * 20 - (tmp3 + tmp6) * 5 + tmp2 + tmp7, cm_base, cm_offset);
+                                dst_base[dst_offset + 5 * dstStride] = (byte)op_put2(dst_base[dst_offset + 5 * dstStride],
+                                    (tmp5 + tmp6) * 20 - (tmp4 + tmp7) * 5 + tmp3 + tmp8, cm_base, cm_offset);
+                                dst_base[dst_offset + 6 * dstStride] = (byte)op_put2(dst_base[dst_offset + 6 * dstStride],
+                                    (tmp6 + tmp7) * 20 - (tmp5 + tmp8) * 5 + tmp4 + tmp9, cm_base, cm_offset);
+                                dst_base[dst_offset + 7 * dstStride] = (byte)op_put2(dst_base[dst_offset + 7 * dstStride],
+                                    (tmp7 + tmp8) * 20 - (tmp6 + tmp9) * 5 + tmp5 + tmp10, cm_base, cm_offset);
+                            }
+                            else
+                            {
+                                // AVG
+                                dst_base[dst_offset + 0 * dstStride] = (byte)op_avg2(dst_base[dst_offset + 0 * dstStride],
+                                    (tmp0 + tmp1) * 20 - (tmpA + tmp2) * 5 + tmpB + tmp3, cm_base, cm_offset);
+                                dst_base[dst_offset + 1 * dstStride] = (byte)op_avg2(dst_base[dst_offset + 1 * dstStride],
+                                    (tmp1 + tmp2) * 20 - (tmp0 + tmp3) * 5 + tmpA + tmp4, cm_base, cm_offset);
+                                dst_base[dst_offset + 2 * dstStride] = (byte)op_avg2(dst_base[dst_offset + 2 * dstStride],
+                                    (tmp2 + tmp3) * 20 - (tmp1 + tmp4) * 5 + tmp0 + tmp5, cm_base, cm_offset);
+                                dst_base[dst_offset + 3 * dstStride] = (byte)op_avg2(dst_base[dst_offset + 3 * dstStride],
+                                    (tmp3 + tmp4) * 20 - (tmp2 + tmp5) * 5 + tmp1 + tmp6, cm_base, cm_offset);
+                                dst_base[dst_offset + 4 * dstStride] = (byte)op_avg2(dst_base[dst_offset + 4 * dstStride],
+                                    (tmp4 + tmp5) * 20 - (tmp3 + tmp6) * 5 + tmp2 + tmp7, cm_base, cm_offset);
+                                dst_base[dst_offset + 5 * dstStride] = (byte)op_avg2(dst_base[dst_offset + 5 * dstStride],
+                                    (tmp5 + tmp6) * 20 - (tmp4 + tmp7) * 5 + tmp3 + tmp8, cm_base, cm_offset);
+                                dst_base[dst_offset + 6 * dstStride] = (byte)op_avg2(dst_base[dst_offset + 6 * dstStride],
+                                    (tmp6 + tmp7) * 20 - (tmp5 + tmp8) * 5 + tmp4 + tmp9, cm_base, cm_offset);
+                                dst_base[dst_offset + 7 * dstStride] = (byte)op_avg2(dst_base[dst_offset + 7 * dstStride],
+                                    (tmp7 + tmp8) * 20 - (tmp6 + tmp9) * 5 + tmp5 + tmp10, cm_base, cm_offset);
+                            } // if
+                            dst_offset++;
+                            tmp_offset++;
+                        }
+                    } // case
                     break;
                 case 16:
-                {
-                    h264_qpel_hv_lowpass(opcode, 8, dst_base, dst_offset, tmp_base, tmp_offset, src_base, src_offset,
-                        dstStride, tmpStride, srcStride);
-                    h264_qpel_hv_lowpass(opcode, 8, dst_base, dst_offset + 8, tmp_base, tmp_offset + 8, src_base,
-                        src_offset + 8, dstStride, tmpStride, srcStride);
-                    src_offset += 8 * srcStride;
-                    dst_offset += 8 * dstStride;
-                    h264_qpel_hv_lowpass(opcode, 8, dst_base, dst_offset, tmp_base, tmp_offset, src_base, src_offset,
-                        dstStride, tmpStride, srcStride);
-                    h264_qpel_hv_lowpass(opcode, 8, dst_base, dst_offset + 8, tmp_base, tmp_offset + 8, src_base,
-                        src_offset + 8, dstStride, tmpStride, srcStride);
-                } // case
+                    {
+                        h264_qpel_hv_lowpass(opcode, 8, dst_base, dst_offset, tmp_base, tmp_offset, src_base, src_offset,
+                            dstStride, tmpStride, srcStride);
+                        h264_qpel_hv_lowpass(opcode, 8, dst_base, dst_offset + 8, tmp_base, tmp_offset + 8, src_base,
+                            src_offset + 8, dstStride, tmpStride, srcStride);
+                        src_offset += 8 * srcStride;
+                        dst_offset += 8 * dstStride;
+                        h264_qpel_hv_lowpass(opcode, 8, dst_base, dst_offset, tmp_base, tmp_offset, src_base, src_offset,
+                            dstStride, tmpStride, srcStride);
+                        h264_qpel_hv_lowpass(opcode, 8, dst_base, dst_offset + 8, tmp_base, tmp_offset + 8, src_base,
+                            src_offset + 8, dstStride, tmpStride, srcStride);
+                    } // case
                     break;
             } // switch
         }
@@ -2225,7 +2225,7 @@ namespace cscodec.h264.decoder
             switch (this.idct_permutation_type)
             {
                 case FF_NO_IDCT_PERM:
-                    for (i = 0; i < 64; i++) this.idct_permutation[i] = (byte) i;
+                    for (i = 0; i < 64; i++) this.idct_permutation[i] = (byte)i;
                     break;
             } // switch
         }

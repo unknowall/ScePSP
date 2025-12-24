@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Reflection;
-using ScePSPUtils;
-using System.Collections.Concurrent;
+﻿using ScePSPUtils;
 using ScePSPUtils.Extensions;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 /// <summary>
 /// 
@@ -67,7 +67,7 @@ public sealed class InjectContext : IDisposable
         return Instance;
     }
 
-    public TType GetInstance<TType>() => (TType) GetInstance(typeof(TType));
+    public TType GetInstance<TType>() => (TType)GetInstance(typeof(TType));
 
     public TType SetInstance<TType>(object Instance) // where TType : IInjectComponent
     {
@@ -82,7 +82,7 @@ public sealed class InjectContext : IDisposable
         return Instance;
     }
 
-    private TType _SetInstance<TType>(object instance) => (TType) _SetInstance(typeof(TType), instance);
+    private TType _SetInstance<TType>(object instance) => (TType)_SetInstance(typeof(TType), instance);
     public void SetInstanceType<TType1>(Type type2) => SetInstanceType(typeof(TType1), type2);
     public void SetInstanceType<TType1, TType2>() where TType2 : TType1 => SetInstanceType<TType1>(typeof(TType2));
     public void SetInstanceType(Type Type1, Type Type2) => TypesByType[Type1] = Type2;
@@ -144,7 +144,7 @@ public sealed class InjectContext : IDisposable
         // Call Initialization
         if (Object.GetType().GetInterfaces().Contains(typeof(IInjectInitialize)))
         {
-            ((IInjectInitialize) Object).Initialize();
+            ((IInjectInitialize)Object).Initialize();
         }
     }
 
@@ -156,7 +156,7 @@ public sealed class InjectContext : IDisposable
 
             if (Item.GetType().GetInterfaces().Contains(typeof(IDisposable)))
             {
-                ((IDisposable) Item).Dispose();
+                ((IDisposable)Item).Dispose();
             }
         }
 

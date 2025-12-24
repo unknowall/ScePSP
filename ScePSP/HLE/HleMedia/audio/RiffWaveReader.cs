@@ -1,7 +1,7 @@
-﻿using ScePSPUtils.Streams;
+﻿using ScePSPUtils.Extensions;
+using ScePSPUtils.Streams;
 using System;
 using System.IO;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Hle.Formats.audio
 {

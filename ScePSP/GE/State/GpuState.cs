@@ -1,11 +1,11 @@
-﻿using System;
-using System.Numerics;
-using System.Runtime.InteropServices;
-using ScePSPUtils;
-using ScePSPUtils.Extensions;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
 using ScePSP.Utils;
+using ScePSPUtils;
+using ScePSPUtils.Extensions;
+using System;
+using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace ScePSP.Core.Gpu.State
 {
@@ -42,7 +42,7 @@ namespace ScePSP.Core.Gpu.State
 
         public Matrix4x4 GetMatrix4X4(GpuOpCodes MATRIX_BASE, int index = 0)
         {
-            var v = Span.Slice((int) MATRIX_BASE + index * 16).Reinterpret<float, uint>();
+            var v = Span.Slice((int)MATRIX_BASE + index * 16).Reinterpret<float, uint>();
             return new Matrix4x4(
                 v[0], v[1], v[2], v[3],
                 v[4], v[5], v[6], v[7],
@@ -53,7 +53,7 @@ namespace ScePSP.Core.Gpu.State
 
         public Matrix4x4 GetMatrix4X3(GpuOpCodes MATRIX_BASE, int index = 0)
         {
-            var v = Span.Slice((int) MATRIX_BASE + index * 12).Reinterpret<float, uint>();
+            var v = Span.Slice((int)MATRIX_BASE + index * 12).Reinterpret<float, uint>();
             return new Matrix4x4(
                 v[0], v[1], v[2], 0,
                 v[3], v[4], v[5], 0,
@@ -95,7 +95,7 @@ namespace ScePSP.Core.Gpu.State
         public ColorTestStateStruct ColorTestState => new ColorTestStateStruct(data);
         public PatchStateStruct PatchState => new PatchStateStruct(data);
         public TextureMappingStateStruct TextureMappingState => new TextureMappingStateStruct(data);
-        
+
         public LightStateStruct Light(byte index) => new LightStateStruct(data, (byte)index);
         public LightStateStruct Light0 => Light(0);
         public LightStateStruct Light1 => Light(1);
@@ -126,11 +126,11 @@ namespace ScePSP.Core.Gpu.State
 
         /// <summary>When set, this will changes the Draw behaviour.</summary>
         public bool ClearingMode => (data.Param24(GpuOpCodes.CLEAR) & 1) != 0;
-        public PointS Offset => new PointS((short) data.Extract(GpuOpCodes.OFFSETX, 0, 4), (short) data.Extract(GpuOpCodes.OFFSETY, 0, 4));
-        public ClearBufferSet ClearFlags => (ClearBufferSet) data.Param8(GpuOpCodes.CLEAR, 8);
+        public PointS Offset => new PointS((short)data.Extract(GpuOpCodes.OFFSETX, 0, 4), (short)data.Extract(GpuOpCodes.OFFSETY, 0, 4));
+        public ClearBufferSet ClearFlags => (ClearBufferSet)data.Param8(GpuOpCodes.CLEAR, 8);
         public ColorbStruct FixColorSource => new ColorbStruct();
         public ColorbStruct FixColorDestination => new ColorbStruct();
-        public ShadingModelEnum ShadeModel => (ShadingModelEnum) data.Int(GpuOpCodes.SHADE);
+        public ShadingModelEnum ShadeModel => (ShadingModelEnum)data.Int(GpuOpCodes.SHADE);
 
         public sbyte[] DitherMatrix
         {
@@ -139,10 +139,10 @@ namespace ScePSP.Core.Gpu.State
                 var _DitherMatrix = new sbyte[16];
                 for (byte n = 0; n < 4; n++)
                 {
-                    _DitherMatrix[4 * n + 0] = (sbyte) data.ExtractSigned(GpuOpCodes.DTH0 + n, 4 * 0, 4);
-                    _DitherMatrix[4 * n + 1] = (sbyte) data.ExtractSigned(GpuOpCodes.DTH0 + n, 4 * 1, 4);
-                    _DitherMatrix[4 * n + 2] = (sbyte) data.ExtractSigned(GpuOpCodes.DTH0 + n, 4 * 2, 4);
-                    _DitherMatrix[4 * n + 3] = (sbyte) data.ExtractSigned(GpuOpCodes.DTH0 + n, 4 * 3, 4);
+                    _DitherMatrix[4 * n + 0] = (sbyte)data.ExtractSigned(GpuOpCodes.DTH0 + n, 4 * 0, 4);
+                    _DitherMatrix[4 * n + 1] = (sbyte)data.ExtractSigned(GpuOpCodes.DTH0 + n, 4 * 1, 4);
+                    _DitherMatrix[4 * n + 2] = (sbyte)data.ExtractSigned(GpuOpCodes.DTH0 + n, 4 * 2, 4);
+                    _DitherMatrix[4 * n + 3] = (sbyte)data.ExtractSigned(GpuOpCodes.DTH0 + n, 4 * 3, 4);
                 }
 
                 var o = new sbyte[16];
@@ -168,7 +168,7 @@ namespace ScePSP.Core.Gpu.State
         public AlphaTestStateStruct(GpuStateData data) => this.data = data;
 
         public bool Enabled => data.Bool(GpuOpCodes.ATE);
-        public TestFunctionEnum Function => (TestFunctionEnum) data.Param8(GpuOpCodes.ATST, 0);
+        public TestFunctionEnum Function => (TestFunctionEnum)data.Param8(GpuOpCodes.ATST, 0);
         public byte Value => (byte)data.Param8(GpuOpCodes.ATST, 8);
         public byte Mask => (byte)data.Param8(GpuOpCodes.ATST, 16);
     }
@@ -180,7 +180,7 @@ namespace ScePSP.Core.Gpu.State
         public BackfaceCullingStateStruct(GpuStateData data) => this.data = data;
 
         public bool Enabled => data.Bool(GpuOpCodes.BCE);
-        public FrontFaceDirectionEnum FrontFaceDirection => (FrontFaceDirectionEnum) data.Int(GpuOpCodes.FFACE);
+        public FrontFaceDirectionEnum FrontFaceDirection => (FrontFaceDirectionEnum)data.Int(GpuOpCodes.FFACE);
     }
 
     public ref struct BlendingStateStruct
@@ -190,14 +190,14 @@ namespace ScePSP.Core.Gpu.State
         public BlendingStateStruct(GpuStateData data) => this.data = data;
 
         public bool Enabled => data.Bool(GpuOpCodes.ABE);
-        
-        public GuBlendingFactorSource FunctionSource => (GuBlendingFactorSource) ((data.Param24(GpuOpCodes.ALPHA) >> 0) & 0xF);
+
+        public GuBlendingFactorSource FunctionSource => (GuBlendingFactorSource)((data.Param24(GpuOpCodes.ALPHA) >> 0) & 0xF);
 
         public GuBlendingFactorDestination FunctionDestination =>
-            (GuBlendingFactorDestination) ((data.Param24(GpuOpCodes.ALPHA) >> 4) & 0xF);
+            (GuBlendingFactorDestination)((data.Param24(GpuOpCodes.ALPHA) >> 4) & 0xF);
 
-        public BlendingOpEnum Equation => (BlendingOpEnum) ((data.Param24(GpuOpCodes.ALPHA) >> 8) & 0xF);
-        
+        public BlendingOpEnum Equation => (BlendingOpEnum)((data.Param24(GpuOpCodes.ALPHA) >> 8) & 0xF);
+
         public ColorfStruct FixColorSource => new ColorfStruct().SetRGB_A1(data.Param24(GpuOpCodes.SFIX));
         public ColorfStruct FixColorDestination => new ColorfStruct().SetRGB_A1(data.Param24(GpuOpCodes.DFIX));
         public OutputPixel ColorMask => OutputPixel.FromRgba(
@@ -217,10 +217,10 @@ namespace ScePSP.Core.Gpu.State
 
         public bool Enabled => data.Bool(GpuOpCodes.CPE);
         public GpuRectStruct Scissor => new GpuRectStruct(
-            (short) data.Extract(GpuOpCodes.SCISSOR1, 0, 10),
-            (short) data.Extract(GpuOpCodes.SCISSOR1, 10, 10),
-            (short) data.Extract(GpuOpCodes.SCISSOR2, 0, 10),
-            (short) data.Extract(GpuOpCodes.SCISSOR2, 10, 10)
+            (short)data.Extract(GpuOpCodes.SCISSOR1, 0, 10),
+            (short)data.Extract(GpuOpCodes.SCISSOR1, 10, 10),
+            (short)data.Extract(GpuOpCodes.SCISSOR2, 0, 10),
+            (short)data.Extract(GpuOpCodes.SCISSOR2, 10, 10)
             );
     }
 
@@ -233,11 +233,11 @@ namespace ScePSP.Core.Gpu.State
         public uint Address => data.Int(GpuOpCodes.CBP) | (data.Int(GpuOpCodes.CBPH) << 24);
         public int NumberOfColors
         {
-            get { return (int) (data.Param8(GpuOpCodes.CLOAD, 0) * 8); }
-            set { data[GpuOpCodes.CLOAD] = (uint) (value / 8); }
+            get { return (int)(data.Param8(GpuOpCodes.CLOAD, 0) * 8); }
+            set { data[GpuOpCodes.CLOAD] = (uint)(value / 8); }
         }
 
-        public GuPixelFormats PixelFormat => (GuPixelFormats) data.Extract(GpuOpCodes.CMODE, 0, 2);
+        public GuPixelFormats PixelFormat => (GuPixelFormats)data.Extract(GpuOpCodes.CMODE, 0, 2);
         public int Shift => (int)data.Extract(GpuOpCodes.CMODE, 2, 5);
         public int Mask => (int)data.Extract(GpuOpCodes.CMODE, 8, 8);
         public int Start => (int)data.Extract(GpuOpCodes.CMODE, 16, 5);
@@ -252,18 +252,18 @@ namespace ScePSP.Core.Gpu.State
 
         public bool Enabled => data.Bool(GpuOpCodes.CTE);
         public OutputPixel Ref => OutputPixel.FromRgba(
-            (byte) data.Extract(GpuOpCodes.CREF, 8 * 0, 8),
-            (byte) data.Extract(GpuOpCodes.CREF, 8 * 1, 8),
-            (byte) data.Extract(GpuOpCodes.CREF, 8 * 2, 8),
+            (byte)data.Extract(GpuOpCodes.CREF, 8 * 0, 8),
+            (byte)data.Extract(GpuOpCodes.CREF, 8 * 1, 8),
+            (byte)data.Extract(GpuOpCodes.CREF, 8 * 2, 8),
             0x00
         );
         public OutputPixel Mask => OutputPixel.FromRgba(
-            (byte) data.Extract(GpuOpCodes.CMSK, 8 * 0, 8),
-            (byte) data.Extract(GpuOpCodes.CMSK, 8 * 1, 8),
-            (byte) data.Extract(GpuOpCodes.CMSK, 8 * 2, 8),
+            (byte)data.Extract(GpuOpCodes.CMSK, 8 * 0, 8),
+            (byte)data.Extract(GpuOpCodes.CMSK, 8 * 1, 8),
+            (byte)data.Extract(GpuOpCodes.CMSK, 8 * 2, 8),
             0x00
         );
-        public ColorTestFunctionEnum Function => (ColorTestFunctionEnum) data.Extract(GpuOpCodes.CTST, 0, 2);
+        public ColorTestFunctionEnum Function => (ColorTestFunctionEnum)data.Extract(GpuOpCodes.CTST, 0, 2);
     }
 
     public ref struct DepthTestStateStruct
@@ -273,9 +273,9 @@ namespace ScePSP.Core.Gpu.State
         public DepthTestStateStruct(GpuStateData data) => this.data = data;
 
         public bool Enabled => data.Bool(GpuOpCodes.ZTE);
-        public TestFunctionEnum Function => (TestFunctionEnum) data.Param8(GpuOpCodes.ZTST, 0);
-        public float RangeNear => (float) data.Param16(GpuOpCodes.FARZ, 0) / ushort.MaxValue; // @TODO: CHECK INVERTED!
-        public float RangeFar => (float) data.Param16(GpuOpCodes.NEARZ, 0) / ushort.MaxValue; // @TODO: CHECK INVERTED!
+        public TestFunctionEnum Function => (TestFunctionEnum)data.Param8(GpuOpCodes.ZTST, 0);
+        public float RangeNear => (float)data.Param16(GpuOpCodes.FARZ, 0) / ushort.MaxValue; // @TODO: CHECK INVERTED!
+        public float RangeFar => (float)data.Param16(GpuOpCodes.NEARZ, 0) / ushort.MaxValue; // @TODO: CHECK INVERTED!
         public ushort Mask => (ushort)data.Param16(GpuOpCodes.ZMSK, 0);
     }
 
@@ -318,8 +318,8 @@ namespace ScePSP.Core.Gpu.State
         public ColorfStruct EmissiveModelColor => new ColorfStruct().SetRGB_A1(data.Param24(GpuOpCodes.EMC));
         public ColorfStruct AmbientLightColor => new ColorfStruct().SetRGB_A1(data.Param24(GpuOpCodes.ALC)).SetA(data.Param24(GpuOpCodes.ALA));
         public float SpecularPower => data.Float1(GpuOpCodes.SPOW);
-        public LightComponentsSet MaterialColorComponents => (LightComponentsSet) data.Param8(GpuOpCodes.CMAT, 0);
-        public LightModelEnum LightModel => (LightModelEnum) data.Param8(GpuOpCodes.LMODE, 0);
+        public LightComponentsSet MaterialColorComponents => (LightComponentsSet)data.Param8(GpuOpCodes.CMAT, 0);
+        public LightModelEnum LightModel => (LightModelEnum)data.Param8(GpuOpCodes.LMODE, 0);
     }
 
     public ref struct AttenuationStruct
@@ -351,22 +351,22 @@ namespace ScePSP.Core.Gpu.State
         }
 
         public bool Enabled => data.Bool(GpuOpCodes.LTE0 + index);
-        public LightTypeEnum Type => (LightTypeEnum) data.Param8(GpuOpCodes.LT0 + index, 8);
-        public LightModelEnum Kind => (LightModelEnum) data.Param8(GpuOpCodes.LT0 + index, 0);
+        public LightTypeEnum Type => (LightTypeEnum)data.Param8(GpuOpCodes.LT0 + index, 8);
+        public LightModelEnum Kind => (LightModelEnum)data.Param8(GpuOpCodes.LT0 + index, 0);
         public Vector4 Position => new Vector4(
             data.Float1(GpuOpCodes.LXP0 + index),
             data.Float1(GpuOpCodes.LYP0 + index),
             data.Float1(GpuOpCodes.LZP0 + index),
             Type == LightTypeEnum.Directional ? 0 : 1
         );
-        public Vector4 SpotDirection=> new Vector4(
+        public Vector4 SpotDirection => new Vector4(
             data.Float1(GpuOpCodes.LXD0 + index),
             data.Float1(GpuOpCodes.LYD0 + index),
             data.Float1(GpuOpCodes.LZD0 + index),
             1
         );
 
-        public AttenuationStruct Attenuation => new AttenuationStruct(data, index); 
+        public AttenuationStruct Attenuation => new AttenuationStruct(data, index);
         public float SpotExponent => data.Float1(GpuOpCodes.SPOTEXP0 + index);
         public float SpotCutoff => Type == LightTypeEnum.PointLight ? 180 : data.Float1(GpuOpCodes.SPOTCUT0 + index);
         public ColorfStruct AmbientColor => new ColorfStruct().SetRGB_A1(data.Int(GpuOpCodes.ALC0 + index));
@@ -390,7 +390,7 @@ namespace ScePSP.Core.Gpu.State
         public LogicalOperationStateStruct(GpuStateData data) : this() => this.data = data;
 
         public bool Enabled => data.Bool(GpuOpCodes.LOE);
-        public LogicalOperationEnum Operation => (LogicalOperationEnum) data.Param8(GpuOpCodes.LOP, 0);
+        public LogicalOperationEnum Operation => (LogicalOperationEnum)data.Param8(GpuOpCodes.LOP, 0);
     }
 
     public ref struct MorphingStateStruct
@@ -399,7 +399,7 @@ namespace ScePSP.Core.Gpu.State
 
         public MorphingStateStruct(GpuStateData data) => this.data = data;
 
-        public float MorphWeight(int index) => data.Float1(GpuOpCodes.MW0 + (byte) index);
+        public float MorphWeight(int index) => data.Float1(GpuOpCodes.MW0 + (byte)index);
     }
 
     public ref struct PatchCullingStateStruct
@@ -423,9 +423,9 @@ namespace ScePSP.Core.Gpu.State
             this.depth = depth;
         }
 
-        
+
         public uint Width => data.Param16(depth ? GpuOpCodes.ZBW : GpuOpCodes.FBW, 0);
-        public GuPixelFormats Format => (GuPixelFormats) data.Param8(GpuOpCodes.PSM, 0);
+        public GuPixelFormats Format => (GuPixelFormats)data.Param8(GpuOpCodes.PSM, 0);
 
         public byte HighAddress => (byte)data.Param8(depth ? GpuOpCodes.ZBW : GpuOpCodes.FBW, 16);
         public uint LowAddress => data.Param24(depth ? GpuOpCodes.ZBP : GpuOpCodes.FBP);
@@ -433,7 +433,7 @@ namespace ScePSP.Core.Gpu.State
         public uint LoadAddress => 0;
         public uint StoreAddress => 0;
 
-        public uint Address => 0x04000000 | ((uint) HighAddress << 24) | LowAddress;
+        public uint Address => 0x04000000 | ((uint)HighAddress << 24) | LowAddress;
 
         public int BytesPerPixel => Format.BytesPerPixel();
     }
@@ -443,7 +443,7 @@ namespace ScePSP.Core.Gpu.State
         private readonly GpuStateData data;
 
         public SkinningStateStruct(GpuStateData data) => this.data = data;
-        
+
         public Matrix4x4 BoneMatrix(int index) => data.GetMatrix4X3(GpuOpCodes.BONE_MATRIX_BASE, index);
         public Matrix4x4 BoneMatrix0 => BoneMatrix(0);
         public Matrix4x4 BoneMatrix1 => BoneMatrix(1);
@@ -462,12 +462,12 @@ namespace ScePSP.Core.Gpu.State
         public StencilStateStruct(GpuStateData data) => this.data = data;
 
         public bool Enabled => data.Bool(GpuOpCodes.STE);
-        public TestFunctionEnum Function => (TestFunctionEnum) data.Param8(GpuOpCodes.STST, 0);
+        public TestFunctionEnum Function => (TestFunctionEnum)data.Param8(GpuOpCodes.STST, 0);
         public byte FunctionRef => (byte)data.Param8(GpuOpCodes.STST, 8);
         public byte FunctionMask => (byte)data.Param8(GpuOpCodes.STST, 16);
-        public StencilOperationEnum OperationFail =>(StencilOperationEnum) data.Param8(GpuOpCodes.SOP, 0);
-        public StencilOperationEnum OperationZFail => (StencilOperationEnum) data.Param8(GpuOpCodes.SOP, 8);
-        public StencilOperationEnum OperationZPass =>(StencilOperationEnum) data.Param8(GpuOpCodes.SOP, 16);
+        public StencilOperationEnum OperationFail => (StencilOperationEnum)data.Param8(GpuOpCodes.SOP, 0);
+        public StencilOperationEnum OperationZFail => (StencilOperationEnum)data.Param8(GpuOpCodes.SOP, 8);
+        public StencilOperationEnum OperationZPass => (StencilOperationEnum)data.Param8(GpuOpCodes.SOP, 16);
     }
 
     public ref struct TextureMappingStateStruct
@@ -481,14 +481,14 @@ namespace ScePSP.Core.Gpu.State
         public ClutStateStruct ClutState => new ClutStateStruct(data);
 
         public bool Enabled => data.Bool(GpuOpCodes.TME);
-        public Matrix4x4 Matrix => new Matrix4x4(); 
+        public Matrix4x4 Matrix => new Matrix4x4();
         public ColorbStruct TextureEnviromentColor => new ColorbStruct().SetRGB_A1(data.Param24(GpuOpCodes.TEC));
-        public TextureMapMode TextureMapMode => (TextureMapMode) data.Param8(GpuOpCodes.TMAP, 0);
-        public TextureProjectionMapMode TextureProjectionMapMode => (TextureProjectionMapMode) data.Param8(GpuOpCodes.TMAP, 8);
+        public TextureMapMode TextureMapMode => (TextureMapMode)data.Param8(GpuOpCodes.TMAP, 0);
+        public TextureProjectionMapMode TextureProjectionMapMode => (TextureProjectionMapMode)data.Param8(GpuOpCodes.TMAP, 8);
 
-        public short ShadeU => (short) data.Extract(GpuOpCodes.TEXTURE_ENV_MAP_MATRIX, 0, 2);
-        public short ShadeV => (short) data.Extract(GpuOpCodes.TEXTURE_ENV_MAP_MATRIX, 8, 2); 
-        public TextureLevelMode LevelMode => (TextureLevelMode) data.Param8(GpuOpCodes.TBIAS, 0);
+        public short ShadeU => (short)data.Extract(GpuOpCodes.TEXTURE_ENV_MAP_MATRIX, 0, 2);
+        public short ShadeV => (short)data.Extract(GpuOpCodes.TEXTURE_ENV_MAP_MATRIX, 8, 2);
+        public TextureLevelMode LevelMode => (TextureLevelMode)data.Param8(GpuOpCodes.TBIAS, 0);
         public float MipmapBias => data.Param8(GpuOpCodes.TBIAS, 16) / 16.0f;
         public float SlopeLevel => data.Float1(GpuOpCodes.TSLOPE);
 
@@ -518,7 +518,7 @@ namespace ScePSP.Core.Gpu.State
         /// </summary>
         public MipmapState Mipmap(byte index) => new MipmapState(data, (byte)index);
 
-        public MipmapState Mipmap0 => Mipmap(0); 
+        public MipmapState Mipmap0 => Mipmap(0);
 
 
         public class MipmapState
@@ -550,14 +550,14 @@ namespace ScePSP.Core.Gpu.State
             /// Texture Width
             /// </summary>
             public ushort TextureWidth =>
-                (ushort) (1 << Math.Min((int) data.Extract(GpuOpCodes.TSIZE0 + index, 0, 4), 9));
+                (ushort)(1 << Math.Min((int)data.Extract(GpuOpCodes.TSIZE0 + index, 0, 4), 9));
 
 
             /// <summary>
             /// Texture Height
             /// </summary>
             public ushort TextureHeight =>
-                (ushort) (1 << Math.Min((int) data.Extract(GpuOpCodes.TSIZE0 + index, 8, 4), 9));
+                (ushort)(1 << Math.Min((int)data.Extract(GpuOpCodes.TSIZE0 + index, 8, 4), 9));
         }
 
         /// <summary>
@@ -574,11 +574,11 @@ namespace ScePSP.Core.Gpu.State
         /// Levels of mipmaps
         /// </summary>
         public int MipmapMaxLevel => (int)data.Param8(GpuOpCodes.TMODE, 16);
-        public GuPixelFormats PixelFormat => (GuPixelFormats) data.Extract(GpuOpCodes.TPSM, 0, 4);
-        public TextureFilter FilterMinification => (TextureFilter) data.Param8(GpuOpCodes.TFLT, 0);
-        public TextureFilter FilterMagnification => (TextureFilter) data.Param8(GpuOpCodes.TFLT, 8);
-        public WrapMode WrapU => (WrapMode) data.Param8(GpuOpCodes.TWRAP, 0);
-        public WrapMode WrapV => (WrapMode) data.Param8(GpuOpCodes.TWRAP, 8);
+        public GuPixelFormats PixelFormat => (GuPixelFormats)data.Extract(GpuOpCodes.TPSM, 0, 4);
+        public TextureFilter FilterMinification => (TextureFilter)data.Param8(GpuOpCodes.TFLT, 0);
+        public TextureFilter FilterMagnification => (TextureFilter)data.Param8(GpuOpCodes.TFLT, 8);
+        public WrapMode WrapU => (WrapMode)data.Param8(GpuOpCodes.TWRAP, 0);
+        public WrapMode WrapV => (WrapMode)data.Param8(GpuOpCodes.TWRAP, 8);
 
         public float ScaleU => data.Float1(GpuOpCodes.USCALE);
         public float ScaleV => data.Float1(GpuOpCodes.VSCALE);
@@ -586,8 +586,8 @@ namespace ScePSP.Core.Gpu.State
         public float OffsetV => data.Float1(GpuOpCodes.VOFFSET);
 
         public bool Fragment2X => data.Param8(GpuOpCodes.TFUNC, 16) != 0;
-        public TextureEffect Effect => (TextureEffect) data.Param8(GpuOpCodes.TFUNC, 0);
-        public TextureColorComponent ColorComponent => (TextureColorComponent) data.Param8(GpuOpCodes.TFUNC, 8);
+        public TextureEffect Effect => (TextureEffect)data.Param8(GpuOpCodes.TFUNC, 0);
+        public TextureColorComponent ColorComponent => (TextureColorComponent)data.Param8(GpuOpCodes.TFUNC, 8);
     }
 
     public ref struct TextureTransferStateStruct
@@ -609,14 +609,14 @@ namespace ScePSP.Core.Gpu.State
 
         public PspPointer SourceAddress => data.Extract(GpuOpCodes.TRXSBP, 0, 24) | (data.Extract(GpuOpCodes.TRXSBW, 16, 8) << 24);
         public PspPointer DestinationAddress => data.Extract(GpuOpCodes.TRXDBP, 0, 24) | (data.Extract(GpuOpCodes.TRXDBW, 16, 8) << 24);
-        public ushort SourceLineWidth => (ushort) data.Extract(GpuOpCodes.TRXSBW, 0, 16);
-        public ushort DestinationLineWidth => (ushort) data.Extract(GpuOpCodes.TRXDBW, 0, 16);
-        public ushort SourceX => (ushort) data.Extract(GpuOpCodes.TRXSPOS, 10 * 0, 10);
-        public ushort SourceY => (ushort) data.Extract(GpuOpCodes.TRXSPOS, 10 * 1, 10);
-        public ushort DestinationX => (ushort) data.Extract(GpuOpCodes.TRXDPOS, 10 * 0, 10);
-        public ushort DestinationY => (ushort) data.Extract(GpuOpCodes.TRXDPOS, 10 * 1, 10);
-        public ushort Width => (ushort) (data.Extract(GpuOpCodes.TRXSIZE, 10 * 0, 10) + 1);
-        public ushort Height => (ushort) (data.Extract(GpuOpCodes.TRXSIZE, 10 * 1, 10) + 1);
+        public ushort SourceLineWidth => (ushort)data.Extract(GpuOpCodes.TRXSBW, 0, 16);
+        public ushort DestinationLineWidth => (ushort)data.Extract(GpuOpCodes.TRXDBW, 0, 16);
+        public ushort SourceX => (ushort)data.Extract(GpuOpCodes.TRXSPOS, 10 * 0, 10);
+        public ushort SourceY => (ushort)data.Extract(GpuOpCodes.TRXSPOS, 10 * 1, 10);
+        public ushort DestinationX => (ushort)data.Extract(GpuOpCodes.TRXDPOS, 10 * 0, 10);
+        public ushort DestinationY => (ushort)data.Extract(GpuOpCodes.TRXDPOS, 10 * 1, 10);
+        public ushort Width => (ushort)(data.Extract(GpuOpCodes.TRXSIZE, 10 * 0, 10) + 1);
+        public ushort Height => (ushort)(data.Extract(GpuOpCodes.TRXSIZE, 10 * 1, 10) + 1);
         public TexelSizeEnum TexelSize
         {
             get => (TexelSizeEnum)data[GpuOpCodes.EX_TEXEL_SIZE];
@@ -661,8 +661,8 @@ namespace ScePSP.Core.Gpu.State
             return !(a == b);
         }
 
-        public static readonly int[] TypeSizeTable = {0, sizeof(byte), sizeof(short), sizeof(float)};
-        public static readonly int[] ColorSizeTable = {0, 1, 1, 1, 2, 2, 2, 4};
+        public static readonly int[] TypeSizeTable = { 0, sizeof(byte), sizeof(short), sizeof(float) };
+        public static readonly int[] ColorSizeTable = { 0, 1, 1, 1, 2, 2, 2, 4 };
 
         public enum IndexEnum : byte
         {
@@ -696,60 +696,60 @@ namespace ScePSP.Core.Gpu.State
 
         public NumericEnum Weight
         {
-            get => (NumericEnum) Value.Extract(9, 2);
-            set => Value = Value.Insert(9, 2, (uint) value);
+            get => (NumericEnum)Value.Extract(9, 2);
+            set => Value = Value.Insert(9, 2, (uint)value);
         }
 
         public bool HasTexture => Texture != NumericEnum.Void;
 
         public NumericEnum Texture
         {
-            get => (NumericEnum) Value.Extract(0, 2);
-            set => Value = Value.Insert(0, 2, (uint) value);
+            get => (NumericEnum)Value.Extract(0, 2);
+            set => Value = Value.Insert(0, 2, (uint)value);
         }
 
         public bool HasColor => Color != ColorEnum.Void;
 
         public ColorEnum Color
         {
-            get => (ColorEnum) Value.Extract(2, 3);
-            set => Value = Value.Insert(2, 3, (uint) value);
+            get => (ColorEnum)Value.Extract(2, 3);
+            set => Value = Value.Insert(2, 3, (uint)value);
         }
 
         public bool HasNormal => Normal != NumericEnum.Void;
 
         public NumericEnum Normal
         {
-            get => (NumericEnum) Value.Extract(5, 2);
-            set => Value = Value.Insert(5, 2, (uint) value);
+            get => (NumericEnum)Value.Extract(5, 2);
+            set => Value = Value.Insert(5, 2, (uint)value);
         }
 
         public bool HasPosition => Position != NumericEnum.Void;
 
         public NumericEnum Position
         {
-            get => (NumericEnum) Value.Extract(7, 2);
-            set => Value = Value.Insert(7, 2, (uint) value);
+            get => (NumericEnum)Value.Extract(7, 2);
+            set => Value = Value.Insert(7, 2, (uint)value);
         }
 
         public bool HasIndex => Index != IndexEnum.Void;
 
         public IndexEnum Index
         {
-            get => (IndexEnum) Value.Extract(11, 2);
-            set => Value = Value.Insert(11, 2, (uint) value);
+            get => (IndexEnum)Value.Extract(11, 2);
+            set => Value = Value.Insert(11, 2, (uint)value);
         }
 
         public int SkinningWeightCount
         {
-            get => (int) Value.Extract(14, 3);
-            set => Value = Value.Insert(14, 3, (uint) value);
+            get => (int)Value.Extract(14, 3);
+            set => Value = Value.Insert(14, 3, (uint)value);
         }
 
         public int MorphingVertexCount
         {
-            get => (int) Value.Extract(18, 2);
-            set => Value = Value.Insert(18, 2, (uint) value);
+            get => (int)Value.Extract(18, 2);
+            set => Value = Value.Insert(18, 2, (uint)value);
         }
 
         public bool Transform2D
@@ -762,35 +762,35 @@ namespace ScePSP.Core.Gpu.State
 
         //public bool HasWeghts { get { return Weight != NumericEnum.Void; } }
 
-        public int SkinSize => TypeSizeTable[(int) Weight];
-        public int ColorSize => ColorSizeTable[(int) Color];
-        public int TextureSize => TypeSizeTable[(int) Texture];
-        public int PositionSize => TypeSizeTable[(int) Position];
-        public int NormalSize => TypeSizeTable[(int) Normal];
+        public int SkinSize => TypeSizeTable[(int)Weight];
+        public int ColorSize => ColorSizeTable[(int)Color];
+        public int TextureSize => TypeSizeTable[(int)Texture];
+        public int PositionSize => TypeSizeTable[(int)Position];
+        public int NormalSize => TypeSizeTable[(int)Normal];
 
         //public uint StructAlignment { get { return Math.Max(Math.Max(Math.Max(Math.Max(SkinSize, ColorSize), TextureSize), PositionSize), NormalSize); } }
 
-        public uint StructAlignment => (uint) MathUtils.Max(SkinSize, ColorSize, TextureSize, PositionSize, NormalSize);
+        public uint StructAlignment => (uint)MathUtils.Max(SkinSize, ColorSize, TextureSize, PositionSize, NormalSize);
 
         public int GetMaxAlignment() => MathUtils.Max(SkinSize, ColorSize, TextureSize, PositionSize, NormalSize);
 
         public int GetVertexSize()
         {
             var size = 0;
-            size = (int) MathUtils.NextAligned(size, SkinSize);
+            size = (int)MathUtils.NextAligned(size, SkinSize);
             size += RealSkinningWeightCount * SkinSize;
-            size = (int) MathUtils.NextAligned(size, TextureSize);
+            size = (int)MathUtils.NextAligned(size, TextureSize);
             size += NormalCount * TextureSize;
-            size = (int) MathUtils.NextAligned(size, ColorSize);
+            size = (int)MathUtils.NextAligned(size, ColorSize);
             size += 1 * ColorSize;
-            size = (int) MathUtils.NextAligned(size, NormalSize);
+            size = (int)MathUtils.NextAligned(size, NormalSize);
             size += 3 * NormalSize;
-            size = (int) MathUtils.NextAligned(size, PositionSize);
+            size = (int)MathUtils.NextAligned(size, PositionSize);
             size += 3 * PositionSize;
 
             var alignmentSize = GetMaxAlignment();
             //Size = (uint)((Size + AlignmentSize - 1) & ~(AlignmentSize - 1));
-            size = (int) MathUtils.NextAligned(size, (uint) alignmentSize);
+            size = (int)MathUtils.NextAligned(size, (uint)alignmentSize);
             //Console.WriteLine("GetVertexSize:" + size);
             return size;
         }
@@ -805,7 +805,7 @@ namespace ScePSP.Core.Gpu.State
         private GpuStateData data;
 
         public VertexStateStruct(GpuStateData data) => this.data = data;
-        
+
         public Matrix4x4 ProjectionMatrix => data.GetMatrix4X4(GpuOpCodes.PROJ_MATRIX_BASE);
         public Matrix4x4 WorldMatrix => data.GetMatrix4X3(GpuOpCodes.WORLD_MATRIX_BASE);
         public Matrix4x4 ViewMatrix => data.GetMatrix4X3(GpuOpCodes.VIEW_MATRIX_BASE);
@@ -835,12 +835,12 @@ namespace ScePSP.Core.Gpu.State
 
         public Vector4 Position => new Vector4(data.Float1(GpuOpCodes.XPOS), data.Float1(GpuOpCodes.YPOS), BitUtils.ExtractUnsignedScaled(data.Int(GpuOpCodes.ZPOS), 0, 16, 1.0f), 1f);
         public Vector4 Scale => new Vector4(data.Float1(GpuOpCodes.XSCALE) * 2, data.Float1(GpuOpCodes.YSCALE) * -2, data.Float1(GpuOpCodes.ZSCALE), 1f);
-        public PointS RegionTopLeft => new PointS((short) data.Extract(GpuOpCodes.REGION1, 0, 10), (short) data.Extract(GpuOpCodes.REGION1, 10, 10));
-        public PointS RegionBottomRight => new PointS((short) (data.Extract(GpuOpCodes.REGION2, 0, 10) + 1), (short) (data.Extract(GpuOpCodes.REGION2, 10, 10) + 1));
+        public PointS RegionTopLeft => new PointS((short)data.Extract(GpuOpCodes.REGION1, 0, 10), (short)data.Extract(GpuOpCodes.REGION1, 10, 10));
+        public PointS RegionBottomRight => new PointS((short)(data.Extract(GpuOpCodes.REGION2, 0, 10) + 1), (short)(data.Extract(GpuOpCodes.REGION2, 10, 10) + 1));
         public PointS RegionSize => new PointS()
         {
-            X = (short) (RegionBottomRight.X - RegionTopLeft.X + 1),
-            Y = (short) (RegionBottomRight.Y - RegionTopLeft.Y + 1),
+            X = (short)(RegionBottomRight.X - RegionTopLeft.X + 1),
+            Y = (short)(RegionBottomRight.Y - RegionTopLeft.Y + 1),
         };
     }
 
@@ -852,15 +852,15 @@ namespace ScePSP.Core.Gpu.State
         public ColorbStruct SetRGB_A1(uint params24)
         {
             Alpha = 0xFF;
-            
+
             return this;
         }
 
         public ColorbStruct SetRgb(uint params24)
         {
-            Red = (byte) ((params24 >> 0) & 0xFF);
-            Green = (byte) ((params24 >> 8) & 0xFF);
-            Blue = (byte) ((params24 >> 16) & 0xFF);
+            Red = (byte)((params24 >> 0) & 0xFF);
+            Green = (byte)((params24 >> 8) & 0xFF);
+            Blue = (byte)((params24 >> 16) & 0xFF);
             return this;
         }
     }

@@ -1,5 +1,5 @@
-﻿using ScePSP.Core.Cpu.Assembler;
-using SafeILGenerator.Ast.Nodes;
+﻿using SafeILGenerator.Ast.Nodes;
+using ScePSP.Core.Cpu.Assembler;
 using System.Collections.Generic;
 
 namespace ScePSP.Core.Cpu.Dynarec.Ast

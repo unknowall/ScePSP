@@ -1,7 +1,4 @@
-﻿using ScePSP.Hle.Media.audio.At3;
-using System.Runtime.InteropServices;
-
-namespace ScePSP.Hle.Formats.audio.At3
+﻿namespace ScePSP.Hle.Formats.audio.At3
 {
     public sealed unsafe partial class MaiAt3PlusCoreDecoder
     {
@@ -61,8 +58,8 @@ namespace ScePSP.Hle.Formats.audio.At3
             fixed (uint* table_search0 = table_search0_o)
             fixed (uint* table_search1 = table_search1_o)
             {
-                var table_tmp0 = (float*) _table_tmp0;
-                var table_tmp1 = (float*) _table_tmp1;
+                var table_tmp0 = (float*)_table_tmp0;
+                var table_tmp1 = (float*)_table_tmp1;
 
                 int rs = 0;
                 short* l136 = stackalloc short[0x10];
@@ -74,7 +71,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                     {
                         for (uint a0 = 0; a0 < chn_infos[0].JointChnInfo.NumBandSplitedUsed; a0++)
                         {
-                            l0 += (short) chn_infos[a00].Table1[a0];
+                            l0 += (short)chn_infos[a00].Table1[a0];
                         }
                     }
 
@@ -172,7 +169,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                                 for (uint a1 = 0; a1 < 0x80; a1++)
                                 {
                                     uint tmp0 = 0x38000000;
-                                    l127[a1] = MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_table_static_0[arg3_1 & 0x3FF] * (*(float*) &tmp0);
+                                    l127[a1] = MaiAT3PlusCoreDecoder_StaticData.MAPCDSD_table_static_0[arg3_1 & 0x3FF] * (*(float*)&tmp0);
                                     arg3_1++;
                                 }
 
@@ -220,9 +217,9 @@ namespace ScePSP.Hle.Formats.audio.At3
                                         float l129 = table_tmp0[chn_infos[a00].Table0[a1]]
                                                      * table_tmp1[chn_infos[a00].Table1[a1]]
                                                      * l128_
-                                                     / (1 << (int) chn_infos[a00].Table0[a1]);
+                                                     / (1 << (int)chn_infos[a00].Table0[a1]);
 
-                                        for (int a2 = (int) table_search0[a1], a3 = 0;
+                                        for (int a2 = (int)table_search0[a1], a3 = 0;
                                             a2 < table_search0[a1 + 1];
                                             a2++, a3++)
                                         {
@@ -255,7 +252,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                                 a1 < MAPCDDF_initMDataTable_table_tmp7[a0 + 1];
                                 a1++)
                             {
-                                for (int a2 = (int) table_search0[a1]; a2 < table_search0[a1 + 1]; a2++)
+                                for (int a2 = (int)table_search0[a1]; a2 < table_search0[a1 + 1]; a2++)
                                 {
                                     pptablef0[1][a2] *= -1.0f;
                                 }
@@ -307,8 +304,8 @@ namespace ScePSP.Hle.Formats.audio.At3
             fixed (byte* table_tmp0_o = _makeSL128_table_tmp0_o)
             fixed (byte* table_tmp1_o = _makeSL128_table_tmp1_o)
             {
-                float* table_tmp0 = (float*) table_tmp0_o;
-                float* table_tmp1 = (float*) table_tmp1_o;
+                float* table_tmp0 = (float*)table_tmp0_o;
+                float* table_tmp1 = (float*)table_tmp1_o;
 
                 for (int a0 = 0; a0 < num1; a0++) lo[a0] = 0.0f;
 
@@ -449,10 +446,10 @@ namespace ScePSP.Hle.Formats.audio.At3
             return rs;
         }
 
-        static readonly float[] table_5b3ed0 = {1.672582e-05f, 2.934863e-05f, 3.487291e-05f, 7.567905e-06f};
-        static readonly float[] table_5b3ee0 = {-8.893659e-06f, -1.682840e-05f, -1.481585e-05f, 0.0003469118f};
-        static readonly float[] table_5b3d50 = {-1.866759e-05f, -2.579335e-05f, -1.344173e-05f, -1.420818e-06f};
-        static readonly float[] table_5b3d60 = {1.032399e-06f, 1.129874e-06f, 4.051321e-07f, 0.0003365371f};
+        static readonly float[] table_5b3ed0 = { 1.672582e-05f, 2.934863e-05f, 3.487291e-05f, 7.567905e-06f };
+        static readonly float[] table_5b3ee0 = { -8.893659e-06f, -1.682840e-05f, -1.481585e-05f, 0.0003469118f };
+        static readonly float[] table_5b3d50 = { -1.866759e-05f, -2.579335e-05f, -1.344173e-05f, -1.420818e-06f };
+        static readonly float[] table_5b3d60 = { 1.032399e-06f, 1.129874e-06f, 4.051321e-07f, 0.0003365371f };
 
         static readonly ushort[] search_table_tmp0 =
         {
@@ -495,9 +492,9 @@ namespace ScePSP.Hle.Formats.audio.At3
             1.191399f, 1.028206f, 0.8551102f, 0.6737797f, 0.4859604f, 0.2934610f, 0.09813535f
         };
 
-        static readonly float[] table_626af0 = {1.961571f, 1.662939f, 1.111140f, 0.3901806f};
-        static readonly float[] table_626ae0 = {1.268787f, 0.9427935f, 0.5805694f, 0.1960343f};
-        static readonly float[] table_626ad0 = {1.990369f, 1.913881f, 1.763843f, 1.546021f};
+        static readonly float[] table_626af0 = { 1.961571f, 1.662939f, 1.111140f, 0.3901806f };
+        static readonly float[] table_626ae0 = { 1.268787f, 0.9427935f, 0.5805694f, 0.1960343f };
+        static readonly float[] table_626ad0 = { 1.990369f, 1.913881f, 1.763843f, 1.546021f };
 
         static readonly uint[] table_5b4050 =
         {
@@ -506,7 +503,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             0x00000020, 0x00000000, 0x00000010, 0x00000000
         };
 
-        static readonly int[] table_tmp4 = {-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        static readonly int[] table_tmp4 = { -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         //static readonly int[] table_tmp4 = { -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
         const float pi = 3.14159265f;
@@ -658,11 +655,11 @@ namespace ScePSP.Hle.Formats.audio.At3
 
                                     for (uint a2 = 0; a2 < 6; a2++)
                                     {
-                                        for (uint a3 = 0; a3 < 1 << (int) a2; a3++)
+                                        for (uint a3 = 0; a3 < 1 << (int)a2; a3++)
                                         {
-                                            uint base0 = (uint) (0x40 >> (int) a2);
-                                            uint base1 = (uint) ((0x80 >> (int) a2) * a3);
-                                            for (uint a1 = 0; a1 < 0x20 >> (int) a2; a1++)
+                                            uint base0 = (uint)(0x40 >> (int)a2);
+                                            uint base1 = (uint)((0x80 >> (int)a2) * a3);
+                                            for (uint a1 = 0; a1 < 0x20 >> (int)a2; a1++)
                                             {
                                                 float ftmp0 =
                                                     stmp40[base1 + a1 * 2 + 1] + stmp40[base1 + a1 * 2 + 1 + base0];
@@ -740,7 +737,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                                         int ctmp1 = 0 - l63[0x3F];
                                         if (ctmp1 >= 0)
                                         {
-                                            l64 = (float) (1 << ctmp1);
+                                            l64 = (float)(1 << ctmp1);
                                         }
                                         else
                                         {
@@ -773,7 +770,7 @@ namespace ScePSP.Hle.Formats.audio.At3
 
                                                     if (ctmp2 >= 0)
                                                     {
-                                                        l64 = (float) (1 << ctmp2);
+                                                        l64 = (float)(1 << ctmp2);
                                                     }
                                                     else
                                                     {
@@ -799,7 +796,7 @@ namespace ScePSP.Hle.Formats.audio.At3
 
                                                     if (ctmp2 >= 0)
                                                     {
-                                                        l64 = (float) (1 << ctmp2);
+                                                        l64 = (float)(1 << ctmp2);
                                                     }
                                                     else
                                                     {
@@ -821,7 +818,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                                                     ctmp2 = 0 - l63[a1];
                                                     if (ctmp2 >= 0)
                                                     {
-                                                        l64 = (float) (1 << ctmp2);
+                                                        l64 = (float)(1 << ctmp2);
                                                     }
                                                     else
                                                     {
@@ -866,7 +863,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                                 }
                             }
 
-                            for (int a0 = (int) _chnInfo[0].JointChnInfo.NumBandDeclared; a0 < 0x10; a0++)
+                            for (int a0 = (int)_chnInfo[0].JointChnInfo.NumBandDeclared; a0 < 0x10; a0++)
                             {
                                 for (int a1 = 0; a1 < 0x80; a1++)
                                 {
@@ -977,7 +974,7 @@ namespace ScePSP.Hle.Formats.audio.At3
                         {
                             if (_chnInfo[0].JointChnInfo.Var94 != 0)
                             {
-                                float tmpf0 = (float) (1 << _chnInfo[0].JointChnInfo.Var98);
+                                float tmpf0 = (float)(1 << _chnInfo[0].JointChnInfo.Var98);
                                 for (int a0 = 0; a0 < 0x10; a0++)
                                 {
                                     for (int a1 = 0; a1 < 0x80; a1++)
@@ -1015,11 +1012,11 @@ namespace ScePSP.Hle.Formats.audio.At3
                                 //float* stmp30 = stackalloc float[0x100];
 
                                 ulong atmp0 = 0x55555556;
-                                atmp0 *= (ulong) (a0 + _c900);
-                                uint atmp1 = (uint) (atmp0 >> 32);
+                                atmp0 *= (ulong)(a0 + _c900);
+                                uint atmp1 = (uint)(atmp0 >> 32);
                                 atmp1 = (atmp1 >> 0x1F) + atmp1;
                                 atmp1 *= 3;
-                                uint mtmp0 = (uint) (_c900 - atmp1 + a0);
+                                uint mtmp0 = (uint)(_c900 - atmp1 + a0);
 
                                 for (int a1 = 0; a1 < 0x10; a1++)
                                 {
@@ -1278,15 +1275,15 @@ namespace ScePSP.Hle.Formats.audio.At3
 
             bufs.GetRawPointer((bufs_ptr_intptr) =>
             {
-                short* bufs_ptr = (short*) bufs_ptr_intptr.ToPointer();
+                short* bufs_ptr = (short*)bufs_ptr_intptr.ToPointer();
                 fixed (float* dst_buf_chn_ptr = _dstBuf[index_chn])
                 {
                     for (int a0 = 0; a0 < 0x800; a0++)
                     {
-                        int data_now = (int) dst_buf_chn_ptr[a0];
+                        int data_now = (int)dst_buf_chn_ptr[a0];
                         if (data_now > 0x7FFF) bufs_ptr[a0] = 0x7FFF;
                         else if (data_now < -0x8000) bufs_ptr[a0] = -0x8000;
-                        else bufs_ptr[a0] = (short) data_now;
+                        else bufs_ptr[a0] = (short)data_now;
                     }
                 }
             });

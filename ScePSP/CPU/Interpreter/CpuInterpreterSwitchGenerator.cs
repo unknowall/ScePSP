@@ -1,10 +1,10 @@
+using SafeILGenerator.Ast;
+using ScePSP.Core.Cpu.Switch;
+using ScePSP.Core.Cpu.Table;
+using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using ScePSPUtils.Extensions;
-using ScePSP.Core.Cpu.Switch;
-using ScePSP.Core.Cpu.Table;
-using SafeILGenerator.Ast;
 
 namespace ScePSP.CPU.Interpreter
 {
@@ -27,7 +27,7 @@ namespace ScePSP.CPU.Interpreter
                     nameToInfo[instructionNames.Name] = methodInfo;
                 }
             }
-            
+
             return EmitLookupGenerator.GenerateSwitch<Action<uint, CpuInterpreter>>(nameof(CpuInterpreterSwitchGenerator),
                 InstructionTable.All,
                 instructionInfo =>
@@ -37,7 +37,7 @@ namespace ScePSP.CPU.Interpreter
                     {
                         methodInfo = nameToInfo[instructionInfo.Name];
                     }
-                    
+
 
                     Console.WriteLine($"{methodInfo} {instructionInfo}");
 

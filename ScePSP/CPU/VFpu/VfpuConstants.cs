@@ -1,7 +1,7 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.Core.Cpu.VFpu
 {
@@ -19,7 +19,7 @@ namespace ScePSP.Core.Cpu.VFpu
         {
             // @TODO: Create a dictionary.
             var names = GetRegisterNames(type, size);
-            return (uint) Array.IndexOf(names, name);
+            return (uint)Array.IndexOf(names, name);
         }
 
         private static string[] GetRegisterNames(VfpuRegisterType type, int size)

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime;
 
 namespace SafeILGenerator.Utils
 {
@@ -23,11 +22,11 @@ namespace SafeILGenerator.Utils
 
         public object Value
         {
-            
-            
+
+
             set { FieldInfo.SetValue(null, value); }
-            
-            
+
+
             get { return FieldInfo.GetValue(null); }
         }
 
@@ -82,7 +81,7 @@ namespace SafeILGenerator.Utils
             var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(
                 new AssemblyName("DynamicAssembly" + _autoincrement++),
                 AssemblyBuilderAccess.RunAndCollect
-                //, DllName
+            //, DllName
             );
             //ModuleBuilder = assemblyBuilder.DefineDynamicModule(assemblyBuilder.GetName().Name, DllName, false);
             ModuleBuilder = assemblyBuilder.DefineDynamicModule(assemblyBuilder.GetName().Name);

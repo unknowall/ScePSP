@@ -42,7 +42,7 @@ namespace SafeILGenerator.Ast.Generators
             var dynamicMethod = new DynamicMethod(
                 "MappingInfo.FromMethodInfo::" + typeof(T).Name + "::" + methodInfo.Name + "(" +
                 methodInfo.GetParameters().First().ParameterType.Name + ")", typeof(void),
-                new Type[] {typeof(object), typeof(AstNode)}, that.GetType());
+                new Type[] { typeof(object), typeof(AstNode) }, that.GetType());
             var ilGenerator = dynamicMethod.GetILGenerator();
 
             ilGenerator.Emit(OpCodes.Ldarg_0);
@@ -57,7 +57,7 @@ namespace SafeILGenerator.Ast.Generators
 
             return new MappingInfo()
             {
-                Action = (MapDelegate) dynamicMethod.CreateDelegate(typeof(MapDelegate)),
+                Action = (MapDelegate)dynamicMethod.CreateDelegate(typeof(MapDelegate)),
             };
         }
 #endif
@@ -94,7 +94,7 @@ namespace SafeILGenerator.Ast.Generators
 
         public virtual TGenerator Reset()
         {
-            return (TGenerator) (object) this;
+            return (TGenerator)(object)this;
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace SafeILGenerator.Ast.Generators
         {
             Reset();
             Generate(astNode);
-            return (TGenerator) (object) this;
+            return (TGenerator)(object)this;
         }
 
         protected virtual void Generate(AstNode astNode)

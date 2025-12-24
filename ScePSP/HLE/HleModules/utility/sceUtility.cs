@@ -1,11 +1,11 @@
-﻿using System;
+﻿using ScePSP.Core.Cpu;
+using ScePSP.Core.Memory;
+using ScePSP.Core.Types;
+using ScePSP.Hle.Attributes;
+using ScePSPUtils;
+using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using ScePSPUtils;
-using ScePSP.Core.Memory;
-using ScePSP.Hle.Attributes;
-using ScePSP.Core.Types;
-using ScePSP.Core.Cpu;
 
 namespace ScePSP.Hle.Modules.utility
 {

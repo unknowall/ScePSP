@@ -1,9 +1,9 @@
 namespace ScePSPUtils
 {
     using System;
-    using System.Linq;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Text.RegularExpressions;
 
     /// <summary>
@@ -117,17 +117,17 @@ namespace ScePSPUtils
                 /// <summary>
                 /// 
                 /// </summary>
-                Keep = (byte) ' ',
+                Keep = (byte)' ',
 
                 /// <summary>
                 /// 
                 /// </summary>
-                Insert = (byte) '+',
+                Insert = (byte)'+',
 
                 /// <summary>
                 /// 
                 /// </summary>
-                Delete = (byte) '-',
+                Delete = (byte)'-',
             }
 
             /// <summary>
@@ -177,7 +177,7 @@ namespace ScePSPUtils
             /// <returns></returns>
             public override string ToString()
             {
-                return $"{LineNumber + 1,4:0}: {(char) Action}{(char) Action} {Line}";
+                return $"{LineNumber + 1,4:0}: {(char)Action}{(char)Action} {Line}";
             }
         }
 
@@ -423,7 +423,7 @@ namespace ScePSPUtils
                 }
                 else
                 {
-                    codes[i] = (int) aCode;
+                    codes[i] = (int)aCode;
                 } // if
             } // for
             return codes;

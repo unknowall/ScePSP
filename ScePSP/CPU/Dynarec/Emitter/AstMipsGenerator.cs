@@ -1,8 +1,8 @@
-﻿using ScePSP.Core.Cpu.InstructionCache;
-using ScePSP.Core.Memory;
-using SafeILGenerator.Ast;
+﻿using SafeILGenerator.Ast;
 using SafeILGenerator.Ast.Nodes;
 using SafeILGenerator.Utils;
+using ScePSP.Core.Cpu.InstructionCache;
+using ScePSP.Core.Memory;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,7 +35,7 @@ namespace ScePSP.Core.Cpu.Emitter
             {
                 return Ast.CallDelegate(
                     Ast.CallInstance(Ast.CpuThreadStateExpr,
-                        (Func<uint, Action<CpuThreadState>>) CpuThreadStateMethods.GetFuncAtPc, pc),
+                        (Func<uint, Action<CpuThreadState>>)CpuThreadStateMethods.GetFuncAtPc, pc),
                     Ast.CpuThreadStateExpr);
             }
         }
@@ -54,10 +54,10 @@ namespace ScePSP.Core.Cpu.Emitter
                 var localCachedFunction = Ast.Local(AstLocal.Create<Action<CpuThreadState>>("CachedFunction"));
                 var localCalculatePc = Ast.Local(AstLocal.Create<uint>("CalculatePC"));
 
-                var call = (AstNodeExpr) Ast.CallDelegate(localCachedFunction, Ast.CpuThreadStateExpr);
-                var callStm = (AstNodeStm) Ast.Statement(call);
+                var call = (AstNodeExpr)Ast.CallDelegate(localCachedFunction, Ast.CpuThreadStateExpr);
+                var callStm = (AstNodeStm)Ast.Statement(call);
                 if (tailCall)
-                    callStm = Ast.Statements(Ast.Statement(Ast.TailCall((AstNodeExprCall) call)), Ast.Return());
+                    callStm = Ast.Statements(Ast.Statement(Ast.TailCall((AstNodeExprCall)call)), Ast.Return());
 
                 return Ast.Statements(
                     Ast.Assign(localCalculatePc, pc),
@@ -67,7 +67,7 @@ namespace ScePSP.Core.Cpu.Emitter
                             Ast.Assign(localCachedPc, localCalculatePc),
                             Ast.Assign(localCachedFunction,
                                 Ast.CallInstance(Ast.CpuThreadStateExpr,
-                                    (Func<uint, Action<CpuThreadState>>) CpuThreadStateMethods.GetFuncAtPc, pc))
+                                    (Func<uint, Action<CpuThreadState>>)CpuThreadStateMethods.GetFuncAtPc, pc))
                         )
                     ),
                     callStm
@@ -81,7 +81,7 @@ namespace ScePSP.Core.Cpu.Emitter
         public AstNodeExpr GetMethodCacheInfoAtPc(AstNodeExpr pc)
         {
             return Ast.CallInstance(Ast.FieldAccess(Ast.CpuThreadStateExpr, CpuThreadStateMethodCacheFieldInfo),
-                (Func<uint, MethodCacheInfo>) MethodCache.Methods.GetForPc, pc);
+                (Func<uint, MethodCacheInfo>)MethodCache.Methods.GetForPc, pc);
         }
 
         public AstNodeExprArgument CpuThreadStateExpr => Ast.Argument<CpuThreadState>(0, "CpuThreadState");
@@ -204,15 +204,15 @@ namespace ScePSP.Core.Cpu.Emitter
 
         public AstNodeExpr GPR_f(int index)
         {
-            if (index == 0) return Ast.Immediate((float) 0);
+            if (index == 0) return Ast.Immediate((float)0);
             return Ast.Reinterpret<float>(Gpr(index));
         }
 
         public AstNodeExpr GPR_s(int index) =>
-            index == 0 ? (AstNodeExpr) Ast.Immediate(0) : Ast.Cast<int>(Gpr(index), false);
+            index == 0 ? (AstNodeExpr)Ast.Immediate(0) : Ast.Cast<int>(Gpr(index), false);
 
         public AstNodeExpr GPR_sl(int index) => Ast.Cast<long>(GPR_s(index));
-        public AstNodeExpr GPR_u(int index) => index == 0 ? (AstNodeExpr) Ast.Immediate((uint) 0) : Gpr(index);
+        public AstNodeExpr GPR_u(int index) => index == 0 ? (AstNodeExpr)Ast.Immediate((uint)0) : Gpr(index);
         public AstNodeExpr GPR_ul(int index) => Ast.Cast<ulong>(GPR_u(index));
         public AstNodeExpr Gpr<TType>(int index) => Gpr(typeof(TType), index);
 
@@ -241,7 +241,7 @@ namespace ScePSP.Core.Cpu.Emitter
             {
                 return Ast.CallInstance(
                     Ast.CpuThreadStateExpr,
-                    (AddressToPointerWithErrorFunc) CpuThreadState.Methods.GetMemoryPtrSafeWithError,
+                    (AddressToPointerWithErrorFunc)CpuThreadState.Methods.GetMemoryPtrSafeWithError,
                     Ast.Cast<uint>(address),
                     errorDescription,
                     true,
@@ -267,7 +267,7 @@ namespace ScePSP.Core.Cpu.Emitter
                 {
                     return Ast.CallInstance(
                         Ast.CpuThreadStateExpr,
-                        (AddressToPointerFunc) CpuThreadState.Methods.GetMemoryPtr,
+                        (AddressToPointerFunc)CpuThreadState.Methods.GetMemoryPtr,
                         address
                     );
                 }
@@ -304,7 +304,7 @@ namespace ScePSP.Core.Cpu.Emitter
             if (mandatory || DynarecConfig.EmitCallTick)
             {
                 return Ast.Statement(Ast.CallInstance(Ast.CpuThreadStateExpr,
-                    (Action) CpuThreadState.Methods.Tick));
+                    (Action)CpuThreadState.Methods.Tick));
             }
             else
             {
@@ -324,7 +324,7 @@ namespace ScePSP.Core.Cpu.Emitter
         {
             var description = $"('{sourceMemberName}') : {Path.GetFileName(sourceFilePath)}:{sourceLineNo}";
             //throw(new NotImplementedException(String.Format("AstNotImplemented: {0}", Description)));
-            return Ast.Statement(Ast.CallStatic((Action<string>) ErrorWriteLine, $"AstNotImplemented: {description}"));
+            return Ast.Statement(Ast.CallStatic((Action<string>)ErrorWriteLine, $"AstNotImplemented: {description}"));
         }
     }
 }

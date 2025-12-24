@@ -1,5 +1,5 @@
-﻿using System;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
+using System;
 
 namespace ScePSP.Hle.Modules.pspnet
 {
@@ -43,7 +43,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="pInfo">Pointer to a ::SceNetApctlInfo.</param>
         /// <returns>Less than 0 on error.</returns>
         [HlePspFunction(NID = 0x2BEFDF23, FirmwareVersion = 150)]
-        public int sceNetApctlGetInfo(int code, SceNetApctlInfo*pInfo)
+        public int sceNetApctlGetInfo(int code, SceNetApctlInfo* pInfo)
         {
             throw new NotImplementedException();
         }

@@ -1,10 +1,10 @@
-﻿using System;
+﻿using ScePSPUtils.Extensions;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using ScePSPUtils.Extensions;
 
 namespace ScePSPUtils.Misc.Acme1
 {
@@ -40,12 +40,12 @@ namespace ScePSPUtils.Misc.Acme1
         {
             _entries.Clear();
             var allContent = stream.ReadAllContentsAsString(encoding).TrimStart();
-            var parts = allContent.Split(new[] {"## POINTER "}, StringSplitOptions.RemoveEmptyEntries);
+            var parts = allContent.Split(new[] { "## POINTER " }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var part in parts)
             {
                 //Console.WriteLine(Part.EscapeString());
 
-                var subparts = part.Split(new[] {"\r\n", "\r", "\n"}, 2, StringSplitOptions.None);
+                var subparts = part.Split(new[] { "\r\n", "\r", "\n" }, 2, StringSplitOptions.None);
                 var infoMatch = Regex.Match(subparts[0], @"(\d+).*$", RegexOptions.Compiled | RegexOptions.Multiline);
                 var text = subparts[1].TrimEnd();
                 var id = ConvertEx.FlexibleToInt(infoMatch.Groups[1].Value);

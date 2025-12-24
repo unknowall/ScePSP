@@ -1,6 +1,5 @@
-﻿using System.Threading;
-using ScePSP.Core.Audio;
-using System;
+﻿using ScePSP.Core.Audio;
+using System.Threading;
 
 namespace ScePSP.Runner.Components.Audio
 {

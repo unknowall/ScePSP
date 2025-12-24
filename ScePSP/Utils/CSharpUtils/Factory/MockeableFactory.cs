@@ -29,7 +29,7 @@ namespace ScePSPUtils.Factory
         {
             if (MockedTypes.ContainsKey(typeof(T)))
             {
-                return (T) Activator.CreateInstance(MockedTypes[typeof(T)]);
+                return (T)Activator.CreateInstance(MockedTypes[typeof(T)]);
             }
 
             return base.New<T>();

@@ -96,9 +96,9 @@ namespace ScePSP.Hle.Managers
                 switch (Type)
                 {
                     case RegKeyTypes.Binary: throw new NotImplementedException();
-                    case RegKeyTypes.Directory: return (uint) ((string) Value).Length;
+                    case RegKeyTypes.Directory: return (uint)((string)Value).Length;
                     case RegKeyTypes.Integer: return sizeof(uint);
-                    case RegKeyTypes.String: return (uint) ((string) Value).Length;
+                    case RegKeyTypes.String: return (uint)((string)Value).Length;
                     default: return 0;
                 }
             }
@@ -111,7 +111,7 @@ namespace ScePSP.Hle.Managers
                 case RegKeyTypes.Binary: throw new NotImplementedException();
                 case RegKeyTypes.Directory: throw new NotImplementedException();
                 case RegKeyTypes.Integer:
-                    *(uint*) Buffer = (uint) Value;
+                    *(uint*)Buffer = (uint)Value;
                     break;
                 case RegKeyTypes.String: throw new NotImplementedException();
                 default: throw new NotImplementedException();
@@ -132,15 +132,15 @@ namespace ScePSP.Hle.Managers
             this.HleRegistryNode = HleRegistryNode;
             this.Name = Name;
 
-            AddKey("language", (uint) HleConfig.Language);
-            AddKey("button_assign", (uint) 0);
+            AddKey("language", (uint)HleConfig.Language);
+            AddKey("button_assign", (uint)0);
         }
 
         public void AddKey(string Name, object Value)
         {
             var Key = new HleRegistryKeyNode()
             {
-                Id = (RegKeyHandle) HleRegistryKeyNodeList.Count,
+                Id = (RegKeyHandle)HleRegistryKeyNodeList.Count,
                 Name = Name,
                 Value = Value,
                 Type = RegKeyTypes.Integer,

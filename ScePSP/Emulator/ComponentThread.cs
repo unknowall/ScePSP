@@ -1,10 +1,9 @@
-﻿using System;
+﻿using ScePSP.Utils;
+using ScePSPUtils;
+using ScePSPUtils.Threading;
+using System;
 using System.Globalization;
 using System.Threading;
-using ScePSPUtils.Threading;
-using ScePSP.Core;
-using ScePSPUtils;
-using ScePSP.Utils;
 
 namespace ScePSP.Runner.Components
 {

@@ -1,8 +1,8 @@
-﻿using System;
-using System.Text;
-using ScePSPUtils;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
+using ScePSPUtils;
+using System;
+using System.Text;
 
 namespace ScePSP.Hle.Modules.registry
 {
@@ -24,7 +24,7 @@ namespace ScePSP.Hle.Modules.registry
         public int sceRegOpenRegistry(RegParam* RegParam, OpenRegistryMode Mode, out RegHandle RegHandle)
         {
             var HleRegistryNode = new HleRegistryNode(RegParam[0].Name);
-            RegHandle = (RegHandle) HleRegistryManager.RegHandles.Create(HleRegistryNode);
+            RegHandle = (RegHandle)HleRegistryManager.RegHandles.Create(HleRegistryNode);
             return 0;
         }
 
@@ -36,7 +36,7 @@ namespace ScePSP.Hle.Modules.registry
         [HlePspFunction(NID = 0x39461B4D, FirmwareVersion = 150)]
         public int sceRegFlushRegistry(RegHandle RegHandle)
         {
-            var HleRegistryNode = HleRegistryManager.RegHandles.Get((int) RegHandle);
+            var HleRegistryNode = HleRegistryManager.RegHandles.Get((int)RegHandle);
             HleRegistryNode.Flush();
             return 0;
         }
@@ -49,7 +49,7 @@ namespace ScePSP.Hle.Modules.registry
         [HlePspFunction(NID = 0xFA8A5739, FirmwareVersion = 150)]
         public int sceRegCloseRegistry(RegHandle RegHandle)
         {
-            HleRegistryManager.RegHandles.Remove((int) RegHandle);
+            HleRegistryManager.RegHandles.Remove((int)RegHandle);
             return 0;
         }
 
@@ -71,10 +71,10 @@ namespace ScePSP.Hle.Modules.registry
         public int sceRegOpenCategory(RegHandle RegHandle, string Name, OpenRegistryMode Mode,
             out RegCategoryHandle RegCategoryHandle)
         {
-            var HleRegistryNode = HleRegistryManager.RegHandles.Get((int) RegHandle);
+            var HleRegistryNode = HleRegistryManager.RegHandles.Get((int)RegHandle);
             var HleRegistryCategoryNode = new HleRegistryCategoryNode(HleConfig, HleRegistryNode, Name);
             RegCategoryHandle =
-                (RegCategoryHandle) HleRegistryManager.RegCategoryHandles.Create(HleRegistryCategoryNode);
+                (RegCategoryHandle)HleRegistryManager.RegCategoryHandles.Create(HleRegistryCategoryNode);
 
             return 0;
         }
@@ -88,7 +88,7 @@ namespace ScePSP.Hle.Modules.registry
         [HlePspFunction(NID = 0x0D69BF40, FirmwareVersion = 150)]
         public int sceRegFlushCategory(RegCategoryHandle RegCategoryHandle)
         {
-            var HleRegistryCategoryNode = HleRegistryManager.RegCategoryHandles.Get((int) RegCategoryHandle);
+            var HleRegistryCategoryNode = HleRegistryManager.RegCategoryHandles.Get((int)RegCategoryHandle);
             HleRegistryCategoryNode.Flush();
             return 0;
         }
@@ -101,7 +101,7 @@ namespace ScePSP.Hle.Modules.registry
         [HlePspFunction(NID = 0x0CAE832B, FirmwareVersion = 150)]
         public int sceRegCloseCategory(RegCategoryHandle RegCategoryHandle)
         {
-            HleRegistryManager.RegCategoryHandles.Remove((int) RegCategoryHandle);
+            HleRegistryManager.RegCategoryHandles.Remove((int)RegCategoryHandle);
             return 0;
         }
 
@@ -118,7 +118,7 @@ namespace ScePSP.Hle.Modules.registry
         public int sceRegGetKeyInfo(RegCategoryHandle RegCategoryHandle, string Name, RegKeyHandle* RegKeyHandle,
             RegKeyTypes* Type, uint* Size)
         {
-            var HleRegistryCategoryNode = HleRegistryManager.RegCategoryHandles.Get((int) RegCategoryHandle);
+            var HleRegistryCategoryNode = HleRegistryManager.RegCategoryHandles.Get((int)RegCategoryHandle);
             var KeyNode = HleRegistryCategoryNode.GetKeyByName(Name);
             if (RegKeyHandle != null) *RegKeyHandle = KeyNode.Id;
             if (Type != null) *Type = KeyNode.Type;
@@ -153,7 +153,7 @@ namespace ScePSP.Hle.Modules.registry
         public int sceRegGetKeyValue(RegCategoryHandle RegCategoryHandle, RegKeyHandle RegKeyHandle, void* Buffer,
             uint Size)
         {
-            var HleRegistryCategoryNode = HleRegistryManager.RegCategoryHandles.Get((int) RegCategoryHandle);
+            var HleRegistryCategoryNode = HleRegistryManager.RegCategoryHandles.Get((int)RegCategoryHandle);
             var KeyNode = HleRegistryCategoryNode.GetKeyNodeById(RegKeyHandle);
             KeyNode.Write(Buffer, Size);
             return 0;

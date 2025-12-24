@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
+﻿using ScePSP.Core.Components.Rtc;
 using ScePSP.Core.Cpu;
 using ScePSP.Hle.Attributes;
-using System.Security.Cryptography;
 using ScePSPUtils;
 using ScePSPUtils.Extensions;
-using ScePSP.Core.Components.Rtc;
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 
 namespace ScePSP.Hle.Modules.utils
 {
@@ -57,10 +57,10 @@ namespace ScePSP.Hle.Modules.utils
             if (TimeVal != null)
             {
                 PspRtc.Update();
-                ulong MicroSeconds = (ulong) PspRtc.Elapsed.GetTotalMicroseconds();
+                ulong MicroSeconds = (ulong)PspRtc.Elapsed.GetTotalMicroseconds();
                 const ulong MicroSecondsInASecond = 1000 * 1000;
-                TimeVal->Seconds = (uint) (MicroSeconds / MicroSecondsInASecond);
-                TimeVal->Microseconds = (uint) (MicroSeconds % MicroSecondsInASecond);
+                TimeVal->Seconds = (uint)(MicroSeconds / MicroSecondsInASecond);
+                TimeVal->Microseconds = (uint)(MicroSeconds % MicroSecondsInASecond);
                 //TimeVal->Seconds = 0;
                 //TimeVal->Microseconds = 0;
                 //Console.Error.WriteLine("aaaaaaaaaaaaaaaaaaaaaaaaa {0}:{1}", TimeVal->Seconds, TimeVal->Microseconds);
@@ -152,7 +152,7 @@ namespace ScePSP.Hle.Modules.utils
 
                 for (int n = 1; n < SceKernelUtilsMt19937Context.MT_N; n++)
                 {
-                    State[n] = (uint) (1812433253 * (State[n - 1] ^ (State[n - 1] >> 30)) + n);
+                    State[n] = (uint)(1812433253 * (State[n - 1] ^ (State[n - 1] >> 30)) + n);
                 }
 
                 Context.Count = 0;
@@ -220,7 +220,7 @@ namespace ScePSP.Hle.Modules.utils
 
             PspRtc.Update();
 
-            var CalculatedTime = (time_t) PspRtc.UnixTimeStamp;
+            var CalculatedTime = (time_t)PspRtc.UnixTimeStamp;
 
             if (Time != null)
             {
@@ -238,7 +238,7 @@ namespace ScePSP.Hle.Modules.utils
         public uint sceKernelLibcClock()
         {
             PspRtc.Update();
-            return (uint) PspRtc.ElapsedTime.TotalMicroseconds;
+            return (uint)PspRtc.ElapsedTime.TotalMicroseconds;
         }
 
         /**
@@ -279,7 +279,7 @@ namespace ScePSP.Hle.Modules.utils
         {
             PointerUtils.Memcpy(
                 Digest,
-                SHA1.Create().ComputeHash(PointerUtils.PointerToByteArray(Data, (int) Size)),
+                SHA1.Create().ComputeHash(PointerUtils.PointerToByteArray(Data, (int)Size)),
                 20
             );
             return 0;
@@ -355,7 +355,7 @@ namespace ScePSP.Hle.Modules.utils
         /// <returns>size decompressed on success, less than 0 on error</returns>
         [HlePspFunction(NID = 0x7DD07271, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceKernelLzrcDecode(byte*dest, uint destSize, byte*src, void*unknown)
+        public int sceKernelLzrcDecode(byte* dest, uint destSize, byte* src, void* unknown)
         {
             throw new NotImplementedException();
         }

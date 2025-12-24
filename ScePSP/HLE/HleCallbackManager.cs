@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using ScePSP.Core.Cpu;
+﻿using ScePSP.Core.Cpu;
 using ScePSP.Hle.Interop;
 using ScePSP.Hle.Vfs.MemoryStick;
+using System;
+using System.Collections.Generic;
 
 #pragma warning disable 649
 #pragma warning disable 169

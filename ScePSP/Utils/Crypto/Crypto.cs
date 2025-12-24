@@ -9,11 +9,11 @@ namespace ScePSP.Core.Components.Crypto
         //private static uint GETuint(byte[] pt) => (((uint)(pt)[0] << 24) ^ ((uint)(pt)[1] << 16) ^ ((uint)(pt)[2] <<  8) ^ ((uint)(pt)[3]));
 
         private static uint GeTuint(byte* pt) =>
-            ((uint) pt[0] << 24) ^ ((uint) pt[1] << 16) ^ ((uint) pt[2] << 8) ^ pt[3];
+            ((uint)pt[0] << 24) ^ ((uint)pt[1] << 16) ^ ((uint)pt[2] << 8) ^ pt[3];
 
         //memcpy(block_buff, src, 16);
         public static void Memcpy(byte* dst, byte* src, int count) => PointerUtils.Memcpy(dst, src, count);
-        public static void Memcpy(void* dst, void* src, int count) => Memcpy((byte*) dst, (byte*) src, count);
+        public static void Memcpy(void* dst, void* src, int count) => Memcpy((byte*)dst, (byte*)src, count);
         public static int Memcmp(byte* str1, byte* str2, int count) => PointerUtils.Memcmp(str1, str2, count);
 
         //private static void PUTuint(byte[] ct, uint st) {
@@ -25,10 +25,10 @@ namespace ScePSP.Core.Components.Crypto
 
         private static void PuTuint(byte* ct, uint st)
         {
-            ct[0] = (byte) (st >> 24);
-            ct[1] = (byte) (st >> 16);
-            ct[2] = (byte) (st >> 8);
-            ct[3] = (byte) st;
+            ct[0] = (byte)(st >> 24);
+            ct[1] = (byte)(st >> 16);
+            ct[2] = (byte)(st >> 8);
+            ct[3] = (byte)st;
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace ScePSP.Core.Components.Crypto
             rk[3] = GeTuint(cipherKey + 12);
             if (keyBits == 128)
             {
-                for (;;)
+                for (; ; )
                 {
                     temp = rk[3];
                     rk[4] = rk[0] ^
@@ -72,7 +72,7 @@ namespace ScePSP.Core.Components.Crypto
             rk[5] = GeTuint(cipherKey + 20);
             if (keyBits == 192)
             {
-                for (;;)
+                for (; ; )
                 {
                     temp = rk[5];
                     rk[6] = rk[0] ^
@@ -96,7 +96,7 @@ namespace ScePSP.Core.Components.Crypto
             rk[6] = GeTuint(cipherKey + 24);
             rk[7] = GeTuint(cipherKey + 28);
             if (keyBits != 256) return 0;
-            for (;;)
+            for (; ; )
             {
                 temp = rk[7];
                 rk[8] = rk[0] ^
@@ -132,7 +132,7 @@ namespace ScePSP.Core.Components.Crypto
         /// <param name="cipherKey"></param>
         /// <param name="keyBits"></param>
         /// <returns>the number of rounds for the given cipher key size.</returns>
-        public static int RijndaelKeySetupDec(uint*rk /*4*(Nr + 1)*/, byte* cipherKey, int keyBits)
+        public static int RijndaelKeySetupDec(uint* rk /*4*(Nr + 1)*/, byte* cipherKey, int keyBits)
         {
             int i, j;
 
@@ -183,7 +183,7 @@ namespace ScePSP.Core.Components.Crypto
             return nr;
         }
 
-        public static void RijndaelEncrypt(uint*rk /*4*(Nr + 1)*/, int nr, byte* pt /*16*/, byte* ct /*[16]*/)
+        public static void RijndaelEncrypt(uint* rk /*4*(Nr + 1)*/, int nr, byte* pt /*16*/, byte* ct /*[16]*/)
         {
             uint t0, t1, t2, t3;
 
@@ -195,7 +195,7 @@ namespace ScePSP.Core.Components.Crypto
             var s3 = GeTuint(pt + 12) ^ rk[3];
             // Nr - 1 full rounds:
             var r = nr >> 1;
-            for (;;)
+            for (; ; )
             {
                 t0 =
                     Te0[s0 >> 24] ^
@@ -285,7 +285,7 @@ namespace ScePSP.Core.Components.Crypto
             PuTuint(ct + 12, s3);
         }
 
-        public static void RijndaelDecrypt(uint* rk /*4*(Nr + 1)*/, int nr, byte* ct, byte*pt)
+        public static void RijndaelDecrypt(uint* rk /*4*(Nr + 1)*/, int nr, byte* ct, byte* pt)
         {
             uint t0;
             uint t1;
@@ -303,7 +303,7 @@ namespace ScePSP.Core.Components.Crypto
              * Nr - 1 full rounds:
              */
             var r = nr >> 1;
-            for (;;)
+            for (; ; )
             {
                 t0 =
                     Td0[s0 >> 24] ^
@@ -410,7 +410,7 @@ namespace ScePSP.Core.Components.Crypto
         }
 
         /* setup key context for both encryption and decryption */
-        public static int rijndael_set_key(RijndaelCtx*ctx, byte*key, int bits)
+        public static int rijndael_set_key(RijndaelCtx* ctx, byte* key, int bits)
         {
             var rounds = RijndaelKeySetupEnc(ctx->Ek, key, bits);
             if (rounds == 0)
@@ -429,14 +429,14 @@ namespace ScePSP.Core.Components.Crypto
             RijndaelDecrypt(ctx->Dk, ctx->Nr, src, dst);
         }
 
-        public static void rijndael_encrypt(RijndaelCtx*ctx, byte*src, byte*dst)
+        public static void rijndael_encrypt(RijndaelCtx* ctx, byte* src, byte* dst)
         {
             RijndaelEncrypt(ctx->Ek, ctx->Nr, src, dst);
         }
 
-        public static int AES_set_key(AesCtx*ctx, byte*key, int bits)
+        public static int AES_set_key(AesCtx* ctx, byte* key, int bits)
         {
-            return rijndael_set_key((RijndaelCtx*) ctx, key, bits);
+            return rijndael_set_key((RijndaelCtx*)ctx, key, bits);
         }
 
         public static void AES_decrypt(AesCtx* ctx, byte* src, byte* dst)
@@ -449,10 +449,10 @@ namespace ScePSP.Core.Components.Crypto
             RijndaelEncrypt(ctx->Ek, ctx->Nr, src, dst);
         }
 
-        private static void xor_128(byte*a, byte*b, byte*Out)
+        private static void xor_128(byte* a, byte* b, byte* Out)
         {
             for (var i = 0; i < 16; i++)
-                Out[i] = (byte) (a[i] ^ b[i]);
+                Out[i] = (byte)(a[i] ^ b[i]);
         }
 
         //No IV support!
@@ -522,9 +522,9 @@ namespace ScePSP.Core.Components.Crypto
 
             for (i = 15; i >= 0; i--)
             {
-                output[i] = (byte) (input[i] << 1);
+                output[i] = (byte)(input[i] << 1);
                 output[i] |= overflow;
-                overflow = (byte) ((input[i] & 0x80) != 0 ? 1 : 0);
+                overflow = (byte)((input[i] & 0x80) != 0 ? 1 : 0);
             }
         }
 
@@ -708,8 +708,8 @@ namespace ScePSP.Core.Components.Crypto
                 }
             }
         }
-        
-         //CMAC GLOBS
+
+        //CMAC GLOBS
         static readonly byte[] ConstRb =
         {
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

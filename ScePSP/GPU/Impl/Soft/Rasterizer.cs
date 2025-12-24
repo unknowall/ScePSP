@@ -1,9 +1,8 @@
+using ScePSP.Utils;
+using ScePSPUtils.Extensions;
 using System;
 using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.CompilerServices;
-using ScePSPUtils.Extensions;
-using ScePSP.Utils;
 
 namespace ScePSP.Rasterizer
 {
@@ -40,9 +39,9 @@ namespace ScePSP.Rasterizer
             var y0 = p0.Y.Clamp(ymin, ymax);
             var y1 = p1.Y;
             var y2 = p2.Y.Clamp(ymin, ymax);
-            
+
             RasterizerResult r0, r1;
-            
+
             for (var y = y0; y <= y2; y++)
             {
                 InterpolateX(y, p0, p2, 1, out r0);
@@ -76,7 +75,7 @@ namespace ScePSP.Rasterizer
             }
         }
 
-        
+
         private static void InterpolateX(
             int y,
             RasterizerPoint a, RasterizerPoint b,
@@ -85,7 +84,7 @@ namespace ScePSP.Rasterizer
         )
         {
             int dY = b.Y - a.Y;
-            var ratio = (y - a.Y) / (float) (dY != 0 ? dY : 1);
+            var ratio = (y - a.Y) / (float)(dY != 0 ? dY : 1);
             var iratio = 1 - ratio;
             var x = ratio.Interpolate(a.X, b.X);
             switch (notUsedIndex)
@@ -103,7 +102,7 @@ namespace ScePSP.Rasterizer
                     throw new Exception();
             }
         }
-        
+
         private void AdjustX(ref RasterizerResult r0, ref RasterizerResult r1)
         {
             if (r0.X > r1.X) Swap(ref r0, ref r1);
@@ -119,7 +118,7 @@ namespace ScePSP.Rasterizer
                 r0 = new RasterizerResult(x0, Vector3.Lerp(r0.Ratios, r1.Ratios, x0.RatioInRange(rx0, rx1)));
                 r1 = new RasterizerResult(x1, Vector3.Lerp(r0.Ratios, r1.Ratios, x1.RatioInRange(rx0, rx1)));
             }
-            
+
         }
 #pragma warning disable CS0693
         private static void Swap<T>(ref T lhs, ref T rhs)

@@ -57,7 +57,7 @@ namespace ScePSP.Hle.Vfs
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            return HleIoDriver.IoLseek(HleIoDrvFileArg, offset, (SeekAnchor) origin);
+            return HleIoDriver.IoLseek(HleIoDrvFileArg, offset, (SeekAnchor)origin);
         }
 
         public override void Write(byte[] buffer, int offset, int count)

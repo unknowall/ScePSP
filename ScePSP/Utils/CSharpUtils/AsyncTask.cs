@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Threading;
 using System.Diagnostics;
+using System.Threading;
 
 namespace ScePSPUtils
 {
@@ -42,7 +42,7 @@ namespace ScePSPUtils
         public AsyncTask(Func<T> getter)
         {
             Semaphore = new Semaphore(0, 1);
-            new Thread(delegate()
+            new Thread(delegate ()
             {
                 _result = getter();
                 Ready = true;

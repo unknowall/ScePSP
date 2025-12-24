@@ -36,12 +36,12 @@ namespace ScePSPUtils
             var expectedLength = Marshal.SizeOf(typeof(T));
             if (rawData.Length < expectedLength)
                 throw new Exception(
-	                $"BytesToStruct. Not enough bytes. Expected: {expectedLength} Provided: {rawData.Length}");
+                    $"BytesToStruct. Not enough bytes. Expected: {expectedLength} Provided: {rawData.Length}");
 
 #if true
             fixed (byte* rawDataPointer = &rawData[0])
             {
-                result = (T) Marshal.PtrToStructure(new IntPtr(rawDataPointer), typeof(T));
+                result = (T)Marshal.PtrToStructure(new IntPtr(rawDataPointer), typeof(T));
             }
 #else
 			GCHandle handle = GCHandle.Alloc(RawData, GCHandleType.Pinned);
@@ -76,7 +76,7 @@ namespace ScePSPUtils
             {
                 for (var n = 0; n < array.Length; n++)
                 {
-                    array[n] = (T) Marshal.PtrToStructure(new IntPtr(rawDataPointer + n * elementSize), type);
+                    array[n] = (T)Marshal.PtrToStructure(new IntPtr(rawDataPointer + n * elementSize), type);
                 }
             }
 
@@ -163,7 +163,7 @@ namespace ScePSPUtils
         /// <returns></returns>
         public static ulong GetULongFrom2UInt(uint low, uint high)
         {
-            return (ulong) low | ((ulong) high << 32);
+            return (ulong)low | ((ulong)high << 32);
         }
 
         /// <summary>
@@ -174,8 +174,8 @@ namespace ScePSPUtils
         /// <param name="high"></param>
         public static void ConvertULongTo2UInt(ulong value, out uint low, out uint high)
         {
-            low = (uint) (value >> 0) & uint.MaxValue;
-            high = (uint) (value >> 32) & uint.MaxValue;
+            low = (uint)(value >> 0) & uint.MaxValue;
+            high = (uint)(value >> 32) & uint.MaxValue;
         }
     }
 }

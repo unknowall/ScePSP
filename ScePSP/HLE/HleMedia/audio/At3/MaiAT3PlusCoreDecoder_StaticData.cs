@@ -1,5 +1,5 @@
-﻿using System.IO;
-using ScePSPUtils.Extensions;
+﻿using ScePSPUtils.Extensions;
+using System.IO;
 
 namespace ScePSP.Hle.Formats.audio.At3
 {
@@ -43,7 +43,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             0xf
         };
 
-        public static readonly byte[] MAPCDSD_band_num_table1 = {0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4};
+        public static readonly byte[] MAPCDSD_band_num_table1 = { 0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4 };
 
         public static readonly uint[] MAPCDSD_bind_table0 =
         {
@@ -79,11 +79,11 @@ namespace ScePSP.Hle.Formats.audio.At3
 
 
         //Huff Tables
-        public static readonly ushort[] MAPCDSD_table_0_0 = {0, 1, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 2};
+        public static readonly ushort[] MAPCDSD_table_0_0 = { 0, 1, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 2 };
 
-        public static readonly byte[] MAPCDSD_table_0_1 = {0, 0, 1, 7};
-        public static readonly ushort[] MAPCDSD_table_0_2 = {0, 1, 4, 3, 5, 3, 0, 0, 0, 0, 0, 0, 6, 3, 7, 3};
-        public static readonly byte[] MAPCDSD_table_0_3 = {0, 0, 0, 0, 1, 2, 6, 7};
+        public static readonly byte[] MAPCDSD_table_0_1 = { 0, 0, 1, 7 };
+        public static readonly ushort[] MAPCDSD_table_0_2 = { 0, 1, 4, 3, 5, 3, 0, 0, 0, 0, 0, 0, 6, 3, 7, 3 };
+        public static readonly byte[] MAPCDSD_table_0_3 = { 0, 0, 0, 0, 1, 2, 6, 7 };
 
         public static readonly ushort[] MAPCDSD_table_0_4 =
             {0, 1, 4, 3, 0xc, 4, 0x1e, 5, 0x1f, 5, 0xd, 4, 0xe, 4, 5, 3};
@@ -381,7 +381,7 @@ namespace ScePSP.Hle.Formats.audio.At3
         public static readonly ushort[] MAPCDSD_table_2_0 =
             {0x0000, 0x0001, 0x0002, 0x0002, 0x0006, 0x0003, 0x0007, 0x0003};
 
-        public static readonly byte[] MAPCDSD_table_2_1 = {0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x02, 0x03};
+        public static readonly byte[] MAPCDSD_table_2_1 = { 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x02, 0x03 };
 
         public static readonly ushort[] MAPCDSD_table_2_2 =
         {
@@ -423,9 +423,9 @@ namespace ScePSP.Hle.Formats.audio.At3
 
 
         //Huff Tables
-        public static readonly byte[] MAPCDSD_table_3_1 = {0};
+        public static readonly byte[] MAPCDSD_table_3_1 = { 0 };
 
-        public static readonly ushort[] MAPCDSD_table_3_0 = {0};
+        public static readonly ushort[] MAPCDSD_table_3_0 = { 0 };
 
         public static readonly byte[] MAPCDSD_table_3_3 =
         {
@@ -950,7 +950,7 @@ namespace ScePSP.Hle.Formats.audio.At3
             0x0, 0x0, 0x7b, 0x7, 0x34, 0x6, 0x9, 0x4
         };
 
-        public static readonly byte[] MAPCDSD_table_3_9 = {0x1, 0x1, 0x2, 0x2, 0x0, 0x3, 0x4, 0x5};
+        public static readonly byte[] MAPCDSD_table_3_9 = { 0x1, 0x1, 0x2, 0x2, 0x0, 0x3, 0x4, 0x5 };
 
         public static readonly ushort[] MAPCDSD_table_3_8 =
             {0x4, 0x3, 0x0, 0x2, 0x1, 0x2, 0x5, 0x3, 0x6, 0x3, 0x7, 0x3};
@@ -4819,8 +4819,8 @@ namespace ScePSP.Hle.Formats.audio.At3
             0x6, 0x30, 0x6, 0x31, 0x6, 0x14, 0x5, 0x15, 0x5, 0x7, 0x4, 0x8, 0x4
         };
 
-        public static readonly byte[] MAPCDSD_table_3_101 = {0x0, 0x0, 0x0, 0x0, 0x2, 0x2, 0x1, 0x3};
-        public static readonly ushort[] MAPCDSD_table_3_100 = {0x0, 0x1, 0x6, 0x3, 0x2, 0x2, 0x7, 0x3};
+        public static readonly byte[] MAPCDSD_table_3_101 = { 0x0, 0x0, 0x0, 0x0, 0x2, 0x2, 0x1, 0x3 };
+        public static readonly ushort[] MAPCDSD_table_3_100 = { 0x0, 0x1, 0x6, 0x3, 0x2, 0x2, 0x7, 0x3 };
 
         public static readonly byte[] MAPCDSD_table_3_103 =
         {
@@ -12943,8 +12943,8 @@ namespace ScePSP.Hle.Formats.audio.At3
             0x33, 0x6, 0x34, 0x6, 0x35, 0x6, 0x13, 0x5, 0x14, 0x5, 0x15, 0x5, 0x6, 0x4, 0x7, 0x4
         };
 
-        public static readonly byte[] MAPCDSD_table_3_227 = {0x0, 0x0, 0x0, 0x0, 0x1, 0x1, 0x2, 0x3};
-        public static readonly ushort[] MAPCDSD_table_3_226 = {0x0, 0x1, 0x2, 0x2, 0x6, 0x3, 0x7, 0x3};
+        public static readonly byte[] MAPCDSD_table_3_227 = { 0x0, 0x0, 0x0, 0x0, 0x1, 0x1, 0x2, 0x3 };
+        public static readonly ushort[] MAPCDSD_table_3_226 = { 0x0, 0x1, 0x2, 0x2, 0x6, 0x3, 0x7, 0x3 };
 
         public static readonly byte[] MAPCDSD_table_3_229 =
             {0x0, 0x0, 0x0, 0x0, 0x1, 0x1, 0x2, 0x2, 0x3, 0x3, 0x4, 0x4, 0x5, 0x5, 0x6, 0x7};

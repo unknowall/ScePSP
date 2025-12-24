@@ -1,6 +1,6 @@
-﻿using ScePSPUtils;
-using ScePSP.Core.Cpu.VFpu;
+﻿using ScePSP.Core.Cpu.VFpu;
 using ScePSP.Core.Memory;
+using ScePSPUtils;
 
 namespace ScePSP.Core.Cpu
 {
@@ -9,7 +9,7 @@ namespace ScePSP.Core.Cpu
         public uint Value;
 
         public uint GetJumpAddress(IPspMemoryInfo memoryInfo, uint currentPc) =>
-            (uint) (currentPc & ~0x0FFFFFFF) + (JumpBits << 2);
+            (uint)(currentPc & ~0x0FFFFFFF) + (JumpBits << 2);
 
         private void Set(int offset, int count, uint setValue) =>
             Value = BitUtils.Insert(Value, offset, count, setValue);
@@ -33,46 +33,46 @@ namespace ScePSP.Core.Cpu
         // Type Register.
         public int Rd
         {
-            get => (int) Get(11 + 5 * 0, 5);
-            set => Set(11 + 5 * 0, 5, (uint) value);
+            get => (int)Get(11 + 5 * 0, 5);
+            set => Set(11 + 5 * 0, 5, (uint)value);
         }
 
         public int Rt
         {
-            get => (int) Get(11 + 5 * 1, 5);
-            set => Set(11 + 5 * 1, 5, (uint) value);
+            get => (int)Get(11 + 5 * 1, 5);
+            set => Set(11 + 5 * 1, 5, (uint)value);
         }
 
         public int Rs
         {
-            get => (int) Get(11 + 5 * 2, 5);
-            set => Set(11 + 5 * 2, 5, (uint) value);
+            get => (int)Get(11 + 5 * 2, 5);
+            set => Set(11 + 5 * 2, 5, (uint)value);
         }
 
         // Type Float Register.
         public int Fd
         {
-            get => (int) Get(6 + 5 * 0, 5);
-            set => Set(6 + 5 * 0, 5, (uint) value);
+            get => (int)Get(6 + 5 * 0, 5);
+            set => Set(6 + 5 * 0, 5, (uint)value);
         }
 
         public int Fs
         {
-            get => (int) Get(6 + 5 * 1, 5);
-            set => Set(6 + 5 * 1, 5, (uint) value);
+            get => (int)Get(6 + 5 * 1, 5);
+            set => Set(6 + 5 * 1, 5, (uint)value);
         }
 
         public int Ft
         {
-            get => (int) Get(6 + 5 * 2, 5);
-            set => Set(6 + 5 * 2, 5, (uint) value);
+            get => (int)Get(6 + 5 * 2, 5);
+            set => Set(6 + 5 * 2, 5, (uint)value);
         }
 
         // Type Immediate (Unsigned).
         public int Imm
         {
-            get => (short) (ushort) Get(0, 16);
-            set => Set(0, 16, (uint) value);
+            get => (short)(ushort)Get(0, 16);
+            set => Set(0, 16, (uint)value);
         }
 
         public uint Immu
@@ -145,7 +145,7 @@ namespace ScePSP.Core.Cpu
             set => Set(6 + 5 * 1, 5, value);
         }
 
-        public uint GetBranchAddress(uint pc) => (uint) (pc + 4 + Imm * 4);
+        public uint GetBranchAddress(uint pc) => (uint)(pc + 4 + Imm * 4);
 
         public uint One
         {
@@ -161,11 +161,11 @@ namespace ScePSP.Core.Cpu
 
         public int OneTwo
         {
-            get => (int) (1 + 1 * One + 2 * Two);
+            get => (int)(1 + 1 * One + 2 * Two);
             set
             {
-                One = (((uint) value - 1) >> 0) & 1;
-                Two = (((uint) value - 1) >> 1) & 1;
+                One = (((uint)value - 1) >> 0) & 1;
+                Two = (((uint)value - 1) >> 1) & 1;
             }
         }
 
@@ -193,7 +193,7 @@ namespace ScePSP.Core.Cpu
             set
             {
                 Vt5 = value;
-                Vt1 = (uint) value >> 5;
+                Vt1 = (uint)value >> 5;
             }
         }
 
@@ -201,7 +201,7 @@ namespace ScePSP.Core.Cpu
         public int Imm14
         {
             get => get_s(2, 14);
-            set => Set(2, 14, (uint) value);
+            set => Set(2, 14, (uint)value);
         }
         //public int IMM14 { get { return (int)get(2, 14); } set { set(2, 14, (uint)value); } }
 
@@ -257,7 +257,7 @@ namespace ScePSP.Core.Cpu
 
         public float ImmHf => HalfFloat.ToFloat(Imm);
 
-        public static implicit operator Instruction(uint value) => new Instruction {Value = value,};
+        public static implicit operator Instruction(uint value) => new Instruction { Value = value, };
 
         public static implicit operator uint(Instruction instruction) => instruction.Value;
     }

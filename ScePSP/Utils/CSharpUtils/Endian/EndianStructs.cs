@@ -59,12 +59,12 @@ namespace ScePSPUtils.Endian
             set
             {
                 var v = MathUtils.ByteSwap(value);
-                _InternalValueLow = (uint) (v >> 0);
-                _InternalValueHigh = (ushort) (v >> 32);
+                _InternalValueLow = (uint)(v >> 0);
+                _InternalValueHigh = (ushort)(v >> 32);
             }
             get
             {
-                var value = ((ulong) _InternalValueLow << 32) | ((ulong) _InternalValueHigh << 16);
+                var value = ((ulong)_InternalValueLow << 32) | ((ulong)_InternalValueHigh << 16);
                 return MathUtils.ByteSwap(value);
             }
         }
@@ -143,7 +143,7 @@ namespace ScePSPUtils.Endian
         /// </summary>
         /// <param name="that"></param>
         /// <returns></returns>
-        public static implicit operator UintBe(UintLe that) => (uint) that;
+        public static implicit operator UintBe(UintLe that) => (uint)that;
 
         /// <summary>
         /// 
@@ -190,7 +190,7 @@ namespace ScePSPUtils.Endian
         /// </summary>
         /// <param name="that"></param>
         /// <returns></returns>
-        public static implicit operator UshortBe(UshortLe that) => (ushort) that;
+        public static implicit operator UshortBe(UshortLe that) => (ushort)that;
 
         /// <summary>
         /// 
@@ -201,12 +201,12 @@ namespace ScePSPUtils.Endian
         /// <summary>
         /// 
         /// </summary>
-        public byte Low => (byte) (NativeValue >> 0);
+        public byte Low => (byte)(NativeValue >> 0);
 
         /// <summary>
         /// 
         /// </summary>
-        public byte High => (byte) (NativeValue >> 8);
+        public byte High => (byte)(NativeValue >> 8);
     }
 
     /// <summary>
@@ -241,7 +241,7 @@ namespace ScePSPUtils.Endian
         /// </summary>
         /// <param name="that"></param>
         /// <returns></returns>
-        public static implicit operator UintLe(UintBe that) => (uint) that;
+        public static implicit operator UintLe(UintBe that) => (uint)that;
 
         /// <summary>
         /// 
@@ -290,7 +290,7 @@ namespace ScePSPUtils.Endian
         /// <returns></returns>
         public static implicit operator UshortLe(UshortBe that)
         {
-            return (ushort) that;
+            return (ushort)that;
         }
 
         /// <summary>

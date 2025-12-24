@@ -1,9 +1,9 @@
-﻿using System;
+﻿using ScePSP.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using ScePSP.Utils;
 
 namespace ScePSP.Core.Gpu.Formats
 {

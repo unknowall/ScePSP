@@ -9,9 +9,6 @@ namespace ScePSP.Core.Audio
 {
     public unsafe class PspAudioChannel
     {
-        /// <summary>
-        /// 
-        /// </summary>
         protected PspAudio PspAudio;
 
         /// <summary>
@@ -26,19 +23,10 @@ namespace ScePSP.Core.Audio
         /// </summary>
         public int Frequency = 44100;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public int Index;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public bool Available;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public bool IsReserved
         {
             get => !Available;
@@ -62,9 +50,6 @@ namespace ScePSP.Core.Audio
         /// </summary>
         public PspAudio.FormatEnum Format;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public TimeSpan BufferTimeLength => TimeSpan.FromSeconds((double) SampleCount / (double) Frequency);
 
         private ProduceConsumeBuffer<short> Buffer = new ProduceConsumeBuffer<short>();
@@ -179,11 +164,6 @@ namespace ScePSP.Core.Audio
             return StereoSamples;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Samples"></param>
-        /// <param name="ActionCallbackOnReaded"></param>
         public void Write(short[] Samples, Action ActionCallbackOnReaded)
         {
             if (Samples == null) throw new InvalidOperationException("short[] Samples is null");
@@ -221,13 +201,6 @@ namespace ScePSP.Core.Audio
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="SamplePointer"></param>
-        /// <param name="VolumeLeft"></param>
-        /// <param name="VolumeRight"></param>
-        /// <param name="ActionCallbackOnReaded"></param>
         public void Write(short* SamplePointer, int VolumeLeft, int VolumeRight, Action ActionCallbackOnReaded)
         {
             //Console.WriteLine("{0}", this.Frequency);

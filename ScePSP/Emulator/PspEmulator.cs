@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using ScePSP.Core;
 using ScePSP.Core.Audio;
-using ScePSP.Core.Audio.Impl.Openal;
 using ScePSP.Core.Cpu;
 using ScePSP.Core.Gpu;
 using ScePSP.Core.Memory;

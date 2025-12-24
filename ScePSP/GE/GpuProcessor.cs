@@ -101,8 +101,7 @@ namespace ScePSP.Core.Gpu
         /// <summary>
         /// 
         /// </summary>
-        public readonly WaitableStateMachine<Status2Enum> Status2 =
-            new WaitableStateMachine<Status2Enum>(Status2Enum.Completed, Debug: false);
+        public readonly WaitableStateMachine<Status2Enum> Status2 = new WaitableStateMachine<Status2Enum>(Status2Enum.Completed, Debug: false);
 
         /// <summary>
         /// 
@@ -410,9 +409,6 @@ namespace ScePSP.Core.Gpu
         public fixed uint Stack[8];
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public unsafe struct PspGeListArgs
     {
         /// <summary>
@@ -425,14 +421,8 @@ namespace ScePSP.Core.Gpu
         /// </summary>
         public uint GpuStateStructAddress;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public uint NumberOfStacks;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public uint StacksAddress;
     }
 }

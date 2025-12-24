@@ -11,7 +11,12 @@ namespace ScePSPPlatform.GL.Impl.Windows
     public unsafe class WinGlContext : IGlContext
     {
         IntPtr _dc;
+
         IntPtr _context;
+
+        IntPtr _hWnd;
+
+        static IntPtr _sharedContext;
 
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr GetWindowDC(IntPtr hWnd);
@@ -64,15 +69,24 @@ namespace ScePSPPlatform.GL.Impl.Windows
             void* lpvObject
         );
 
+        [SuppressUnmanagedCodeSecurity, DllImport("GDI32.dll", ExactSpelling = true, SetLastError = true)]
+        public static extern int ChoosePixelFormat(IntPtr hDc, PixelFormatDescriptor* pPfd);
+
+        [SuppressUnmanagedCodeSecurity, DllImport("GDI32.dll", ExactSpelling = true, SetLastError = true)]
+        public static extern bool SetPixelFormat(IntPtr hdc, int ipfd, PixelFormatDescriptor* ppfd);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern bool AdjustWindowRectEx(ref Rect lpRect, int dwStyle, bool bMenu, int dwExStyle);
+
         const ClassStyle DefaultClassStyle = ClassStyle.OwnDc;
 
         private static bool _classRegistered;
 
         static readonly IntPtr Instance = Marshal.GetHINSTANCE(typeof(WinGlContext).Module);
+
         static readonly IntPtr ClassName = Marshal.StringToHGlobalAuto(Guid.NewGuid().ToString());
 
-        const ExtendedWindowStyle ParentStyleEx = ExtendedWindowStyle.WindowEdge | ExtendedWindowStyle.ApplicationWindow
-            ;
+        const ExtendedWindowStyle ParentStyleEx = ExtendedWindowStyle.WindowEdge | ExtendedWindowStyle.ApplicationWindow;
 
         private static void RegisterClassOnce()
         {
@@ -101,23 +115,10 @@ namespace ScePSPPlatform.GL.Impl.Windows
             return DefWindowProc(handle, message, wParam, lParam);
         }
 
-        [SuppressUnmanagedCodeSecurity, DllImport("GDI32.dll", ExactSpelling = true, SetLastError = true)]
-        public static extern int ChoosePixelFormat(IntPtr hDc, PixelFormatDescriptor* pPfd);
-
-        [SuppressUnmanagedCodeSecurity, DllImport("GDI32.dll", ExactSpelling = true, SetLastError = true)]
-        public static extern bool SetPixelFormat(IntPtr hdc, int ipfd, PixelFormatDescriptor* ppfd);
-
-        static IntPtr _sharedContext;
-
         public static WinGlContext FromWindowHandle(IntPtr windowHandle)
         {
             return new WinGlContext(windowHandle);
         }
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        public static extern bool AdjustWindowRectEx(ref Rect lpRect, int dwStyle, bool bMenu, int dwExStyle);
-
-        IntPtr _hWnd;
 
         private WinGlContext(IntPtr winHandle)
         {
@@ -156,17 +157,16 @@ namespace ScePSPPlatform.GL.Impl.Windows
             var pfd = new PixelFormatDescriptor();
             pfd.Size = (short)sizeof(PixelFormatDescriptor);
             pfd.Version = 1;
-            pfd.Flags = PixelFormatDescriptorFlags.DrawToWindow | PixelFormatDescriptorFlags.SupportOpengl |
-                        PixelFormatDescriptorFlags.Doublebuffer;
+            pfd.Flags = PixelFormatDescriptorFlags.DrawToWindow 
+                | PixelFormatDescriptorFlags.SupportOpengl 
+                | PixelFormatDescriptorFlags.Doublebuffer;
             pfd.LayerType = 0;
             pfd.PixelType = PixelType.RGBA; // PFD_TYPE_RGBA
-            //pfd.ColorBits = 32;
-            pfd.ColorBits = 24;
-            pfd.DepthBits = 16;
+            pfd.ColorBits = 32;
+            pfd.DepthBits = 24;
             pfd.StencilBits = 8;
 
             var pf = ChoosePixelFormat(_dc, &pfd);
-            //pf = 10;
 
             if (!SetPixelFormat(_dc, pf, &pfd))
             {
@@ -174,6 +174,7 @@ namespace ScePSPPlatform.GL.Impl.Windows
             }
 
             _context = Wgl.wglCreateContext(_dc);
+
             if (_sharedContext != IntPtr.Zero)
             {
             RetryShareLists:
@@ -192,26 +193,33 @@ namespace ScePSPPlatform.GL.Impl.Windows
                     throw new InvalidOperationException($"Can't share lists {lastError}");
                 }
             }
+
             MakeCurrent();
-            Console.Out.WriteLineColored(ConsoleColor.Yellow, "Version:{0}.{1}", GL.glGetInteger(GL.GL_MAJOR_VERSION),
-                GL.glGetInteger(GL.GL_MINOR_VERSION));
+
+            //Console.Out.WriteLineColored(ConsoleColor.Yellow, "OpenGL Version:{0}.{1}", GL.glGetInteger(GL.GL_MAJOR_VERSION), GL.glGetInteger(GL.GL_MINOR_VERSION));
+
             DynamicLibraryFactory.MapLibraryToType<Extension>(new DynamicLibraryGl());
-            GL.LoadAllOnce();
+
+            //GL.LoadAllOnce();
 
 #if false
 			if (Extension.wglCreateContextAttribsARB != null)
 			{
 				ReleaseCurrent();
+
 				WGL.wglDeleteContext(this.Context);
-				fixed (int* AttribListPtr =
-new int[] { (int)ArbCreateContext.MajorVersion, 3, (int)ArbCreateContext.MinorVersion, 1, 0, 0 })
+
+				fixed (int* AttribListPtr = new int[] { (int)ArbCreateContext.MajorVersion, 3, (int)ArbCreateContext.MinorVersion, 1, 0, 0 })
 				{
 					this.Context = Extension.wglCreateContextAttribsARB(DC, SharedContext, AttribListPtr);
 				}
+
 				if (this.Context == IntPtr.Zero) throw(new Exception("Error creating context"));
+
 				MakeCurrent();
 
 				Console.WriteLine("OpenGL Version: {0}", Marshal.PtrToStringAnsi(new IntPtr(GL.glGetString(GL.GL_VERSION))));
+
 				//Console.ReadKey();
 			}
 #endif
@@ -221,9 +229,9 @@ new int[] { (int)ArbCreateContext.MajorVersion, 3, (int)ArbCreateContext.MinorVe
                 _sharedContext = _context;
             }
 
-            if (Extension.WglSwapIntervalExt != null)
+            if (Extension.wglSwapIntervalEXT != null)
             {
-                Extension.WglSwapIntervalExt(0);
+                Extension.wglSwapIntervalEXT(0);
             }
 
             //RECT clientRect;
@@ -257,16 +265,16 @@ new int[] { (int)ArbCreateContext.MajorVersion, 3, (int)ArbCreateContext.MinorVe
 
         public class Extension
         {
-            public static WglCreateContextAttribsArb WglCreateContextAttribsArb;
-            public static WglSwapIntervalExt WglSwapIntervalExt;
-            public static WglGetSwapIntervalExt WglGetSwapIntervalExt;
+            public static wglCreateContextAttribsARB wglCreateContextAttribsARB;
+            public static wglSwapIntervalEXT wglSwapIntervalEXT;
+            public static wglGetSwapIntervalEXT wglGetSwapIntervalEXT;
         }
 
-        public delegate IntPtr WglCreateContextAttribsArb(IntPtr hDc, IntPtr hShareContext, int* attribList);
+        public delegate IntPtr wglCreateContextAttribsARB(IntPtr hDc, IntPtr hShareContext, int* attribList);
 
-        public delegate bool WglSwapIntervalExt(int interval);
+        public delegate bool wglSwapIntervalEXT(int interval);
 
-        public delegate int WglGetSwapIntervalExt();
+        public delegate int wglGetSwapIntervalEXT();
 
         public IGlContext MakeCurrent()
         {
@@ -274,10 +282,11 @@ new int[] { (int)ArbCreateContext.MajorVersion, 3, (int)ArbCreateContext.MinorVe
             {
                 if (!Wgl.wglMakeCurrent(_dc, _context))
                 {
-                    throw new Exception("Can't MakeCurrent");
+                    Console.WriteLine($"Can't MakeCurrent DC {_dc} context {_context}");
                 }
                 GlContextFactory.Current = this;
             }
+            //Console.WriteLine($"WinGlContext MakeCurrent DC {_dc} context {_context}");
             return this;
         }
 
@@ -287,10 +296,11 @@ new int[] { (int)ArbCreateContext.MajorVersion, 3, (int)ArbCreateContext.MinorVe
             {
                 if (!Wgl.wglMakeCurrent(_dc, IntPtr.Zero))
                 {
-                    throw new Exception("Can't MakeCurrent");
+                    Console.WriteLine($"Can't MakeCurrent DC {_dc} context {_context}");
                 }
                 GlContextFactory.Current = null;
             }
+            //Console.WriteLine($"WinGlContext ReleaseCurrent DC {_dc} context {_context}");
             return this;
         }
 
@@ -304,7 +314,6 @@ new int[] { (int)ArbCreateContext.MajorVersion, 3, (int)ArbCreateContext.MinorVe
         {
             Wgl.wglDeleteContext(_context);
             _context = IntPtr.Zero;
-            //throw new NotImplementedException();
         }
     }
 }

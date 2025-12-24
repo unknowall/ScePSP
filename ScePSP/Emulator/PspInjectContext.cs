@@ -34,7 +34,7 @@ namespace ScePSP.Runner
                 PspPluginImpl.SelectWorkingPlugin<GpuImpl>(injectContext,
                     typeof(GpuImplSoft),
                     typeof(OpenglGpuImpl)
-                //typeof(GpuImplNull)
+                    //typeof(GpuImplNull)
                 );
 
                 // AUDIO

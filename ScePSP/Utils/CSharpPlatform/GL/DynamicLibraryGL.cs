@@ -21,7 +21,7 @@ namespace ScePSPPlatform.GL
             }
             if (Return == IntPtr.Zero)
             {
-                Console.WriteLine("Can't find '{0}' : {1:X8}", name, Marshal.GetLastWin32Error());
+                Console.WriteLine("wglGetProcAddress Can't find '{0}' : {1:X8}", name, Marshal.GetLastWin32Error());
             }
             return Return;
         }

@@ -27,21 +27,23 @@ namespace ScePSPPlatform.GL
 
         static GL()
         {
-            DynamicLibraryFactory.MapLibraryToType<GL>(
-                DynamicLibraryFactory.CreateForLibrary(DllWindows, DllLinux, DllMac, DllAndroid)
-            );
+            //DynamicLibraryFactory.MapLibraryToType<GL>(
+            //    DynamicLibraryFactory.CreateForLibrary(DllWindows, DllLinux, DllMac, DllAndroid)
+            //);
+
+            DynamicLibraryFactory.MapLibraryToType<GL>(new DynamicLibraryGl());
         }
 
-        private static bool LoadedAll;
+        //private static bool LoadedAll;
 
-        public static void LoadAllOnce()
-        {
-            if (!LoadedAll)
-            {
-                LoadedAll = true;
-                DynamicLibraryFactory.MapLibraryToType<GL>(new DynamicLibraryGl());
-            }
-        }
+        //public static void LoadAllOnce()
+        //{
+        //    if (!LoadedAll)
+        //    {
+        //        LoadedAll = true;
+        //        DynamicLibraryFactory.MapLibraryToType<GL>(new DynamicLibraryGl());
+        //    }
+        //}
 
         private static Dictionary<int, string> Constants;
 

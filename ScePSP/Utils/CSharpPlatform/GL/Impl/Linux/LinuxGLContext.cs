@@ -203,7 +203,7 @@ namespace ScePSPPlatform.GL.Impl.Linux
             }
 
             MakeCurrent();
-            GL.LoadAllOnce();
+            //GL.LoadAllOnce();
 
             Console.Out.WriteLineColored(ConsoleColor.Yellow, "VisualID:{0}", info.VisualID);
             Console.Out.WriteLineColored(ConsoleColor.Yellow, "Display:{0:X8}",

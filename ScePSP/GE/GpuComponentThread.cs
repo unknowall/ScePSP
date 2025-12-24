@@ -21,6 +21,7 @@ namespace ScePSP.Runner.Components.Gpu
             //Console.WriteLine("GpuComponentThread.Start()");
             try
             {
+                //GpuProcessor.SetCurrent();
                 while (true)
                 {
                     WaitHandle.WaitAny(new WaitHandle[] { GpuProcessor.DisplayListQueueUpdated, ThreadTaskQueue.EnqueuedEvent, RunningUpdatedEvent }, 200.Milliseconds());
@@ -28,11 +29,12 @@ namespace ScePSP.Runner.Components.Gpu
                     // TODO: Should wait until the Form has created its context.
 
                     ThreadTaskQueue.HandleEnqueued();
+
                     if (!Running) break;
-                    GpuProcessor.SetCurrent();
+
                     GpuProcessor.ProcessStep();
-                    GpuProcessor.UnsetCurrent();
                 }
+                //GpuProcessor.UnsetCurrent();
             }
             finally
             {

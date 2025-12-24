@@ -52,6 +52,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         public class FastList<T>
         {
             public int Length = 0;
+
             public T[] Buffer = new T[1024];
 
             public void Reset() => Length = 0;
@@ -233,9 +234,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                 if (VertexType.HasTexture)
                 {
                     _verticesTexcoordsBuffer.SetData(_verticesTexcoords.Buffer, 0, _verticesTexcoords.Length);
-                    ShaderInfo.vertexTexCoords.SetData<float>(_verticesTexcoordsBuffer, 3, 0,
-                        sizeof(Vector3),
-                        false);
+                    ShaderInfo.vertexTexCoords.SetData<float>(_verticesTexcoordsBuffer, 3, 0, sizeof(Vector3), false);
                 }
 
                 if (VertexType.HasColor)
@@ -247,8 +246,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                 if (VertexType.HasNormal)
                 {
                     _verticesNormalBuffer.SetData(_verticesNormal.Buffer, 0, _verticesNormal.Length);
-                    ShaderInfo.vertexNormal.NoWarning()
-                        .SetData<float>(_verticesNormalBuffer, 4, 0, sizeof(Vector3), false);
+                    ShaderInfo.vertexNormal.NoWarning().SetData<float>(_verticesNormalBuffer, 4, 0, sizeof(Vector3), false);
                 }
 
                 if (VertexType.HasWeight)
@@ -262,8 +260,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                     };
                     for (var n = 0; n < VertexType.RealSkinningWeightCount; n++)
                     {
-                        vertexWeights[n].SetData<float>(_verticesWeightsBuffer, 1, n * sizeof(float),
-                            sizeof(VertexInfoWeights), false);
+                        vertexWeights[n].SetData<float>(_verticesWeightsBuffer, 1, n * sizeof(float), sizeof(VertexInfoWeights), false);
                     }
                 }
             });
@@ -295,9 +292,6 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             _indicesList.Add((uint)vertexIndex);
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="vertexInfo"></param>
         private void PutVertex(VertexInfo vertexInfo)
         {
             _CapturePutVertex(ref vertexInfo);
@@ -312,6 +306,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         }
 
         private object PspWavefrontObjWriterLock = new object();
+
         private PspWavefrontObjWriter _pspWavefrontObjWriter = null;
 
         public override void StartCapture()
@@ -333,8 +328,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             }
         }
 
-        private void _CapturePrimitive(GuPrimitiveType primitiveType, uint vertexAddress, int vetexCount,
-            ref VertexTypeStruct vertexType, Action action)
+        private void _CapturePrimitive(GuPrimitiveType primitiveType, uint vertexAddress, int vetexCount, ref VertexTypeStruct vertexType, Action action)
         {
             if (_pspWavefrontObjWriter != null)
             {
@@ -445,14 +439,12 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         GuPrimitiveType _primitiveType;
         GLRenderTarget _logicOpsRenderTarget;
 
-        public override void PrimStart(GlobalGpuState globalGpuState, GpuStateStruct gpuState,
-            GuPrimitiveType primitiveType)
+        public override void PrimStart(GlobalGpuState globalGpuState, GpuStateStruct gpuState, GuPrimitiveType primitiveType)
         {
             GpuState = gpuState;
             _primitiveType = primitiveType;
             _doPrimStart = true;
             ResetVertex();
-
 
             if (_shader != null)
             {
@@ -465,6 +457,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                         _logicOpsRenderTarget = GLRenderTarget.Create(512, 272, RenderTargetLayers.Color);
                     }
                     GLRenderTarget.CopyFromTo(GLRenderTarget.Current, _logicOpsRenderTarget);
+
                     _shader.GetUniform("backtex").Set(GLTextureUnit.CreateAtIndex(1).SetFiltering(GLScaleFilter.Linear)
                         .SetWrap(GLWrap.ClampToEdge).SetTexture(_logicOpsRenderTarget.TextureColor));
 
@@ -486,9 +479,6 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             ResetVertex();
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="vertexCount"></param>
         public override void Prim(ushort vertexCount)
         {
             VertexType = GpuState.VertexState.Type;
@@ -516,6 +506,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             //if (PrimitiveType == GuPrimitiveType.TriangleStrip) VertexCount++;
 
             uint morpingVertexCount, totalVerticesWithoutMorphing;
+
             PreparePrim(GpuState, out totalVerticesWithoutMorphing, vertexCount, out morpingVertexCount);
 
             var z = 0;
@@ -689,11 +680,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         public static string GlGetString(int name) => GL.GetString(name);
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <see cref="http://www.opentk.com/doc/graphics/graphicscontext"/>
-        //[HandleProcessCorruptedStateExceptions]
         public override void InitSynchronizedOnce()
         {
             //Memory.WriteBytesHook += OnMemoryWrite;
@@ -709,6 +696,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                     Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
 
                     OpenglContext = GlContextFactory.CreateWindowless();
+
                     OpenglContext.MakeCurrent();
 
                     try
@@ -894,8 +882,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             {
                 return;
             }
-            GL.glDepthFunc(
-                OpenglGpuImplConversionTables.DepthFunctionTranslate[(int)gpuState.DepthTestState.Function]);
+            GL.glDepthFunc(OpenglGpuImplConversionTables.DepthFunctionTranslate[(int)gpuState.DepthTestState.Function]);
         }
 
         private void PrepareState_Colors_2D(GpuStateStruct gpuState)
@@ -1028,11 +1015,9 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
             //Console.WriteLine("Blend!");
 
-            var openglFunctionSource =
-                OpenglGpuImplConversionTables.BlendFuncSrcTranslate[(int)blendingState.FunctionSource];
+            var openglFunctionSource = OpenglGpuImplConversionTables.BlendFuncSrcTranslate[(int)blendingState.FunctionSource];
             //var OpenglFunctionDestination = BlendFuncDstTranslate[(int)BlendingState->FunctionDestination];
-            var openglFunctionDestination =
-                OpenglGpuImplConversionTables.BlendFuncSrcTranslate[(int)blendingState.FunctionDestination];
+            var openglFunctionDestination = OpenglGpuImplConversionTables.BlendFuncSrcTranslate[(int)blendingState.FunctionDestination];
 
             Func<ColorfStruct, int> getBlendFix = (color) =>
             {
@@ -1048,8 +1033,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
             if (blendingState.FunctionDestination == GuBlendingFactorDestination.GuFix)
             {
-                if ((int)openglFunctionSource == GL.GL_CONSTANT_COLOR &&
-                    (blendingState.FixColorSource + blendingState.FixColorDestination).IsColorf(1, 1, 1))
+                if ((int)openglFunctionSource == GL.GL_CONSTANT_COLOR && (blendingState.FixColorSource + blendingState.FixColorDestination).IsColorf(1, 1, 1))
                 {
                     openglFunctionDestination = GL.GL_ONE_MINUS_CONSTANT_COLOR;
                 }
@@ -1060,8 +1044,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             }
             //Console.WriteLine("{0}, {1}", OpenglFunctionSource, OpenglFunctionDestination);
 
-            var openglBlendEquation =
-                OpenglGpuImplConversionTables.BlendEquationTranslate[(int)blendingState.Equation];
+            var openglBlendEquation = OpenglGpuImplConversionTables.BlendEquationTranslate[(int)blendingState.Equation];
 
             /*
             Console.WriteLine(
@@ -1071,6 +1054,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             */
 
             GL.glBlendEquation(openglBlendEquation);
+
             GL.glBlendFunc(openglFunctionSource, openglFunctionDestination);
 
             GL.glBlendColor(
@@ -1127,8 +1111,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                         switch (gpuState.TextureMappingState.TextureProjectionMapMode)
                         {
                             default:
-                                Console.Error.WriteLine("NotImplemented: GU_TEXTURE_MATRIX: {0}",
-                                    gpuState.TextureMappingState.TextureProjectionMapMode);
+                                Console.Error.WriteLine("NotImplemented: GU_TEXTURE_MATRIX: {0}", gpuState.TextureMappingState.TextureProjectionMapMode);
                                 break;
                         }
                         break;
@@ -1136,8 +1119,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                         Console.Error.WriteLine("NotImplemented: GU_ENVIRONMENT_MAP");
                         break;
                     default:
-                        Console.Error.WriteLine("NotImplemented TextureMappingState->TextureMapMode: " +
-                                                textureMappingState.TextureMapMode);
+                        Console.Error.WriteLine("NotImplemented TextureMappingState->TextureMapMode: " + textureMappingState.TextureMapMode);
                         break;
                 }
             }
@@ -1161,9 +1143,11 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             }
 
             //GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
+
             //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
             RenderbufferManager.TextureCacheGetAndBind(gpuState);
+
             //CurrentTexture.Save("test.png");
 
             //GL.glTexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvModeTranslate[(int)TextureState->Effect]);
@@ -1216,14 +1200,11 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             var bytesPerPixel = textureTransferState.BytesPerPixel;
 
             var sourceTotalBytes = textureTransferState.SourceLineWidth * textureTransferState.Height * bytesPerPixel;
-            var destinationTotalBytes =
-                textureTransferState.DestinationLineWidth * textureTransferState.Height * bytesPerPixel;
+            var destinationTotalBytes = textureTransferState.DestinationLineWidth * textureTransferState.Height * bytesPerPixel;
 
-            var sourcePointer =
-                (byte*)Memory.PspAddressToPointerSafe(textureTransferState.SourceAddress.Address, sourceTotalBytes);
+            var sourcePointer = (byte*)Memory.PspAddressToPointerSafe(textureTransferState.SourceAddress.Address, sourceTotalBytes);
             var destinationPointer =
-                (byte*)Memory.PspAddressToPointerSafe(textureTransferState.DestinationAddress.Address,
-                    destinationTotalBytes);
+                (byte*)Memory.PspAddressToPointerSafe(textureTransferState.DestinationAddress.Address, destinationTotalBytes);
 
             for (uint y = 0; y < textureTransferState.Height; y++)
             {

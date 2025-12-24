@@ -51,7 +51,6 @@ namespace ScePSP.Core.Gpu
         protected uint DrawAddress;
         protected GuPrimitiveType PrimitiveType;
 
-
         public virtual void PrimStart(
             GlobalGpuState globalGpuState,
             GpuStateStruct gpuState,
@@ -191,12 +190,9 @@ namespace ScePSP.Core.Gpu
             a.W * ra + b.W * rb + c.W * rc
         );
 
-        static public Vector4 LerpRatios(Vector4 a, Vector4 b, Vector4 c, Vector3 ratios) =>
-            LerpRatios(a, b, c, ratios.X, ratios.Y, ratios.Z);
+        static public Vector4 LerpRatios(Vector4 a, Vector4 b, Vector4 c, Vector3 ratios) => LerpRatios(a, b, c, ratios.X, ratios.Y, ratios.Z);
 
-
-        private VPoint Vector4ToPoint(Vector4 v, Vector4 n, Vector4 t, Vector4 color) =>
-            new VPoint(new RasterizerPoint((int)v.X, (int)v.Y), n, t, color);
+        private VPoint Vector4ToPoint(Vector4 v, Vector4 n, Vector4 t, Vector4 color) => new VPoint(new RasterizerPoint((int)v.X, (int)v.Y), n, t, color);
 
         private uint[] colors = { 0xFF0077FF, 0xFF00FFFF, 0xFF0000FF };
 
@@ -346,11 +342,9 @@ namespace ScePSP.Core.Gpu
 
         private void ReadVertex_Void(int index, out VertexInfo vertexInfo) => vertexInfo = Vertices[index];
 
-        private void ReadVertex_Byte(int index, out VertexInfo vertexInfo) =>
-            vertexInfo = Vertices[indexListByte[index]];
+        private void ReadVertex_Byte(int index, out VertexInfo vertexInfo) => vertexInfo = Vertices[indexListByte[index]];
 
-        private void ReadVertex_Short(int index, out VertexInfo vertexInfo) =>
-            vertexInfo = Vertices[indexListShort[index]];
+        private void ReadVertex_Short(int index, out VertexInfo vertexInfo) => vertexInfo = Vertices[indexListShort[index]];
 
         protected delegate void ReadVertexDelegate(int index, out VertexInfo vertexInfo);
 
@@ -367,8 +361,7 @@ namespace ScePSP.Core.Gpu
             void* indexPointer = null;
             if (VertexType.Index != VertexTypeStruct.IndexEnum.Void)
             {
-                indexPointer =
-                    Memory.PspAddressToPointerSafe(GpuState.GetAddressRelativeToBaseOffset(GpuState.IndexAddress), 0);
+                indexPointer = Memory.PspAddressToPointerSafe(GpuState.GetAddressRelativeToBaseOffset(GpuState.IndexAddress), 0);
             }
 
             //Console.Error.WriteLine(VertexType.Index);

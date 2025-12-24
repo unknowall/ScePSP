@@ -12,6 +12,7 @@ using ScePSP.Hle.Modules.emulator;
 using ScePSP.Runner;
 using ScePSP.Runner.Components.Display;
 using ScePSPUtils;
+using ScePSPPlatform.GL;
 using SDL2;
 using System;
 using System.Windows.Forms;
@@ -23,6 +24,8 @@ class Program
     [STAThreadAttribute]
     static unsafe void Main(string[] args)
     {
+        //GL.LoadAllOnce();
+
         if (SDL.SDL_Init(SDL.SDL_INIT_VIDEO | SDL.SDL_INIT_AUDIO) != 0)
         {
             Console.Error.WriteLine("Couldn't initialize SDL");

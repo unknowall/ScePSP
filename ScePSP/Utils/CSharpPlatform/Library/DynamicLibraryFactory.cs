@@ -8,14 +8,14 @@ namespace ScePSPPlatform.Library
 {
     public static class DynamicLibraryFactory
     {
-        public static IDynamicLibrary CreateForLibrary(string nameWindows, string nameLinux = null,
-            string nameMac = null, string nameAndroid = null)
+        static string name;
+
+        public static IDynamicLibrary CreateForLibrary(string nameWindows, string nameLinux = null, string nameMac = null, string nameAndroid = null)
         {
             if (nameLinux == null) nameLinux = nameWindows;
             if (nameMac == null) nameMac = nameLinux;
             if (nameAndroid == null) nameAndroid = nameLinux;
 
-            string name;
             switch (Platform.OS)
             {
                 case OS.Windows:
@@ -38,7 +38,6 @@ namespace ScePSPPlatform.Library
                     break;
             }
 
-
             switch (Platform.OS)
             {
                 case OS.Windows:
@@ -59,15 +58,11 @@ namespace ScePSPPlatform.Library
                 var method = dynamicLibrary.GetMethod(field.Name);
                 if (method != IntPtr.Zero)
                 {
-                    field.SetValue(
-                        null,
-                        Marshal.GetDelegateForFunctionPointer(method, field.FieldType)
-                    );
+                    field.SetValue(null, Marshal.GetDelegateForFunctionPointer(method, field.FieldType));
                 }
                 else
                 {
-                    Console.WriteLine($"{field.Name} : {method}");
-                    //Console.WriteLine(Field.Name);
+                    Console.WriteLine($"GetProcAddress {name} Not Found {field.Name} : {method}");
                 }
             }
         }

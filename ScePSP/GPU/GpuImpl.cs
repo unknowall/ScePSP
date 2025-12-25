@@ -15,7 +15,7 @@ namespace ScePSP.Core.Gpu
         [Inject] protected PspMemory Memory;
         [Inject] protected PspStoredConfig PspStoredConfig;
 
-        protected int _ScaleViewport = 2;
+        protected int _ScaleViewport = 1;
 
         internal event Action<int> OnScaleViewport;
 
@@ -29,7 +29,7 @@ namespace ScePSP.Core.Gpu
             get => _ScaleViewport;
         }
 
-        public virtual void InitSynchronizedOnce()
+        public virtual void InitSynchronizedOnce(IntPtr TargetHwnd)
         {
         }
 
@@ -75,10 +75,10 @@ namespace ScePSP.Core.Gpu
             //    Console.WriteLine($"Model {model}");
             //    Console.WriteLine($"View {view}");
             //    Console.WriteLine($"Projection3D {projection3D}");
-            //    //Console.WriteLine($"Projection2D {projection2D}");
+            //    Console.WriteLine($"Projection2D {projection2D}");
             //    Console.WriteLine($"worldView {modelView}");
             //    Console.WriteLine($"worldViewProjection3D {worldViewProjection3D}");
-            //    //Console.WriteLine($"worldViewProjection2D {worldViewProjection2D}");
+            //    Console.WriteLine($"worldViewProjection2D {worldViewProjection2D}");
             //    Console.WriteLine($"PrimStart: {primitiveType}");
             //}
         }
@@ -155,9 +155,6 @@ namespace ScePSP.Core.Gpu
                         break;
                 }
             }
-
-            //DrawPixel(52, 52, 0xFFFFFFFF);
-            //Console.WriteLine($"Prim {vertexCount}");
         }
 
         virtual protected void DrawPoint(VPoint a)

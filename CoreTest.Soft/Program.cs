@@ -6,13 +6,15 @@ using ScePSP.Core.Components.Controller;
 using ScePSP.Core.Components.Display;
 using ScePSP.Core.Components.Rtc;
 using ScePSP.Core.Gpu;
+using ScePSP.Core.Gpu.Impl.Opengl;
+using ScePSP.Core.Gpu.Impl.Soft;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types.Controller;
 using ScePSP.Hle.Modules.emulator;
 using ScePSP.Runner;
 using ScePSP.Runner.Components.Display;
-using ScePSPUtils;
 using ScePSPPlatform.GL;
+using ScePSPUtils;
 using SDL2;
 using System;
 using System.Windows.Forms;
@@ -24,7 +26,6 @@ class Program
     [STAThreadAttribute]
     static unsafe void Main(string[] args)
     {
-        //GL.LoadAllOnce();
 
         if (SDL.SDL_Init(SDL.SDL_INIT_VIDEO | SDL.SDL_INIT_AUDIO) != 0)
         {
@@ -47,13 +48,13 @@ class Program
 
     LoadRom:
         OpenFileDialog ofn = new OpenFileDialog();
-        ofn.Filter = "PSP Roms (*.pbp,*.iso, *.elf, *.zip)|*.pbp;*.iso;*.elf;*.zip";
+        ofn.Filter = "PSP Roms (*.pbp, *.prx, *.iso, *.elf, *.zip)|*.pbp;*.prx;*.iso;*.elf;*.zip";
         ofn.Title = "PSP Rom";
         if (ofn.ShowDialog() == DialogResult.Cancel) goto LoadRom;
 
         try
         {
-            var injector = PspInjectContext.CreateInjectContext(PspStoredConfig.Load(), false);
+            var injector = PspInjectContext.CreateInjectContext(PspStoredConfig.Load(), PspGpuType.Soft, PspAudioType.SDL);
 
             using var pspEmulator = injector.GetInstance<PspEmulator>();
 
@@ -65,12 +66,11 @@ class Program
                 var display = emulator.InjectContext.GetInstance<PspDisplay>();
                 var displayComponent = emulator.InjectContext.GetInstance<DisplayComponentThread>();
                 var memory = emulator.InjectContext.GetInstance<PspMemory>();
-                var controller = pspEmulator.InjectContext.GetInstance<PspController>();
+                var controller = emulator.InjectContext.GetInstance<PspController>();
 
                 displayComponent.triggerStuff = false;
 
-                //emulator.InjectContext.SetInstanceType<GpuImpl, GpuImplSoft>();
-                //emulator.InjectContext.SetInstanceType<PspAudioImpl, AudioImplNull>();
+                Console.WriteLine("Starting main loop");
 
                 var ctrlData = new SceCtrlData { Buttons = 0, Lx = 0, Ly = 0 };
 
@@ -156,7 +156,8 @@ class Program
                                     default:
                                         buttonMask = 0;
                                         break;
-                                };
+                                }
+                                ;
 
                                 if (pressed)
                                 {
@@ -215,7 +216,7 @@ class Program
                     //display.TriggerVBlankEnd();
                 }
 
-            }, false, false, false);
+            }, false, false);
         }
         finally
         {

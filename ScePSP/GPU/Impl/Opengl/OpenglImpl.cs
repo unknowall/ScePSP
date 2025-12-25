@@ -1,14 +1,5 @@
-﻿//#define DISABLE_SKINNING
-//#define SLOW_SIMPLE_RENDER_TARGET
+﻿#define ENABLE_TEXTURES
 
-//#define DEBUG_PRIM
-
-#if !RELEASE
-//#define DEBUG_VERTEX_TYPE
-#endif
-
-//using Cloo;
-//using Cloo.Bindings;
 using ScePSP.Core.Gpu.Formats;
 using ScePSP.Core.Gpu.Impl.Opengl.Modules;
 using ScePSP.Core.Gpu.Impl.Opengl.Utils;
@@ -24,15 +15,30 @@ using System;
 using System.Globalization;
 using System.Numerics;
 using System.Threading;
-//using OpenTK.Graphics;
 
 namespace ScePSP.Core.Gpu.Impl.Opengl
 {
     public unsafe class OpenglGpuImpl : GpuImpl, IInjectInitialize
     {
+        public override bool IsWorking => true;
+
         public TextureCacheOpengl TextureCache;
 
         private new GpuStateStruct GpuState;
+
+        AutoResetEvent StopEvent = new AutoResetEvent(false);
+
+        bool Running = true;
+
+        public static IGlContext OpenglContext;
+
+        public static bool AlreadyInitialized;
+
+        public bool IsCurrentWindow;
+
+        private object PspWavefrontObjWriterLock = new object();
+
+        private PspWavefrontObjWriter _pspWavefrontObjWriter = null;
 
         public override void InvalidateCache(uint address, int size)
         {
@@ -147,12 +153,13 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             _verticesTexcoordsBuffer = GLBuffer.Create();
             _verticesColorsBuffer = GLBuffer.Create();
             _verticesWeightsBuffer = GLBuffer.Create();
-            //Console.WriteLine(typeof(OpenglGpuImpl).Assembly.GetManifestResourceNames().ToStringList());
+
             _shader = new GLShader(Shaders.ShaderVert, Shaders.ShaderFrag);
-            Console.WriteLine("###################################");
-            foreach (var uniform in _shader.Uniforms) Console.WriteLine(uniform);
-            foreach (var attribute in _shader.Attributes) Console.WriteLine(attribute);
-            Console.WriteLine("###################################");
+
+            //Console.WriteLine("###################################");
+            //foreach (var uniform in _shader.Uniforms) Console.WriteLine(uniform);
+            //foreach (var attribute in _shader.Attributes) Console.WriteLine(attribute);
+            //Console.WriteLine("###################################");
 
             _shader.BindUniformsAndAttributes(ShaderInfo);
         }
@@ -167,9 +174,9 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             ShaderInfo.hasPerVertexColor.Set(VertexType.HasColor);
             ShaderInfo.clearingMode.Set(GpuState.ClearingMode);
             ShaderInfo.hasTexture.Set(GpuState.TextureMappingState.Enabled);
-
             ShaderInfo.weightCount.Set(VertexType.RealSkinningWeightCount);
             //ShaderInfo.weightCount.Set(0);
+
             if (VertexType.HasWeight)
             {
                 ShaderInfo.matrixBones.Set(new[]
@@ -220,6 +227,8 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         private void DrawVertices(GLGeometry type)
         {
+            //Console.Out.WriteLineColored(ConsoleColor.Green, $"GE Prim Vertices: ({_indicesList.Length})");
+
             ShaderInfo.hasReversedNormal.NoWarning().Set(VertexType.ReversedNormal);
 
             _shader.Draw(type, _indicesList.Buffer, _indicesList.Length, () =>
@@ -227,8 +236,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                 if (VertexType.HasPosition)
                 {
                     _verticesPositionBuffer.SetData(_verticesPosition.Buffer, 0, _verticesPosition.Length);
-                    ShaderInfo.vertexPosition.SetData<float>(_verticesPositionBuffer, 3, 0, sizeof(Vector3),
-                        false);
+                    ShaderInfo.vertexPosition.SetData<float>(_verticesPositionBuffer, 3, 0, sizeof(Vector3), false);
                 }
 
                 if (VertexType.HasTexture)
@@ -273,7 +281,6 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             _verticesWeights.Reset();
             _verticesTexcoords.Reset();
             _verticesColors.Reset();
-
             _indicesList.Reset();
         }
 
@@ -305,17 +312,11 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             _verticesWeights.Add(new VertexInfoWeights(vertexInfo));
         }
 
-        private object PspWavefrontObjWriterLock = new object();
-
-        private PspWavefrontObjWriter _pspWavefrontObjWriter = null;
-
         public override void StartCapture()
         {
             lock (PspWavefrontObjWriterLock)
             {
-                _pspWavefrontObjWriter =
-                    new PspWavefrontObjWriter(
-                        new WavefrontObjWriter(ApplicationPaths.MemoryStickRootFolder + "/gpu_frame.obj"));
+                _pspWavefrontObjWriter = new PspWavefrontObjWriter(new WavefrontObjWriter(ApplicationPaths.AssertPath + "/gpu_frame.obj"));
             }
         }
 
@@ -333,8 +334,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             if (_pspWavefrontObjWriter != null)
             {
                 lock (PspWavefrontObjWriterLock)
-                    _pspWavefrontObjWriter.StartPrimitive(GpuState, primitiveType, vertexAddress, vetexCount,
-                        ref vertexType);
+                    _pspWavefrontObjWriter.StartPrimitive(GpuState, primitiveType, vertexAddress, vetexCount, ref vertexType);
                 try
                 {
                     action();
@@ -476,6 +476,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         private void EndVertex()
         {
             DrawVertices(ConvertGLGeometry(_primitiveType));
+
             ResetVertex();
         }
 
@@ -500,6 +501,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                 }
 
                 OpenglGpuImplMatrix.PrepareStateMatrix(GpuState, out _worldViewProjectionMatrix);
+
                 PrepareDrawStateFirst();
             }
 
@@ -540,8 +542,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                 }
             }
 
-            _CapturePrimitive(_primitiveType, GpuState.GetAddressRelativeToBaseOffset(GpuState.VertexAddress),
-                vertexCount, ref VertexType, () =>
+            _CapturePrimitive(_primitiveType, GpuState.GetAddressRelativeToBaseOffset(GpuState.VertexAddress), vertexCount, ref VertexType, () =>
                 {
                     // Continuation
                     if (_indicesList.Length > 0)
@@ -598,18 +599,17 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                 });
         }
 
-        private static GLGeometry ConvertGLGeometry(GuPrimitiveType primitiveType) =>
-            primitiveType switch
-            {
-                GuPrimitiveType.Lines => GLGeometry.GL_LINES,
-                GuPrimitiveType.LineStrip => GLGeometry.GL_LINE_STRIP,
-                GuPrimitiveType.Triangles => GLGeometry.GL_TRIANGLES,
-                GuPrimitiveType.Points => GLGeometry.GL_POINTS,
-                GuPrimitiveType.TriangleFan => GLGeometry.GL_TRIANGLE_FAN,
-                GuPrimitiveType.TriangleStrip => GLGeometry.GL_TRIANGLE_STRIP,
-                GuPrimitiveType.Sprites => GLGeometry.GL_TRIANGLE_STRIP,
-                _ => throw new NotImplementedException("Not implemented PrimitiveType:'" + primitiveType + "'")
-            };
+        private static GLGeometry ConvertGLGeometry(GuPrimitiveType primitiveType) => primitiveType switch
+        {
+            GuPrimitiveType.Lines => GLGeometry.GL_LINES,
+            GuPrimitiveType.LineStrip => GLGeometry.GL_LINE_STRIP,
+            GuPrimitiveType.Triangles => GLGeometry.GL_TRIANGLES,
+            GuPrimitiveType.Points => GLGeometry.GL_POINTS,
+            GuPrimitiveType.TriangleFan => GLGeometry.GL_TRIANGLE_FAN,
+            GuPrimitiveType.TriangleStrip => GLGeometry.GL_TRIANGLE_STRIP,
+            GuPrimitiveType.Sprites => GLGeometry.GL_TRIANGLE_STRIP,
+            _ => throw new NotImplementedException("Not implemented PrimitiveType:'" + primitiveType + "'")
+        };
 
         public override void BeforeDraw(GpuStateStruct gpuState)
         {
@@ -647,22 +647,6 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         {
         }
 
-        public override bool IsWorking => true;
-
-        //static public GraphicsContext MyContext;
-
-        //Thread CThread;
-
-        AutoResetEvent StopEvent = new AutoResetEvent(false);
-
-        bool Running = true;
-
-        public static IGlContext OpenglContext;
-
-        public static bool AlreadyInitialized;
-
-        public bool IsCurrentWindow;
-
         public override void SetCurrent()
         {
             if (!IsCurrentWindow)
@@ -680,8 +664,13 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         public static string GlGetString(int name) => GL.GetString(name);
 
+        public void SwapBuffers()
+        {
+            OpenglContext.SwapBuffers();
+        }
+
         /// <see cref="http://www.opentk.com/doc/graphics/graphicscontext"/>
-        public override void InitSynchronizedOnce()
+        public override void InitSynchronizedOnce(IntPtr TargetHwnd)
         {
             //Memory.WriteBytesHook += OnMemoryWrite;
             ScaleViewport = PspStoredConfig.RenderScale;
@@ -689,13 +678,23 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             if (!AlreadyInitialized)
             {
                 AlreadyInitialized = true;
+
                 var completedEvent = new AutoResetEvent(false);
 
                 new Thread(() =>
                 {
                     Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
 
-                    OpenglContext = GlContextFactory.CreateWindowless();
+                    if (TargetHwnd == IntPtr.Zero)
+                    {
+                        Console.Out.WriteLineColored(ConsoleColor.White, $"## OpenGL Windowless Mode");
+                        OpenglContext = GlContextFactory.CreateWindowless();
+                    }
+                    else
+                    {
+                        Console.Out.WriteLineColored(ConsoleColor.White, $"## OpenGL Window HWND: {TargetHwnd}");
+                        OpenglContext = GlContextFactory.CreateFromWindowHandle(TargetHwnd);
+                    }
 
                     OpenglContext.MakeCurrent();
 
@@ -720,7 +719,8 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                         OpenglContext.ReleaseCurrent();
 
                         completedEvent.Set();
-                        Console.WriteLine("OpenglGpuImpl.Init.Start()");
+
+                        Console.WriteLine("Opengl Initialize.");
                         try
                         {
                             while (Running)
@@ -731,12 +731,12 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                         }
                         finally
                         {
-                            Console.WriteLine("OpenglGpuImpl.Init.End()");
+                            Console.WriteLine("Opengl Uninitialize.");
                         }
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("OpenglGpuImpl.Init.Error: {0}", e);
+                        Console.WriteLine("Opengl initialize Error: {0}", e);
                     }
                 })
                 {
@@ -752,8 +752,6 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         {
             //Running = false;
             //StopEvent.WaitOne();
-
-            //GraphicsContext.Dispose();
             //NativeWindow.Dispose();
         }
 

@@ -25,6 +25,8 @@ namespace ScePSP.Core.Gpu.Impl.Opengl.Modules
         //static int ScreenWidth = 480 * 2;
         //static int ScreenHeight = 272 * 2;
 
+        OpenglGpuImpl OpenglGpuImpl;
+
         public class DrawBufferValue : IDisposable
         {
             public DrawBufferKey DrawBufferKey;
@@ -126,8 +128,11 @@ namespace ScePSP.Core.Gpu.Impl.Opengl.Modules
             }
         }
 
-        private readonly Dictionary<DrawBufferKey, DrawBufferValue> _drawBufferTextures =
-            new Dictionary<DrawBufferKey, DrawBufferValue>();
+        private readonly Dictionary<DrawBufferKey, DrawBufferValue> _drawBufferTextures = new Dictionary<DrawBufferKey, DrawBufferValue>();
+
+        private uint _cachedBindAddress;
+
+        public DrawBufferValue CurrentDrawBuffer { get; private set; }
 
         public GLTexture TextureCacheGetAndBind(GpuStateStruct gpuState)
         {
@@ -157,8 +162,6 @@ namespace ScePSP.Core.Gpu.Impl.Opengl.Modules
         //	//Console.WriteLine("GetDrawTexture: {0}", GetCurrentDrawBufferTexture(Key).TextureColor);
         //	return GetCurrentDrawBufferTexture(Key).TextureColor;
         //}
-
-        OpenglGpuImpl OpenglGpuImpl;
 
         public RenderbufferManager(OpenglGpuImpl openglGpuImpl)
         {
@@ -211,9 +214,6 @@ namespace ScePSP.Core.Gpu.Impl.Opengl.Modules
             drawBuffer.Unbind();
             Console.WriteLine("DrawVideo: {0:X8}, {1}x{2}", frameBufferAddress, width, height);
         }
-
-        private uint _cachedBindAddress;
-        public DrawBufferValue CurrentDrawBuffer { get; private set; }
 
         public void BindCurrentDrawBufferTexture(GpuStateStruct gpuState)
         {

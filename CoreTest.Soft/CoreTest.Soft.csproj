@@ -4,7 +4,7 @@
         <OutputType>Exe</OutputType>
         <LangVersion>9</LangVersion>
         <NullableContextOptions>disable</NullableContextOptions>
-        <RootNamespace>ScePSP.SDL</RootNamespace>
+        <RootNamespace>CoreTest</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <TargetFramework>net8.0-windows7.0</TargetFramework>
         <Nullable>enable</Nullable>

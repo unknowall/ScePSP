@@ -249,8 +249,7 @@ namespace ScePSP.Core.Gpu
                         if (_primCount == 0)
                         {
                             GpuProcessor.GpuImpl.BeforeDraw(GpuStateStructPointer);
-                            GpuProcessor.GpuImpl.PrimStart(GlobalGpuState, GpuStateStructPointer,
-                                primitiveType);
+                            GpuProcessor.GpuImpl.PrimStart(GlobalGpuState, GpuStateStructPointer, primitiveType);
                         }
 
                         if (vertexCount > 0)

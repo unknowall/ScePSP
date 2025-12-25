@@ -51,8 +51,7 @@ namespace ScePSPPlatform.GL.Utils
 
                 To.TextureDepth?.BindUnbind(() =>
                 {
-                    GL.glCopyTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_DEPTH_COMPONENT, 0, 0, From.Width,
-                        From.Height, 0);
+                    GL.glCopyTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_DEPTH_COMPONENT, 0, 0, From.Width, From.Height, 0);
                 });
             });
         }
@@ -131,14 +130,12 @@ namespace ScePSPPlatform.GL.Utils
         {
             if ((RenderTargetLayers & RenderTargetLayers.Color) != 0)
             {
-                GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D,
-                    TextureColor.Texture, 0);
+                GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D, TextureColor.Texture, 0);
             }
 
             if ((RenderTargetLayers & RenderTargetLayers.Depth) != 0)
             {
-                GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_TEXTURE_2D,
-                    TextureDepth.Texture, 0);
+                GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_TEXTURE_2D, TextureDepth.Texture, 0);
             }
 
             if ((RenderTargetLayers & RenderTargetLayers.Stencil) != 0)

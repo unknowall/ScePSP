@@ -15,9 +15,24 @@ using System;
 
 namespace ScePSP.Runner
 {
+    public enum PspGpuType
+    {
+        Soft = 0,
+        OpenGL = 1,
+        Null = -1,
+    }
+
+    public enum PspAudioType
+    {
+        SDL = 0,
+        Null = -1,
+    }
+
     public class PspInjectContext
     {
-        public static InjectContext CreateInjectContext(PspStoredConfig storedConfig, bool test, Action<InjectContext> configure = null)
+        public static InjectContext CreateInjectContext(PspStoredConfig storedConfig, 
+            PspGpuType gputype = PspGpuType.Soft, PspAudioType audiotype = PspAudioType.SDL, 
+            Action<InjectContext> configure = null)
         {
             var injectContext = new InjectContext();
             configure?.Invoke(injectContext);
@@ -28,25 +43,27 @@ namespace ScePSP.Runner
             injectContext.SetInstanceType<IInterruptManager, HleInterruptManager>();
             injectContext.SetInstanceType<PspMemory, FastPspMemory>();
 
-            if (!test)
+            switch (gputype)
             {
-                // RENDER
-                PspPluginImpl.SelectWorkingPlugin<GpuImpl>(injectContext,
-                    typeof(GpuImplSoft),
-                    typeof(OpenglGpuImpl)
-                    //typeof(GpuImplNull)
-                );
-
-                // AUDIO
-                PspPluginImpl.SelectWorkingPlugin<AudioImpl>(injectContext,
-                    typeof(SDLAudioImpl),
-                    typeof(AudioImplNull)
-                    );
+                case PspGpuType.Null:
+                    PspPluginImpl.SelectWorkingPlugin<GpuImpl>(injectContext, typeof(GpuImplNull));
+                    break;
+                case PspGpuType.Soft:
+                    PspPluginImpl.SelectWorkingPlugin<GpuImpl>(injectContext, typeof(GpuImplSoft));
+                    break;
+                case PspGpuType.OpenGL:
+                    PspPluginImpl.SelectWorkingPlugin<GpuImpl>(injectContext, typeof(OpenglGpuImpl));
+                    break;
             }
-            else
+
+            switch (audiotype)
             {
-                injectContext.SetInstanceType<GpuImpl, GpuImplNull>();
-                injectContext.SetInstanceType<AudioImpl, AudioImplNull>();
+                case PspAudioType.Null:
+                    PspPluginImpl.SelectWorkingPlugin<AudioImpl>(injectContext, typeof(AudioImplNull));
+                    break;
+                case PspAudioType.SDL:
+                    PspPluginImpl.SelectWorkingPlugin<AudioImpl>(injectContext, typeof(SDLAudioImpl));
+                    break;
             }
 
             return injectContext;

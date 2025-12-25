@@ -56,6 +56,12 @@ namespace ScePSPPlatform.GL.Impl.Windows
             IntPtr param
         );
 
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32.dll")]
+        private static extern bool UpdateWindow(IntPtr hWnd);
+
         [DllImport("Gdi32.dll")]
         internal static extern IntPtr GetCurrentObject(
             IntPtr hdc,
@@ -129,7 +135,7 @@ namespace ScePSPPlatform.GL.Impl.Windows
 
             if (winHandle == IntPtr.Zero)
             {
-                var style = WindowStyle.OverlappedWindow | WindowStyle.ClipChildren | WindowStyle.ClipSiblings;
+                var style = WindowStyle.OverlappedWindow | WindowStyle.ClipChildren | WindowStyle.ClipSiblings;// | WindowStyle.Visible;
                 var exStyle = ParentStyleEx;
 
                 var rect = new Rect
@@ -150,9 +156,16 @@ namespace ScePSPPlatform.GL.Impl.Windows
 
                 if (_hWnd == IntPtr.Zero)
                     throw new Exception($"Failed to create window. Error: {Marshal.GetLastWin32Error()}");
+
+                //ShowWindow(_hWnd, 1); // 1=SW_SHOWNORMAL
+                //UpdateWindow(_hWnd);
             }
 
             _dc = GetDC(_hWnd);
+            if (_dc == 0)
+            {
+                Console.WriteLine($"Error GetDC HWND {_hWnd}");
+            }
 
             var pfd = new PixelFormatDescriptor();
             pfd.Size = (short)sizeof(PixelFormatDescriptor);

@@ -1,12 +1,6 @@
 ﻿// ReSharper disable InconsistentNaming
 namespace ScePSP.Core.Gpu
 {
-    public class Test
-    {
-        static public void test()
-        {
-        }
-    }
     public enum GpuOpCodes : ushort
     {
         NOP,         // 0x00 - 0 - NOP

@@ -39,6 +39,8 @@ namespace ScePSP
 
         [Inject] TextureHookPlugin TextureHookPlugin;
 
+        [Inject] MessageBus MessageBus;
+
         public InjectContext InjectContext
         {
             get
@@ -102,22 +104,25 @@ namespace ScePSP
         public void StartAndLoad(
             string File, Action<PspEmulator> GuiRunner = null,
             bool TraceSyscalls = false, bool TrackCallStack = true,
+            IntPtr GpuWindowHandle = default,
             bool? EnableMpeg = null
         )
         {
             Start(() =>
                     {
-                        CpuConfig.DebugSyscalls = TraceSyscalls;
-                        CpuConfig.TrackCallStack = TrackCallStack;
                         LoadFile(File);
-                    }, GuiRunner
+                    }, GuiRunner , TraceSyscalls, TrackCallStack, GpuWindowHandle
                 );
         }
 
-        public void Start(Action CallbackOnInit = null, Action<PspEmulator> GuiRunner = null, bool TrackCallStack = true)
+        public void Start(Action CallbackOnInit = null, Action<PspEmulator> GuiRunner = null, bool TraceSyscalls = false, bool TrackCallStack = true, IntPtr GpuWindowHandle = default)
         {
             try
             {
+                CpuConfig.DebugSyscalls = TraceSyscalls;
+                CpuConfig.TrackCallStack = TrackCallStack;
+                DisplayConfig.WindowHandle = GpuWindowHandle;
+
                 // Creates a temporal context.
                 //PspEmulatorContext = new PspEmulatorContext(PspConfig);
 
@@ -152,9 +157,7 @@ namespace ScePSP
             //}
             //Environment.Exit(0);
             return;
-        }
-
-        [Inject] MessageBus MessageBus;
+        }        
 
         public void LoadFile(string FileName)
         {
@@ -175,7 +178,7 @@ namespace ScePSP
 
         public void CreateNewContextAndRemoveOldOne()
         {
-            Console.WriteLine("----- CreateNewContextAndRemoveOldOne -----------------------------------------");
+            //Console.WriteLine("----- CreateNewContextAndRemoveOldOne -----------------------------------------");
             // Stops the current context if it has one already.
             /*
             if (PspRunner != null)

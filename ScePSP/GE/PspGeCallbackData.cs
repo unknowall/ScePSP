@@ -9,9 +9,6 @@ namespace ScePSP.Core.Gpu
     {
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public struct PspGeCallbackData
     {
         /// <summary>

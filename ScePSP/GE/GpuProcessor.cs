@@ -33,50 +33,23 @@ namespace ScePSP.Core.Gpu
         /// </summary>
         public enum SyncTypeEnum : uint
         {
-            /// <summary>
-            /// 
-            /// </summary>
             ListDone = 0,
 
-            /// <summary>
-            /// 
-            /// </summary>
             ListQueued = 1,
 
-            /// <summary>
-            /// 
-            /// </summary>
             ListDrawingDone = 2,
 
-            /// <summary>
-            /// 
-            /// </summary>
             ListStallReached = 3,
 
-            /// <summary>
-            /// 
-            /// </summary>
             ListCancelDone = 4,
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public GlobalGpuState GlobalGpuState = new GlobalGpuState();
 
-        /// <summary>
-        /// 
-        /// </summary>
         internal volatile LinkedList<GpuDisplayList> DisplayListQueue;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public volatile AutoResetEvent DisplayListQueueUpdated = new AutoResetEvent(false);
 
-        /// <summary>
-        /// 
-        /// </summary>
         protected volatile Queue<GpuDisplayList> DisplayListFreeQueue;
 
         public const int DisplayListsCount = 64;
@@ -89,7 +62,6 @@ namespace ScePSP.Core.Gpu
         public GpuDisplayList GetDisplayList(int Index)
         {
             lock (DisplayLists) return DisplayLists[Index];
-            //return DisplayLists[Index];
         }
 
         public enum Status2Enum
@@ -98,29 +70,14 @@ namespace ScePSP.Core.Gpu
             HavePendingLists = 1,
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public readonly WaitableStateMachine<Status2Enum> Status2 = new WaitableStateMachine<Status2Enum>(Status2Enum.Completed, Debug: false);
 
-        /// <summary>
-        /// 
-        /// </summary>
         [Inject] public GpuImpl GpuImpl;
 
-        /// <summary>
-        /// 
-        /// </summary>
         [Inject] public GpuConfig GpuConfig;
 
-        /// <summary>
-        /// 
-        /// </summary>
         [Inject] public PspMemory Memory;
 
-        /// <summary>
-        /// 
-        /// </summary>
         [Inject] public IGpuConnector Connector;
 
         private GpuProcessor()
@@ -142,10 +99,6 @@ namespace ScePSP.Core.Gpu
 
         AutoResetEvent DisplayListFreeEvent = new AutoResetEvent(false);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public GpuDisplayList DequeueFreeDisplayList()
         {
             lock (DisplayListFreeQueue)
@@ -156,10 +109,6 @@ namespace ScePSP.Core.Gpu
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="GpuDisplayList"></param>
         public void EnqueueFreeDisplayList(GpuDisplayList GpuDisplayList)
         {
             //Console.WriteLine("EnqueueFreeDisplayList: {0}", this.DisplayListFreeQueue.Count);
@@ -171,10 +120,6 @@ namespace ScePSP.Core.Gpu
             DisplayListFreeEvent.Set();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="DisplayList"></param>
         public void EnqueueDisplayListFirst(GpuDisplayList DisplayList)
         {
             //Console.WriteLine("EnqueueDisplayListFirst: {0}", this.DisplayListFreeQueue.Count);
@@ -188,10 +133,6 @@ namespace ScePSP.Core.Gpu
             ListEnqueuedEvent.Set();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="DisplayList"></param>
         public void EnqueueDisplayListLast(GpuDisplayList DisplayList)
         {
             //Console.WriteLine("EnqueueDisplayListLast: {0}", this.DisplayListFreeQueue.Count);
@@ -205,7 +146,6 @@ namespace ScePSP.Core.Gpu
             ListEnqueuedEvent.Set();
         }
 
-
         public void ProcessInit()
         {
         }
@@ -216,9 +156,6 @@ namespace ScePSP.Core.Gpu
         private volatile GpuDisplayList LastProcessedGpuDisplayList = null;
         public bool UsingGe { get; private set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void ProcessStep()
         {
             CurrentGpuDisplayList = null;
@@ -373,9 +310,6 @@ namespace ScePSP.Core.Gpu
         PSP_GE_SIGNAL_BREAK2 = 0xFF,
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public enum DisplayListStatusEnum
     {
         /// <summary>

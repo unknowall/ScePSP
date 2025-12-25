@@ -78,16 +78,18 @@ namespace ScePSPPlatform.GL.Utils
 
             if (VertexShaderCompileStatus == 0 || FragmentShaderCompileStatus == 0)
             {
-                //throw (new Exception(String.Format("Shader ERROR (I): {0}, {1}", VertexShaderInfo, FragmentShaderInfo)));
-                Console.Error.WriteLineColored(ConsoleColor.Red, "Shader ERROR (I): {0}, {1}", VertexShaderInfo,
-                    FragmentShaderInfo);
+                Console.Error.WriteLineColored(ConsoleColor.Red, "Shader ERROR: {0}, {1}", VertexShaderInfo, FragmentShaderInfo);
+            }
+            else
+            {
+                Console.Out.WriteLineColored(ConsoleColor.Blue, "OpenGL Shader Compiled.");
             }
 
-            Console.Out.WriteLineColored(
-                ConsoleColor.Blue,
-                "Compiled Shader! : {0}, {1}",
-                VertexShaderSource, FragmentShaderSource
-            );
+            //Console.Out.WriteLineColored(
+            //    ConsoleColor.Blue,
+            //    "Compiled Shader! : {0}, {1}",
+            //    VertexShaderSource, FragmentShaderSource
+            //);
 
             GL.glAttachShader(Program, VertexShader);
             GL.glAttachShader(Program, FragmentShader);
@@ -241,6 +243,7 @@ namespace ScePSPPlatform.GL.Utils
         {
             Use();
             SetDataCallback();
+            //Console.Out.WriteLineColored(ConsoleColor.Green, $"glDrawArrays Vertices: ({Count})");
             GL.glDrawArrays((int)Geometry, Offset, Count);
         }
 
@@ -250,6 +253,7 @@ namespace ScePSPPlatform.GL.Utils
             SetDataCallback();
             fixed (uint* IndicesPtr = &Indices[IndicesOffset])
             {
+                //Console.Out.WriteLineColored(ConsoleColor.Green, $"glDrawElements Vertices: ({Count})");
                 GL.glDrawElements((int)Geometry, Count, GL.GL_UNSIGNED_INT, IndicesPtr);
             }
         }

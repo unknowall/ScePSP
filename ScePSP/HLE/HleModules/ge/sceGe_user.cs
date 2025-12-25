@@ -77,7 +77,7 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="contextAddr">Pointer to a <see cref="PspGeContext"/>.</param>
         /// <returns>&lt; 0 on error.</returns>
         [HlePspFunction(NID = 0x0BF608FB, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HlePspNotImplemented]
         public int sceGeRestoreContext(uint Address)
         {
             //var pointer = Memory.PspAddressToSpan<uint>(Address, 0x200);
@@ -155,7 +155,7 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="BreakAddress">Unused (just K1-checked).</param>
         /// <returns>The stopped queue ID if mode isn't set to 0, otherwise 0, and &lt; 0 on error.</returns>
         [HlePspFunction(NID = 0xB448EC0D, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceGeBreak(int Mode, void* BreakAddress)
         {
             throw new NotImplementedException();
@@ -166,7 +166,7 @@ namespace ScePSP.Hle.Modules.ge
         /// </summary>
         /// <returns>&lt; 0 on error.</returns>
         [HlePspFunction(NID = 0x4C06E472, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceGeContinue()
         {
             var currentList = GpuProcessor.GetCurrentGpuDisplayList();
@@ -225,7 +225,7 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="PspGeCallbackData">Configured callback data structure</param>
         /// <returns>The callback ID, less than 0 on error</returns>
         [HlePspFunction(NID = 0xA4FC06A4, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceGeSetCallback(ref PspGeCallbackData PspGeCallbackData)
         {
             int CallbackId = CallbackLastId++;
@@ -241,10 +241,8 @@ namespace ScePSP.Hle.Modules.ge
             });
             */
 
-            Logger.Info("PspGeCallbackData.Finish(0x{0:X}) : (0x{1:X})", PspGeCallbackData.FinishFunction,
-                PspGeCallbackData.FinishArgument);
-            Logger.Info("PspGeCallbackData.Signal(0x{0:X}) : (0x{1:X})", PspGeCallbackData.SignalFunction,
-                PspGeCallbackData.SignalArgument);
+            Logger.Info("PspGeCallbackData.Finish(0x{0:X}) : (0x{1:X})", PspGeCallbackData.FinishFunction, PspGeCallbackData.FinishArgument);
+            Logger.Info("PspGeCallbackData.Signal(0x{0:X}) : (0x{1:X})", PspGeCallbackData.SignalFunction, PspGeCallbackData.SignalArgument);
 
             //Console.Error.WriteLine("{0}", *PspGeCallbackData);
             return CallbackId;
@@ -256,7 +254,7 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="cbid">The ID of the callbacks from sceGeSetCallback</param>
         /// <returns>Less than 0 on error</returns>
         [HlePspFunction(NID = 0x05DB22CE, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceGeUnsetCallback(int cbid)
         {
             Callbacks.Remove(cbid);
@@ -285,8 +283,7 @@ namespace ScePSP.Hle.Modules.ge
             return GpuProcessor.GetDisplayList(DisplayListId);
         }
 
-        private GpuDisplayList _sceGeListEnQueue(uint InstructionAddressStart, uint InstructionAddressStall,
-            int CallbackId, PspGeListArgs* Args)
+        private GpuDisplayList _sceGeListEnQueue(uint InstructionAddressStart, uint InstructionAddressStall, int CallbackId, PspGeListArgs* Args)
         {
             var DisplayList = GpuProcessor.DequeueFreeDisplayList();
 
@@ -322,8 +319,7 @@ namespace ScePSP.Hle.Modules.ge
         /// <returns>The DisplayList ID</returns>
         [HlePspFunction(NID = 0xAB49E76A, FirmwareVersion = 150)]
         //[HlePspNotImplemented]
-        public int sceGeListEnQueue(uint InstructionAddressStart, uint InstructionAddressStall, int CallbackId,
-            PspGeListArgs* Args)
+        public int sceGeListEnQueue(uint InstructionAddressStart, uint InstructionAddressStall, int CallbackId, PspGeListArgs* Args)
         {
             var DisplayList = _sceGeListEnQueue(InstructionAddressStart, InstructionAddressStall, CallbackId, Args);
             GpuProcessor.EnqueueDisplayListLast(DisplayList);
@@ -340,8 +336,7 @@ namespace ScePSP.Hle.Modules.ge
         /// <returns>The DisplayList ID</returns>
         [HlePspFunction(NID = 0x1C0D95A6, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceGeListEnQueueHead(uint InstructionAddressStart, uint InstructionAddressStall, int CallbackId,
-            PspGeListArgs* Args)
+        public int sceGeListEnQueueHead(uint InstructionAddressStart, uint InstructionAddressStall, int CallbackId, PspGeListArgs* Args)
         {
             var DisplayList = _sceGeListEnQueue(InstructionAddressStart, InstructionAddressStall, CallbackId, Args);
             GpuProcessor.EnqueueDisplayListFirst(DisplayList);
@@ -403,7 +398,7 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="SyncType">Specifies the condition to wait on.  One of PspGeSyncType.</param>
         /// <returns>???</returns>
         [HlePspFunction(NID = 0x03444EB4, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public DisplayListStatusEnum sceGeListSync(int DisplayListId, SyncTypeEnum SyncType)
         {
             var DisplayList = GetDisplayListFromId(DisplayListId);

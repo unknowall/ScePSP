@@ -39,6 +39,7 @@ namespace ScePSP.Runner.Components.Display
             var endTime = startTime + endTimeIncrement;
 
             ThreadTaskQueue.HandleEnqueued();
+
             if (!Running) return;
 
             // Draw time

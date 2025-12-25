@@ -1,6 +1,5 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
-//using OpenTK;
 
 namespace ScePSP.Core.Gpu
 {
@@ -15,7 +14,6 @@ namespace ScePSP.Core.Gpu
         }
     }
 
-    /// <summary>Information about a vertex.</summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public unsafe struct VertexInfo
     {

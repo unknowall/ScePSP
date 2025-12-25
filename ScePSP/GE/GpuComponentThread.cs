@@ -1,6 +1,7 @@
 ﻿using ScePSP.Core.Gpu;
 using ScePSP.Utils;
 using System.Threading;
+using ScePSP.Core.Components.Display;
 
 namespace ScePSP.Runner.Components.Gpu
 {
@@ -12,16 +13,17 @@ namespace ScePSP.Runner.Components.Gpu
 
         [Inject] private GpuImpl GpuImpl;
 
+        [Inject] private DisplayConfig DisplayConfig;
+
         protected override void Main()
         {
-            GpuImpl.InitSynchronizedOnce();
+            GpuImpl.InitSynchronizedOnce(DisplayConfig.WindowHandle);
 
             GpuProcessor.ProcessInit();
 
             //Console.WriteLine("GpuComponentThread.Start()");
             try
             {
-                //GpuProcessor.SetCurrent();
                 while (true)
                 {
                     WaitHandle.WaitAny(new WaitHandle[] { GpuProcessor.DisplayListQueueUpdated, ThreadTaskQueue.EnqueuedEvent, RunningUpdatedEvent }, 200.Milliseconds());
@@ -32,9 +34,10 @@ namespace ScePSP.Runner.Components.Gpu
 
                     if (!Running) break;
 
+                    GpuProcessor.SetCurrent();
                     GpuProcessor.ProcessStep();
+                    GpuProcessor.UnsetCurrent();
                 }
-                //GpuProcessor.UnsetCurrent();
             }
             finally
             {

@@ -15,7 +15,7 @@ namespace ScePSP.Core.Gpu
         [Inject] protected PspMemory Memory;
         [Inject] protected PspStoredConfig PspStoredConfig;
 
-        protected int _ScaleViewport = 1;
+        protected int _ScaleViewport = 2;
 
         internal event Action<int> OnScaleViewport;
 

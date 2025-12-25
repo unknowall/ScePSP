@@ -172,7 +172,6 @@ class Program
                         }
                     }
 
-
                     {
                         //Console.WriteLine(display.CurrentInfo.FrameAddress);
                         var pixels2 = new uint[PspDisplay.MaxBufferArea];
@@ -194,8 +193,10 @@ class Program
                         }
                     }
 
-                    displayComponent.Step(DrawStart: () => { display.TriggerDrawStart(); },
-                        VBlankStart: () => { display.TriggerVBlankStart(); }, VBlankEnd: () =>
+                    displayComponent.Step(
+                        DrawStart: () => { display.TriggerDrawStart(); },
+                        VBlankStart: () => { display.TriggerVBlankStart(); },
+                        VBlankEnd: () =>
                         {
                             lx = pressingAnalogLeft != 0 ? -pressingAnalogLeft : pressingAnalogRight;
                             ly = pressingAnalogUp != 0 ? -pressingAnalogUp : pressingAnalogDown;
@@ -211,9 +212,6 @@ class Program
 
                             display.TriggerVBlankEnd();
                         });
-                    //display.TriggerVBlankStart();
-
-                    //display.TriggerVBlankEnd();
                 }
 
             }, false, false);

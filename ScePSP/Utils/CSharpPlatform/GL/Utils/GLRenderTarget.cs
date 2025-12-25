@@ -66,8 +66,7 @@ namespace ScePSPPlatform.GL.Utils
             Initialize();
         }
 
-        public static GLRenderTarget Create(int Width, int Height,
-            RenderTargetLayers RenderTargetLayers = RenderTargetLayers.All)
+        public static GLRenderTarget Create(int Width, int Height, RenderTargetLayers RenderTargetLayers = RenderTargetLayers.All)
         {
             return new GLRenderTarget(Width, Height, RenderTargetLayers);
         }

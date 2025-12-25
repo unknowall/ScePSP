@@ -82,8 +82,8 @@ namespace ScePSP.Core
 
         public DateTime LastCheckedTime;
         public bool LimitVerticalSync = true;
-        public int DisplayScale = 1;
-        public int RenderScale = 1;
+        public int DisplayScale = 2;
+        public int RenderScale = 2;
         public bool UseFastMemory = true;
         public bool EnableAstOptimizations = true;
         public ControllerConfig ControllerConfig = new ControllerConfig();

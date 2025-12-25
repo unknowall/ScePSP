@@ -121,15 +121,13 @@ namespace ScePSP.Core.Gpu
                 if (InstructionAddressStall != 0 && InstructionAddressCurrent >= InstructionAddressStall)
                 {
                     if (Debug)
-                        Console.WriteLine(
-                            "- STALLED --------------------------------------------------------------------");
+                        Console.WriteLine( "- STALLED --------------------------------------------------------------------");
                     Status.SetValue(DisplayListStatusEnum.Stalling);
                     while (!StallAddressUpdated.WaitOne(TimeSpan.FromSeconds(2)))
                     {
                         ConsoleUtils.SaveRestoreConsoleColor(ConsoleColor.Magenta, () =>
                         {
-                            Console.WriteLine("DisplayListQueue.GetCountLock(): {0}",
-                                GpuProcessor.DisplayListQueue.GetCountLock());
+                            Console.WriteLine("DisplayListQueue.GetCountLock(): {0}", GpuProcessor.DisplayListQueue.GetCountLock());
                             Console.WriteLine("CurrentGpuDisplayList.Status: {0}", Status.ToStringDefault());
                         });
                         if (GpuProcessor.Syncing)
@@ -555,8 +553,7 @@ namespace ScePSP.Core.Gpu
             }
 
             GpuProcessor.GpuImpl.BeforeDraw(GpuStateStructPointer);
-            GpuProcessor.GpuImpl.DrawCurvedSurface(GlobalGpuState, GpuStateStructPointer,
-                patch, uCount, vCount);
+            GpuProcessor.GpuImpl.DrawCurvedSurface(GlobalGpuState, GpuStateStructPointer, patch, uCount, vCount);
         }
 
 

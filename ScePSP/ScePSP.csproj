@@ -12,13 +12,10 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <NoWarn>1701;1702;0649;0169;0078</NoWarn>
+    <IsTrimmable>False</IsTrimmable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <NoWarn>1701;1702;0649;0169;0078</NoWarn>
+    <IsTrimmable>False</IsTrimmable>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="Resources\**" />
-    <EmbeddedResource Remove="Resources\**" />
-    <None Remove="Resources\**" />
-  </ItemGroup>
 </Project>

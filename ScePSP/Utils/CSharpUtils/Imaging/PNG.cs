@@ -1,8 +1,8 @@
-using ScePSPUtils.Extensions;
 using System;
 using System.IO;
+using ScePSPUtils.Extensions;
 
-namespace ScePSP.Utils.Imaging
+namespace ScePSPUtils.Utils.Imaging
 {
     public class PNG
     {

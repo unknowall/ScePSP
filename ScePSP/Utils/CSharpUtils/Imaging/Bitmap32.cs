@@ -1,6 +1,6 @@
 using System;
 
-namespace ScePSP.Utils.Imaging
+namespace ScePSPUtils.Utils.Imaging
 {
     public class Bitmap32
     {

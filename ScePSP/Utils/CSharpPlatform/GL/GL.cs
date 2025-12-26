@@ -7,9 +7,6 @@ using System.Runtime.InteropServices;
 using System.Security;
 using GLintptr = System.IntPtr;
 
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnassignedReadonlyField
-
 namespace ScePSPPlatform.GL
 {
     public unsafe class GL
@@ -64,6 +61,18 @@ namespace ScePSPPlatform.GL
                 }
                 return Constants[Value];
             }
+        }
+
+        public enum DepthFunction
+        {
+            Never = 0x0200,
+            Less = 0x0201,
+            Equal = 0x0202,
+            Lequal = 0x0203,
+            Greater = 0x0204,
+            Notequal = 0x0205,
+            Gequal = 0x0206,
+            Always = 0x0207
         }
 
         public const int GL_ES_VERSION_2_0 = 1;
@@ -122,6 +131,7 @@ namespace ScePSPPlatform.GL
         public const int GL_CULL_FACE = 0x0B44;
         public const int GL_BLEND = 0x0BE2;
         public const int GL_DITHER = 0x0BD0;
+        public const int GL_ALPHA_TEST = 0x0BC0;
         public const int GL_STENCIL_TEST = 0x0B90;
         public const int GL_DEPTH_TEST = 0x0B71;
         public const int GL_SCISSOR_TEST = 0x0C11;
@@ -370,6 +380,9 @@ namespace ScePSPPlatform.GL
         public const int GL_MAX_RENDERBUFFER_SIZE = 0x84E8;
         public const int GL_INVALID_FRAMEBUFFER_OPERATION = 0x0506;
         public const int GL_COLOR_MATERIAL = 0x0B57;
+        public const int GL_LIGHTING = 0x0B50;
+        public const int GL_FOG = 0x0B60;
+        public const int GL_LOGIC_OP = 0x0BF1;
 
         public static readonly glActiveTexture glActiveTexture;
         public static readonly glAttachShader glAttachShader;
@@ -544,6 +557,7 @@ namespace ScePSPPlatform.GL
         public static readonly glMaterialfv glMaterialfv;
         public static readonly glMaterialf glMaterialf;
         public static readonly glMateriali glMateriali;
+        public static readonly glAlphaFunc glAlphaFunc;
 
         public static void ClearError()
         {
@@ -1046,4 +1060,7 @@ namespace ScePSPPlatform.GL
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
     public delegate void glMateriali(int face, int pname, int param);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+    public delegate void glAlphaFunc(int func, float refValue);
 }

@@ -5,7 +5,6 @@ using ScePSP.Core.Components.Display;
 using ScePSP.Core.Components.Rtc;
 using ScePSP.Core.Gpu;
 using ScePSP.Core.Gpu.Impl.Opengl;
-using ScePSP.Core.Gpu.Impl.Opengl.Modules;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types.Controller;
 using ScePSP.Runner;

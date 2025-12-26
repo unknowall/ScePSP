@@ -1,7 +1,6 @@
 ﻿#define ENABLE_TEXTURES
 
 using ScePSP.Core.Gpu.Formats;
-using ScePSP.Core.Gpu.Impl.Opengl.Modules;
 using ScePSP.Core.Gpu.Impl.Opengl.Utils;
 using ScePSP.Core.Gpu.State;
 using ScePSP.Core.Gpu.VertexReading;
@@ -90,9 +89,6 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         public RenderbufferManager RenderbufferManager { get; private set; }
         private GLShader _shader;
 
-        // ReSharper disable FieldCanBeMadeReadOnly.Global
-        // ReSharper disable UnassignedField.Global
-        // ReSharper disable InconsistentNaming
         public class ShaderInfoClass
         {
             public GlUniform matrixWorldViewProjection;
@@ -358,9 +354,80 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             }
         }
 
-        //private static readonly GuPrimitiveType[] patch_prim_types = { GuPrimitiveType.TriangleStrip, GuPrimitiveType.LineStrip, GuPrimitiveType.Points };
-        //public override void DrawCurvedSurface(GlobalGpuState GlobalGpuState, GpuStateStruct* GpuStateStruct, VertexInfo[,] Patch, int UCount, int VCount)
-        //{
+        private static readonly GuPrimitiveType[] patch_prim_types = { GuPrimitiveType.TriangleStrip, GuPrimitiveType.LineStrip, GuPrimitiveType.Points };
+        public override void DrawCurvedSurface(GlobalGpuState GlobalGpuState, GpuStateStruct GpuStateStruct, VertexInfo[,] Patch, int UCount, int VCount)
+        {
+            if (Patch == null) return;
+            if (Patch.Length == 0) return;
+
+            GpuState = GpuStateStruct;
+            VertexType = GpuState.VertexState.Type;
+
+            PrepareStateCommon(GpuState, ScaleViewport);
+            PrepareStateDraw(GpuState);
+            PrepareStateMatrix(GpuState, out _worldViewProjectionMatrix);
+
+#if ENABLE_TEXTURES
+            PrepareState_Texture_Common(GpuState);
+            PrepareState_Texture_3D(GpuState);
+#endif
+            PrepareDrawStateFirst();
+
+            int s_len = Patch.GetLength(0);
+            int t_len = Patch.GetLength(1);
+
+            if (s_len <= 1 || t_len <= 1)
+            {
+                // 无法构造三角形
+                return;
+            }
+
+            float s_len_float = s_len;
+            float t_len_float = t_len;
+
+            var mipmap0 = GpuState.TextureMappingState.TextureState.Mipmap0;
+            float mipmapWidth = mipmap0.TextureWidth != 0 ? mipmap0.TextureWidth : 1.0f;
+            float mipmapHeight = mipmap0.TextureHeight != 0 ? mipmap0.TextureHeight : 1.0f;
+
+            ResetVertex();
+
+            for (int t = 0; t < t_len - 1; t++)
+            {
+                for (int s = 0; s < s_len - 1; s++)
+                {
+                    var v1 = Patch[s + 0, t + 0];
+                    var v2 = Patch[s + 0, t + 1];
+                    var v3 = Patch[s + 1, t + 1];
+                    var v4 = Patch[s + 1, t + 0];
+
+                    if (VertexType.HasTexture)
+                    {
+                        v1.Texture.X = ((float)s + 0) * mipmapWidth / s_len_float;
+                        v1.Texture.Y = ((float)t + 0) * mipmapHeight / t_len_float;
+
+                        v2.Texture.X = ((float)s + 0) * mipmapWidth / s_len_float;
+                        v2.Texture.Y = ((float)t + 1) * mipmapHeight / t_len_float;
+
+                        v3.Texture.X = ((float)s + 1) * mipmapWidth / s_len_float;
+                        v3.Texture.Y = ((float)t + 1) * mipmapHeight / t_len_float;
+
+                        v4.Texture.X = ((float)s + 1) * mipmapWidth / s_len_float;
+                        v4.Texture.Y = ((float)t + 0) * mipmapHeight / t_len_float;
+                    }
+
+                    PutVertex(v1);
+                    PutVertex(v2);
+                    PutVertex(v3);
+
+                    PutVertex(v1);
+                    PutVertex(v3);
+                    PutVertex(v4);
+                }
+            }
+
+            DrawVertices(GLGeometry.GL_TRIANGLES);
+            ResetVertex();
+
         //	//GpuState->TextureMappingState.Enabled = true;
         //
         //	//ResetState();
@@ -432,7 +499,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         //		}
         //	}
         //	DrawVertices(GLGeometry.GL_TRIANGLES);
-        //}
+        }
 
         bool _doPrimStart;
         VertexTypeStruct _cachedVertexType;
@@ -489,18 +556,18 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                 _cachedVertexType = VertexType;
                 _doPrimStart = false;
 
-                OpenglGpuImplCommon.PrepareStateCommon(GpuState, ScaleViewport);
+                PrepareStateCommon(GpuState, ScaleViewport);
 
                 if (GpuState.ClearingMode)
                 {
-                    OpenglGpuImplClear.PrepareStateClear(GpuState);
+                    PrepareStateClear(GpuState);
                 }
                 else
                 {
                     PrepareStateDraw(GpuState);
                 }
 
-                OpenglGpuImplMatrix.PrepareStateMatrix(GpuState, out _worldViewProjectionMatrix);
+                PrepareStateMatrix(GpuState, out _worldViewProjectionMatrix);
 
                 PrepareDrawStateFirst();
             }
@@ -802,17 +869,37 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             );
         }
 
+        private GL.DepthFunction DepthFunctionTranslate(int pspFunc)
+        {
+            return pspFunc switch
+            {
+                0 => GL.DepthFunction.Never,       // 永不通过
+                1 => GL.DepthFunction.Less,        // 小于阈值
+                2 => GL.DepthFunction.Equal,       // 等于阈值
+                3 => GL.DepthFunction.Lequal,      // 小于等于阈值
+                4 => GL.DepthFunction.Greater,     // 大于阈值
+                5 => GL.DepthFunction.Notequal,    // 不等于阈值
+                6 => GL.DepthFunction.Gequal,      // 大于等于阈值
+                7 => GL.DepthFunction.Always,      // 始终通过
+                _ => GL.DepthFunction.Always       // 未知值默认始终通过，避免渲染崩溃
+            };
+        }
+
         private void PrepareState_AlphaTest(GpuStateStruct gpuState)
         {
-            //if (!GL.EnableDisable(EnableCap.AlphaTest, GpuState.AlphaTestState.Enabled))
-            //{
-            //    return;
-            //}
+            if (!gpuState.AlphaTestState.Enabled)
+            {
+                GL.glDisable(GL.GL_ALPHA_TEST);
+                return;
+            }
 
-            //GL glAlphaFunc(
-            //    (AlphaFunction)DepthFunctionTranslate[(int)GpuState.AlphaTestState.Function],
-            //    GpuState.AlphaTestState.Value
-            //);
+            GL.glEnable(GL.GL_ALPHA_TEST);
+
+            var glCompareFunc = DepthFunctionTranslate((int)gpuState.AlphaTestState.Function);
+
+            float alphaThreshold = gpuState.AlphaTestState.Value / 255.0f;
+
+            GL.glAlphaFunc((int)glCompareFunc, alphaThreshold);
         }
 
         private void PrepareState_Stencil(GpuStateStruct gpuState)
@@ -886,78 +973,46 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         private void PrepareState_Colors_3D(GpuStateStruct gpuState)
         {
-            //GL.EnableDisable(EnableCap.ColorMaterial, VertexType.Color != VertexTypeStruct.ColorEnum.Void);
+            try
+            {
+                ShaderInfo.uniformColor.Set(gpuState.LightingState.AmbientModelColor.ToVector4());
+            }
+            catch
+            {
+            }
 
-            //var Color = GpuState.LightingState.AmbientModelColor;
-            //var LightingState = GpuState.LightingState;
-            //GL.Color4(Color.Red);
-
-            //if (VertexType.Color != VertexTypeStruct.ColorEnum.Void && LightingState.Enabled)
-            //{
-            //    var Flags = (ColorMaterialParameter)0;
-            //    /*
-            //	glMaterialfv(faces, GL_AMBIENT , [0.0f, 0.0f, 0.0f, 0.0f].ptr);
-            //	glMaterialfv(faces, GL_DIFFUSE , [0.0f, 0.0f, 0.0f, 0.0f].ptr);
-            //	glMaterialfv(faces, GL_SPECULAR, [0.0f, 0.0f, 0.0f, 0.0f].ptr);
-            //	*/
-
-            //    var MaterialColorComponents = LightingState.MaterialColorComponents;
-
-            //    if (MaterialColorComponents.HasFlag(LightComponentsSet.Ambient))
-            //    {
-            //        GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Ambient, LightingState.AmbientModelColor.Red);
-            //    }
-
-            //    if (MaterialColorComponents.HasFlag(LightComponentsSet.Diffuse))
-            //    {
-            //        GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Diffuse, LightingState.DiffuseModelColor.Red);
-            //    }
-
-            //    if (MaterialColorComponents.HasFlag(LightComponentsSet.Specular))
-            //    {
-            //        GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Specular, LightingState.SpecularModelColor.Red);
-            //    }
-
-            //    if (MaterialColorComponents.HasFlag(LightComponentsSet.AmbientAndDiffuse))
-            //    {
-            //        Flags = ColorMaterialParameter.AmbientAndDiffuse;
-            //    }
-            //    else if (MaterialColorComponents.HasFlag(LightComponentsSet.Ambient))
-            //    {
-            //        Flags = ColorMaterialParameter.Ambient;
-            //    }
-            //    else if (MaterialColorComponents.HasFlag(LightComponentsSet.Diffuse))
-            //    {
-            //        Flags = ColorMaterialParameter.Diffuse;
-            //    }
-            //    else if (MaterialColorComponents.HasFlag(LightComponentsSet.Specular))
-            //    {
-            //        Flags = ColorMaterialParameter.Specular;
-            //    }
-            //    else
-            //    {
-            //        //throw (new NotImplementedException("Error! : " + MaterialColorComponents));
-            //    }
-            //    //flags = GL_SPECULAR;
-            //    if (Flags != 0)
-            //    {
-            //        GL.ColorMaterial(MaterialFace.FrontAndBack, Flags);
-            //    }
-            //    //glEnable(GL_COLOR_MATERIAL);
-            //}
-
-            //GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Emission, GpuState.LightingState.EmissiveModelColor.Red);
+            // 对固定管线无害，在着色器管线中也不会破坏行为
+            GL.EnableDisable(GL.GL_COLOR_MATERIAL, VertexType.HasColor);
         }
 
         private void PrepareState_Lighting(GpuStateStruct gpuState)
         {
-            //var LightingState = &GpuState->LightingState;
-            //
-            //if (!GL.EnableDisable(EnableCap.Lighting, LightingState->Enabled))
-            //{
-            //	return;
-            //}
-            //
+            // 这里尽量根据 LightingState 提供合适的 uniformColor，使无固定管线光照时也有合理显示。
+            var lighting = gpuState.LightingState;
+
+            if (!lighting.Enabled)
+            {
+                // 如果光照被禁用，使用环境色作为基础颜色
+                ShaderInfo.uniformColor.NoWarning().Set(lighting.AmbientModelColor.ToVector4());
+                return;
+            }
+
+            // 合成一个简单的基色 Ambient + Emissive + Diffuse（相加并 clamp 到 [0,1]）
+            var ambient = lighting.AmbientModelColor.ToVector4();
+            var emissive = lighting.EmissiveModelColor.ToVector4();
+            var diffuse = lighting.DiffuseModelColor.ToVector4();
+
+            var combined = new Vector4(
+                MathF.Min(1f, ambient.X + emissive.X + diffuse.X),
+                MathF.Min(1f, ambient.Y + emissive.Y + diffuse.Y),
+                MathF.Min(1f, ambient.Z + emissive.Z + diffuse.Z),
+                1f
+            );
+
+            ShaderInfo.uniformColor.NoWarning().Set(combined);
+
+            // TODP: 固定功能的逐光源设置（glLight 等）未统一封装，
+
             //GL.LightModel(
             //	LightModelParameter.LightModelColorControl,
             //	(int)((LightingState->LightModel == LightModelEnum.SeparateSpecularColor) ? LightModelColorControl.SeparateSpecularColor : LightModelColorControl.SingleColor)
@@ -1147,44 +1202,105 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             //GL.glTexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvModeTranslate[(int)TextureState.Effect]);
         }
 
-        private void TransferToFrameBuffer(GpuStateStruct gpuState)
+        public static void PrepareStateCommon(GpuStateStruct gpuState, int scaleViewport)
         {
-            Console.WriteLine("TransferToFrameBuffer Not Implemented");
-            //var TextureTransferState = GpuState->TextureTransferState;
-            //
-            //var GlPixelFormat = GlPixelFormatList[(int)GpuState->DrawBufferState.Format];
-            //
-            //GL.PixelZoom(1, -1);
-            //GL.WindowPos2(TextureTransferState.DestinationX, 272 - TextureTransferState.DestinationY);
-            ////GL.PixelZoom(1, -1);
-            ////GL.PixelZoom(1, 1);
-            //GL.PixelStore(PixelStoreParameter.UnpackAlignment, TextureTransferState.BytesPerPixel);
-            //GL.PixelStore(PixelStoreParameter.UnpackRowLength, TextureTransferState.SourceLineWidth);
-            //GL.PixelStore(PixelStoreParameter.UnpackSkipPixels, TextureTransferState.SourceX);
-            //GL.PixelStore(PixelStoreParameter.UnpackSkipRows, TextureTransferState.SourceY);
-            //
-            //{
-            //	GL.DrawPixels(
-            //		TextureTransferState.Width,
-            //		TextureTransferState.Height,
-            //		PixelFormat.Rgba,
-            //		GlPixelFormat.OpenglPixelType,
-            //		new IntPtr(Memory.PspAddressToPointerSafe(
-            //			TextureTransferState.SourceAddress,
-            //			TextureTransferState.Width * TextureTransferState.Height * 4
-            //		))
-            //	);
-            //}
-            //
-            //GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
-            //GL.PixelStore(PixelStoreParameter.UnpackRowLength, 0);
-            //GL.PixelStore(PixelStoreParameter.UnpackSkipPixels, 0);
-            //GL.PixelStore(PixelStoreParameter.UnpackSkipRows, 0);
+            var viewport = gpuState.Viewport;
+
+            // PSP 中 viewport 坐标通常以左上为原点，OpenGL 以左下为原点
+            // 简单映射
+            var left = (int)viewport.RegionTopLeft.X * scaleViewport;
+            var top = (int)viewport.RegionTopLeft.Y * scaleViewport;
+            var width = Math.Max(1, (int)viewport.RegionSize.X * scaleViewport);
+            var height = Math.Max(1, (int)viewport.RegionSize.Y * scaleViewport);
+
+            GL.glViewport(left, top, width, height);
+
+            GL.glDisable(GL.GL_LIGHTING);
+            GL.glDisable(GL.GL_POLYGON_OFFSET_FILL);
+
+            try
+            {
+                GL.EnableDisable(GL.GL_DITHER, true);
+            }
+            catch
+            {
+            }
         }
 
-        private void TransferGeneric(GpuStateStruct gpuState)
+        public static void PrepareStateMatrix(GpuStateStruct gpuState, out Matrix4x4 worldViewProjectionMatrix)
         {
-            Console.WriteLine("TransferGeneric Not Implemented");
+            {
+                if (gpuState.VertexState.Type.Transform2D)
+                //if (true)
+                {
+                    worldViewProjectionMatrix = Matrix4x4.CreateOrthographic(512, 272, 0, -0xFFFF);
+                    //WorldViewProjectionMatrix = Matrix4f.Ortho(0, 480, 272, 0, 0, -0xFFFF);
+                }
+                else
+                {
+                    worldViewProjectionMatrix =
+                        gpuState.VertexState.WorldMatrix * gpuState.VertexState.ViewMatrix *
+                        gpuState.VertexState.ProjectionMatrix;
+                }
+            }
+        }
+
+        public static void PrepareStateClear(GpuStateStruct gpuState)
+        {
+            bool ccolorMask = false, calphaMask = false;
+
+            GL.glDisable(GL.GL_BLEND);
+            GL.glDisable(GL.GL_LIGHTING);
+            GL.glDisable(GL.GL_TEXTURE_2D);
+            GL.glDisable(GL.GL_ALPHA_TEST);
+            GL.glDisable(GL.GL_DEPTH_TEST);
+            GL.glDisable(GL.GL_STENCIL_TEST);
+            GL.glDisable(GL.GL_FOG);
+            GL.glDisable(GL.GL_LOGIC_OP);
+            GL.glDisable(GL.GL_CULL_FACE);
+            GL.glDepthMask(false);
+
+            if (gpuState.ClearFlags.HasFlag(ClearBufferSet.ColorBuffer))
+            {
+                ccolorMask = true;
+            }
+
+            if (GL.EnableDisable(GL.GL_STENCIL_TEST, gpuState.ClearFlags.HasFlag(ClearBufferSet.StencilBuffer)))
+            {
+                calphaMask = true;
+                // Sets to 0x00 the stencil.
+                // @TODO @FIXME! : Color should be extracted from the color! (as alpha component)
+                GL.glStencilFunc(GL.GL_ALWAYS, 0x00, 0xFF);
+                GL.glStencilOp(GL.GL_REPLACE, GL.GL_REPLACE, GL.GL_REPLACE);
+                //Console.Error.WriteLine("Stencil!");
+                //GL.Enable(EnableCap.DepthTest);
+            }
+
+            //int i; glGetIntegerv(GL_STENCIL_BITS, &i); writefln("GL_STENCIL_BITS: %d", i);
+            if (gpuState.ClearFlags.HasFlag(ClearBufferSet.DepthBuffer))
+            {
+                GL.glEnable(GL.GL_DEPTH_TEST);
+                GL.glDepthFunc(GL.GL_ALWAYS);
+                GL.glDepthMask(true);
+
+                GL.DepthRange(0, 0);
+                //glDepthRange(0.0, 1.0); // Original value
+            }
+
+            GL.glColorMask(ccolorMask, ccolorMask, ccolorMask, calphaMask);
+
+            GL.glClearDepthf(0.0f);
+            GL.glClear(GL.GL_COLOR_BUFFER_BIT);
+
+            if (gpuState.ClearFlags.HasFlag(ClearBufferSet.DepthBuffer))
+                GL.glClear(GL.GL_DEPTH_BUFFER_BIT);
+
+            if (gpuState.ClearFlags.HasFlag(ClearBufferSet.StencilBuffer))
+                GL.glClear(GL.GL_STENCIL_BUFFER_BIT);
+        }
+
+        private void TransferToFrameBuffer(GpuStateStruct gpuState)
+        {
             var textureTransferState = gpuState.TextureTransferState;
 
             var sourceX = textureTransferState.SourceX;
@@ -1193,12 +1309,67 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             var destinationY = textureTransferState.DestinationY;
             var bytesPerPixel = textureTransferState.BytesPerPixel;
 
-            var sourceTotalBytes = textureTransferState.SourceLineWidth * textureTransferState.Height * bytesPerPixel;
-            var destinationTotalBytes = textureTransferState.DestinationLineWidth * textureTransferState.Height * bytesPerPixel;
+            var drawBuffer = gpuState.DrawBufferState;
 
-            var sourcePointer = (byte*)Memory.PspAddressToPointerSafe(textureTransferState.SourceAddress.Address, sourceTotalBytes);
-            var destinationPointer =
-                (byte*)Memory.PspAddressToPointerSafe(textureTransferState.DestinationAddress.Address, destinationTotalBytes);
+            // 如果目的 DrawBuffer 的行宽或每像素大小和传输描述不一致，退回到通用实现以保证正确性
+            if (bytesPerPixel != drawBuffer.BytesPerPixel || textureTransferState.DestinationLineWidth != drawBuffer.Width)
+            {
+                TransferGeneric(gpuState);
+                return;
+            }
+
+            // 计算缓冲区总大小以供安全访问（以行宽计算）
+            var sourceLineWidth = textureTransferState.SourceLineWidth;
+            var destLineWidth = textureTransferState.DestinationLineWidth; // 应当等于 drawBuffer.Width
+
+            long sourceTotalBytes = (long)sourceLineWidth * textureTransferState.Height * bytesPerPixel;
+            long destTotalBytes = (long)destLineWidth * textureTransferState.Height * bytesPerPixel;
+
+            var sourcePtr = (byte*)Memory.PspAddressToPointerSafe(textureTransferState.SourceAddress.Address, (int)Math.Max(0L, sourceTotalBytes));
+            var destPtr = (byte*)Memory.PspAddressToPointerSafe(drawBuffer.Address, (int)Math.Max(0L, destTotalBytes));
+
+            if (sourcePtr == null || destPtr == null)
+            {
+                Console.Error.WriteLine("TransferToFrameBuffer: Invalid memory pointer(s).");
+                return;
+            }
+
+            // 逐行拷贝，注意源/目的可能有不同的行首偏移
+            for (uint y = 0; y < textureTransferState.Height; y++)
+            {
+                var rowSourceOffset = (uint)(sourceLineWidth * (y + sourceY) + sourceX);
+                var rowDestinationOffset = (uint)(destLineWidth * (y + destinationY) + destinationX);
+
+                PointerUtils.Memcpy(
+                    destPtr + rowDestinationOffset * bytesPerPixel,
+                    sourcePtr + rowSourceOffset * bytesPerPixel,
+                    textureTransferState.Width * bytesPerPixel
+                );
+            }
+            // 完成后，不在此强制刷新 GPU 纹理缓存；上层或 RenderbufferManager 会在需要时使用 DrawBuffer 数据。
+        }
+
+        private void TransferGeneric(GpuStateStruct gpuState)
+        {
+            var textureTransferState = gpuState.TextureTransferState;
+
+            var sourceX = textureTransferState.SourceX;
+            var sourceY = textureTransferState.SourceY;
+            var destinationX = textureTransferState.DestinationX;
+            var destinationY = textureTransferState.DestinationY;
+            var bytesPerPixel = textureTransferState.BytesPerPixel;
+
+            var sourceTotalBytes = (long)textureTransferState.SourceLineWidth * textureTransferState.Height * bytesPerPixel;
+            var destinationTotalBytes = (long)textureTransferState.DestinationLineWidth * textureTransferState.Height * bytesPerPixel;
+
+            var sourcePointer = (byte*)Memory.PspAddressToPointerSafe(textureTransferState.SourceAddress.Address, (int)Math.Max(0L, sourceTotalBytes));
+            var destinationPointer = (byte*)Memory.PspAddressToPointerSafe(textureTransferState.DestinationAddress.Address, (int)Math.Max(0L, destinationTotalBytes));
+
+            if (sourcePointer == null || destinationPointer == null)
+            {
+                Console.Error.WriteLine("TransferGeneric: Invalid memory pointer(s).");
+                return;
+            }
 
             for (uint y = 0; y < textureTransferState.Height; y++)
             {
@@ -1214,62 +1385,24 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                     textureTransferState.Width * bytesPerPixel
                 );
             }
-
-            /*
-            // Generic implementation.
-            with (gpu.state.textureTransfer) {
-                auto srcAddressHost = cast(ubyte*)gpu.memory.getPointer(srcAddress);
-                auto dstAddressHost = cast(ubyte*)gpu.memory.getPointer(dstAddress);
-
-                if (gpu.state.drawBuffer.isAnyAddressInBuffer([srcAddress, dstAddress])) {
-                    gpu.performBufferOp(BufferOperation.STORE, BufferType.COLOR);
-                }
-
-                for (int n = 0; n < height; n++) {
-                    int srcOffset = ((n + srcY) * srcLineWidth + srcX) * bpp;
-                    int dstOffset = ((n + dstY) * dstLineWidth + dstX) * bpp;
-                    (dstAddressHost + dstOffset)[0.. width * bpp] = (srcAddressHost + srcOffset)[0.. width * bpp];
-                    //writefln("%08X <- %08X :: [%d]", dstOffset, srcOffset, width * bpp);
-                }
-                //std.file.write("buffer", dstAddressHost[0..512 * 272 * 4]);
-            
-                if (gpu.state.drawBuffer.isAnyAddressInBuffer([dstAddress])) {
-                    //gpu.impl.test();
-                    //gpu.impl.test("trxkick");
-                    gpu.markBufferOp(BufferOperation.LOAD, BufferType.COLOR);
-                }
-                //gpu.impl.test();
-            }
-            */
         }
 
         public override void Transfer(GpuStateStruct gpuState)
         {
-            Console.WriteLine("Transfer Not Implemented");
-            //return;
             var textureTransferState = gpuState.TextureTransferState;
 
+            // 如果写入目标是当前 DrawBuffer（地址和行宽与 DrawBuffer 匹配），走专用路径以获得更高效的拷贝
             if (
                 textureTransferState.DestinationAddress.Address == gpuState.DrawBufferState.Address &&
                 textureTransferState.DestinationLineWidth == gpuState.DrawBufferState.Width &&
                 textureTransferState.BytesPerPixel == gpuState.DrawBufferState.BytesPerPixel
             )
             {
-                //Console.Error.WriteLine("Writting to DrawBuffer");
                 TransferToFrameBuffer(gpuState);
             }
             else
             {
-                Console.Error.WriteLine("NOT Writting to DrawBuffer");
                 TransferGeneric(gpuState);
-                /*
-                base.Transfer(GpuStateStruct);
-                PrepareWrite(GpuStateStruct);
-                {
-
-                }
-                PrepareRead(GpuStateStruct);
-                */
             }
         }
 

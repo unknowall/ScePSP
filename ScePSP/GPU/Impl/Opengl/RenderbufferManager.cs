@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace ScePSP.Core.Gpu.Impl.Opengl.Modules
+namespace ScePSP.Core.Gpu.Impl.Opengl
 {
     public struct DrawBufferKey
     {

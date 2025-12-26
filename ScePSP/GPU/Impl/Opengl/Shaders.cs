@@ -229,7 +229,9 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 			}
 
 			vec4 prepareNormal(vec4 normal) {
-				return hasReversedNormal ? -normal : normal;
+				vec4 n = hasReversedNormal ? -normal : normal;
+				n.w = 0.0; // 保证矩阵变换不包含位移
+				return n;
 			}
 
 			void main() {

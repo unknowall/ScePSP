@@ -223,8 +223,7 @@ namespace ScePSP.Core.Gpu
                 case GpuOpCodes.TRXKICK:
                     {
                         var transfer = GpuStateStructPointer.TextureTransferState;
-                        transfer.TexelSize =
-                            (TextureTransferStateStruct.TexelSizeEnum)Params24.Extract(0, 1);
+                        transfer.TexelSize = (TextureTransferStateStruct.TexelSizeEnum)Params24.Extract(0, 1);
                         GpuProcessor.GpuImpl.Transfer(GpuStateStructPointer);
                         break;
                     }
@@ -275,6 +274,7 @@ namespace ScePSP.Core.Gpu
 #endif
                     }
                     break;
+
                 case GpuOpCodes.BEZIER:
                     {
                         var uCount = (byte)Params24.Extract(0, 8);
@@ -282,6 +282,7 @@ namespace ScePSP.Core.Gpu
                         DrawBezier(uCount, vCount);
                         break;
                     }
+
                 case GpuOpCodes.ZBW:
                     {
                         GpuProcessor.MarkDepthBufferLoad(); // @TODO: Is this required?

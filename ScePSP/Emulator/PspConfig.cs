@@ -84,7 +84,7 @@ namespace ScePSP.Core
         public bool LimitVerticalSync = true;
         public int DisplayScale = 2;
         public int RenderScale = 2;
-        public bool UseFastMemory = true;
+        public bool UseFastMemory = false;
         public bool EnableAstOptimizations = true;
         public ControllerConfig ControllerConfig = new ControllerConfig();
         public List<string> RecentFiles = new List<string>();

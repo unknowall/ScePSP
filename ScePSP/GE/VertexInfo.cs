@@ -17,11 +17,11 @@ namespace ScePSP.Core.Gpu
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public unsafe struct VertexInfo
     {
-        public Vector4 Color;
-        public Vector4 Position;
-        public Vector4 Normal;
-        public Vector4 Texture;
         public fixed float Weights[8];
+        public Vector4 Texture;
+        public Vector4 Color;
+        public Vector4 Normal;
+        public Vector4 Position;
 
         public override string ToString() => $"VertexInfo(Position={Position}, Normal={Normal}, UV={Texture}, COLOR={Color})";
     }

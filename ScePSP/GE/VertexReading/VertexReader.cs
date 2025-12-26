@@ -9,7 +9,6 @@ namespace ScePSP.Core.Gpu.VertexReading
 {
     public unsafe class VertexReader
     {
-        // Lists
         protected readonly Action[] ReadWeightsList;
         protected readonly Action[] ReadTextureCoordinatesList;
         protected readonly Action[] ReadColorList;
@@ -18,12 +17,9 @@ namespace ScePSP.Core.Gpu.VertexReading
 
         public VertexReader()
         {
-            // ReSharper disable HeapView.DelegateAllocation
             ReadWeightsList = new Action[] { Void, ReadWeightByte, ReadWeightShort, ReadWeightFloat };
-            ReadTextureCoordinatesList = new Action[]
-                {Void, ReadTextureCoordinatesByte, ReadTextureCoordinatesShort, ReadTextureCoordinatesFloat};
-            ReadColorList = new Action[]
-                {Void, Invalid, Invalid, Invalid, ReadColor5650, ReadColor5551, ReadColor4444, ReadColor8888};
+            ReadTextureCoordinatesList = new Action[] {Void, ReadTextureCoordinatesByte, ReadTextureCoordinatesShort, ReadTextureCoordinatesFloat};
+            ReadColorList = new Action[] {Void, Invalid, Invalid, Invalid, ReadColor5650, ReadColor5551, ReadColor4444, ReadColor8888};
             ReadNormalList = new Action[] { Void, ReadNormalByte, ReadNormalShort, ReadNormalFloat };
             ReadPositionList = new Action[] { Void, ReadPositionByte, ReadPositionShort, ReadPositionFloat };
         }
@@ -151,6 +147,7 @@ namespace ScePSP.Core.Gpu.VertexReading
         protected void ReadTextureCoordinatesShort()
         {
             Align2();
+
             VertexInfo->Texture.X = ((ushort*)Pointer)[0];
             VertexInfo->Texture.Y = ((ushort*)Pointer)[1];
             VertexInfo->Texture.Z = VertexType.NormalCount > 2 ? ((ushort*)Pointer)[2] : 0.0f;
@@ -168,6 +165,7 @@ namespace ScePSP.Core.Gpu.VertexReading
         protected void ReadTextureCoordinatesFloat()
         {
             Align4();
+
             VertexInfo->Texture.X = ((float*)Pointer)[0];
             VertexInfo->Texture.Y = ((float*)Pointer)[1];
             VertexInfo->Texture.Z = VertexType.NormalCount > 2 ? ((float*)Pointer)[2] : 0.0f;
@@ -224,8 +222,9 @@ namespace ScePSP.Core.Gpu.VertexReading
         public void ReadPositionByte()
         {
             Align1();
-            VertexInfo->Position.X = ((sbyte*)Pointer)[0];
-            VertexInfo->Position.Y = ((sbyte*)Pointer)[1];
+
+            VertexInfo->Position.X = (float)((sbyte*)Pointer)[0];
+            VertexInfo->Position.Y = (float)((sbyte*)Pointer)[1];
             VertexInfo->Position.Z = Transform2D ? Pointer[2] : (float)((sbyte*)Pointer)[2];
             VertexInfo->Position.W = 1f;
 
@@ -236,17 +235,16 @@ namespace ScePSP.Core.Gpu.VertexReading
                 VertexInfo->Position.Z *= 1.0f / 127f;
             }
 
-            //Console.Error.WriteLine(VertexInfo->PZ);
-
             PointerOffset += sizeof(byte) * 3;
         }
 
         public void ReadPositionShort()
         {
             Align2();
-            VertexInfo->Position.X = ((short*)Pointer)[0];
-            VertexInfo->Position.Y = ((short*)Pointer)[1];
-            VertexInfo->Position.Z = Transform2D ? ((ushort*)Pointer)[2] : (float)((short*)Pointer)[2];
+
+            VertexInfo->Position.X = (float)((short*)Pointer)[0];
+            VertexInfo->Position.Y = (float)((short*)Pointer)[1];
+            VertexInfo->Position.Z = Transform2D ? (float)((ushort*)Pointer)[2] : (float)((short*)Pointer)[2];
             VertexInfo->Position.W = 1f;
 
             if (!Transform2D)
@@ -255,7 +253,6 @@ namespace ScePSP.Core.Gpu.VertexReading
                 VertexInfo->Position.Y *= 1.0f / 32767f;
                 VertexInfo->Position.Z *= 1.0f / 32767f;
             }
-            //Console.Error.WriteLine(VertexInfo->PZ);
 
             PointerOffset += sizeof(short) * 3;
         }
@@ -263,10 +260,12 @@ namespace ScePSP.Core.Gpu.VertexReading
         public void ReadPositionFloat()
         {
             Align4();
+
             VertexInfo->Position.X = ((float*)Pointer)[0];
             VertexInfo->Position.Y = ((float*)Pointer)[1];
             VertexInfo->Position.Z = ((float*)Pointer)[2];
             VertexInfo->Position.W = 1f;
+
             PointerOffset += sizeof(float) * 3;
         }
 
@@ -300,6 +299,7 @@ namespace ScePSP.Core.Gpu.VertexReading
         public void ReadNormalByte()
         {
             Align1();
+
             VertexInfo->Normal.X = Pointer[0];
             VertexInfo->Normal.Y = Pointer[1];
             VertexInfo->Normal.Z = Pointer[2];
@@ -315,6 +315,7 @@ namespace ScePSP.Core.Gpu.VertexReading
         public void ReadNormalShort()
         {
             Align2();
+
             VertexInfo->Normal.X = ((short*)Pointer)[0];
             VertexInfo->Normal.Y = ((short*)Pointer)[1];
             VertexInfo->Normal.Z = ((short*)Pointer)[2];
@@ -330,6 +331,7 @@ namespace ScePSP.Core.Gpu.VertexReading
         public void ReadNormalFloat()
         {
             Align4();
+
             VertexInfo->Normal.X = ((float*)Pointer)[0];
             VertexInfo->Normal.Y = ((float*)Pointer)[1];
             VertexInfo->Normal.Z = ((float*)Pointer)[2];

@@ -164,31 +164,60 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         {
             if (_shader == null) DrawInitVertices();
 
+            var vertexType = GpuState.VertexState.Type;
+
             ShaderInfo.matrixWorldViewProjection.Set(_worldViewProjectionMatrix);
             ShaderInfo.matrixTexture.Set(_textureMatrix);
-            ShaderInfo.uniformColor.Set(GpuState.LightingState.AmbientModelColor.ToVector4());
-            ShaderInfo.hasPerVertexColor.Set(VertexType.HasColor);
-            ShaderInfo.clearingMode.Set(GpuState.ClearingMode);
-            ShaderInfo.hasTexture.Set(GpuState.TextureMappingState.Enabled);
-            ShaderInfo.weightCount.Set(VertexType.RealSkinningWeightCount);
-            //ShaderInfo.weightCount.Set(0);
 
-            if (VertexType.HasWeight)
+            try
             {
-                ShaderInfo.matrixBones.Set(new[]
-                {
-                    GpuState.SkinningState.BoneMatrix0,
-                    GpuState.SkinningState.BoneMatrix1,
-                    GpuState.SkinningState.BoneMatrix2,
-                    GpuState.SkinningState.BoneMatrix3,
-                    GpuState.SkinningState.BoneMatrix4,
-                    GpuState.SkinningState.BoneMatrix5,
-                    GpuState.SkinningState.BoneMatrix6,
-                    GpuState.SkinningState.BoneMatrix7,
-                });
+                ShaderInfo.uniformColor.NoWarning().Set(GpuState.LightingState.AmbientModelColor.ToVector4());
+            }
+            catch
+            {
             }
 
-            if (VertexType.HasTexture && GpuState.TextureMappingState.Enabled)
+            ShaderInfo.hasPerVertexColor.Set(vertexType.HasColor);
+            ShaderInfo.clearingMode.Set(GpuState.ClearingMode);
+            ShaderInfo.hasTexture.Set(GpuState.TextureMappingState.Enabled);
+            ShaderInfo.weightCount.Set(vertexType.RealSkinningWeightCount);
+
+            if (vertexType.HasWeight && ShaderInfo.matrixBones != null && ShaderInfo.matrixBones.IsAvailable)
+            {
+                int uniformArrayLength = Math.Max(0, ShaderInfo.matrixBones.ArrayLength);
+
+                // PSP 最多8根骨骼
+                if (uniformArrayLength > 0)
+                {
+                    var bones = new Matrix4x4[uniformArrayLength];
+                    for (int i = 0; i < uniformArrayLength; i++)
+                    {
+                        switch (i)
+                        {
+                            case 0: bones[i] = GpuState.SkinningState.BoneMatrix0; break;
+                            case 1: bones[i] = GpuState.SkinningState.BoneMatrix1; break;
+                            case 2: bones[i] = GpuState.SkinningState.BoneMatrix2; break;
+                            case 3: bones[i] = GpuState.SkinningState.BoneMatrix3; break;
+                            case 4: bones[i] = GpuState.SkinningState.BoneMatrix4; break;
+                            case 5: bones[i] = GpuState.SkinningState.BoneMatrix5; break;
+                            case 6: bones[i] = GpuState.SkinningState.BoneMatrix6; break;
+                            case 7: bones[i] = GpuState.SkinningState.BoneMatrix7; break;
+                            default: bones[i] = Matrix4x4.Identity; break;
+                        }
+                    }
+
+                    try
+                    {
+                        ShaderInfo.matrixBones.Set(bones);
+                    }
+                    catch (Exception)
+                    {
+                        //shader 可能没有该 uniform 或长度不匹配
+                    }
+                }
+            }
+
+            if (vertexType.HasTexture && GpuState.TextureMappingState.Enabled)
             {
                 var textureState = GpuState.TextureMappingState.TextureState;
 
@@ -200,8 +229,6 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                 ShaderInfo.alphaFunction.Set((int)GpuState.AlphaTestState.Function);
                 ShaderInfo.alphaMask.NoWarning().Set(GpuState.AlphaTestState.Mask);
                 ShaderInfo.alphaValue.Set(GpuState.AlphaTestState.Value);
-
-                //Console.WriteLine("{0}, {1}, {2}, {3}, {4}, {5}", TextureState->Effect, TextureState->ColorComponent, GpuState->BlendingState.Enabled, GpuState->BlendingState.FunctionSource, GpuState->BlendingState.FunctionDestination, GpuState->ColorTestState.Enabled);
 
                 ShaderInfo.texture0.Set(GLTextureUnit.CreateAtIndex(0)
                     .SetWrap(
@@ -223,37 +250,62 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         private void DrawVertices(GLGeometry type)
         {
-            //Console.Out.WriteLineColored(ConsoleColor.Green, $"GE Prim Vertices: ({_indicesList.Length})");
+            //Console.Out.WriteLineColored(ConsoleColor.Green, $"GE Prim Vertices: {_indicesList.Length} GLGeometr: {type.ToString()}");
+            //int i = 0;
+            //foreach (var v in _verticesPosition.Buffer)
+            //{
+            //    i++;
+            //    Console.Out.WriteLineColored(ConsoleColor.Green, $"    Pos: {v.X}, {v.Y}, {v.Z}");
+            //    if (i >= _indicesList.Length) break;
+            //}
 
             ShaderInfo.hasReversedNormal.NoWarning().Set(VertexType.ReversedNormal);
 
             _shader.Draw(type, _indicesList.Buffer, _indicesList.Length, () =>
             {
+                // 位置
                 if (VertexType.HasPosition)
                 {
                     _verticesPositionBuffer.SetData(_verticesPosition.Buffer, 0, _verticesPosition.Length);
                     ShaderInfo.vertexPosition.SetData<float>(_verticesPositionBuffer, 3, 0, sizeof(Vector3), false);
                 }
-
+                else
+                {
+                    ShaderInfo.vertexPosition.UnsetData();
+                }
+                // 纹理
                 if (VertexType.HasTexture)
                 {
                     _verticesTexcoordsBuffer.SetData(_verticesTexcoords.Buffer, 0, _verticesTexcoords.Length);
                     ShaderInfo.vertexTexCoords.SetData<float>(_verticesTexcoordsBuffer, 3, 0, sizeof(Vector3), false);
                 }
-
+                else
+                {
+                    ShaderInfo.vertexTexCoords.UnsetData();
+                }
+                // 顶点颜色
                 if (VertexType.HasColor)
                 {
                     _verticesColorsBuffer.SetData(_verticesColors.Buffer, 0, _verticesColors.Length);
                     ShaderInfo.vertexColor.SetData<float>(_verticesColorsBuffer, 4, 0, sizeof(RgbaFloat), false);
                 }
-
+                else
+                {
+                    ShaderInfo.vertexColor.UnsetData();
+                }
+                // 法线
                 if (VertexType.HasNormal)
                 {
                     _verticesNormalBuffer.SetData(_verticesNormal.Buffer, 0, _verticesNormal.Length);
-                    ShaderInfo.vertexNormal.NoWarning().SetData<float>(_verticesNormalBuffer, 4, 0, sizeof(Vector3), false);
+                    ShaderInfo.vertexNormal.NoWarning().SetData<float>(_verticesNormalBuffer, 3, 0, sizeof(Vector3), false);
                 }
-
-                if (VertexType.HasWeight)
+                else
+                {
+                    ShaderInfo.vertexNormal.NoWarning().UnsetData();
+                }
+                // 骨骼权重：如果当前顶点类型包含权重，则上传需要的权重属性并取消未用属性绑定
+                var realWeightCount = VertexType.RealSkinningWeightCount;
+                if (VertexType.HasWeight && realWeightCount > 0)
                 {
                     _verticesWeightsBuffer.SetData(_verticesWeights.Buffer, 0, _verticesWeights.Length);
                     var vertexWeights = new[]
@@ -262,10 +314,29 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                         ShaderInfo.vertexWeight3, ShaderInfo.vertexWeight4, ShaderInfo.vertexWeight5,
                         ShaderInfo.vertexWeight6, ShaderInfo.vertexWeight7
                     };
-                    for (var n = 0; n < VertexType.RealSkinningWeightCount; n++)
+                    for (var n = 0; n < 8; n++)
                     {
-                        vertexWeights[n].SetData<float>(_verticesWeightsBuffer, 1, n * sizeof(float), sizeof(VertexInfoWeights), false);
+                        if (n < realWeightCount)
+                        {
+                            // elementSize = 1 (单个 float), offset = n * sizeof(float), stride = sizeof(VertexInfoWeights)
+                            vertexWeights[n].SetData<float>(_verticesWeightsBuffer, 1, n * sizeof(float), sizeof(VertexInfoWeights), false);
+                        }
+                        else
+                        {
+                            vertexWeights[n].UnsetData();
+                        }
                     }
+                }
+                else
+                {
+                    ShaderInfo.vertexWeight0.UnsetData();
+                    ShaderInfo.vertexWeight1.UnsetData();
+                    ShaderInfo.vertexWeight2.UnsetData();
+                    ShaderInfo.vertexWeight3.UnsetData();
+                    ShaderInfo.vertexWeight4.UnsetData();
+                    ShaderInfo.vertexWeight5.UnsetData();
+                    ShaderInfo.vertexWeight6.UnsetData();
+                    ShaderInfo.vertexWeight7.UnsetData();
                 }
             });
         }
@@ -297,6 +368,8 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         private void PutVertex(VertexInfo vertexInfo)
         {
+            //Console.Out.WriteLineColored(ConsoleColor.Yellow, $"PutVertex {vertexInfo.ToString()}");
+
             _CapturePutVertex(ref vertexInfo);
 
             PutVertexIndex(_verticesPosition.Length);
@@ -305,7 +378,40 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             _verticesNormal.Add(vertexInfo.Normal.ToRVector3());
             _verticesTexcoords.Add(vertexInfo.Texture.ToRVector3());
             _verticesColors.Add(new RgbaFloat(vertexInfo.Color));
-            _verticesWeights.Add(new VertexInfoWeights(vertexInfo));
+
+            var weightsStruct = new VertexInfoWeights(vertexInfo);
+
+            var count = VertexType.RealSkinningWeightCount;
+            if (count <= 0) count = 0; // defensive
+            float sum = 0f;
+            // sum 仅计算前 count 个权重
+            for (int i = 0; i < count && i < 8; i++)
+            {
+                sum += weightsStruct.W[i];
+            }
+            if (count > 0)
+            {
+                if (sum <= float.Epsilon)
+                {
+                    // 如果总权重为 0，则设置第一个权重为 1，避免除零并保持顶点不变形
+                    weightsStruct.W[0] = 1.0f;
+                    for (int i = 1; i < count && i < 8; i++) weightsStruct.W[i] = 0.0f;
+                }
+                else
+                {
+                    // 归一化前 count 个权重
+                    for (int i = 0; i < count && i < 8; i++) weightsStruct.W[i] = weightsStruct.W[i] / sum;
+                }
+                // 其余槽置 0
+                for (int i = count; i < 8; i++) weightsStruct.W[i] = 0.0f;
+            }
+            else
+            {
+                // 没有权重
+                for (int i = 0; i < 8; i++) weightsStruct.W[i] = 0.0f;
+            }
+
+            _verticesWeights.Add(weightsStruct);
         }
 
         public override void StartCapture()
@@ -427,78 +533,6 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
             DrawVertices(GLGeometry.GL_TRIANGLES);
             ResetVertex();
-
-        //	//GpuState->TextureMappingState.Enabled = true;
-        //
-        //	//ResetState();
-        //	OpenglGpuImplCommon.PrepareStateCommon(GpuState, ScaleViewport);
-        //	PrepareStateDraw(GpuState);
-        //	OpenglGpuImplMatrix.PrepareStateMatrix(GpuState, ref ModelViewProjectionMatrix);
-        //
-        //#if true
-        //	PrepareState_Texture_Common(GpuState);
-        //	PrepareState_Texture_3D(GpuState);
-        //#endif
-        //
-        //	//GL.ActiveTexture(TextureUnit.Texture0);
-        //	//GL.Disable(EnableCap.Texture2D);
-        //
-        //	var VertexType = GpuStateStruct->VertexState.Type;
-        //
-        //	//GL.Color3(Color.White);
-        //
-        //	int s_len = Patch.GetLength(0);
-        //	int t_len = Patch.GetLength(1);
-        //
-        //	float s_len_float = s_len;
-        //	float t_len_float = t_len;
-        //
-        //	var Mipmap0 = &GpuStateStruct->TextureMappingState.TextureState.Mipmap0;
-        //
-        //	float MipmapWidth = Mipmap0->TextureWidth;
-        //	float MipmapHeight = Mipmap0->TextureHeight;
-        //
-        //	//float MipmapWidth = 1f;
-        //	//float MipmapHeight = 1f;
-        //
-        //	ResetVertex();
-        //	for (int t = 0; t < t_len - 1; t++)
-        //	{
-        //		for (int s = 0; s < s_len - 1; s++)
-        //		{
-        //			var VertexInfo1 = Patch[s + 0, t + 0];
-        //			var VertexInfo2 = Patch[s + 0, t + 1];
-        //			var VertexInfo3 = Patch[s + 1, t + 1];
-        //			var VertexInfo4 = Patch[s + 1, t + 0];
-        //
-        //			if (VertexType.Texture != VertexTypeStruct.NumericEnum.Void)
-        //			{
-        //				VertexInfo1.Texture.X = ((float)s + 0) * MipmapWidth / s_len_float;
-        //				VertexInfo1.Texture.Y = ((float)t + 0) * MipmapHeight / t_len_float;
-        //
-        //				VertexInfo2.Texture.X = ((float)s + 0) * MipmapWidth / s_len_float;
-        //				VertexInfo2.Texture.Y = ((float)t + 1) * MipmapHeight / t_len_float;
-        //
-        //				VertexInfo3.Texture.X = ((float)s + 1) * MipmapWidth / s_len_float;
-        //				VertexInfo3.Texture.Y = ((float)t + 1) * MipmapHeight / t_len_float;
-        //
-        //				VertexInfo4.Texture.X = ((float)s + 1) * MipmapWidth / s_len_float;
-        //				VertexInfo4.Texture.Y = ((float)t + 0) * MipmapHeight / t_len_float;
-        //			}
-        //
-        //			PutVertex(ref VertexType, VertexInfo1);
-        //			PutVertex(ref VertexType, VertexInfo2);
-        //			PutVertex(ref VertexType, VertexInfo3);
-        //
-        //			PutVertex(ref VertexType, VertexInfo1);
-        //			PutVertex(ref VertexType, VertexInfo3);
-        //			PutVertex(ref VertexType, VertexInfo4);
-        //
-        //			//GL.Color3(Color.White);
-        //			//Console.WriteLine("{0}, {1} : {2}", s, t, VertexInfo1);
-        //		}
-        //	}
-        //	DrawVertices(GLGeometry.GL_TRIANGLES);
         }
 
         bool _doPrimStart;
@@ -542,6 +576,8 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         private void EndVertex()
         {
+            //Console.Out.WriteLineColored(ConsoleColor.Green, $"DrawVertices Geometr: {_primitiveType.ToString()}");
+
             DrawVertices(ConvertGLGeometry(_primitiveType));
 
             ResetVertex();
@@ -572,18 +608,13 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                 PrepareDrawStateFirst();
             }
 
-            //if (PrimitiveType == GuPrimitiveType.TriangleStrip) vertexCount++;
-
             uint morpingVertexCount, totalVerticesWithoutMorphing;
 
             PreparePrim(GpuState, out totalVerticesWithoutMorphing, vertexCount, out morpingVertexCount);
 
             var z = 0;
-
-            //for (int n = 0; n < MorpingVertexCount; n++) Console.Write("{0}, ", Morphs[n]); Console.WriteLine("");
-
-            //int VertexInfoFloatCount = (sizeof(Color4F) + sizeof(Vector3F) * 3) / sizeof(float);
             var vertexInfoFloatCount = sizeof(VertexInfo) / sizeof(float);
+
             fixed (VertexInfo* verticesPtr = Vertices)
             {
                 if (morpingVertexCount == 1)
@@ -610,60 +641,57 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             }
 
             _CapturePrimitive(_primitiveType, GpuState.GetAddressRelativeToBaseOffset(GpuState.VertexAddress), vertexCount, ref VertexType, () =>
+            {
+                if (_indicesList.Length > 0)
                 {
-                    // Continuation
-                    if (_indicesList.Length > 0)
+                    switch (_primitiveType)
                     {
-                        switch (_primitiveType)
-                        {
-                            // Degenerate.
-                            case GuPrimitiveType.TriangleStrip:
-                            case GuPrimitiveType.Sprites:
-                                if (vertexCount > 0)
-                                {
-                                    PutVertexIndexRelative(-1);
-                                    PutVertexIndexRelative(0);
-                                }
-                                break;
-                            // Can't degenerate, flush.
-                            default:
-                                EndVertex();
-                                break;
-                        }
-                    }
-
-                    if (_primitiveType == GuPrimitiveType.Sprites)
-                    {
-                        GL.glDisable(GL.GL_CULL_FACE);
-                        for (var n = 0; n < vertexCount; n += 2)
-                        {
-                            VertexInfo v0, v1, v2, v3;
-
-                            readVertex(n + 0, out v0);
-                            readVertex(n + 1, out v3);
-
-                            VertexUtils.GenerateTriangleStripFromSpriteVertices(ref v0, out v1, out v2, ref v3);
-
-                            if (n > 0)
+                        case GuPrimitiveType.TriangleStrip:
+                        case GuPrimitiveType.Sprites:
+                            if (vertexCount > 0)
                             {
                                 PutVertexIndexRelative(-1);
                                 PutVertexIndexRelative(0);
                             }
+                            break;
+                        // Can't degenerate, flush.
+                        default:
+                            EndVertex();
+                            break;
+                    }
+                }
 
-                            PutVertices(v0, v1, v2, v3);
-                        }
-                    }
-                    else
+                if (_primitiveType == GuPrimitiveType.Sprites)
+                {
+                    GL.glDisable(GL.GL_CULL_FACE);
+                    for (var n = 0; n < vertexCount; n += 2)
                     {
-                        VertexInfo VertexInfo;
-                        //Console.Error.WriteLine("{0} : {1} : {2}", BeginMode, VertexCount, VertexType.Index);
-                        for (var n = 0; n < vertexCount; n++)
+                        VertexInfo v0, v1, v2, v3;
+
+                        readVertex(n + 0, out v0);
+                        readVertex(n + 1, out v3);
+
+                        VertexUtils.GenerateTriangleStripFromSpriteVertices(ref v0, out v1, out v2, ref v3);
+
+                        if (n > 0)
                         {
-                            readVertex(n, out VertexInfo);
-                            PutVertex(VertexInfo);
+                            PutVertexIndexRelative(-1);
+                            PutVertexIndexRelative(0);
                         }
+
+                        PutVertices(v0, v1, v2, v3);
                     }
-                });
+                }
+                else
+                {
+                    VertexInfo VertexInfo;
+                    for (var n = 0; n < vertexCount; n++)
+                    {
+                        readVertex(n, out VertexInfo);
+                        PutVertex(VertexInfo);
+                    }
+                }
+            });
         }
 
         private static GLGeometry ConvertGLGeometry(GuPrimitiveType primitiveType) => primitiveType switch
@@ -731,12 +759,6 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         public static string GlGetString(int name) => GL.GetString(name);
 
-        public void SwapBuffers()
-        {
-            OpenglContext.SwapBuffers();
-        }
-
-        /// <see cref="http://www.opentk.com/doc/graphics/graphicscontext"/>
         public override void InitSynchronizedOnce(IntPtr TargetHwnd)
         {
             //Memory.WriteBytesHook += OnMemoryWrite;
@@ -987,7 +1009,6 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         private void PrepareState_Lighting(GpuStateStruct gpuState)
         {
-            // 这里尽量根据 LightingState 提供合适的 uniformColor，使无固定管线光照时也有合理显示。
             var lighting = gpuState.LightingState;
 
             if (!lighting.Enabled)
@@ -1011,7 +1032,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
             ShaderInfo.uniformColor.NoWarning().Set(combined);
 
-            // TODP: 固定功能的逐光源设置（glLight 等）未统一封装，
+            // TODO: 固定功能的逐光源设置（glLight 等）未统一封装，
 
             //GL.LightModel(
             //	LightModelParameter.LightModelColorControl,
@@ -1125,13 +1146,13 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                         1.0f / mipmap0.BufferWidth,
                         1.0f / mipmap0.TextureHeight,
                         1.0f
-                )
-                    ;
-                //GL.ActiveTexture(TextureUnit.Texture0);
-                //GL.MatrixMode(MatrixMode.Texture);
-                //GL.LoadIdentity();
+                );
+
+                //GL.glActiveTexture(TextureUnit.Texture0);
+                //GL.glMatrixMode(MatrixMode.Texture);
+                //GL.glLoadIdentity();
                 //
-                //GL.Scale(
+                //GL.glScale(
                 //	1.0f / Mipmap0->BufferWidth,
                 //	1.0f / Mipmap0->TextureHeight,
                 //	1.0f
@@ -1229,25 +1250,28 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         public static void PrepareStateMatrix(GpuStateStruct gpuState, out Matrix4x4 worldViewProjectionMatrix)
         {
+            if (gpuState.VertexState.Type.Transform2D)
             {
-                if (gpuState.VertexState.Type.Transform2D)
-                //if (true)
-                {
-                    worldViewProjectionMatrix = Matrix4x4.CreateOrthographic(512, 272, 0, -0xFFFF);
-                    //WorldViewProjectionMatrix = Matrix4f.Ortho(0, 480, 272, 0, 0, -0xFFFF);
-                }
-                else
-                {
-                    worldViewProjectionMatrix =
-                        gpuState.VertexState.WorldMatrix * gpuState.VertexState.ViewMatrix *
-                        gpuState.VertexState.ProjectionMatrix;
-                }
+                // OrthographicOffCenter(左, 右, 下, 上, 近裁面, 远裁面)
+                worldViewProjectionMatrix = Matrix4x4.CreateOrthographicOffCenter(
+                    0, 480,    // 左右边界（宽度480）
+                    272, 0,    // 下上边界（翻转Y轴，匹配PSP左上角原点）
+                    0, 0xFFFF  // 深度范围（0~65535，正序）
+                );
+            }
+            else
+            {
+                worldViewProjectionMatrix =
+                    gpuState.VertexState.WorldMatrix * gpuState.VertexState.ViewMatrix *
+                    gpuState.VertexState.ProjectionMatrix;
             }
         }
 
         public static void PrepareStateClear(GpuStateStruct gpuState)
         {
-            bool ccolorMask = false, calphaMask = false;
+            bool colorMask = false, alphaMask = false;
+            bool depthMask = gpuState.ClearFlags.HasFlag(ClearBufferSet.DepthBuffer);
+            bool stencilMask = gpuState.ClearFlags.HasFlag(ClearBufferSet.StencilBuffer);
 
             GL.glDisable(GL.GL_BLEND);
             GL.glDisable(GL.GL_LIGHTING);
@@ -1262,41 +1286,38 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
             if (gpuState.ClearFlags.HasFlag(ClearBufferSet.ColorBuffer))
             {
-                ccolorMask = true;
+                colorMask = true;
             }
 
-            if (GL.EnableDisable(GL.GL_STENCIL_TEST, gpuState.ClearFlags.HasFlag(ClearBufferSet.StencilBuffer)))
+            if (GL.EnableDisable(GL.GL_STENCIL_TEST, stencilMask))
             {
-                calphaMask = true;
-                // Sets to 0x00 the stencil.
-                // @TODO @FIXME! : Color should be extracted from the color! (as alpha component)
+                alphaMask = true;
                 GL.glStencilFunc(GL.GL_ALWAYS, 0x00, 0xFF);
                 GL.glStencilOp(GL.GL_REPLACE, GL.GL_REPLACE, GL.GL_REPLACE);
-                //Console.Error.WriteLine("Stencil!");
-                //GL.Enable(EnableCap.DepthTest);
+                GL.glStencilMask(0xFF);
             }
 
-            //int i; glGetIntegerv(GL_STENCIL_BITS, &i); writefln("GL_STENCIL_BITS: %d", i);
-            if (gpuState.ClearFlags.HasFlag(ClearBufferSet.DepthBuffer))
+            if (depthMask)
             {
                 GL.glEnable(GL.GL_DEPTH_TEST);
                 GL.glDepthFunc(GL.GL_ALWAYS);
                 GL.glDepthMask(true);
-
-                GL.DepthRange(0, 0);
-                //glDepthRange(0.0, 1.0); // Original value
+                GL.glDepthRange(0.0f, 0.0f);
+                //GL.glDepthRange(0.0f, 1.0f); // Original value
             }
 
-            GL.glColorMask(ccolorMask, ccolorMask, ccolorMask, calphaMask);
+            GL.glColorMask(colorMask, colorMask, colorMask, alphaMask);
 
-            GL.glClearDepthf(0.0f);
-            GL.glClear(GL.GL_COLOR_BUFFER_BIT);
+            GL.glClearDepthf(1.0f);
 
-            if (gpuState.ClearFlags.HasFlag(ClearBufferSet.DepthBuffer))
-                GL.glClear(GL.GL_DEPTH_BUFFER_BIT);
-
-            if (gpuState.ClearFlags.HasFlag(ClearBufferSet.StencilBuffer))
-                GL.glClear(GL.GL_STENCIL_BUFFER_BIT);
+            uint clearBits = 0;
+            if (colorMask) clearBits |= GL.GL_COLOR_BUFFER_BIT;
+            if (depthMask) clearBits |= GL.GL_DEPTH_BUFFER_BIT;
+            if (stencilMask) clearBits |= GL.GL_STENCIL_BUFFER_BIT;
+            if (clearBits != 0)
+            {
+                GL.glClear(clearBits);
+            }
         }
 
         private void TransferToFrameBuffer(GpuStateStruct gpuState)

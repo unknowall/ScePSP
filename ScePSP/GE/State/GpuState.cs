@@ -112,8 +112,7 @@ namespace ScePSP.Core.Gpu.State
 
         public uint GetAddressRelativeToBase(uint relativeAddress) => BaseAddress | relativeAddress;
 
-        public uint GetAddressRelativeToBaseOffset(uint relativeAddress) =>
-            (BaseAddress | relativeAddress) + BaseOffset;
+        public uint GetAddressRelativeToBaseOffset(uint relativeAddress) => (BaseAddress | relativeAddress) + BaseOffset;
 
         public uint VertexAddress
         {
@@ -644,7 +643,7 @@ namespace ScePSP.Core.Gpu.State
         }
 
         public bool ReversedNormal => data.Bool(GpuOpCodes.RNORM);
-        public byte NormalCount; // => GpuState.TextureMappingState.GetTextureComponentsCount()
+        public byte NormalCount;// => GpuState.TextureMappingState.GetTextureComponentsCount();
         public uint Value
         {
             get => data[GpuOpCodes.VTYPE];
@@ -787,7 +786,7 @@ namespace ScePSP.Core.Gpu.State
             size += 3 * NormalSize;
             size = (int)MathUtils.NextAligned(size, PositionSize);
             size += 3 * PositionSize;
-
+            //Console.WriteLine($"SkinSize {SkinSize}, ColorSize {ColorSize}, TextureSize {TextureSize}, PositionSize {PositionSize}, NormalSize {NormalSize} NormalCount {NormalCount}");
             var alignmentSize = GetMaxAlignment();
             //Size = (uint)((Size + AlignmentSize - 1) & ~(AlignmentSize - 1));
             size = (int)MathUtils.NextAligned(size, (uint)alignmentSize);

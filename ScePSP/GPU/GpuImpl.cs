@@ -329,25 +329,29 @@ namespace ScePSP.Core.Gpu
 
         public GpuImpl()
         {
-            // ReSharper disable HeapView.DelegateAllocation
             ReadVertex_Void_delegate = ReadVertex_Void;
             ReadVertex_Byte_delegate = ReadVertex_Byte;
             ReadVertex_Short_delegate = ReadVertex_Short;
         }
 
-        private void ReadVertex_Void(int index, out VertexInfo vertexInfo) => vertexInfo = Vertices[index];
+        public void ReadVertex_Void(int index, out VertexInfo vertexInfo) => vertexInfo = Vertices[index];
 
-        private void ReadVertex_Byte(int index, out VertexInfo vertexInfo) => vertexInfo = Vertices[indexListByte[index]];
+        public void ReadVertex_Byte(int index, out VertexInfo vertexInfo) => vertexInfo = Vertices[indexListByte[index]];
 
-        private void ReadVertex_Short(int index, out VertexInfo vertexInfo) => vertexInfo = Vertices[indexListShort[index]];
+        public void ReadVertex_Short(int index, out VertexInfo vertexInfo) => vertexInfo = Vertices[indexListShort[index]];
 
         protected delegate void ReadVertexDelegate(int index, out VertexInfo vertexInfo);
 
         protected void PreparePrim(GpuStateStruct GpuState, out uint totalVerticesWithoutMorphing, uint vertexCount, out uint morpingVertexCount)
         {
             totalVerticesWithoutMorphing = vertexCount;
+
             morpingVertexCount = (uint)(VertexType.MorphingVertexCount + 1);
+
+            VertexType.NormalCount = GpuState.TextureMappingState.GetTextureComponentsCount();
+
             readVertex = ReadVertex_Void_delegate;
+
             VertexReader.SetVertexTypeStruct(
                 VertexType,
                 (byte*)Memory.PspAddressToPointerSafe(GpuState.GetAddressRelativeToBaseOffset(GpuState.VertexAddress), 0)
@@ -359,44 +363,68 @@ namespace ScePSP.Core.Gpu
                 indexPointer = Memory.PspAddressToPointerSafe(GpuState.GetAddressRelativeToBaseOffset(GpuState.IndexAddress), 0);
             }
 
-            //Console.Error.WriteLine(VertexType.Index);
             switch (VertexType.Index)
             {
                 case VertexTypeStruct.IndexEnum.Void:
                     break;
+
                 case VertexTypeStruct.IndexEnum.Byte:
-                    readVertex = ReadVertex_Byte_delegate;
-                    indexListByte = (byte*)indexPointer;
-                    totalVerticesWithoutMorphing = 0;
-                    if (indexListByte != null)
+                    // If index pointer is missing, fallback to non-indexed behaviour:
+                    if (indexPointer == null)
                     {
-                        for (var n = 0; n < vertexCount; n++)
+                        // treat as non-indexed: read sequential vertices
+                        readVertex = ReadVertex_Void_delegate;
+                        indexListByte = null;
+                        totalVerticesWithoutMorphing = vertexCount;
+                    }
+                    else
+                    {
+                        readVertex = ReadVertex_Byte_delegate;
+                        indexListByte = (byte*)indexPointer;
+                        totalVerticesWithoutMorphing = 0;
+                        if (indexListByte != null)
                         {
-                            if (totalVerticesWithoutMorphing < indexListByte[n])
-                                totalVerticesWithoutMorphing = indexListByte[n];
+                            for (var n = 0; n < vertexCount; n++)
+                            {
+                                if (totalVerticesWithoutMorphing < indexListByte[n])
+                                    totalVerticesWithoutMorphing = indexListByte[n];
+                            }
                         }
                     }
-
                     break;
+
                 case VertexTypeStruct.IndexEnum.Short:
-                    readVertex = ReadVertex_Short_delegate;
-                    indexListShort = (ushort*)indexPointer;
-                    totalVerticesWithoutMorphing = 0;
-                    //VertexCount--;
-                    if (indexListShort != null)
+                    // If index pointer is missing, fallback to non-indexed behaviour:
+                    if (indexPointer == null)
                     {
-                        for (var n = 0; n < vertexCount; n++)
+                        readVertex = ReadVertex_Void_delegate;
+                        indexListShort = null;
+                        totalVerticesWithoutMorphing = vertexCount;
+                    }
+                    else
+                    {
+                        readVertex = ReadVertex_Short_delegate;
+                        indexListShort = (ushort*)indexPointer;
+                        totalVerticesWithoutMorphing = 0;
+                        if (indexListShort != null)
                         {
-                            //Console.Error.WriteLine(IndexListShort[n]);
-                            if (totalVerticesWithoutMorphing < indexListShort[n])
-                                totalVerticesWithoutMorphing = indexListShort[n];
+                            for (var n = 0; n < vertexCount; n++)
+                            {
+                                if (totalVerticesWithoutMorphing < indexListShort[n])
+                                    totalVerticesWithoutMorphing = indexListShort[n];
+                            }
                         }
                     }
-
                     break;
 
                 default:
                     throw new NotImplementedException("VertexType.Index: " + VertexType.Index);
+            }
+
+            // ensure we read at least one vertex when max-index logic yields zero
+            if (totalVerticesWithoutMorphing == 0)
+            {
+                totalVerticesWithoutMorphing = vertexCount;
             }
             totalVerticesWithoutMorphing++;
 
@@ -409,9 +437,8 @@ namespace ScePSP.Core.Gpu
 
             if (morpingVertexCount != 1 || VertexType.RealSkinningWeightCount != 0)
             {
-                //Console.WriteLine("PRIM: {0}, {1}, Morphing:{2}, Skinning:{3}", PrimitiveType, VertexCount, MorpingVertexCount, VertexType.RealSkinningWeightCount);
+                //Console.WriteLine("PRIM: {0}, {1}, Morphing:{2}, Skinning:{3}", PrimitiveType, vertexCount, morpingVertexCount, VertexType.RealSkinningWeightCount);
             }
-
             //Console.WriteLine(TotalVerticesWithoutMorphing);
         }
     }

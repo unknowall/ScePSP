@@ -76,9 +76,6 @@ namespace ScePSP.Core.Gpu
 
         //Action[] InstructionSwitch = new Action[256];
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         internal GpuDisplayList(PspMemory Memory, GpuProcessor GpuProcessor, int Id)
         {
             this.Memory = Memory;

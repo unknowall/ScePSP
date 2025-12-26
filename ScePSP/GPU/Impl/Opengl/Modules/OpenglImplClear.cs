@@ -9,8 +9,6 @@ namespace ScePSP.Core.Gpu.Impl.Opengl.Modules
         {
             bool ccolorMask = false, calphaMask = false;
 
-            //return;
-
             GL.glDisable(GL.GL_BLEND);
             //GL.glDisable(GL.GL_LIGHTING);
             GL.glDisable(GL.GL_TEXTURE_2D);
@@ -39,7 +37,6 @@ namespace ScePSP.Core.Gpu.Impl.Opengl.Modules
             }
 
             //int i; glGetIntegerv(GL_STENCIL_BITS, &i); writefln("GL_STENCIL_BITS: %d", i);
-
             if (gpuState.ClearFlags.HasFlag(ClearBufferSet.DepthBuffer))
             {
                 GL.glEnable(GL.GL_DEPTH_TEST);
@@ -47,16 +44,19 @@ namespace ScePSP.Core.Gpu.Impl.Opengl.Modules
                 GL.glDepthMask(true);
 
                 GL.DepthRange(0, 0);
-
                 //glDepthRange(0.0, 1.0); // Original value
             }
 
             GL.glColorMask(ccolorMask, ccolorMask, ccolorMask, calphaMask);
 
-            //glClearDepth(0.0); glClear(GL_COLOR_BUFFER_BIT);
+            GL.glClearDepthf(0.0f); 
+            GL.glClear(GL.GL_COLOR_BUFFER_BIT);
 
-            //if (state.clearFlags & ClearBufferMask.GU_COLOR_BUFFER_BIT) glClear(GL_DEPTH_BUFFER_BIT);
-            //GL.Clear(ClearBufferMask.StencilBufferBit);
+            if (gpuState.ClearFlags .HasFlag(ClearBufferSet.DepthBuffer))
+                GL.glClear(GL.GL_DEPTH_BUFFER_BIT);
+
+            if (gpuState.ClearFlags.HasFlag(ClearBufferSet.StencilBuffer))
+                GL.glClear(GL.GL_STENCIL_BUFFER_BIT);
         }
     }
 }

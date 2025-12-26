@@ -700,8 +700,8 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
                     try
                     {
-                        Console.Out.WriteLineColored(ConsoleColor.White, "## OpenGL Context Version: {0}, {1}",
-                            GlGetString(GL.GL_VERSION), GlGetString(GL.GL_RENDERER));
+                        Console.Out.WriteLineColored(ConsoleColor.White, "## OpenGL Context Version: {0}",
+                            GlGetString(GL.GL_VERSION));
                         Console.Out.WriteLineColored(ConsoleColor.White, "## Depth Bits: {0}",
                             GL.glGetInteger(GL.GL_DEPTH_BITS));
                         Console.Out.WriteLineColored(ConsoleColor.White, "## Stencil Bits: {0}",
@@ -804,14 +804,14 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         private void PrepareState_AlphaTest(GpuStateStruct gpuState)
         {
-            //if (!GL.EnableDisable(EnableCap.AlphaTest, GpuState->AlphaTestState.Enabled))
+            //if (!GL.EnableDisable(EnableCap.AlphaTest, GpuState.AlphaTestState.Enabled))
             //{
-            //	return;
+            //    return;
             //}
-            //
-            //GL.glAlphaFunc(
-            //	(AlphaFunction)DepthFunctionTranslate[(int)GpuState->AlphaTestState.Function],
-            //	GpuState->AlphaTestState.Value
+
+            //GL glAlphaFunc(
+            //    (AlphaFunction)DepthFunctionTranslate[(int)GpuState.AlphaTestState.Function],
+            //    GpuState.AlphaTestState.Value
             //);
         }
 
@@ -821,11 +821,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             {
                 return;
             }
-
-            //Console.Error.WriteLine("aaaaaa!");
-
             //if (state.stencilFuncFunc == 2) { outputDepthAndStencil(); assert(0); }
-
 #if false
 			Console.Error.WriteLine(
 				"{0}:{1}:{2} - {3}, {4}, {5}",
@@ -891,66 +887,66 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         private void PrepareState_Colors_3D(GpuStateStruct gpuState)
         {
             //GL.EnableDisable(EnableCap.ColorMaterial, VertexType.Color != VertexTypeStruct.ColorEnum.Void);
-            //
-            //var Color = GpuState->LightingState.AmbientModelColor;
-            //var LightingState = &GpuState->LightingState;
-            //GL.Color4(&Color.Red);
-            //
-            //if (VertexType.Color != VertexTypeStruct.ColorEnum.Void && LightingState->Enabled)
+
+            //var Color = GpuState.LightingState.AmbientModelColor;
+            //var LightingState = GpuState.LightingState;
+            //GL.Color4(Color.Red);
+
+            //if (VertexType.Color != VertexTypeStruct.ColorEnum.Void && LightingState.Enabled)
             //{
-            //	var Flags = (ColorMaterialParameter)0;
-            //	/*
+            //    var Flags = (ColorMaterialParameter)0;
+            //    /*
             //	glMaterialfv(faces, GL_AMBIENT , [0.0f, 0.0f, 0.0f, 0.0f].ptr);
             //	glMaterialfv(faces, GL_DIFFUSE , [0.0f, 0.0f, 0.0f, 0.0f].ptr);
             //	glMaterialfv(faces, GL_SPECULAR, [0.0f, 0.0f, 0.0f, 0.0f].ptr);
             //	*/
-            //
-            //	var MaterialColorComponents = LightingState->MaterialColorComponents;
-            //
-            //	if (MaterialColorComponents.HasFlag(LightComponentsSet.Ambient))
-            //	{
-            //		GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Ambient, &LightingState->AmbientModelColor.Red);
-            //	}
-            //
-            //	if (MaterialColorComponents.HasFlag(LightComponentsSet.Diffuse))
-            //	{
-            //		GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Diffuse, &LightingState->DiffuseModelColor.Red);
-            //	}
-            //
-            //	if (MaterialColorComponents.HasFlag(LightComponentsSet.Specular))
-            //	{
-            //		GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Specular, &LightingState->SpecularModelColor.Red);
-            //	}
-            //
-            //	if (MaterialColorComponents.HasFlag(LightComponentsSet.AmbientAndDiffuse))
-            //	{
-            //		Flags = ColorMaterialParameter.AmbientAndDiffuse;
-            //	}
-            //	else if (MaterialColorComponents.HasFlag(LightComponentsSet.Ambient))
-            //	{
-            //		Flags = ColorMaterialParameter.Ambient;
-            //	}
-            //	else if (MaterialColorComponents.HasFlag(LightComponentsSet.Diffuse))
-            //	{
-            //		Flags = ColorMaterialParameter.Diffuse;
-            //	}
-            //	else if (MaterialColorComponents.HasFlag(LightComponentsSet.Specular))
-            //	{
-            //		Flags = ColorMaterialParameter.Specular;
-            //	}
-            //	else
-            //	{
-            //		//throw (new NotImplementedException("Error! : " + MaterialColorComponents));
-            //	}
-            //	//flags = GL_SPECULAR;
-            //	if (Flags != 0)
-            //	{
-            //		GL.ColorMaterial(MaterialFace.FrontAndBack, Flags);
-            //	}
-            //	//glEnable(GL_COLOR_MATERIAL);
+
+            //    var MaterialColorComponents = LightingState.MaterialColorComponents;
+
+            //    if (MaterialColorComponents.HasFlag(LightComponentsSet.Ambient))
+            //    {
+            //        GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Ambient, LightingState.AmbientModelColor.Red);
+            //    }
+
+            //    if (MaterialColorComponents.HasFlag(LightComponentsSet.Diffuse))
+            //    {
+            //        GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Diffuse, LightingState.DiffuseModelColor.Red);
+            //    }
+
+            //    if (MaterialColorComponents.HasFlag(LightComponentsSet.Specular))
+            //    {
+            //        GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Specular, LightingState.SpecularModelColor.Red);
+            //    }
+
+            //    if (MaterialColorComponents.HasFlag(LightComponentsSet.AmbientAndDiffuse))
+            //    {
+            //        Flags = ColorMaterialParameter.AmbientAndDiffuse;
+            //    }
+            //    else if (MaterialColorComponents.HasFlag(LightComponentsSet.Ambient))
+            //    {
+            //        Flags = ColorMaterialParameter.Ambient;
+            //    }
+            //    else if (MaterialColorComponents.HasFlag(LightComponentsSet.Diffuse))
+            //    {
+            //        Flags = ColorMaterialParameter.Diffuse;
+            //    }
+            //    else if (MaterialColorComponents.HasFlag(LightComponentsSet.Specular))
+            //    {
+            //        Flags = ColorMaterialParameter.Specular;
+            //    }
+            //    else
+            //    {
+            //        //throw (new NotImplementedException("Error! : " + MaterialColorComponents));
+            //    }
+            //    //flags = GL_SPECULAR;
+            //    if (Flags != 0)
+            //    {
+            //        GL.ColorMaterial(MaterialFace.FrontAndBack, Flags);
+            //    }
+            //    //glEnable(GL_COLOR_MATERIAL);
             //}
-            //
-            //GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Emission, &GpuState->LightingState.EmissiveModelColor.Red);
+
+            //GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Emission, GpuState.LightingState.EmissiveModelColor.Red);
         }
 
         private void PrepareState_Lighting(GpuStateStruct gpuState)
@@ -1126,7 +1122,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         private void PrepareState_Texture_Common(GpuStateStruct gpuState)
         {
             var textureMappingState = gpuState.TextureMappingState;
-            //var ClutState = &TextureMappingState->ClutState;
+            //var ClutState = TextureMappingState.ClutState;
             var textureState = textureMappingState.TextureState;
 
             if (!GL.EnableDisable(GL.GL_TEXTURE_2D, textureMappingState.Enabled)) return;
@@ -1148,7 +1144,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
             //CurrentTexture.Save("test.png");
 
-            //GL.glTexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvModeTranslate[(int)TextureState->Effect]);
+            //GL.glTexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvModeTranslate[(int)TextureState.Effect]);
         }
 
         private void TransferToFrameBuffer(GpuStateStruct gpuState)

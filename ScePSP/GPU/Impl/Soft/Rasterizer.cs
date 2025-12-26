@@ -6,8 +6,7 @@ using System.Numerics;
 
 namespace ScePSP.Rasterizer
 {
-    public delegate void RasterizeDelegate<T>(int y, ref RasterizerResult left, ref RasterizerResult right,
-        ref T context);
+    public delegate void RasterizeDelegate<T>(int y, ref RasterizerResult left, ref RasterizerResult right, ref T context);
 
     public struct TriangleRasterizer<T>
     {
@@ -26,9 +25,7 @@ namespace ScePSP.Rasterizer
             this.xmax = xmax;
         }
 
-        public void RasterizeTriangle(
-            RasterizerPoint p0, RasterizerPoint p1, RasterizerPoint p2, T param
-        )
+        public void RasterizeTriangle(RasterizerPoint p0, RasterizerPoint p1, RasterizerPoint p2, T param)
         {
             // ReSharper disable InvocationIsSkipped
             Debug.Assert(p0.Y <= p1.Y);
@@ -52,9 +49,7 @@ namespace ScePSP.Rasterizer
             }
         }
 
-        public void RasterizeLine(
-            RasterizerPoint p0, RasterizerPoint p1, T param
-        )
+        public void RasterizeLine(RasterizerPoint p0, RasterizerPoint p1, T param)
         {
             // ReSharper disable InvocationIsSkipped
             Debug.Assert(p0.Y <= p1.Y);

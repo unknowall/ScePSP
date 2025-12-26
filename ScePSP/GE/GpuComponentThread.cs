@@ -1,13 +1,6 @@
-﻿using ScePSP.Core;
-using ScePSP.Core.Components.Display;
+﻿using ScePSP.Core.Components.Display;
 using ScePSP.Core.Gpu;
-using ScePSP.Core.Gpu.Impl.Opengl;
 using ScePSP.Utils;
-using System;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace ScePSP.Runner.Components.Gpu
@@ -43,15 +36,6 @@ namespace ScePSP.Runner.Components.Gpu
 
                     GpuProcessor.SetCurrent();
                     GpuProcessor.ProcessStep();
-
-                    //var OpenglImpl = (GpuImpl as OpenglGpuImpl);
-                    //if (OpenglImpl.RenderbufferManager.CurrentDrawBuffer != null)
-                    //{
-                    //    byte[] ColorPixels = OpenglImpl.RenderbufferManager.CurrentDrawBuffer.RenderTarget.ReadPixels();
-                    //    Console.WriteLine($"{OpenglGpuImpl.RenderbufferManager.CurrentDrawBuffer.RenderTarget.ToString()} ColorPixels {ColorPixels.Length}");
-                    //    File.WriteAllBytes(ApplicationPaths.AssertPath + "/draw.bin", ColorPixels);
-                    //}
-
                     GpuProcessor.UnsetCurrent();
                 }
             }

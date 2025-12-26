@@ -369,6 +369,7 @@ namespace ScePSPPlatform.GL
         public const int GL_RENDERBUFFER_BINDING = 0x8CA7;
         public const int GL_MAX_RENDERBUFFER_SIZE = 0x84E8;
         public const int GL_INVALID_FRAMEBUFFER_OPERATION = 0x0506;
+        public const int GL_COLOR_MATERIAL = 0x0B57;
 
         public static readonly glActiveTexture glActiveTexture;
         public static readonly glAttachShader glAttachShader;
@@ -540,6 +541,9 @@ namespace ScePSPPlatform.GL
         public static readonly glVertexAttrib4fv glVertexAttrib4fv;
         public static readonly glVertexAttribPointer glVertexAttribPointer;
         public static readonly glViewport glViewport;
+        public static readonly glMaterialfv glMaterialfv;
+        public static readonly glMaterialf glMaterialf;
+        public static readonly glMateriali glMateriali;
 
         public static void ClearError()
         {
@@ -1033,4 +1037,13 @@ namespace ScePSPPlatform.GL
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
     public delegate void glViewport(int x, int y, int width, int height);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+    public delegate void glMaterialfv(int face, int pname, float[] @params);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+    public delegate void glMaterialf(int face, int pname, float param);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+    public delegate void glMateriali(int face, int pname, int param);
 }

@@ -25,7 +25,6 @@ namespace ScePSP.Core.Gpu.Impl.Soft
                 //Console.WriteLine(triangle.P0.T);
                 if (VertexType.HasTexture)
                 {
-
                     var texA = LerpRatios(P0.T, P1.T, P2.T, a.Ratios);
                     var texB = LerpRatios(P0.T, P1.T, P2.T, b.Ratios);
                     //Console.WriteLine($"{P0.T} {P1.T} {P2.T} {a.Ratios} {b.Ratios} {texA} {texB}");

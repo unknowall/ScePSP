@@ -32,11 +32,6 @@ namespace ScePSPPlatform.GL.Utils
         {
         }
 
-        /// <summary>
-        /// Copies a RenderTarget from one to another
-        /// </summary>
-        /// <param name="From"></param>
-        /// <param name="To"></param>
         public static void CopyFromTo(GLRenderTarget From, GLRenderTarget To)
         {
             Contract.Assert(From != null);
@@ -147,10 +142,10 @@ namespace ScePSPPlatform.GL.Utils
             {
                 throw new Exception($"Failed to bind FrameBuffer 0x{Status:X4} : {GL.GetConstantString(Status)}, {RenderTargetLayers}, {Width}x{Height}");
             }
-
+            //Console.WriteLine($"Bound FrameBuffer {FrameBufferId} : {RenderTargetLayers}, {Width}x{Height}");
             GL.glViewport(0, 0, Width, Height);
-            GL.glClearColor(0, 0, 0, 0);
-            GL.glClear(GL.GL_COLOR_CLEAR_VALUE | GL.GL_DEPTH_CLEAR_VALUE | GL.GL_STENCIL_CLEAR_VALUE);
+            GL.glClearColor(0, 0, 0, 1);
+            GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
             GL.glFlush();
         }
 

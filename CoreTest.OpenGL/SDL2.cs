@@ -1196,7 +1196,8 @@ namespace SDL2
                 callback = (SDL_LogOutputFunction)GetDelegateForFunctionPointer<SDL_LogOutputFunction>(
                     result
                 );
-            } else
+            }
+            else
             {
                 callback = null;
             }
@@ -3723,7 +3724,8 @@ namespace SDL2
                     pOrder == SDL_PackedOrder.SDL_PACKEDORDER_ABGR ||
                     pOrder == SDL_PackedOrder.SDL_PACKEDORDER_BGRA
                 );
-            } else if (SDL_ISPIXELFORMAT_ARRAY(format))
+            }
+            else if (SDL_ISPIXELFORMAT_ARRAY(format))
             {
                 SDL_ArrayOrder aOrder =
                     (SDL_ArrayOrder)SDL_PIXELORDER(format);
@@ -5589,7 +5591,8 @@ namespace SDL2
                 filter = (SDL_EventFilter)GetDelegateForFunctionPointer<SDL_EventFilter>(
                     result
                 );
-            } else
+            }
+            else
             {
                 filter = null;
             }

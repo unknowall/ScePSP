@@ -12,6 +12,7 @@ using ScePSP.Runner;
 using ScePSP.Runner.Components.Display;
 using ScePSPPlatform.GL;
 using ScePSPPlatform.GL.Utils;
+using ScePSPUtils;
 using SDL2;
 using System;
 using System.Windows.Forms;
@@ -35,13 +36,16 @@ class Program
     static PspEmulator? pspEmulator;
 
     static SceCtrlData ctrlData;
-
     static int lx, ly;
     static int pressingAnalogLeft, pressingAnalogRight, pressingAnalogUp, pressingAnalogDown;
 
     static GLShader? Shader;
     static GLBuffer? VertexBuffer;
     static GLBuffer? TexCoordsBuffer;
+    static GLTexture? TexVram;
+    static GLTexture? DrawTexture;
+    //static GLTexture? DrawDepth;
+    static bool TextureVerticalFlip;
     //static GLTexture? TestTexture;
     public class ShaderInfoClass
     {
@@ -50,21 +54,6 @@ class Program
         public GlUniform? texture;
     }
     static ShaderInfoClass ShaderInfo = new ShaderInfoClass();
-
-    public class GuiRectangle
-    {
-        public int X, Y, Width, Height;
-
-        public GuiRectangle(int x, int y, int width, int height)
-        {
-            this.X = x;
-            this.Y = y;
-            this.Width = width;
-            this.Height = height;
-        }
-    }
-    static GLTexture? DrawTexture;
-    //static GLTexture? DrawDepth;
 
     [STAThreadAttribute]
     private static void Main(string[] args)
@@ -128,6 +117,63 @@ class Program
         pspEmulator.StartAndLoad(ofn.FileName, RunMainLoop, false, false);
     }
 
+    private static void GetTextureFromGpu()
+    {
+        var OpengImpl = (gpu.GpuImpl as OpenglGpuImpl);
+        OpengImpl.RenderbufferManager.GetDrawBufferTextureAndLock(
+            new DrawBufferKey() { Address = display.CurrentInfo.FrameAddress },
+            (DrawBuffer) =>
+            {
+                if (DrawBuffer != null)
+                {
+                    var RenderTarget = DrawBuffer.RenderTarget;
+                    if (GL.glIsTexture(RenderTarget.TextureColor.Texture))
+                    {
+                        TextureVerticalFlip = false;
+                        DrawTexture = RenderTarget.TextureColor;
+                        //DrawDepth = RenderTarget.TextureDepth;
+                        return;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Not shared contexts");
+                    }
+                }
+            });
+    }
+
+    private unsafe static void GetTextureFromRam()
+    {
+        if (TexVram == null)
+        {
+            TexVram = GLTexture.Create().SetFormat(TextureFormat.RGBA).SetSize(1, 1);
+        }
+
+        TexVram.Bind();
+
+        var width = display.CurrentInfo.Width;
+        var height = display.CurrentInfo.Height;
+        var pixels2 = new uint[PspDisplay.MaxBufferArea];
+        var displayData = memory.Range<uint>(display.CurrentInfo.FrameAddress, PspDisplay.MaxBufferArea);
+        for (var m = 0; m < PspDisplay.MaxBufferArea; m++)
+        {
+            var color = displayData[m];
+            uint r = color.Extract(0, 8);
+            uint g = color.Extract(8, 8);
+            uint b = color.Extract(16, 8);
+            //pixels2[m] = (b << 24) | (g << 16) | (r << 8) | 0xFF;
+            pixels2[m] = ((uint)0xFF << 24) | (b << 16) | (g << 8) | r;
+        }
+        fixed (uint* pp = pixels2)
+        {
+            GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, 512, 272, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, pp);
+        }
+
+        DrawTexture = TexVram;
+
+        TextureVerticalFlip = true;
+    }
+
     private static void DrawFrame()
     {
         lx = pressingAnalogLeft != 0 ? -pressingAnalogLeft : pressingAnalogRight;
@@ -142,49 +188,29 @@ class Program
 
         Context.MakeCurrent();
 
-        var OpengImpl = (gpu.GpuImpl as OpenglGpuImpl);
+        if (!display.CurrentInfo.PlayingVideo && gpu.UsingGe)
+        {
+            GetTextureFromGpu();
+        }
+        else
+        {
+            GetTextureFromRam();
+        }
 
-        OpengImpl.RenderbufferManager.GetDrawBufferTextureAndLock(new DrawBufferKey() { Address = display.CurrentInfo.FrameAddress },
-            (DrawBuffer) =>
-            {
-                if (DrawBuffer == null)
-                {
-                    return;
-                }
-                else
-                {
-                    var RenderTarget = DrawBuffer.RenderTarget;
-                    if (GL.glIsTexture(RenderTarget.TextureColor.Texture))
-                    {
-                        DrawTexture = RenderTarget.TextureColor;
-                        //DrawDepth = RenderTarget.TextureDepth;
-                        return;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Not shared contexts");
-                    }
-                }
-            });
-
-        GuiRectangle rect = new GuiRectangle(0, 0, PspDisplay.MaxVisibleWidth * 2, PspDisplay.MaxVisibleHeight * 2);
-
-        GL.glViewport(rect.X, rect.Y, rect.Width, rect.Height);
+        GL.glViewport(0, 0, PspDisplay.MaxVisibleWidth * 2, PspDisplay.MaxVisibleHeight * 2);
         GL.glClearColor(0, 0, 0, 1);
         GL.glClear(GL.GL_COLOR_BUFFER_BIT);
-        
+
         Shader.Draw(GLGeometry.GL_TRIANGLE_STRIP, 4, () =>
         {
             var TextureRect = ScePSPPlatform.RectangleF.FromCoords(0, 0, (float)display.CurrentInfo.Width / 512f, (float)display.CurrentInfo.Height / 272f);
-            //TextureRect = TextureRect.VFlip();
+            if (TextureVerticalFlip) TextureRect = TextureRect.VFlip();
             TexCoordsBuffer = GLBuffer.Create().SetData(TextureRect.GetFloat2TriangleStripCoords());
             ShaderInfo.texture.Set(GLTextureUnit.CreateAtIndex(0).SetFiltering(GLScaleFilter.Nearest).SetWrap(GLWrap.ClampToEdge).SetTexture(DrawTexture));
             //ShaderInfo.texture.Set(GLTextureUnit.CreateAtIndex(0).SetFiltering(GLScaleFilter.Nearest).SetWrap(GLWrap.ClampToEdge).SetTexture(DrawDepth));
             ShaderInfo.position.SetData<float>(VertexBuffer, 2);
             ShaderInfo.texCoords.SetData<float>(TexCoordsBuffer, 2);
         });
-
-        //Console.WriteLine("Context.SwapBuffers");
 
         Context.SwapBuffers();
 
@@ -289,4 +315,5 @@ class Program
         }
 
     }
+
 }

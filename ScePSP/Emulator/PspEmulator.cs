@@ -105,7 +105,7 @@ namespace ScePSP
             string File, Action<PspEmulator> GuiRunner = null,
             bool TraceSyscalls = false, bool TrackCallStack = true,
             IntPtr GpuWindowHandle = default,
-            bool? EnableMpeg = null
+            bool EnableMpeg = false
         )
         {
             Start(() =>

@@ -505,7 +505,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                 PrepareDrawStateFirst();
             }
 
-            //if (PrimitiveType == GuPrimitiveType.TriangleStrip) VertexCount++;
+            //if (PrimitiveType == GuPrimitiveType.TriangleStrip) vertexCount++;
 
             uint morpingVertexCount, totalVerticesWithoutMorphing;
 

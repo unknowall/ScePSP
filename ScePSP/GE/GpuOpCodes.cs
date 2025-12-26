@@ -1,1271 +1,276 @@
-﻿// ReSharper disable InconsistentNaming
-namespace ScePSP.Core.Gpu
+﻿namespace ScePSP.Core.Gpu
 {
     public enum GpuOpCodes : ushort
     {
-        NOP,         // 0x00 - 0 - NOP
-        VADDR,       // 0x01 - 1 - Vertex List (BASE)
-        IADDR,       // 0x02 - 2 - Index List (BASE)
-        Unknown0x03, // 0x03 - 3 -
-        PRIM,        // 0x04 - 4 - Primitive Kick
-        BEZIER,      // 0x05 - 5 - Bezier Patch Kick
-
-        /// <summary>
-        /// 0x06 - 6 - Spline Surface Kick
-        /// </summary>
-        SPLINE,
-
-        /// <summary>
-        /// 0x07 - 7 - Bounding Box
-        /// </summary>
-        BBOX,
-
-        /// <summary>
-        /// 0x08 - 8 - Jump To New Address (BASE)
-        /// </summary>
-        JUMP,
-
-        /// <summary>
-        /// 0x09 - 9 - Conditional Jump (BASE)
-        /// </summary>
-        BJUMP,
-
-        /// <summary>
-        /// 0x0A - 10 - Call Address (BASE)
-        /// </summary>
-        CALL,
-
-        /// <summary>
-        /// 0x0B - 11 - Return From Call
-        /// </summary>
-        RET,
-
-        /// <summary>
-        /// 0x0C - 12 - Stop Execution
-        /// </summary>
-        END,
-
-        /// <summary>
-        /// 0x0D - 13 - 
-        /// </summary>
-        Unknown0x0D,
-
-        /// <summary>
-        /// 0x0E - 14 - Raise Signal Interrupt
-        /// </summary>
-        SIGNAL,
-
-        /// <summary>
-        /// 0x0F - 15 - Complete Rendering
-        /// </summary>
-        FINISH,
-
-        /// <summary>
-        /// 0x10 - 16 - Base Address Register
-        /// </summary>
-        BASE,
-
-        /// <summary>
-        /// 0x11 - 17 -
-        /// </summary>
-        Unknown0x11,
-
-        /// <summary>
-        /// 0x12 - 18 - Vertex Type
-        /// </summary>
-        VTYPE,
-
-        /// <summary>
-        /// 0x13 - 19 - Offset Address (BASE)
-        /// </summary>
-        OFFSET_ADDR,
-
-        /// <summary>
-        /// 0x14 - 20 - Origin Address (BASE)
-        /// </summary>
-        ORIGIN_ADDR,
-
-        /// <summary>
-        /// 0x15 - 21 - Draw Region Start
-        /// </summary>
-        REGION1,
-
-        /// <summary>
-        /// 0x16 - 22 - Draw Region End
-        /// </summary>
-        REGION2,
-
-        /// <summary>
-        /// 0x17 - 23 - Lighting Enable
-        /// </summary>
-        LTE,
-
-        /// <summary>
-        /// 0x18 - 24 - Light 0 Enable
-        /// </summary>
-        LTE0,
-
-        /// <summary>
-        /// 0x19 - 25 - Light 1 Enable
-        /// </summary>
-        LTE1,
-
-        /// <summary>
-        /// 0x1A - 26 - Light 2 Enable
-        /// </summary>
-        LTE2,
-
-        /// <summary>
-        /// 0x1B - 27 - Light 3 Enable
-        /// </summary>
-        LTE3,
-
-        /// <summary>
-        /// 0x1C - Clip Plane Enable
-        /// </summary>
-        CPE,
-
-        /// <summary>
-        /// 0x1D - Backface Culling Enable
-        /// </summary>
-        BCE,
-
-        /// <summary>
-        /// 0x1E - Texture Mapping Enable
-        /// </summary>
-        TME,
-
-        /// <summary>
-        /// 0x1F - Fog Enable
-        /// </summary>
-        FGE,
-
-        /// <summary>
-        /// 0x20 - Dither Enable
-        /// </summary>
-        DTE,
-
-        /// <summary>
-        /// 0x21 - Alpha Blend Enable
-        /// </summary>
-        ABE,
-
-        /// <summary>
-        /// 0x22 - Alpha Test Enable
-        /// </summary>
-        ATE,
-
-        /// <summary>
-        /// 0x23 - Depth Test Enable
-        /// </summary>
-        ZTE,
-
-        /// <summary>
-        /// 0x24 - Stencil Test Enable
-        /// </summary>
-        STE,
-
-        /// <summary>
-        /// 0x25 - Anitaliasing Enable
-        /// </summary>
-        AAE,
-
-        /// <summary>
-        /// 0x26 - Patch Cull Enable
-        /// </summary>
-        PCE,
-
-        /// <summary>
-        /// 0x27 - Color Test Enable
-        /// </summary>
-        CTE,
-
-        /// <summary>
-        /// 0x28 - Logical Operation Enable
-        /// </summary>
-        LOE,
-
-        /// <summary>
-        /// 0x29 - 
-        /// </summary>
-        Unknown0x29,
-
-        /// <summary>
-        /// 0x2A - Bone Matrix Offset
-        /// </summary>
-        BOFS,
-
-        /// <summary>
-        /// 0x2B - Bone Matrix Upload
-        /// </summary>
-        BONE,
-
-        /// <summary>
-        /// 0x2C - Morph Weight 0
-        /// </summary>
-        MW0,
-
-        /// <summary>
-        /// 0x2D - Morph Weight 1
-        /// </summary>
-        MW1,
-
-        /// <summary>
-        /// 0x2E - Morph Weight 2
-        /// </summary>
-        MW2,
-
-        /// <summary>
-        /// 0x2F - Morph Weight 3
-        /// </summary>
-        MW3,
-
-        /// <summary>
-        /// 0x30 - Morph Weight 4
-        /// </summary>
-        MW4,
-
-        /// <summary>
-        /// 0x31 - Morph Weight 5
-        /// </summary>
-        MW5,
-
-        /// <summary>
-        /// 0x32 - Morph Weight 6
-        /// </summary>
-        MW6,
-
-        /// <summary>
-        /// 0x33 - Morph Weight 7
-        /// </summary>
-        MW7,
-
-        /// <summary>
-        /// 0x34 - 
-        /// </summary>
-        Unknown0x34,
-
-        /// <summary>
-        /// 0x35 - 
-        /// </summary>
-        Unknown0x35,
-
-        /// <summary>
-        /// 0x36 - Patch Subdivision
-        /// </summary>
-        PSUB,
-
-        /// <summary>
-        /// 0x37 - Patch Primitive
-        /// </summary>
-        PPRIM,
-
-        /// <summary>
-        /// 0x38 - Patch Front Face
-        /// </summary>
-        PFACE,
-
-        /// <summary>
-        /// 0x39 - 
-        /// </summary>
-        Unknown0x39,
-
-        /// <summary>
-        /// 0x3A - World Matrix Select
-        /// </summary>
-        WMS,
-
-        /// <summary>
-        /// 0x3B - World Matrix Upload
-        /// </summary>
-        WORLD,
-
-        /// <summary>
-        /// 0x3C - View Matrix Select
-        /// </summary>
-        VMS,
-
-        /// <summary>
-        /// 0x3D - View Matrix upload
-        /// </summary>
-        VIEW,
-
-        /// <summary>
-        /// 0x3E - Projection matrix Select
-        /// </summary>
-        PMS,
-
-        /// <summary>
-        /// 0x3F - Projection Matrix upload
-        /// </summary>
-        PROJ,
-
-        /// <summary>
-        /// 0x40 - Texture Matrix Select
-        /// </summary>
-        TMS,
-
-        /// <summary>
-        /// 0x41 - Texture Matrix Upload
-        /// </summary>
-        TMATRIX,
-
-        /// <summary>
-        /// 0x42 - 66 - Viewport Width Scale
-        /// </summary>
-        XSCALE,
-
-        /// <summary>
-        /// 0x43 - 67 - Viewport Height Scale
-        /// </summary>
-        YSCALE,
-
-        /// <summary>
-        /// 0x44 - 68 - Depth Scale
-        /// </summary>
-        ZSCALE,
-
-        /// <summary>
-        /// 0x45 - 69 - Viewport X Position
-        /// </summary>
-        XPOS,
-
-        /// <summary>
-        /// 0x46 - 90 - Viewport Y Position
-        /// </summary>
-        YPOS,
-
-        /// <summary>
-        /// 0x47 - Depth Position
-        /// </summary>
-        ZPOS,
-
-        /// <summary>
-        /// 0x48 - Texture Scale U
-        /// </summary>
-        USCALE,
-
-        /// <summary>
-        /// 0x49 - Texture Scale V
-        /// </summary>
-        VSCALE,
-
-        /// <summary>
-        /// 0x4A - Texture Offset U
-        /// </summary>
-        UOFFSET,
-
-        /// <summary>
-        /// 0x4B - Texture Offset V
-        /// </summary>
-        VOFFSET,
-
-        /// <summary>
-        /// 0x4C - Viewport offset (X)
-        /// </summary>
-        OFFSETX,
-
-        /// <summary>
-        /// 0x4D - Viewport offset (Y)
-        /// </summary>
-        OFFSETY,
-
-        /// <summary>
-        /// 0x4E - 
-        /// </summary>
-        Unknown0x4E,
-
-        /// <summary>
-        /// 0x4F - 
-        /// </summary>
-        Unknown0x4F,
-
-        /// <summary>
-        /// 0x50 - Shade Model
-        /// </summary>
-        SHADE,
-
-        /// <summary>
-        /// 0x51 - Reverse Face Normals Enable
-        /// </summary>
-        RNORM,
-
-        /// <summary>
-        /// 0x52 - 
-        /// </summary>
-        Unknown0x52,
-
-        /// <summary>
-        /// 0x53 - Color Material
-        /// </summary>
-        CMAT,
-
-        /// <summary>
-        /// 0x54 - Emissive Model Color
-        /// </summary>
-        EMC,
-
-        /// <summary>
-        /// 0x55 - Ambient Model Color
-        /// </summary>
-        AMC,
-
-        /// <summary>
-        /// 0x56 - Diffuse Model Color
-        /// </summary>
-        DMC,
-
-        /// <summary>
-        /// 0x57 - Specular Model Color
-        /// </summary>
-        SMC,
-
-        /// <summary>
-        /// 0x58 - Ambient Model Alpha
-        /// </summary>
-        AMA,
-
-        /// <summary>
-        /// 0x59 - 
-        /// </summary>
-        Unknown0x59,
-
-        /// <summary>
-        /// 0x5A - 
-        /// </summary>
-        Unknown0x5A,
-
-        /// <summary>
-        /// 0x5B - Specular Power
-        /// </summary>
-        SPOW,
-
-        /// <summary>
-        /// 0x5C - Ambient Light Color
-        /// </summary>
-        ALC,
-
-        /// <summary>
-        /// 0x5D - Ambient Light Alpha
-        /// </summary>
-        ALA,
-
-        /// <summary>
-        /// 0x5E - Light Model
-        /// </summary>
-        LMODE,
-
-        /// <summary>
-        /// 0x5F - Light Type 0
-        /// </summary>
-        LT0,
-
-        /// <summary>
-        /// 0x60 - Light Type 1
-        /// </summary>
-        LT1,
-
-        /// <summary>
-        /// 0x61 - Light Type 2
-        /// </summary>
-        LT2,
-
-        /// <summary>
-        /// 0x62 - Light Type 3
-        /// </summary>
-        LT3,
-
-        /// <summary>
-        /// 0x63 - Light X Position 0
-        /// </summary>
-        LXP0,
-
-        /// <summary>
-        /// 0x64 - Light Y Position 0
-        /// </summary>
-        LYP0,
-
-        /// <summary>
-        /// 0x65 - Light Z Position 0
-        /// </summary>
-        LZP0,
-
-        /// <summary>
-        /// 0x66 - Light X Position 1
-        /// </summary>
-        LXP1,
-
-        /// <summary>
-        /// 0x67 - Light Y Position 1
-        /// </summary>
-        LYP1,
-
-        /// <summary>
-        /// 0x68 - Light Z Position 1
-        /// </summary>
-        LZP1,
-
-        /// <summary>
-        /// 0x69 - Light X Position 2
-        /// </summary>
-        LXP2,
-
-        /// <summary>
-        /// 0x6A - Light Y Position 2
-        /// </summary>
-        LYP2,
-
-        /// <summary>
-        /// 0x6B - Light Z Position 2
-        /// </summary>
-        LZP2,
-
-        /// <summary>
-        /// 0x6C - Light X Position 3
-        /// </summary>
-        LXP3,
-
-        /// <summary>
-        /// 0x6D - Light Y Position 3
-        /// </summary>
-        LYP3,
-
-        /// <summary>
-        /// 0x6E - Light Z Position 3
-        /// </summary>
-        LZP3,
-
-        /// <summary>
-        /// 0x6F - Light X Direction 0
-        /// </summary>
-        LXD0,
-
-        /// <summary>
-        /// 0x70 - Light Y Direction 0
-        /// </summary>
-        LYD0,
-
-        /// <summary>
-        /// 0x71 - Light Z Direction 0
-        /// </summary>
-        LZD0,
-
-        /// <summary>
-        /// 0x72 - Light X Direction 1
-        /// </summary>
-        LXD1,
-
-        /// <summary>
-        /// 0x73 - Light Y Direction 1
-        /// </summary>
-        LYD1,
-
-        /// <summary>
-        /// 0x74 - Light Z Direction 1
-        /// </summary>
-        LZD1,
-
-        /// <summary>
-        /// 0x75 - Light X Direction 2
-        /// </summary>
-        LXD2,
-
-        /// <summary>
-        /// 0x76 - Light Y Direction 2
-        /// </summary>
-        LYD2,
-
-        /// <summary>
-        /// 0x77 - Light Z Direction 2
-        /// </summary>
-        LZD2,
-
-        /// <summary>
-        /// 0x78 - Light X Direction 3
-        /// </summary>
-        LXD3,
-
-        /// <summary>
-        /// 0x79 - Light Y Direction 3
-        /// </summary>
-        LYD3,
-
-        /// <summary>
-        /// 0x7A - Light Z Direction 3
-        /// </summary>
-        LZD3,
-
-        /// <summary>
-        /// 0x7B - Light Constant Attenuation 0
-        /// </summary>
-        LCA0,
-
-        /// <summary>
-        /// 0x7C - Light Linear Attenuation 0
-        /// </summary>
-        LLA0,
-
-        /// <summary>
-        /// 0x7D - Light Quadratic Attenuation 0
-        /// </summary>
-        LQA0,
-
-        /// <summary>
-        /// 0x7E - Light Constant Attenuation 1
-        /// </summary>
-        LCA1,
-
-        /// <summary>
-        /// 0x7F - Light Linear Attenuation 1
-        /// </summary>
-        LLA1,
-
-        /// <summary>
-        /// 0x80 - Light Quadratic Attenuation 1
-        /// </summary>
-        LQA1,
-
-        /// <summary>
-        /// 0x81 - Light Constant Attenuation 2
-        /// </summary>
-        LCA2,
-
-        /// <summary>
-        /// 0x82 - Light Linear Attenuation 2
-        /// </summary>
-        LLA2,
-
-        /// <summary>
-        /// 0x83 - Light Quadratic Attenuation 2
-        /// </summary>
-        LQA2,
-
-        /// <summary>
-        /// 0x84 - Light Constant Attenuation 3
-        /// </summary>
-        LCA3,
-
-        /// <summary>
-        /// 0x85 - Light Linear Attenuation 3
-        /// </summary>
-        LLA3,
-
-        /// <summary>
-        /// 0x86 - Light Quadratic Attenuation 3
-        /// </summary>
-        LQA3,
-
-        /// <summary>
-        /// 0x87 - Spot light 0 exponent
-        /// </summary>
-        SPOTEXP0,
-
-        /// <summary>
-        /// 0x88 - Spot light 1 exponent
-        /// </summary>
-        SPOTEXP1,
-
-        /// <summary>
-        /// 0x89 - Spot light 2 exponent
-        /// </summary>
-        SPOTEXP2,
-
-        /// <summary>
-        /// 0x8A - Spot light 3 exponent
-        /// </summary>
-        SPOTEXP3,
-
-        /// <summary>
-        /// 0x8B - Spot light 0 cutoff
-        /// </summary>
-        SPOTCUT0,
-
-        /// <summary>
-        /// 0x8C - Spot light 1 cutoff
-        /// </summary>
-        SPOTCUT1,
-
-        /// <summary>
-        /// 0x8D - Spot light 2 cutoff
-        /// </summary>
-        SPOTCUT2,
-
-        /// <summary>0x8E - Spot light 3 cutoff</summary>
-        SPOTCUT3,
-
-        /// <summary>
-        /// 0x8F - Ambient Light Color 0
-        /// </summary>
-        ALC0,
-
-        /// <summary>
-        /// 0x90 - Diffuse Light Color 0
-        /// </summary>
-        DLC0,
-
-        /// <summary>
-        /// 0x91 - Specular Light Color 0
-        /// </summary>
-        SLC0,
-
-        /// <summary>
-        /// 0x92 - Ambient Light Color 1
-        /// </summary>
-        ALC1,
-
-        /// <summary>
-        /// 0x93 - Diffuse Light Color 1
-        /// </summary>
-        DLC1,
-
-        /// <summary>
-        /// 0x94 - Specular Light Color 1
-        /// </summary>
-        SLC1,
-
-        /// <summary>
-        /// 0x95 - Ambient Light Color 2
-        /// </summary>
-        ALC2,
-
-        /// <summary>
-        /// 0x96 - Diffuse Light Color 2
-        /// </summary>
-        DLC2,
-
-        /// <summary>
-        /// 0x97 - Specular Light Color 2
-        /// </summary>
-        SLC2,
-
-        /// <summary>
-        /// 0x98 - Ambient Light Color 3
-        /// </summary>
-        ALC3,
-
-        /// <summary>
-        /// 0x99 - Diffuse Light Color 3
-        /// </summary>
-        DLC3,
-
-        /// <summary>
-        /// 0x9A - Specular Light Color 3
-        /// </summary>
-        SLC3,
-
-        /// <summary>
-        /// 0x9B - Front Face Culling Order
-        /// </summary>
-        FFACE,
-
-        /// <summary>
-        /// 0x9C - 156  Frame Buffer Pointer
-        /// </summary>
-        FBP,
-
-        /// <summary>
-        /// 0x9D - 157 - Frame Buffer Width
-        /// </summary>
-        FBW,
-
-        /// <summary>
-        /// 0x9E - Depth Buffer Pointer
-        /// </summary>
-        ZBP,
-
-        /// <summary>
-        /// 0x9F - Depth Buffer Width
-        /// </summary>
-        ZBW,
-
-        /// <summary>
-        /// 0xA0 - Texture Buffer Pointer 0
-        /// </summary>
-        TBP0,
-
-        /// <summary>
-        /// 0xA1 - Texture Buffer Pointer 1
-        /// </summary>
-        TBP1,
-
-        /// <summary>
-        /// 0xA2 - Texture Buffer Pointer 2
-        /// </summary>
-        TBP2,
-
-        /// <summary>
-        /// 0xA3 - Texture Buffer Pointer 3
-        /// </summary>
-        TBP3,
-
-        /// <summary>
-        /// 0xA4 - Texture Buffer Pointer 4
-        /// </summary>
-        TBP4,
-
-        /// <summary>
-        /// 0xA5 - Texture Buffer Pointer 5
-        /// </summary>
-        TBP5,
-
-        /// <summary>
-        /// 0xA6 - Texture Buffer Pointer 6
-        /// </summary>
-        TBP6,
-
-        /// <summary>
-        /// 0xA7 - Texture Buffer Pointer 7
-        /// </summary>
-        TBP7,
-
-        /// <summary>
-        /// 0xA8 - Texture Buffer Width 0
-        /// </summary>
-        TBW0,
-
-        /// <summary>
-        /// 0xA9 - Texture Buffer Width 1
-        /// </summary>
-        TBW1,
-
-        /// <summary>
-        /// 0xAA - Texture Buffer Width 2
-        /// </summary>
-        TBW2,
-
-        /// <summary>
-        /// 0xAB - Texture Buffer Width 3
-        /// </summary>
-        TBW3,
-
-        /// <summary>
-        /// 0xAC - Texture Buffer Width 4
-        /// </summary>
-        TBW4,
-
-        /// <summary>
-        /// 0xAD - Texture Buffer Width 5
-        /// </summary>
-        TBW5,
-
-        /// <summary>
-        /// 0xAE - Texture Buffer Width 6
-        /// </summary>
-        TBW6,
-
-        /// <summary>
-        /// 0xAF - Texture Buffer Width 7
-        /// </summary>
-        TBW7,
-
-        /// <summary>
-        /// 0xB0 - CLUT Buffer Pointer
-        /// </summary>
-        CBP,
-
-        /// <summary>
-        /// 0xB1 - CLUT Buffer Pointer High
-        /// </summary>
-        CBPH,
-
-        /// <summary>
-        /// 0xB2 - Transmission Source Buffer Pointer
-        /// </summary>
-        TRXSBP,
-
-        /// <summary>
-        /// 0xB3 - Transmission Source Buffer Width
-        /// </summary>
-        TRXSBW,
-
-        /// <summary>
-        /// 0xB4 - Transmission Destination Buffer Pointer
-        /// </summary>
-        TRXDBP,
-
-        /// <summary>
-        /// 0xB5 - Transmission Destination Buffer Width
-        /// </summary>
-        TRXDBW,
-
-        /// <summary>
-        /// 0xB6 - 
-        /// </summary>
-        Unknown0xB6,
-
-        /// <summary>
-        /// 0xB7 - 
-        /// </summary>
-        Unknown0xB7,
-
-        /// <summary>
-        /// 0xB8 - Texture Size Level 0
-        /// </summary>
-        TSIZE0,
-
-        /// <summary>
-        /// 0xB9 - Texture Size Level 1
-        /// </summary>
-        TSIZE1,
-
-        /// <summary>
-        /// 0xBA - Texture Size Level 2
-        /// </summary>
-        TSIZE2,
-
-        /// <summary>
-        /// 0xBB - Texture Size Level 3
-        /// </summary>
-        TSIZE3,
-
-        /// <summary>
-        /// 0xBC - Texture Size Level 4
-        /// </summary>
-        TSIZE4,
-
-        /// <summary>
-        /// 0xBD - Texture Size Level 5
-        /// </summary>
-        TSIZE5,
-
-        /// <summary>
-        /// 0xBE - Texture Size Level 6
-        /// </summary>
-        TSIZE6,
-
-        /// <summary>
-        /// 0xBF - Texture Size Level 7
-        /// </summary>
-        TSIZE7,
-
-        /// <summary>
-        /// 0xC0 - Texture Projection Map Mode + Texture Map Mode
-        /// </summary>
-        TMAP,
-
-        /// <summary>
-        /// 0xC1 - Environment Map Matrix
-        /// </summary>
-        TEXTURE_ENV_MAP_MATRIX,
-
-        /// <summary>
-        /// 0xC2 - Texture Mode
-        /// </summary>
-        TMODE,
-
-        /// <summary>
-        /// 0xC3 - Texture Pixel Storage Mode
-        /// </summary>
-        TPSM,
-
-        /// <summary>
-        /// 0xC4 - CLUT Load
-        /// </summary>
-        CLOAD,
-
-        /// <summary>
-        /// 0xC5 - CLUT Mode
-        /// </summary>
-        CMODE,
-
-        /// <summary>
-        /// 0xC6 - Texture Filter
-        /// </summary>
-        TFLT,
-
-        /// <summary>
-        /// 0xC7 - Texture Wrapping
-        /// </summary>
-        TWRAP,
-
-        /// <summary>
-        /// 0xC8 - Texture Level Bias (???)
-        /// </summary>
-        TBIAS,
-
-        /// <summary>
-        /// 0xC9 - Texture Function
-        /// </summary>
-        TFUNC,
-
-        /// <summary>
-        /// 0xCA - Texture Environment Color
-        /// </summary>
-        TEC,
-
-        /// <summary>
-        /// 0xCB - Texture Flush
-        /// </summary>
-        TFLUSH,
-
-        /// <summary>
-        /// 0xCC - Texture Sync
-        /// </summary>
-        TSYNC,
-
-        /// <summary>
-        /// 0xCD - Fog Far (???)
-        /// </summary>
-        FFAR,
-
-        /// <summary>
-        /// 0xCE - Fog Range
-        /// </summary>
-        FDIST,
-
-        /// <summary>
-        /// 0xCF - Fog Color
-        /// </summary>
-        FCOL,
-
-        /// <summary>
-        /// 0xD0 - Texture Slope
-        /// </summary>
-        TSLOPE,
-
-        /// <summary>
-        /// 0xD1 - 
-        /// </summary>
-        Unknown0xD1,
-
-        /// <summary>
-        /// 0xD2 - Frame Buffer Pixel Storage Mode
-        /// </summary>
-        PSM,
-
-        /// <summary>
-        /// 0xD3 - Clear Flags
-        /// </summary>
-        CLEAR,
-
-        /// <summary>
-        /// 0xD4 - Scissor Region Start
-        /// </summary>
-        SCISSOR1,
-
-        /// <summary>
-        /// 0xD5 - Scissor Region End
-        /// </summary>
-        SCISSOR2,
-
-        /// <summary>
-        /// 0xD6 - Near Depth Range
-        /// </summary>
-        NEARZ,
-
-        /// <summary>
-        /// 0xD7 - Far Depth Range
-        /// </summary>
-        FARZ,
-
-        /// <summary>
-        /// 0xD8 - Color Test Function
-        /// </summary>
-        CTST,
-
-        /// <summary>
-        /// 0xD9 - Color Reference
-        /// </summary>
-        CREF,
-
-        /// <summary>
-        /// 0xDA - Color Mask
-        /// </summary>
-        CMSK,
-
-        /// <summary>
-        /// 0xDB - Alpha Test
-        /// </summary>
-        ATST,
-
-        /// <summary>
-        /// 0xDC - Stencil Test
-        /// </summary>
-        STST,
-
-        /// <summary>
-        /// 0xDD - Stencil Operations
-        /// </summary>
-        SOP,
-
-        /// <summary>
-        /// 0xDE - Depth Test Function
-        /// </summary>
-        ZTST,
-
-        /// <summary>
-        /// 0xDF - Alpha Blend
-        /// </summary>
-        ALPHA,
-
-        /// <summary>
-        /// 0xE0 - Source Fix Color
-        /// </summary>
-        SFIX,
-
-        /// <summary>
-        /// 0xE1 - Destination Fix Color
-        /// </summary>
-        DFIX,
-
-        /// <summary>
-        /// 0xE2 - Dither Matrix Row 0
-        /// </summary>
-        DTH0,
-
-        /// <summary>
-        /// 0xE3 - Dither Matrix Row 1
-        /// </summary>
-        DTH1,
-
-        /// <summary>
-        /// 0xE4 - Dither Matrix Row 2
-        /// </summary>
-        DTH2,
-
-        /// <summary>
-        /// 0xE5 - Dither Matrix Row 3
-        /// </summary>
-        DTH3,
-
-        /// <summary>
-        /// 0xE6 - Logical Operation
-        /// </summary>
-        LOP,
-
-        /// <summary>
-        /// 0xE7 - Depth Mask
-        /// </summary>
-        ZMSK,
-
-        /// <summary>
-        /// 0xE8 - Pixel Mask Color
-        /// </summary>
-        PMSKC,
-
-        /// <summary>
-        /// 0xE9 - Pixel Mask Alpha
-        /// </summary>
-        PMSKA,
-
-        /// <summary>
-        /// 0xEA - Transmission Kick
-        /// </summary>
-        TRXKICK,
-
-        /// <summary>
-        /// 0xEB - Transfer Source Position
-        /// </summary>
-        TRXSPOS,
-
-        /// <summary>
-        /// 0xEC - Transfer Destination Position
-        /// </summary>
-        TRXDPOS,
-
-        /// <summary>
-        /// 0xED - 
-        /// </summary>
-        Unknown0xED,
-
-        /// <summary>
-        /// 0xEE - Transfer Size
-        /// </summary>
-        TRXSIZE,
-
-        /// <summary>
-        /// 0xEF - 
-        /// </summary>
-        Unknown0xEF,
-
-        /// <summary>
-        /// 0xF0 - 
-        /// </summary>
-        Unknown0xF0,
-
-        /// <summary>
-        /// 0xF1 - 
-        /// </summary>
-        Unknown0xF1,
-
-        /// <summary>
-        /// 0xF2 - 
-        /// </summary>
-        Unknown0xF2,
-
-        /// <summary>
-        /// 0xF3 - 
-        /// </summary>
-        Unknown0xF3,
-
-        /// <summary>
-        /// 0xF4 - 
-        /// </summary>
-        Unknown0xF4,
-
-        /// <summary>
-        /// 0xF5 - 
-        /// </summary>
-        Unknown0xF5,
-
-        /// <summary>
-        /// 0xF6 - 
-        /// </summary>
-        Unknown0xF6,
-
-        /// <summary>
-        /// 0xF7 - 
-        /// </summary>
-        Unknown0xF7,
-
-        /// <summary>
-        /// 0xF8 - 
-        /// </summary>
-        Unknown0xF8,
-
-        /// <summary>
-        /// 0xF9 - 
-        /// </summary>
-        Unknown0xF9,
-
-        /// <summary>
-        /// 0xFA - 
-        /// </summary>
-        Unknown0xFA,
-
-        /// <summary>
-        /// 0xFB - 
-        /// </summary>
-        Unknown0xFB,
-
-        /// <summary>
-        /// 0xFC - 
-        /// </summary>
-        Unknown0xFC,
-
-        /// <summary>
-        /// 0xFD - 
-        /// </summary>
-        Unknown0xFD,
-
-        /// <summary>
-        /// 0xFE - 
-        /// </summary>
-        Unknown0xFE,
-
-        /// <summary>
-        /// 0xFF - 
-        /// </summary>
-        Dummy,
-
-        TMATRIX_BASE = 0x100,
-        VIEW_MATRIX_BASE = 0x110,
-        WORLD_MATRIX_BASE = 0x120,
-        PROJ_MATRIX_BASE = 0x130,
-        BONE_MATRIX_BASE = 0x140,
-
-        EX_TEXEL_SIZE = 0x1b0,
-
+        NOP = 0x00,         // 0x00 - 0 - NOP
+        VADDR = 0x01,       // 0x01 - 1 - Vertex List (BASE)
+        IADDR = 0x02,       // 0x02 - 2 - Index List (BASE)
+        RESET = 0x03,       // 0x03 - 3 - GPU State Reset
+        PRIM = 0x04,        // 0x04 - 4 - Primitive Kick
+        BEZIER = 0x05,      // 0x05 - 5 - Bezier Patch Kick
+        SPLINE = 0x06,      // 0x06 - 6 - Spline Surface Kick
+        BBOX = 0x07,        // 0x07 - 7 - Bounding Box
+        JUMP = 0x08,        // 0x08 - 8 - Jump To New Address (BASE)
+        BJUMP = 0x09,       // 0x09 - 9 - Conditional Jump (BASE)
+        CALL = 0x0A,        // 0x0A - 10 - Call Address (BASE)
+        RET = 0x0B,         // 0x0B - 11 - Return From Call
+        END = 0x0C,         // 0x0C - 12 - Stop Execution
+        WAIT = 0x0D,        // 0x0D - 13 - Wait for GPU Idle/Signal
+        SIGNAL = 0x0E,      // 0x0E - 14 - Raise Signal Interrupt
+        FINISH = 0x0F,      // 0x0F - 15 - Complete Rendering
+        BASE = 0x10,        // 0x10 - 16 - Base Address Register
+        Unknown0x11 = 0x11, // 0x11 - 17 - Reserved
+        VTYPE = 0x12,       // 0x12 - 18 - Vertex Type
+        OFFSET_ADDR = 0x13, // 0x13 - 19 - Offset Address (BASE)
+        ORIGIN_ADDR = 0x14, // 0x14 - 20 - Origin Address (BASE)
+        REGION1 = 0x15,     // 0x15 - 21 - Draw Region Start
+        REGION2 = 0x16,     // 0x16 - 22 - Draw Region End
+        LTE = 0x17,         // 0x17 - 23 - Lighting Enable
+        LTE0 = 0x18,        // 0x18 - 24 - Light 0 Enable
+        LTE1 = 0x19,        // 0x19 - 25 - Light 1 Enable
+        LTE2 = 0x1A,        // 0x1A - 26 - Light 2 Enable
+        LTE3 = 0x1B,        // 0x1B - 27 - Light 3 Enable
+        CPE = 0x1C,         // 0x1C - 28 - Clip Plane Enable
+        BCE = 0x1D,         // 0x1D - 29 - Backface Culling Enable
+        TME = 0x1E,         // 0x1E - 30 - Texture Mapping Enable
+        FGE = 0x1F,         // 0x1F - 31 - Fog Enable
+        DTE = 0x20,         // 0x20 - 32 - Dither Enable
+        ABE = 0x21,         // 0x21 - 33 - Alpha Blend Enable
+        ATE = 0x22,         // 0x22 - 34 - Alpha Test Enable
+        ZTE = 0x23,         // 0x23 - 35 - Depth Test Enable
+        STE = 0x24,         // 0x24 - 36 - Stencil Test Enable
+        AAE = 0x25,         // 0x25 - 37 - Antialiasing Enable
+        PCE = 0x26,         // 0x26 - 38 - Patch Cull Enable
+        CTE = 0x27,         // 0x27 - 39 - Color Test Enable
+        LOE = 0x28,         // 0x28 - 40 - Logical Operation Enable
+        ALPHA_BIAS = 0x29,  // 0x29 - 41 - Alpha Bias Value
+        BOFS = 0x2A,        // 0x2A - 42 - Bone Matrix Offset
+        BONE = 0x2B,        // 0x2B - 43 - Bone Matrix Upload
+        MW0 = 0x2C,         // 0x2C - 44 - Morph Weight 0
+        MW1 = 0x2D,         // 0x2D - 45 - Morph Weight 1
+        MW2 = 0x2E,         // 0x2E - 46 - Morph Weight 2
+        MW3 = 0x2F,         // 0x2F - 47 - Morph Weight 3
+        MW4 = 0x30,         // 0x30 - 48 - Morph Weight 4
+        MW5 = 0x31,         // 0x31 - 49 - Morph Weight 5
+        MW6 = 0x32,         // 0x32 - 50 - Morph Weight 6
+        MW7 = 0x33,         // 0x33 - 51 - Morph Weight 7
+        MORPH_MODE = 0x34,  // 0x34 - 52 - Morph Interpolation Mode
+        BONE_MODE = 0x35,   // 0x35 - 53 - Bone Skinning Mode
+        PSUB = 0x36,        // 0x36 - 54 - Patch Subdivision
+        PPRIM = 0x37,       // 0x37 - 55 - Patch Primitive
+        PFACE = 0x38,       // 0x38 - 56 - Patch Front Face
+        PATCH_MODE = 0x39,  // 0x39 - 57 - Patch Subdivision Mode
+        WMS = 0x3A,         // 0x3A - 58 - World Matrix Select
+        WORLD = 0x3B,       // 0x3B - 59 - World Matrix Upload
+        VMS = 0x3C,         // 0x3C - 60 - View Matrix Select
+        VIEW = 0x3D,        // 0x3D - 61 - View Matrix Upload
+        PMS = 0x3E,         // 0x3E - 62 - Projection Matrix Select
+        PROJ = 0x3F,        // 0x3F - 63 - Projection Matrix Upload
+        TMS = 0x40,         // 0x40 - 64 - Texture Matrix Select
+        TMATRIX = 0x41,     // 0x41 - 65 - Texture Matrix Upload
+        XSCALE = 0x42,      // 0x42 - 66 - Viewport Width Scale
+        YSCALE = 0x43,      // 0x43 - 67 - Viewport Height Scale
+        ZSCALE = 0x44,      // 0x44 - 68 - Depth Scale
+        XPOS = 0x45,        // 0x45 - 69 - Viewport X Position
+        YPOS = 0x46,        // 0x46 - 70 - Viewport Y Position
+        ZPOS = 0x47,        // 0x47 - 71 - Depth Position
+        USCALE = 0x48,      // 0x48 - 72 - Texture Scale U
+        VSCALE = 0x49,      // 0x49 - 73 - Texture Scale V
+        UOFFSET = 0x4A,     // 0x4A - 74 - Texture Offset U
+        VOFFSET = 0x4B,     // 0x4B - 75 - Texture Offset V
+        OFFSETX = 0x4C,     // 0x4C - 76 - Viewport Offset (X)
+        OFFSETY = 0x4D,     // 0x4D - 77 - Viewport Offset (Y)
+        OFFSETZ = 0x4E,     // 0x4E - 78 - Viewport Offset (Z)
+        FOG_MODE = 0x4F,    // 0x4F - 79 - Fog Mode (Linear/Exponential)
+        SHADE = 0x50,       // 0x50 - 80 - Shade Model
+        RNORM = 0x51,       // 0x51 - 81 - Reverse Face Normals Enable
+        NORMALIZE = 0x52,   // 0x52 - 82 - Normal Vector Normalization Enable
+        CMAT = 0x53,        // 0x53 - 83 - Color Material
+        EMC = 0x54,         // 0x54 - 84 - Emissive Model Color
+        AMC = 0x55,         // 0x55 - 85 - Ambient Model Color
+        DMC = 0x56,         // 0x56 - 86 - Diffuse Model Color
+        SMC = 0x57,         // 0x57 - 87 - Specular Model Color
+        AMA = 0x58,         // 0x58 - 88 - Ambient Model Alpha
+        DIFFUSE_ALPHA = 0x59,// 0x59 - 89 - Diffuse Color Alpha
+        SPECULAR_ALPHA = 0x5A,// 0x5A - 90 - Specular Color Alpha
+        SPOW = 0x5B,        // 0x5B - 91 - Specular Power
+        ALC = 0x5C,         // 0x5C - 92 - Ambient Light Color
+        ALA = 0x5D,         // 0x5D - 93 - Ambient Light Alpha
+        LMODE = 0x5E,       // 0x5E - 94 - Light Model
+        LT0 = 0x5F,         // 0x5F - 95 - Light Type 0
+        LT1 = 0x60,         // 0x60 - 96 - Light Type 1
+        LT2 = 0x61,         // 0x61 - 97 - Light Type 2
+        LT3 = 0x62,         // 0x62 - 98 - Light Type 3
+        LXP0 = 0x63,        // 0x63 - 99 - Light X Position 0
+        LYP0 = 0x64,        // 0x64 - 100 - Light Y Position 0
+        LZP0 = 0x65,        // 0x65 - 101 - Light Z Position 0
+        LXP1 = 0x66,        // 0x66 - 102 - Light X Position 1
+        LYP1 = 0x67,        // 0x67 - 103 - Light Y Position 1
+        LZP1 = 0x68,        // 0x68 - 104 - Light Z Position 1
+        LXP2 = 0x69,        // 0x69 - 105 - Light X Position 2
+        LYP2 = 0x6A,        // 0x6A - 106 - Light Y Position 2
+        LZP2 = 0x6B,        // 0x6B - 107 - Light Z Position 2
+        LXP3 = 0x6C,        // 0x6C - 108 - Light X Position 3
+        LYP3 = 0x6D,        // 0x6D - 109 - Light Y Position 3
+        LZP3 = 0x6E,        // 0x6E - 110 - Light Z Position 3
+        LXD0 = 0x6F,        // 0x6F - 111 - Light X Direction 0
+        LYD0 = 0x70,        // 0x70 - 112 - Light Y Direction 0
+        LZD0 = 0x71,        // 0x71 - 113 - Light Z Direction 0
+        LXD1 = 0x72,        // 0x72 - 114 - Light X Direction 1
+        LYD1 = 0x73,        // 0x73 - 115 - Light Y Direction 1
+        LZD1 = 0x74,        // 0x74 - 116 - Light Z Direction 1
+        LXD2 = 0x75,        // 0x75 - 117 - Light X Direction 2
+        LYD2 = 0x76,        // 0x76 - 118 - Light Y Direction 2
+        LZD2 = 0x77,        // 0x77 - 119 - Light Z Direction 2
+        LXD3 = 0x78,        // 0x78 - 120 - Light X Direction 3
+        LYD3 = 0x79,        // 0x79 - 121 - Light Y Direction 3
+        LZD3 = 0x7A,        // 0x7A - 122 - Light Z Direction 3
+        LCA0 = 0x7B,        // 0x7B - 123 - Light Constant Attenuation 0
+        LLA0 = 0x7C,        // 0x7C - 124 - Light Linear Attenuation 0
+        LQA0 = 0x7D,        // 0x7D - 125 - Light Quadratic Attenuation 0
+        LCA1 = 0x7E,        // 0x7E - 126 - Light Constant Attenuation 1
+        LLA1 = 0x7F,        // 0x7F - 127 - Light Linear Attenuation 1
+        LQA1 = 0x80,        // 0x80 - 128 - Light Quadratic Attenuation 1
+        LCA2 = 0x81,        // 0x81 - 129 - Light Constant Attenuation 2
+        LLA2 = 0x82,        // 0x82 - 130 - Light Linear Attenuation 2
+        LQA2 = 0x83,        // 0x83 - 131 - Light Quadratic Attenuation 2
+        LCA3 = 0x84,        // 0x84 - 132 - Light Constant Attenuation 3
+        LLA3 = 0x85,        // 0x85 - 133 - Light Linear Attenuation 3
+        LQA3 = 0x86,        // 0x86 - 134 - Light Quadratic Attenuation 3
+        SPOTEXP0 = 0x87,    // 0x87 - 135 - Spot Light 0 Exponent
+        SPOTEXP1 = 0x88,    // 0x88 - 136 - Spot Light 1 Exponent
+        SPOTEXP2 = 0x89,    // 0x89 - 137 - Spot Light 2 Exponent
+        SPOTEXP3 = 0x8A,    // 0x8A - 138 - Spot Light 3 Exponent
+        SPOTCUT0 = 0x8B,    // 0x8B - 139 - Spot Light 0 Cutoff
+        SPOTCUT1 = 0x8C,    // 0x8C - 140 - Spot Light 1 Cutoff
+        SPOTCUT2 = 0x8D,    // 0x8D - 141 - Spot Light 2 Cutoff
+        SPOTCUT3 = 0x8E,    // 0x8E - 142 - Spot Light 3 Cutoff
+        ALC0 = 0x8F,        // 0x8F - 143 - Ambient Light Color 0
+        DLC0 = 0x90,        // 0x90 - 144 - Diffuse Light Color 0
+        SLC0 = 0x91,        // 0x91 - 145 - Specular Light Color 0
+        ALC1 = 0x92,        // 0x92 - 146 - Ambient Light Color 1
+        DLC1 = 0x93,        // 0x93 - 147 - Diffuse Light Color 1
+        SLC1 = 0x94,        // 0x94 - 148 - Specular Light Color 1
+        ALC2 = 0x95,        // 0x95 - 149 - Ambient Light Color 2
+        DLC2 = 0x96,        // 0x96 - 150 - Diffuse Light Color 2
+        SLC2 = 0x97,        // 0x97 - 151 - Specular Light Color 2
+        ALC3 = 0x98,        // 0x98 - 152 - Ambient Light Color 3
+        DLC3 = 0x99,        // 0x99 - 153 - Diffuse Light Color 3
+        SLC3 = 0x9A,        // 0x9A - 154 - Specular Light Color 3
+        FFACE = 0x9B,       // 0x9B - 155 - Front Face Culling Order
+        FBP = 0x9C,         // 0x9C - 156 - Frame Buffer Pointer
+        FBW = 0x9D,         // 0x9D - 157 - Frame Buffer Width
+        ZBP = 0x9E,         // 0x9E - 158 - Depth Buffer Pointer
+        ZBW = 0x9F,         // 0x9F - 159 - Depth Buffer Width
+        TBP0 = 0xA0,        // 0xA0 - 160 - Texture Buffer Pointer 0
+        TBP1 = 0xA1,        // 0xA1 - 161 - Texture Buffer Pointer 1
+        TBP2 = 0xA2,        // 0xA2 - 162 - Texture Buffer Pointer 2
+        TBP3 = 0xA3,        // 0xA3 - 163 - Texture Buffer Pointer 3
+        TBP4 = 0xA4,        // 0xA4 - 164 - Texture Buffer Pointer 4
+        TBP5 = 0xA5,        // 0xA5 - 165 - Texture Buffer Pointer 5
+        TBP6 = 0xA6,        // 0xA6 - 166 - Texture Buffer Pointer 6
+        TBP7 = 0xA7,        // 0xA7 - 167 - Texture Buffer Pointer 7
+        TBW0 = 0xA8,        // 0xA8 - 168 - Texture Buffer Width 0
+        TBW1 = 0xA9,        // 0xA9 - 169 - Texture Buffer Width 1
+        TBW2 = 0xAA,        // 0xAA - 170 - Texture Buffer Width 2
+        TBW3 = 0xAB,        // 0xAB - 171 - Texture Buffer Width 3
+        TBW4 = 0xAC,        // 0xAC - 172 - Texture Buffer Width 4
+        TBW5 = 0xAD,        // 0xAD - 173 - Texture Buffer Width 5
+        TBW6 = 0xAE,        // 0xAE - 174 - Texture Buffer Width 6
+        TBW7 = 0xAF,        // 0xAF - 175 - Texture Buffer Width 7
+        CBP = 0xB0,         // 0xB0 - 176 - CLUT Buffer Pointer
+        CBPH = 0xB1,        // 0xB1 - 177 - CLUT Buffer Pointer High
+        TRXSBP = 0xB2,      // 0xB2 - 178 - Transmission Source Buffer Pointer
+        TRXSBW = 0xB3,      // 0xB3 - 179 - Transmission Source Buffer Width
+        TRXDBP = 0xB4,      // 0xB4 - 180 - Transmission Destination Buffer Pointer
+        TRXDBW = 0xB5,      // 0xB5 - 181 - Transmission Destination Buffer Width
+        TRX_FILTER = 0xB6,  // 0xB6 - 182 - Transfer Pixel Filter
+        TRX_FORMAT = 0xB7,  // 0xB7 - 183 - Transfer Pixel Format
+        TSIZE0 = 0xB8,      // 0xB8 - 184 - Texture Size Level 0
+        TSIZE1 = 0xB9,      // 0xB9 - 185 - Texture Size Level 1
+        TSIZE2 = 0xBA,      // 0xBA - 186 - Texture Size Level 2
+        TSIZE3 = 0xBB,      // 0xBB - 187 - Texture Size Level 3
+        TSIZE4 = 0xBC,      // 0xBC - 188 - Texture Size Level 4
+        TSIZE5 = 0xBD,      // 0xBD - 189 - Texture Size Level 5
+        TSIZE6 = 0xBE,      // 0xBE - 190 - Texture Size Level 6
+        TSIZE7 = 0xBF,      // 0xBF - 191 - Texture Size Level 7
+        TMAP = 0xC0,        // 0xC0 - 192 - Texture Projection + Map Mode
+        TEXTURE_ENV_MAP_MATRIX = 0xC1,// 0xC1 - 193 - Environment Map Matrix
+        TMODE = 0xC2,       // 0xC2 - 194 - Texture Mode
+        TPSM = 0xC3,        // 0xC3 - 195 - Texture Pixel Storage Mode
+        CLOAD = 0xC4,       // 0xC4 - 196 - CLUT Load
+        CMODE = 0xC5,       // 0xC5 - 197 - CLUT Mode
+        TFLT = 0xC6,        // 0xC6 - 198 - Texture Filter
+        TWRAP = 0xC7,       // 0xC7 - 199 - Texture Wrapping
+        TBIAS = 0xC8,       // 0xC8 - 200 - Texture Level Bias
+        TFUNC = 0xC9,       // 0xC9 - 201 - Texture Function
+        TEC = 0xCA,         // 0xCA - 202 - Texture Environment Color
+        TFLUSH = 0xCB,      // 0xCB - 203 - Texture Flush
+        TSYNC = 0xCC,       // 0xCC - 204 - Texture Sync
+        FFAR = 0xCD,        // 0xCD - 205 - Fog Far Distance
+        FDIST = 0xCE,       // 0xCE - 206 - Fog Range
+        FCOL = 0xCF,        // 0xCF - 207 - Fog Color
+        DEPTH_OFFSET = 0xD0,// 0xD0 - 208 - Depth Offset (Polygon Offset)
+        TSLOPE = 0xD0,      // 0xD0 - 208 - Alias: Texture Slope
+        TEXTURE_LOD = 0xD1, // 0xD1 - 209 - Texture LOD Threshold
+        PSM = 0xD2,         // 0xD2 - 210 - Frame Buffer Pixel Storage Mode
+        CLEAR = 0xD3,       // 0xD3 - 211 - Clear Flags
+        SCISSOR1 = 0xD4,    // 0xD4 - 212 - Scissor Region Start
+        SCISSOR2 = 0xD5,    // 0xD5 - 213 - Scissor Region End
+        NEARZ = 0xD6,       // 0xD6 - 214 - Near Depth Range
+        FARZ = 0xD7,        // 0xD7 - 215 - Far Depth Range
+        CTST = 0xD8,        // 0xD8 - 216 - Color Test Function
+        CREF = 0xD9,        // 0xD9 - 217 - Color Reference
+        CMSK = 0xDA,        // 0xDA - 218 - Color Mask
+        ATST = 0xDB,        // 0xDB - 219 - Alpha Test
+        STST = 0xDC,        // 0xDC - 220 - Stencil Test
+        STENCIL_REF = 0xDC, // 0xDC - 220 - Alias: Stencil Test Reference
+        SOP = 0xDD,         // 0xDD - 221 - Stencil Operations
+        ZTST = 0xDE,        // 0xDE - 222 - Depth Test Function
+        ALPHA = 0xDF,       // 0xDF - 223 - Alpha Blend
+        BLEND_EQUATION = 0xDF,// 0xDF - 223 - Alias: Blend Equation
+        SFIX = 0xE0,        // 0xE0 - 224 - Source Fix Color
+        DFIX = 0xE1,        // 0xE1 - 225 - Destination Fix Color
+        DTH0 = 0xE2,        // 0xE2 - 226 - Dither Matrix Row 0
+        DTH1 = 0xE3,        // 0xE3 - 227 - Dither Matrix Row 1
+        DTH2 = 0xE4,        // 0xE4 - 228 - Dither Matrix Row 2
+        DTH3 = 0xE5,        // 0xE5 - 229 - Dither Matrix Row 3
+        LOP = 0xE6,         // 0xE6 - 230 - Logical Operation
+        ZMSK = 0xE7,        // 0xE7 - 231 - Depth Mask
+        PMSKC = 0xE8,       // 0xE8 - 232 - Pixel Mask Color
+        PMSKA = 0xE9,       // 0xE9 - 233 - Pixel Mask Alpha
+        TRXKICK = 0xEA,     // 0xEA - 234 - Transmission Kick
+        TRXSPOS = 0xEB,     // 0xEB - 235 - Transfer Source Position
+        TRXDPOS = 0xEC,     // 0xEC - 236 - Transfer Destination Position
+        TRX_ROTATE = 0xED,  // 0xED - 237 - Transfer Pixel Rotation
+        TRXSIZE = 0xEE,     // 0xEE - 238 - Transfer Size
+        Unknown0xEF = 0xEF, // 0xEF - 239 - Reserved
+        RESERVED_F0 = 0xF0, // 0xF0 - 240 - Reserved
+        RESERVED_F1 = 0xF1, // 0xF1 - 241 - Reserved
+        RESERVED_F2 = 0xF2, // 0xF2 - 242 - Reserved
+        RESERVED_F3 = 0xF3, // 0xF3 - 243 - Reserved
+        RESERVED_F4 = 0xF4, // 0xF4 - 244 - Reserved
+        RESERVED_F5 = 0xF5, // 0xF5 - 245 - Reserved
+        RESERVED_F6 = 0xF6, // 0xF6 - 246 - Reserved
+        RESERVED_F7 = 0xF7, // 0xF7 - 247 - Reserved
+        RESERVED_F8 = 0xF8, // 0xF8 - 248 - Reserved
+        RESERVED_F9 = 0xF9, // 0xF9 - 249 - Reserved
+        RESERVED_FA = 0xFA, // 0xFA - 250 - Reserved
+        RESERVED_FB = 0xFB, // 0xFB - 251 - Reserved
+        RESERVED_FC = 0xFC, // 0xFC - 252 - Reserved
+        RESERVED_FD = 0xFD, // 0xFD - 253 - Reserved
+        RESERVED_FE = 0xFE, // 0xFE - 254 - Reserved
+        Dummy = 0xFF,       // 0xFF - 255 - Dummy Instruction
+
+        // 扩展指令/基址常量
+        TMATRIX_BASE = 0x100,    // 0x100 - 256 - Texture Matrix Base
+        VIEW_MATRIX_BASE = 0x110,// 0x110 - 272 - View Matrix Base
+        WORLD_MATRIX_BASE = 0x120,// 0x120 - 288 - World Matrix Base
+        PROJ_MATRIX_BASE = 0x130, // 0x130 - 304 - Projection Matrix Base
+        BONE_MATRIX_BASE = 0x140, // 0x140 - 320 - Bone Matrix Base
+        EX_TEXEL_SIZE = 0x1b0,    // 0x1B0 - 432 - Extended Texel Size
+
+        // 通用未知指令标记
         UNKNOWN = unchecked((byte)-1),
     }
 }

@@ -165,6 +165,7 @@ namespace ScePSP.Core.Gpu
                 // Address
                 case GpuOpCodes.ORIGIN_ADDR:
                     break;
+
                 case GpuOpCodes.OFFSET_ADDR:
                     GpuStateData[GpuOpCodes.OFFSET_ADDR] = Params24 << 8;
                     break;
@@ -204,6 +205,7 @@ namespace ScePSP.Core.Gpu
                 case GpuOpCodes.TFLUSH:
                     GpuProcessor.GpuImpl.TextureFlush(GpuStateStructPointer);
                     break;
+
                 case GpuOpCodes.TSYNC:
                     GpuProcessor.GpuImpl.TextureSync(GpuStateStructPointer);
                     break;

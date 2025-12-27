@@ -10,8 +10,8 @@
 - pspplayer on Http://code.google.com/p/pspplayer
 - cspspemu on https://github.com/soywiz-archive/cspspemu
 
-_(Figure 1: runing PSPDemo/ortho.pbp)_  
-<img width="962" height="576" alt="PSP5" src="https://github.com/user-attachments/assets/31c32ad6-07f4-433c-a4d6-18aee2101f6a" />
+_(Figure 1: runing Street Fighter Alpha 3 Max (ULES-00235) on title )_  
+<img width="1001" height="781" alt="PSP6" src="https://github.com/user-attachments/assets/bf1e9b35-b7e9-4ed7-8ecd-0760ccfab0c5" />
 
 _(Figure 2: CoreTest.Opengl runing PSPDemo/morphskin.elf)_  
 <img width="962" height="576" alt="PSP2" src="https://github.com/user-attachments/assets/355a362a-350e-4d66-b6ac-dc8bd4e6cc81" />

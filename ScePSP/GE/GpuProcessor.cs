@@ -1,6 +1,5 @@
 ﻿using ScePSP.Core.Gpu.State;
 using ScePSP.Core.Memory;
-using ScePSP.Core.Threading.Synchronization;
 using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;

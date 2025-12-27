@@ -1,17 +1,13 @@
 ﻿using ScePSPUtils.Arrays;
-using ScePSPUtils.Threading;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ScePSPUtils.Streams
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="TType"></typeparam>
     public class StreamStructCachedArrayWrapper<TType> : IArray<TType> where TType : struct
     {
         readonly List<TType> _cachedValues = new List<TType>();
@@ -20,26 +16,23 @@ namespace ScePSPUtils.Streams
         static readonly Type StructType = typeof(TType);
         private static readonly int StructSize = Marshal.SizeOf(StructType);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="numberOfItemsToBuffer"></param>
-        /// <param name="stream"></param>
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+        private Task _currentReadTask = Task.CompletedTask;
+
+        private int BufferedItemsCount => _cachedValues.Count;
+
+        public int Length => (int)(_stream.Length / StructSize);
+
         public StreamStructCachedArrayWrapper(int numberOfItemsToBuffer, Stream stream)
         {
             _numberOfItemsToBuffer = numberOfItemsToBuffer;
             _stream = stream;
-            CustomThreadPool = new CustomThreadPool(1);
         }
-
-        private int BufferedItemsCount => _cachedValues.Count;
 
         private void SecureUpToItem(int maxItem)
         {
             maxItem = Math.Min(maxItem, Length);
             var itemsToRead = maxItem - BufferedItemsCount;
-
-            //Console.WriteLine("SecureUpToItem: {0}, {1}, {2}", MaxItem, BufferedItemsCount, ItemsToRead);
 
             if (itemsToRead > 0)
             {
@@ -48,18 +41,23 @@ namespace ScePSPUtils.Streams
                     var dataLength = itemsToRead * StructSize;
                     var data = new byte[dataLength];
 
-                    /*
-                    Stream.BeginRead(Data, 0, DataLength, (AsyncState) =>
+                    _currentReadTask = _currentReadTask.ContinueWith(async (prev) =>
                     {
-                        int Readed = Stream.EndRead(AsyncState);
-                        CachedValues.AddRange(PointerUtils.ByteArrayToArray<TType>(Data));
-                    }, null);
-                    */
-                    CustomThreadPool.AddTask(0, () =>
-                    {
-                        var readed = _stream.Read(data, 0, dataLength);
-                        _cachedValues.AddRange(PointerUtils.ByteArrayToArray<TType>(data));
-                    });
+                        await _semaphore.WaitAsync();
+                        try
+                        {
+                            if (_cachedValues.Count >= maxItem) return;
+                            var readed = _stream.Read(data, 0, dataLength);
+                            if (readed > 0)
+                            {
+                                _cachedValues.AddRange(PointerUtils.ByteArrayToArray<TType>(data));
+                            }
+                        }
+                        finally
+                        {
+                            _semaphore.Release();
+                        }
+                    }).Unwrap();
                 }
                 catch (Exception exception)
                 {
@@ -81,21 +79,17 @@ namespace ScePSPUtils.Streams
 
                     if (offset >= BufferedItemsCount)
                     {
+                        _currentReadTask.Wait();
                         Thread.Sleep(1);
                     }
                     else
                     {
                         break;
                     }
-                    //Console.Write("Wait({0}, {1})", Offset, BufferedItemsCount);
                 }
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public IEnumerator<TType> GetEnumerator()
         {
             for (var n = 0; n < Length; n++) yield return this[n];
@@ -106,42 +100,25 @@ namespace ScePSPUtils.Streams
             for (var n = 0; n < Length; n++) yield return this[n];
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="index"></param>
-        /// <exception cref="IndexOutOfRangeException"></exception>
-        /// <exception cref="NotImplementedException"></exception>
         public TType this[int index]
         {
             get
             {
                 if (index < 0 || index >= Length)
-                    throw new IndexOutOfRangeException($"Invalid Index {index}. Must be in range {00}-{Length}");
+                    throw new IndexOutOfRangeException($"Invalid Index {index}. Must be in range 0-{Length}");
                 SecureUpToItem(index, _numberOfItemsToBuffer);
+                _currentReadTask.Wait();
                 return _cachedValues[index];
             }
             set => throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public int Length => (int)(_stream.Length / StructSize);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public TType[] GetArray()
         {
             SecureUpToItem(Length);
+            _currentReadTask.Wait();
             return _cachedValues.ToArray();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public CustomThreadPool CustomThreadPool { get; set; }
     }
 }

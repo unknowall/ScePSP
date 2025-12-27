@@ -1,5 +1,3 @@
-using System;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 
@@ -14,7 +12,7 @@ namespace System.Drawing
 
         public void Clear(Color color)
         {
-            
+
         }
     }
 
@@ -25,7 +23,7 @@ namespace System.Drawing
             throw new NotImplementedException();
         }
     }
-    
+
     public class Image
     {
         static public Image FromStream(Stream stream)
@@ -43,7 +41,7 @@ namespace System.Drawing
             throw new NotImplementedException();
         }
     }
-    
+
     public class Bitmap : IDisposable
     {
         public Size Size = new Size(100, 100);

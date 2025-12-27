@@ -6,15 +6,62 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-/// <summary>
-/// 
-/// </summary>
+public interface IInjectInitialize
+{
+    void Initialize();
+}
+
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+public class InjectMapAttribute : Attribute
+{
+    public Type From { get; set; }
+    public Type To { get; set; }
+
+    public InjectMapAttribute(Type From, Type To)
+    {
+        this.From = From;
+        this.To = To;
+    }
+}
+
+[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
+public sealed class InjectAttribute : Attribute
+{
+}
+
+public class InjectMessageBus
+{
+    Dictionary<Type, List<Delegate>> Handlers = new Dictionary<Type, List<Delegate>>();
+
+    public void Unregister<T>(Action<T> Handler)
+    {
+        //if (!Handlers.ContainsKey(typeof(T))) Handlers[typeof(T)] = new List<Delegate>();
+        //Handlers[typeof(T)].Add(Handler);
+    }
+
+    public void Register<T>(Action<T> Handler)
+    {
+        if (!Handlers.ContainsKey(typeof(T))) Handlers[typeof(T)] = new List<Delegate>();
+        Handlers[typeof(T)].Add(Handler);
+    }
+
+    public void Dispatch<T>(T Value)
+    {
+        if (Handlers.ContainsKey(typeof(T)))
+        {
+            foreach (var Handler in Handlers[typeof(T)])
+            {
+                Handler.DynamicInvoke(Value);
+            }
+        }
+    }
+}
+
 public sealed class InjectContext : IDisposable
 {
     public InjectContext()
     {
         SetInstance<InjectContext>(this);
-        //Console.WriteLine("new InjectContext()");
     }
 
     static Logger Logger = Logger.GetLogger("InjectContext");
@@ -102,20 +149,12 @@ public sealed class InjectContext : IDisposable
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="Object"></param>
     public void InjectDependencesTo(object Object)
     {
         var GetBindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 
-        //Console.WriteLine("aaaaaaaaaaaaaaaaa");
-
-        // Initialize all [Inject]
         foreach (var Member in Object.GetType().GetMembers(GetBindingFlags))
         {
-            //Console.WriteLine("{0}", Member);
             var Field = Member as FieldInfo;
             var Property = Member as PropertyInfo;
             var MemberType = Member.MemberType switch
@@ -131,10 +170,10 @@ public sealed class InjectContext : IDisposable
             switch (Member.MemberType)
             {
                 case MemberTypes.Field:
-                    Field.SetValue(Object, this.GetInstance(MemberType));
+                    Field.SetValue(Object, GetInstance(MemberType));
                     break;
                 case MemberTypes.Property:
-                    Property.SetValue(Object, this.GetInstance(MemberType), null);
+                    Property.SetValue(Object, GetInstance(MemberType), null);
                     break;
             }
 
@@ -178,7 +217,7 @@ public sealed class InjectContext : IDisposable
         {
             foreach (var Pair in PairTypes)
             {
-                this.SetInstanceType(Pair.Key, Pair.Value);
+                SetInstanceType(Pair.Key, Pair.Value);
             }
         }
     }
@@ -187,7 +226,7 @@ public sealed class InjectContext : IDisposable
     {
         foreach (var InjectMap in Bootstrap.GetType().GetCustomAttributes<InjectMapAttribute>(true))
         {
-            this.SetInstanceType(InjectMap.From, InjectMap.To);
+            SetInstanceType(InjectMap.From, InjectMap.To);
         }
     }
 }

@@ -1,20 +1,21 @@
-﻿using ScePSP.Utils;
+﻿using ScePSP.Emulator;
+using ScePSP.Utils;
 using ScePSPUtils;
-using ScePSPUtils.Threading;
 using System;
-using System.Globalization;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace ScePSP.Runner.Components
+namespace ScePSP.Runner.Tasks
 {
-    public abstract class ComponentThread : IRunnableComponent
+    public abstract class PspDeviceTask : IRunnableTask
     {
-        static Logger Logger = Logger.GetLogger("ComponentThread");
+        static Logger Logger = Logger.GetLogger("DeviceTask");
 
         protected AutoResetEvent RunningUpdatedEvent = new AutoResetEvent(false);
         public bool Running = true;
 
-        protected ThreadEX ComponentThreadThread;
+        protected Task Task;
+        protected CancellationTokenSource TaskCts;
         protected AutoResetEvent StopCompleteEvent = new AutoResetEvent(false);
         protected AutoResetEvent PauseEvent = new AutoResetEvent(false);
         protected AutoResetEvent ResumeEvent = new AutoResetEvent(false);
@@ -22,21 +23,25 @@ namespace ScePSP.Runner.Components
         public readonly TaskQueue ThreadTaskQueue = new TaskQueue();
         protected abstract string ThreadName { get; }
 
-        protected ComponentThread()
+        protected PspDeviceTask()
         {
         }
 
         public void StartSynchronized()
         {
-            //Console.WriteLine("Component {0} StartSynchronized!", this);
             var ElapsedTime = Logger.Measure(() =>
             {
-                ComponentThreadThread = new ThreadEX(() =>
+                TaskCts = new CancellationTokenSource();
+                var token = TaskCts.Token;
+
+                Task = Task.Factory.StartNew(() =>
                 {
-                    ThreadEX.CurrentThread.CurrentCulture = new CultureInfo("en-US");
                     try
                     {
                         Main();
+                    }
+                    catch (OperationCanceledException)
+                    {
                     }
                     catch (Exception e)
                     {
@@ -47,14 +52,10 @@ namespace ScePSP.Runner.Components
                         Running = false;
                         RunningUpdatedEvent.Set();
                         StopCompleteEvent.Set();
-                        //Console.WriteLine("Component {0} Stopped!", this);
+                        //Console.WriteLine("Task {0} Stopped!", this);
                     }
-                })
-                {
-                    Name = this.ThreadName,
-                    IsBackground = true,
-                };
-                ComponentThreadThread.Start();
+                }, token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+
                 ThreadTaskQueue.EnqueueAndWaitCompleted(() => { });
             });
             //Logger.Notice("Component {0} Started! StartedTime({1})", this, ElapsedTime.TotalSeconds);
@@ -63,20 +64,42 @@ namespace ScePSP.Runner.Components
 
         public void StopSynchronized()
         {
-            Logger.Notice("Component {0} StopSynchronized...", this);
+            Logger.Notice("Task {0} StopSynchronized...", this);
             var ElapsedTime = Logger.Measure(() =>
             {
                 if (Running)
                 {
                     StopCompleteEvent.Reset();
+
+                    Running = false;
+                    RunningUpdatedEvent.Set();
+
+                    try
                     {
-                        Running = false;
-                        RunningUpdatedEvent.Set();
+                        TaskCts?.Cancel();
+
+                        if (Task != null)
+                        {
+                            bool completed = Task.Wait(1000);
+                            if (!completed)
+                            {
+                                Logger.Error("Error stopping {0}: task did not complete within timeout", this);
+                            }
+                        }
                     }
-                    if (!StopCompleteEvent.WaitOne(1000))
+                    catch (AggregateException ae)
                     {
-                        Logger.Error("Error stopping {0}", this);
-                        ComponentThreadThread?.Abort();
+                        ae.Handle(ex => ex is OperationCanceledException);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error("Error stopping {0}: {1}", this, ex);
+                    }
+                    finally
+                    {
+                        Task = null;
+                        TaskCts?.Dispose();
+                        TaskCts = null;
                     }
                 }
             });
@@ -85,30 +108,20 @@ namespace ScePSP.Runner.Components
 
         public void PauseSynchronized()
         {
-            Logger.Notice("Component {0} PauseSynchronized!", this);
-
-            //Console.WriteLine("[1]");
+            Logger.Notice("Task {0} PauseSynchronized!", this);
 
             ThreadTaskQueue.EnqueueAndWaitStarted(() =>
             {
-                //int MaxCounts = 200;
-                //Console.WriteLine("[2]");
                 while (!PauseEvent.WaitOne(10.Milliseconds()))
                 {
-                    //Console.WriteLine("[3]");
                     if (!Running) break;
-                    //if (MaxCounts-- < 0)
-                    //{
-                    //	Console.Error.WriteLine("Infinite loop detected!");
-                    //	break;
-                    //}
                 }
             }, TimeSpan.FromSeconds(2), () => { Console.WriteLine("Timed Out!"); });
         }
 
         public void ResumeSynchronized()
         {
-            Logger.Notice("Component {0} ResumeSynchronized!", this);
+            Logger.Notice("Task {0} ResumeSynchronized!", this);
 
             PauseEvent.Set();
         }

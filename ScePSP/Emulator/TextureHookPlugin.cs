@@ -1,7 +1,6 @@
 ﻿using ScePSP.Core;
 using ScePSP.Core.Gpu.Impl.Opengl;
 using ScePSP.Core.Types;
-using ScePSP.Inject;
 using ScePSPUtils.Drawing;
 using ScePSPUtils.Drawing.Extensions;
 using System;
@@ -13,7 +12,7 @@ namespace ScePSP.TextureHook
 {
     public class TextureHookPlugin : IInjectInitialize, IDisposable
     {
-        [Inject] MessageBus MessageBus;
+        [Inject] InjectMessageBus MessageBus;
 
         [Inject] PspStoredConfig PspStoredConfig;
 

@@ -9,7 +9,7 @@ using ScePSP.Core.Gpu.Impl.Opengl;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types.Controller;
 using ScePSP.Runner;
-using ScePSP.Runner.Components.Display;
+using ScePSP.Runner.Tasks.Display;
 using ScePSPPlatform.GL;
 using ScePSPPlatform.GL.Utils;
 using ScePSPUtils;
@@ -31,7 +31,7 @@ class Program
     static InjectContext? injector;
     static PspRtc? rtc;
     static PspDisplay? display;
-    static DisplayComponentThread? displayComponent;
+    static DisplayTask? displayComponent;
     static PspMemory? memory;
     static PspController? controller;
     static GpuProcessor? gpu;
@@ -103,7 +103,7 @@ class Program
 
         rtc = pspEmulator.InjectContext.GetInstance<PspRtc>();
         display = pspEmulator.InjectContext.GetInstance<PspDisplay>();
-        displayComponent = pspEmulator.InjectContext.GetInstance<DisplayComponentThread>();
+        displayComponent = pspEmulator.InjectContext.GetInstance<DisplayTask>();
         memory = pspEmulator.InjectContext.GetInstance<PspMemory>();
         controller = pspEmulator.InjectContext.GetInstance<PspController>();
         gpu = pspEmulator.InjectContext.GetInstance<GpuProcessor>();

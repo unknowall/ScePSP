@@ -29,13 +29,13 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace ScePSP.Runner.Components.Cpu
+namespace ScePSP.Runner.Tasks.Cpu
 {
-    public sealed unsafe class CpuComponentThread : ComponentThread, IInjectInitialize
+    public sealed unsafe class CpuTask : PspDeviceTask, IInjectInitialize
     {
-        static Logger Logger = Logger.GetLogger("CpuComponentThread");
+        static Logger Logger = Logger.GetLogger("CpuTask");
 
-        protected override string ThreadName => "CpuThread";
+        protected override string ThreadName => "CpuTask";
 
         [Inject] public CpuProcessor CpuProcessor;
 
@@ -85,8 +85,6 @@ namespace ScePSP.Runner.Components.Cpu
             {
                 Console.WriteLine(e);
             }
-            /*
-            */
 
             MemoryStickMountable = new HleIoDriverMountable();
             MemoryStickMountable.Mount("/", new HleIoDriverLocalFileSystem(memoryStickRootFolder));
@@ -260,7 +258,7 @@ namespace ScePSP.Runner.Components.Cpu
                             string[] filesToTry = {
                             "/PSP_GAME/SYSDIR/BOOT.BIN",
                             "/PSP_GAME/SYSDIR/EBOOT.BIN",
-                            "/PSP_GAME/SYSDIR/EBOOT.OLD",
+                            //"/PSP_GAME/SYSDIR/EBOOT.OLD",
                         };
 
                             foreach (var fileToTry in filesToTry)

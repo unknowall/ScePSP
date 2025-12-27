@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace ScePSPUtils.Threading
+namespace ScePSP.HLE
 {
     public class CoroutinePool : IDisposable
     {
@@ -15,7 +16,9 @@ namespace ScePSPUtils.Threading
 
         public Coroutine CreateCoroutine(string name, Action action)
         {
-            return new Coroutine(name, this, action);
+            var c = new Coroutine(name, this, action);
+            Coroutines.Add(c);
+            return c;
         }
 
         public void YieldInPool()
@@ -33,7 +36,8 @@ namespace ScePSPUtils.Threading
     {
         internal CoroutinePool Pool;
         internal AutoResetEvent CoroutineContinueEvent = new AutoResetEvent(false);
-        internal Thread Thread;
+        internal Task WorkerTask;
+        private Thread _underlyingThread;
 
         public string Name { set; get; }
 
@@ -56,14 +60,30 @@ namespace ScePSPUtils.Threading
         }
 
         bool _mustStart;
+        private string _nameField;
 
         internal Coroutine(string name, CoroutinePool pool, Action action)
         {
             Pool = pool;
             IsAlive = true;
-            Thread = new Thread(() =>
+            Name = name;
+            _mustStart = true;
+            _nameField = "Coroutine-" + name;
+
+            //延迟到 ExecuteStep 时启动
+            WorkerTask = new Task(() =>
             {
-                Console.WriteLine("Coroutine.Start()");
+                _underlyingThread = Thread.CurrentThread;
+                try
+                {
+                    if (string.IsNullOrEmpty(_underlyingThread.Name))
+                    {
+                        _underlyingThread.Name = _nameField;
+                    }
+                    _nameField = _underlyingThread.Name;
+                }
+                catch { }
+
                 try
                 {
                     CoroutineContinueEvent_WaitOne();
@@ -78,17 +98,10 @@ namespace ScePSPUtils.Threading
                 }
                 finally
                 {
-                    Console.WriteLine("Coroutine.End()");
                     IsAlive = false;
                     pool.CallerContinueEvent.Set();
                 }
-            })
-            {
-                CurrentCulture = new CultureInfo("en-US"),
-                IsBackground = true,
-            };
-            Name = name;
-            _mustStart = true;
+            }, TaskCreationOptions.LongRunning);
         }
 
         public void ExecuteStep()
@@ -96,8 +109,15 @@ namespace ScePSPUtils.Threading
             if (_mustStart)
             {
                 _mustStart = false;
-                Thread.Name = "Coroutine-" + Name;
-                Thread.Start();
+                try
+                {
+                    WorkerTask.Start(TaskScheduler.Default);
+                }
+                catch// (Exception e)
+                {
+                    IsAlive = false;
+                    throw;
+                }
             }
             //Debug.WriteLine("ExecuteStep");
             if (IsAlive)
@@ -114,9 +134,7 @@ namespace ScePSPUtils.Threading
             {
                 try
                 {
-                    //StackTraceUtils.PreserveStackTrace(RethrowException);
-                    throw new GreenThreadException("GreenThread Exception", _rethrowException);
-                    //throw (RethrowException);
+                    throw new HLETaskException("HLETask Exception", _rethrowException);
                 }
                 finally
                 {
@@ -128,24 +146,6 @@ namespace ScePSPUtils.Threading
         public void YieldInPool()
         {
             //Debug.WriteLine("YieldInPool");
-#if false
-			if (Pool == null)
-			{
-				throw(new Exception("Pool can't be null"));
-			}
-			if (Pool.CurrentCoroutine == null)
-			{
-				throw (new Exception("Pool.CurrentCoroutine can't be null"));
-			}
-			if (Pool.CallerContinueEvent == null)
-			{
-				throw (new Exception("Pool.CallerContinueEvent can't be null"));
-			}
-			if (Pool.CurrentCoroutine.CoroutineContinueEvent == null)
-			{
-				throw (new Exception("Pool.CurrentCoroutine.CoroutineContinueEvent can't be null"));
-			}
-#endif
 
             if (Pool.CurrentCoroutine == null)
             {
@@ -159,7 +159,6 @@ namespace ScePSPUtils.Threading
 
             CoroutineContinueEvent.Reset();
             Pool.CallerContinueEvent.Set();
-            //Pool.CurrentCoroutine.CoroutineContinueEvent_WaitOne();
             CoroutineContinueEvent_WaitOne();
         }
 
@@ -171,6 +170,14 @@ namespace ScePSPUtils.Threading
         {
             IsAlive = false;
             CoroutineContinueEvent.Set();
+            try
+            {
+                if (WorkerTask != null && WorkerTask.Status == TaskStatus.Running)
+                {
+                    WorkerTask.Wait(50);
+                }
+            }
+            catch { }
             Pool.Coroutines.Remove(this);
         }
     }

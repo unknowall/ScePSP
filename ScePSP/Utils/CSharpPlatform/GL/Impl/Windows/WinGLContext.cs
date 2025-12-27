@@ -12,11 +12,11 @@ namespace ScePSPPlatform.GL.Impl.Windows
     {
         IntPtr _dc;
 
-        IntPtr _context;
+        public IntPtr _context;
 
         IntPtr _hWnd;
 
-        static IntPtr _sharedContext;
+        public static IntPtr _sharedContext;
 
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr GetWindowDC(IntPtr hWnd);
@@ -129,12 +129,14 @@ namespace ScePSPPlatform.GL.Impl.Windows
         private WinGlContext(IntPtr winHandle)
         {
             _hWnd = winHandle;
-            RegisterClassOnce();
-            var width = 512;
-            var height = 512;
 
             if (winHandle == IntPtr.Zero)
             {
+                RegisterClassOnce();
+
+                var width = 512;
+                var height = 512;
+
                 var style = WindowStyle.OverlappedWindow | WindowStyle.ClipChildren | WindowStyle.ClipSiblings;// | WindowStyle.Visible;
                 var exStyle = ParentStyleEx;
 
@@ -170,8 +172,8 @@ namespace ScePSPPlatform.GL.Impl.Windows
             var pfd = new PixelFormatDescriptor();
             pfd.Size = (short)sizeof(PixelFormatDescriptor);
             pfd.Version = 1;
-            pfd.Flags = PixelFormatDescriptorFlags.DrawToWindow 
-                | PixelFormatDescriptorFlags.SupportOpengl 
+            pfd.Flags = PixelFormatDescriptorFlags.DrawToWindow
+                | PixelFormatDescriptorFlags.SupportOpengl
                 | PixelFormatDescriptorFlags.Doublebuffer;
             pfd.LayerType = 0;
             pfd.PixelType = PixelType.RGBA; // PFD_TYPE_RGBA
@@ -209,46 +211,49 @@ namespace ScePSPPlatform.GL.Impl.Windows
 
             MakeCurrent();
 
-            //Console.Out.WriteLineColored(ConsoleColor.Yellow, "OpenGL Version:{0}.{1}", GL.glGetInteger(GL.GL_MAJOR_VERSION), GL.glGetInteger(GL.GL_MINOR_VERSION));
-
             DynamicLibraryFactory.MapLibraryToType<Extension>(new DynamicLibraryGl());
 
-            //GL.LoadAllOnce();
+            if (Extension.wglCreateContextAttribsARB != null)
+            {
+                ReleaseCurrent();
 
-#if false
-			if (Extension.wglCreateContextAttribsARB != null)
-			{
-				ReleaseCurrent();
+                Wgl.wglDeleteContext(_context);
 
-				WGL.wglDeleteContext(this.Context);
+                fixed (int* contextAttribs = new int[]{
+                    (int)ArbCreateContext.MajorVersion, 3,
+                    (int)ArbCreateContext.MinorVersion, 3,
+                    (int)ArbCreateContext.ProfileMask, (int)ArbCreateContext.CompatibilityProfileBit,
+                    0
+                })
+                {
+                    _context = Extension.wglCreateContextAttribsARB(_dc, _sharedContext, contextAttribs);
+                }
 
-				fixed (int* AttribListPtr = new int[] { (int)ArbCreateContext.MajorVersion, 3, (int)ArbCreateContext.MinorVersion, 1, 0, 0 })
-				{
-					this.Context = Extension.wglCreateContextAttribsARB(DC, SharedContext, AttribListPtr);
-				}
+                if (_context == IntPtr.Zero) throw (new Exception("Error creating context"));
 
-				if (this.Context == IntPtr.Zero) throw(new Exception("Error creating context"));
+                MakeCurrent();
 
-				MakeCurrent();
-
-				Console.WriteLine("OpenGL Version: {0}", Marshal.PtrToStringAnsi(new IntPtr(GL.glGetString(GL.GL_VERSION))));
-
-				//Console.ReadKey();
-			}
-#endif
+                //Console.WriteLine("OpenGL Context Version: {0}", Marshal.PtrToStringAnsi(new IntPtr(GL.glGetString(GL.GL_VERSION))));
+            }
 
             if (_sharedContext == IntPtr.Zero)
             {
                 _sharedContext = _context;
             }
 
+            SetVSync(false);
+
+        }
+
+        public void SetVSync(bool Enable = false)
+        {
             if (Extension.wglSwapIntervalEXT != null)
             {
-                Extension.wglSwapIntervalEXT(0);
+                if (Enable)
+                    Extension.wglSwapIntervalEXT(1);
+                else
+                    Extension.wglSwapIntervalEXT(0);
             }
-
-            //RECT clientRect;
-            //GetClientRect(hWnd, &clientRect);
         }
 
         public GlContextSize Size
@@ -264,18 +269,23 @@ namespace ScePSPPlatform.GL.Impl.Windows
 
         public override string ToString() => $"WinOpenglContext({_dc}, {_context}, {_sharedContext}, {Size})";
 
-        public enum ArbCreateContext
+        public enum ArbCreateContext : int
         {
-            DebugBit = 0x0001,
-            ForwardCompatibleBit = 0x0002,
             MajorVersion = 0x2091,
             MinorVersion = 0x2092,
             LayerPlane = 0x2093,
             Flags = 0x2094,
-            ErrorInvalidVersion = 0x2095
+            ProfileMask = 0x9126,
+
+            DebugBit = 0x00000001,
+            ForwardCompatibleBit = 0x00000002,
+
+            CoreProfileBit = 0x00000001,
+            CompatibilityProfileBit = 0x00000002,
+
+            ErrorInvalidVersion = 0x2095,
+            ErrorInvalidProfile = 0x2096
         }
-
-
         public class Extension
         {
             public static wglCreateContextAttribsARB wglCreateContextAttribsARB;

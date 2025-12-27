@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace ScePSPUtils.Threading
+namespace ScePSP.Emulator
 {
     public sealed class TaskQueue
     {

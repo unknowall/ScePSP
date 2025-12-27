@@ -3,7 +3,6 @@
 using ScePSP.Core.Gpu.State;
 using ScePSP.Core.Gpu.VertexReading;
 using ScePSP.Core.Memory;
-using ScePSP.Core.Threading.Synchronization;
 using ScePSPUtils;
 using ScePSPUtils.Extensions;
 using System;
@@ -117,7 +116,7 @@ namespace ScePSP.Core.Gpu
                 if (InstructionAddressStall != 0 && InstructionAddressCurrent >= InstructionAddressStall)
                 {
                     if (Debug)
-                        Console.WriteLine( "- STALLED --------------------------------------------------------------------");
+                        Console.WriteLine("- STALLED --------------------------------------------------------------------");
                     Status.SetValue(DisplayListStatusEnum.Stalling);
                     while (!StallAddressUpdated.WaitOne(TimeSpan.FromSeconds(2)))
                     {
@@ -373,10 +372,10 @@ namespace ScePSP.Core.Gpu
                         break;
                     }
 
-                //default:
-                //    Console.Error.WriteLine("Unknown GE OpCode Instruction: PC=0x{0:X8} OpCode={1} Params=0x{2:X6}",
-                //        Pc - 4, Instruction.OpCode, Instruction.Params);
-                //    break;
+                    //default:
+                    //    Console.Error.WriteLine("Unknown GE OpCode Instruction: PC=0x{0:X8} OpCode={1} Params=0x{2:X6}",
+                    //        Pc - 4, Instruction.OpCode, Instruction.Params);
+                    //    break;
             }
 
             if (Debug)

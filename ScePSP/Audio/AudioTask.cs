@@ -1,20 +1,17 @@
 ﻿using ScePSP.Core.Audio;
 using System.Threading;
 
-namespace ScePSP.Runner.Components.Audio
+namespace ScePSP.Runner.Tasks.Audio
 {
-    public sealed class AudioComponentThread : ComponentThread
+    public sealed class AudioTask : PspDeviceTask
     {
-        // ReSharper disable once InconsistentNaming
         [Inject] private PspAudio PspAudio;
 
-        protected override string ThreadName => "AudioThread";
+        protected override string ThreadName => "AudioTask";
 
         protected override void Main()
         {
-            Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
-            //Thread.CurrentThread.Priority = ThreadPriority.Normal;
-            //Console.WriteLine("AudioComponentThread.Start()");
+            //Console.WriteLine("AudioTask.Start()");
             try
             {
                 while (true)
@@ -30,7 +27,7 @@ namespace ScePSP.Runner.Components.Audio
             }
             finally
             {
-                //Console.WriteLine("AudioComponentThread.End()");
+                //Console.WriteLine("AudioTask.End()");
             }
         }
     }

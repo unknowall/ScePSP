@@ -5,21 +5,21 @@ using ScePSPUtils;
 using System;
 using System.Threading;
 
-namespace ScePSP.Runner.Components.Display
+namespace ScePSP.Runner.Tasks.Display
 {
-    public sealed class DisplayComponentThread : ComponentThread
+    public sealed class DisplayTask : PspDeviceTask
     {
         private HleInterruptManager _hleInterruptManager;
 
         private PspDisplay _pspDisplay;
 
-        public DisplayComponentThread(HleInterruptManager hleInterruptManager, PspDisplay pspDisplay)
+        public DisplayTask(HleInterruptManager hleInterruptManager, PspDisplay pspDisplay)
         {
             _hleInterruptManager = hleInterruptManager;
             _pspDisplay = pspDisplay;
         }
 
-        protected override string ThreadName => "DisplayThread";
+        protected override string ThreadName => "DisplayTask";
 
         TimeSpan vSyncTimeIncrement = TimeSpan.FromSeconds(1.0 / (PspDisplay.HorizontalSyncHertz / (double)PspDisplay.VsyncRow));
 
@@ -33,7 +33,6 @@ namespace ScePSP.Runner.Components.Display
 
         public void Step(Action DrawStart, Action VBlankStart, Action VBlankEnd)
         {
-            //Console.WriteLine("[1]");
             var startTime = DateTime.UtcNow;
             var vSyncTime = startTime + vSyncTimeIncrement;
             var endTime = startTime + endTimeIncrement;
@@ -57,7 +56,7 @@ namespace ScePSP.Runner.Components.Display
         {
             vBlankInterruptHandler = _hleInterruptManager.GetInterruptHandler(PspInterrupts.PspVblankInt);
 
-            Console.WriteLine("DisplayComponentThread.Start()");
+            //Console.WriteLine("DisplayTask.Start()");
 
             try
             {
@@ -75,7 +74,7 @@ namespace ScePSP.Runner.Components.Display
             }
             finally
             {
-                Console.WriteLine("DisplayComponentThread.End()");
+                //Console.WriteLine("DisplayTask.End()");
             }
         }
     }

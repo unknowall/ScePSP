@@ -217,16 +217,16 @@ namespace ScePSP.Hle.Modules.pspnet
 
             public void Start()
             {
-                (this.MainThread = new ThreadEX(ThreadMain) { IsBackground = true }).Start();
+                (this.MainThread = new Thread(ThreadMain) { IsBackground = true }).Start();
             }
 
-            ThreadEX MainThread;
-            ThreadEX HelloThread;
-            ThreadEX PingThread;
+            Thread MainThread;
+            Thread HelloThread;
+            Thread PingThread;
 
             public void ThreadMain()
             {
-                (HelloThread = new ThreadEX(() =>
+                (HelloThread = new Thread(() =>
                 {
                     while (true)
                     {
@@ -235,7 +235,7 @@ namespace ScePSP.Hle.Modules.pspnet
                     }
                 })
                 { IsBackground = true }).Start();
-                (PingThread = new ThreadEX(() =>
+                (PingThread = new Thread(() =>
                 {
                     while (true)
                     {
@@ -341,9 +341,9 @@ namespace ScePSP.Hle.Modules.pspnet
 
             public void Dispose()
             {
-                HelloThread.Abort();
-                PingThread.Abort();
-                MainThread.Abort();
+                //HelloThread.Abort();
+                //PingThread.Abort();
+                //MainThread.Abort();
             }
 
             public void Stop()

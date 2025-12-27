@@ -1,9 +1,17 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace ScePSPUtils.Threading
+namespace ScePSP.HLE
 {
-    public class GreenThread : IDisposable
+    public class HLETaskException : Exception
+    {
+        public HLETaskException(string name, Exception innerException) : base(name, innerException)
+        {
+        }
+    }
+
+    public class HLETasks : IDisposable
     {
         public class StopException : Exception
         {
@@ -11,17 +19,18 @@ namespace ScePSPUtils.Threading
 
         protected Action Action;
 
+        // Parent continues to be an OS thread that switches into the green thread.
         protected Thread ParentThread;
-        protected Thread CurrentThread;
+
+        protected Task CurrentTask;
+        private Thread CurrentUnderlyingThread;
 
         protected ManualResetEvent ParentEvent;
         protected ManualResetEvent ThisEvent;
 
-        protected static ThreadLocal<GreenThread> ThisGreenThreadList = new ThreadLocal<GreenThread>();
+        protected static ThreadLocal<HLETasks> ThisGreenThreadList = new ThreadLocal<HLETasks>();
 
         public static int GreenThreadLastId = 0;
-
-        public static Thread MonitorThread;
 
         private Exception RethrowException;
 
@@ -31,11 +40,13 @@ namespace ScePSPUtils.Threading
 
         private CancellationTokenSource cts = new CancellationTokenSource();
 
-        public GreenThread()
+        private string _nameField;
+
+        public HLETasks()
         {
         }
 
-        ~GreenThread()
+        ~HLETasks()
         {
         }
 
@@ -43,8 +54,7 @@ namespace ScePSPUtils.Threading
         {
             while (true)
             {
-                // If the parent thread have been stopped. We should not wait any longer.
-                if (Kill || !ParentThread.IsAlive)
+                if (Kill || ParentThread == null || !ParentThread.IsAlive)
                 {
                     break;
                 }
@@ -56,7 +66,7 @@ namespace ScePSPUtils.Threading
                 }
             }
 
-            if (Kill || !ParentThread.IsAlive)
+            if (Kill || ParentThread == null || !ParentThread.IsAlive)
             {
                 try
                 {
@@ -70,22 +80,36 @@ namespace ScePSPUtils.Threading
         public void InitAndStartStopped(Action Action)
         {
             this.Action = Action;
-            this.ParentThread = Thread.CurrentThread;
+            ParentThread = Thread.CurrentThread;
 
             ParentEvent = new ManualResetEvent(false);
             ThisEvent = new ManualResetEvent(false);
 
             var This = this;
 
-            this.CurrentThread = new Thread(() =>
+            var token = cts.Token;
+            var id = GreenThreadLastId++;
+
+            CurrentTask = Task.Factory.StartNew(() =>
             {
-                while (!cts.Token.IsCancellationRequested)
+                CurrentUnderlyingThread = Thread.CurrentThread;
+                try
+                {
+                    if (string.IsNullOrEmpty(CurrentUnderlyingThread.Name))
+                    {
+                        CurrentUnderlyingThread.Name = "HLETask-" + id;
+                    }
+                    _nameField = CurrentUnderlyingThread.Name;
+                }
+                catch { }
+
+                while (!token.IsCancellationRequested)
                 {
                     ThisGreenThreadList.Value = This;
 
                     ThisSemaphoreWaitOrParentThreadStopped();
 
-                    if (cts.Token.IsCancellationRequested) break;
+                    if (token.IsCancellationRequested) break;
 
                     try
                     {
@@ -111,12 +135,7 @@ namespace ScePSPUtils.Threading
                         }
                     }
                 }
-                //Console.WriteLine("GreenThread.Running: {0}", Running);
-            });
-
-            this.CurrentThread.Name = "GreenThread-" + GreenThreadLastId++;
-
-            this.CurrentThread.Start();
+            }, token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         public void SwitchTo()
@@ -133,18 +152,16 @@ namespace ScePSPUtils.Threading
                 catch { }
                 try
                 {
-                    CurrentThread.Join();
+                    CurrentTask?.Wait();
                 }
                 catch { }
             }
-            //ThisSemaphoreWaitOrParentThreadStopped();
             ParentEvent.WaitOne();
             if (RethrowException != null)
             {
                 try
                 {
-                    //StackTraceUtils.PreserveStackTrace(RethrowException);
-                    throw (new GreenThreadException("GreenThread Exception", RethrowException));
+                    throw new HLETaskException("HLETask Exception", RethrowException);
                 }
                 finally
                 {
@@ -175,14 +192,46 @@ namespace ScePSPUtils.Threading
                 }
                 else
                 {
-                    throw (new InvalidOperationException("GreenThread has finalized"));
+                    throw new InvalidOperationException("HLETask has finalized");
                 }
             }
         }
 
         public static void StopAll()
         {
-            throw (new NotImplementedException());
+            try
+            {
+                var values = ThisGreenThreadList.Values;
+                if (values != null)
+                {
+                    foreach (var gt in values)
+                    {
+                        try
+                        {
+                            gt?.Stop();
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+            }
+            catch (InvalidOperationException)
+            {
+                try
+                {
+                    if (ThisGreenThreadList.IsValueCreated)
+                    {
+                        ThisGreenThreadList.Value?.Stop();
+                    }
+                }
+                catch
+                {
+                }
+            }
+            catch
+            {
+            }
         }
 
         public void Stop()
@@ -196,10 +245,20 @@ namespace ScePSPUtils.Threading
             catch { }
             try
             {
-                CurrentThread.Join();
+                if (CurrentTask != null)
+                {
+                    try
+                    {
+                        CurrentTask.Wait();
+                    }
+                    catch (AggregateException ae)
+                    {
+                        ae.Handle(e => e is OperationCanceledException);
+                    }
+                    catch { }
+                }
             }
             catch { }
-            //CurrentThread.Abort();
         }
 
         public void Dispose()
@@ -211,11 +270,21 @@ namespace ScePSPUtils.Threading
         {
             get
             {
-                return CurrentThread.Name;
+                try
+                {
+                    if (CurrentUnderlyingThread != null) return CurrentUnderlyingThread.Name;
+                }
+                catch { }
+                return _nameField;
             }
             set
             {
-                if (CurrentThread != null) CurrentThread.Name = value;
+                _nameField = value;
+                try
+                {
+                    if (CurrentUnderlyingThread != null) CurrentUnderlyingThread.Name = value;
+                }
+                catch { }
             }
         }
     }

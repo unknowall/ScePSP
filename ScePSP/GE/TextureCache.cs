@@ -4,7 +4,6 @@ using ScePSP.Core.Gpu.Impl.Opengl;
 using ScePSP.Core.Gpu.State;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
-using ScePSP.Inject;
 using ScePSP.Utils;
 using ScePSPUtils;
 using ScePSPUtils.Drawing;
@@ -114,13 +113,13 @@ namespace ScePSP.Core.Gpu
         private byte[] SwizzlingBuffer = new byte[4 * 1024 * 1024];
         private OutputPixel[] DecodedTextureBuffer = new OutputPixel[1024 * 1024];
 
-        MessageBus MessageBus;
+        InjectMessageBus MessageBus;
 
         public TextureCache(PspMemory PspMemory, TGpuImpl GpuImpl, InjectContext InjectContext)
         {
             this.PspMemory = PspMemory;
             this.GpuImpl = GpuImpl;
-            MessageBus = InjectContext.GetInstance<MessageBus>();
+            MessageBus = InjectContext.GetInstance<InjectMessageBus>();
         }
 
         TTexture InvalidTexture;

@@ -15,9 +15,6 @@ using System.Linq;
 
 namespace ScePSP.Core.Cpu.Dynarec
 {
-    /// <summary>
-    /// Compiles functions
-    /// </summary>
     public class DynarecFunctionCompiler
     {
         [Inject] CpuProcessor CpuProcessor;

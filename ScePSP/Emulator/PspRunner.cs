@@ -1,28 +1,28 @@
-﻿using ScePSP.Runner.Components;
-using ScePSP.Runner.Components.Audio;
-using ScePSP.Runner.Components.Cpu;
-using ScePSP.Runner.Components.Display;
-using ScePSP.Runner.Components.Gpu;
+﻿using ScePSP.Runner.Tasks;
+using ScePSP.Runner.Tasks.Audio;
+using ScePSP.Runner.Tasks.Cpu;
+using ScePSP.Runner.Tasks.Display;
+using ScePSP.Runner.Tasks.Gpu;
 using System;
 using System.Collections.Generic;
 
 namespace ScePSP.Runner
 {
-    public class PspRunner : IRunnableComponent, IInjectInitialize
+    public class PspRunner : IRunnableTask, IInjectInitialize
     {
         [Inject]
-        public CpuComponentThread CpuComponentThread { get; protected set; }
+        public CpuTask CpuTask { get; protected set; }
 
         [Inject]
-        public GpuComponentThread GpuComponentThread { get; protected set; }
+        public GpuTask GpuTask { get; protected set; }
 
         [Inject]
-        public AudioComponentThread AudioComponentThread { get; protected set; }
+        public AudioTask AudioTask { get; protected set; }
 
         [Inject]
-        public DisplayComponentThread DisplayComponentThread { get; protected set; }
+        public DisplayTask DisplayTask { get; protected set; }
 
-        protected List<IRunnableComponent> RunnableComponentList = new List<IRunnableComponent>();
+        protected List<IRunnableTask> RunnableTaskList = new List<IRunnableTask>();
 
         public bool Paused { get; protected set; }
 
@@ -32,15 +32,15 @@ namespace ScePSP.Runner
 
         void IInjectInitialize.Initialize()
         {
-            RunnableComponentList.Add(CpuComponentThread);
-            RunnableComponentList.Add(GpuComponentThread);
-            RunnableComponentList.Add(AudioComponentThread);
-            RunnableComponentList.Add(DisplayComponentThread);
+            RunnableTaskList.Add(CpuTask);
+            RunnableTaskList.Add(GpuTask);
+            RunnableTaskList.Add(AudioTask);
+            RunnableTaskList.Add(DisplayTask);
         }
 
         public void StartSynchronized()
         {
-            RunnableComponentList.ForEach(runnableComponent =>
+            RunnableTaskList.ForEach(runnableComponent =>
                 runnableComponent.StartSynchronized()
             );
         }
@@ -48,7 +48,7 @@ namespace ScePSP.Runner
         public void StopSynchronized()
         {
             Console.WriteLine("Stopping!");
-            RunnableComponentList.ForEach(runnableComponent =>
+            RunnableTaskList.ForEach(runnableComponent =>
                 runnableComponent.StopSynchronized()
             );
             Console.WriteLine("Stopped!");
@@ -56,7 +56,7 @@ namespace ScePSP.Runner
 
         public void PauseSynchronized()
         {
-            RunnableComponentList.ForEach(runnableComponent =>
+            RunnableTaskList.ForEach(runnableComponent =>
             {
                 Console.Write("Pausing {0}...", runnableComponent);
                 runnableComponent.PauseSynchronized();
@@ -67,7 +67,7 @@ namespace ScePSP.Runner
 
         public void ResumeSynchronized()
         {
-            RunnableComponentList.ForEach(runnableComponent =>
+            RunnableTaskList.ForEach(runnableComponent =>
             {
                 Console.Write("Resuming {0}...", runnableComponent);
                 runnableComponent.ResumeSynchronized();

@@ -6,8 +6,8 @@ using ScePSP.Core.Components.Display;
 using ScePSP.Core.Cpu;
 using ScePSP.Core.Gpu;
 using ScePSP.Hle.Interop;
+using ScePSP.HLE;
 using ScePSPUtils;
-using ScePSPUtils.Threading;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,7 +55,7 @@ namespace ScePSP.Hle.Managers
             }
             else
             {
-                GreenThread.Yield();
+                HLETasks.Yield();
             }
         }
 #pragma warning disable CS0162
@@ -266,8 +266,7 @@ namespace ScePSP.Hle.Managers
                         ConsoleUtils.SaveRestoreConsoleState(() =>
                         {
                             Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine("Execute: {0} : PC: 0x{1:X}", CurrentCurrent,
-                                CurrentCurrent.CpuThreadState.Pc);
+                            Console.WriteLine("Execute: {0} : PC: 0x{1:X}", CurrentCurrent, CurrentCurrent.CpuThreadState.Pc);
                         });
                     }
 
@@ -305,7 +304,7 @@ namespace ScePSP.Hle.Managers
         {
             var HlePspThread = new HleThread(InjectContext, new CpuThreadState(Processor));
             HlePspThread.Id = LastId++;
-            HlePspThread.Name = "Thread-" + HlePspThread.Id;
+            HlePspThread.Name = "PspThread-" + HlePspThread.Id;
             HlePspThread.SetStatus(HleThread.Status.Stopped);
 
             //Console.Error.WriteLine("Created: {0}", HlePspThread);
@@ -352,7 +351,6 @@ namespace ScePSP.Hle.Managers
             ThreadsById.Remove(HleThread.Id);
             PreemptiveScheduler.Remove(HleThread);
         }
-
 
         public void ScheduleNext()
         {

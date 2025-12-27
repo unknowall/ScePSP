@@ -171,7 +171,7 @@ namespace ScePSP.Hle.Modules.threadman
         {
             if (ThreadManager.Current == null)
             {
-                Console.WriteLine("_sceKernelSleepThreadCB: ThreadManager.Current is null!");
+                //Console.WriteLine("_sceKernelSleepThreadCB: ThreadManager.Current is null!");
                 return 0;
             }
             var ThreadToSleep = ThreadManager.Current;
@@ -252,6 +252,8 @@ namespace ScePSP.Hle.Modules.threadman
         [HlePspFunction(NID = 0xD59EAD2F, FirmwareVersion = 150)]
         public int sceKernelWakeupThread(int ThreadId)
         {
+            if (ThreadManager.Current == null)
+                return 0;
             try
             {
                 var ThreadCurrent = ThreadManager.Current;
@@ -302,7 +304,7 @@ namespace ScePSP.Hle.Modules.threadman
 
             if (ThreadManager.Current == null)
             {
-                Console.WriteLine("_sceKernelWaitThreadEndCB: ThreadManager.Current is null!");
+                //Console.WriteLine("_sceKernelWaitThreadEndCB: ThreadManager.Current is null!");
                 return 0;
             }
 
@@ -425,7 +427,7 @@ namespace ScePSP.Hle.Modules.threadman
         {
             if (ThreadManager.Current == null)
             {
-                Console.WriteLine("sceKernelChangeCurrentThreadAttr: ThreadManager.Current is null!");
+                //Console.WriteLine("sceKernelChangeCurrentThreadAttr: ThreadManager.Current is null!");
                 return 0;
             }
             ThreadManager.Current.Attribute &= ~RemoveAttributes;
@@ -477,7 +479,7 @@ namespace ScePSP.Hle.Modules.threadman
         {
             if (ThreadManager.Current == null)
             {
-                Console.WriteLine("sceKernelExitDeleteThread: ThreadManager.Current is null!");
+                //Console.WriteLine("sceKernelExitDeleteThread: ThreadManager.Current is null!");
                 return 0;
             }
             var CurrentThreadId = ThreadManager.Current.Id;

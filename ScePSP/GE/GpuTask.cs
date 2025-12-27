@@ -3,11 +3,11 @@ using ScePSP.Core.Gpu;
 using ScePSP.Utils;
 using System.Threading;
 
-namespace ScePSP.Runner.Components.Gpu
+namespace ScePSP.Runner.Tasks.Gpu
 {
-    public sealed class GpuComponentThread : ComponentThread
+    public sealed class GpuTask : PspDeviceTask
     {
-        protected override string ThreadName => "CpuThread";
+        protected override string ThreadName => "GpuTask";
 
         [Inject] private GpuProcessor GpuProcessor;
 
@@ -21,7 +21,7 @@ namespace ScePSP.Runner.Components.Gpu
 
             GpuProcessor.ProcessInit();
 
-            //Console.WriteLine("GpuComponentThread.Start()");
+            //Console.WriteLine("GpuTask.Start()");
             try
             {
                 while (true)
@@ -41,7 +41,7 @@ namespace ScePSP.Runner.Components.Gpu
             }
             finally
             {
-                //Console.WriteLine("GpuComponentThread.End()");
+                //Console.WriteLine("GpuTask.End()");
             }
         }
     }

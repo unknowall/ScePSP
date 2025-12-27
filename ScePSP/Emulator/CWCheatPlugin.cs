@@ -1,6 +1,5 @@
 ﻿using ScePSP.Core.Components.Display;
 using ScePSP.Core.Memory;
-using ScePSP.Inject;
 using ScePSPUtils;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ namespace ScePSP.cheats
 
         [Inject] PspMemory PspMemory;
 
-        [Inject] MessageBus MessageBus;
+        [Inject] InjectMessageBus MessageBus;
 
         protected List<CWCheatEntry> CWCheats = new List<CWCheatEntry>();
         //public bool UseFastMemory;

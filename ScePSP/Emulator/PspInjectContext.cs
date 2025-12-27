@@ -30,8 +30,8 @@ namespace ScePSP.Runner
 
     public class PspInjectContext
     {
-        public static InjectContext CreateInjectContext(PspStoredConfig storedConfig, 
-            PspGpuType gputype = PspGpuType.Soft, PspAudioType audiotype = PspAudioType.SDL, 
+        public static InjectContext CreateInjectContext(PspStoredConfig storedConfig,
+            PspGpuType gputype = PspGpuType.Soft, PspAudioType audiotype = PspAudioType.SDL,
             Action<InjectContext> configure = null)
         {
             var injectContext = new InjectContext();

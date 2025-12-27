@@ -1,6 +1,6 @@
-﻿namespace ScePSP.Runner.Components
+﻿namespace ScePSP.Runner.Tasks
 {
-    public interface IRunnableComponent
+    public interface IRunnableTask
     {
         /// <summary>
         /// Starts the component and waits until it have been successfully started.

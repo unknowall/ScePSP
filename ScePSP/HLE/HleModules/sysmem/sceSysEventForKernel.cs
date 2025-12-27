@@ -1,5 +1,4 @@
 ﻿using ScePSP.Hle.Attributes;
-using System;
 
 namespace ScePSP.Hle.Modules.sysmem
 {
@@ -32,11 +31,11 @@ namespace ScePSP.Hle.Modules.sysmem
         [HlePspFunction(NID = 0xCD9E4BB5, FirmwareVersion = 150)]
         public int sceKernelRegisterSysEventHandler(PspSysEventHandler* PspSysEventHandler)
         {
-            
+
             //logInfo("sceKernelRegisterSysEventHandler");
             //pspSysEventHandler = *PspSysEventHandler;
             return 0;
-            
+
             //throw new NotImplementedException();
         }
 
@@ -55,7 +54,7 @@ namespace ScePSP.Hle.Modules.sysmem
         public int sceKernelSysEventDispatch(int EventTypeMask, int EventId, uint EventNamePointer, uint Parameter,
             uint Result, int BreakNonZero, PspSysEventHandler* BreakHandler)
         {
-            
+
             //logWarning("Not fully implemented sceKernelSysEventDispatch");
             //HleEmulatorState.callbacksHandler.addToExecuteQueue(
             //    pspSysEventHandler.handler,

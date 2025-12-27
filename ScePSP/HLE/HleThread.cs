@@ -4,8 +4,8 @@ using ScePSP.Hle.Interop;
 using ScePSP.Hle.Loader;
 using ScePSP.Hle.Managers;
 using ScePSP.Hle.Threading.EventFlags;
+using ScePSP.HLE;
 using ScePSPUtils;
-using ScePSPUtils.Threading;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -37,9 +37,6 @@ namespace ScePSP.Hle
 
         private int _PriorityValue;
 
-        /// <summary>
-        /// Value used to schedule threads.
-        /// </summary>
         public int PriorityValue
         {
             get => _PriorityValue;
@@ -61,15 +58,12 @@ namespace ScePSP.Hle
 
         [Inject] private ElfConfig ElfConfig;
 
-        /// <summary>
-        /// Event
-        /// </summary>
         public event Action OnTerminate;
 
         public DelegateInfo LastCalledHleFunction;
 
         //public int Priority = 1;
-        protected GreenThread GreenThread;
+        protected HLETasks HleTask;
 
         protected Coroutine Coroutine;
 
@@ -155,7 +149,7 @@ namespace ScePSP.Hle
                 }
                 else
                 {
-                    //this.GreenThread.Name = value;
+                    this.HleTask.Name = value;
                 }
             }
         }
@@ -171,8 +165,8 @@ namespace ScePSP.Hle
             }
             else
             {
-                this.GreenThread = new GreenThread();
-                GreenThread.InitAndStartStopped(MainLoop);
+                this.HleTask = new HLETasks();
+                HleTask.InitAndStartStopped(MainLoop);
             }
 
             this.CpuThreadState = CpuThreadState;
@@ -254,7 +248,6 @@ namespace ScePSP.Hle
 
         protected void MainLoop()
         {
-            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
             var Memory = CpuThreadState.CpuProcessor.Memory;
             try
             {
@@ -289,7 +282,7 @@ namespace ScePSP.Hle
                 }
                 else
                 {
-                    GreenThread.SwitchTo();
+                    HleTask.SwitchTo();
                 }
             } while (!HleInterruptManager.Enabled);
         }
@@ -307,8 +300,6 @@ namespace ScePSP.Hle
                 //throw (new InvalidOperationException());
             }
 
-            //Console.WriteLine("Thread:{0}:{1}", this, Thread.CurrentThread.Name);
-
             lock (HleThreadManager.ChangeStatusActions)
             {
                 HleThreadManager.ChangeStatusActions.Enqueue(() => { SetStatus(Status.Ready); });
@@ -322,12 +313,11 @@ namespace ScePSP.Hle
             }
         }
 
-        public void SetWaitAndPrepareWakeUp(WaitType WaitType, string WaitDescription, object WaitObject,
-            Action<Action> PrepareCallback, bool HandleCallbacks = false)
+        public void SetWaitAndPrepareWakeUp(WaitType WaitType, string WaitDescription, object WaitObject, Action<Action> PrepareCallback, bool HandleCallbacks = false)
         {
             if (this.HasAllStatus(Status.Waiting))
             {
-                Console.Error.WriteLine("Trying to sleep an already sleeping thread!");
+                Console.Error.WriteLine("[HLE] Trying to sleep an already sleeping thread!");
             }
 
             var calledAlready = false;
@@ -375,13 +365,14 @@ namespace ScePSP.Hle
         public override string ToString()
         {
             return
-                $"HleThread(Id={Id}, Priority={PriorityValue}, Name='{Name}', Status={CurrentStatus}, WaitDescription='{WaitDescription}', YieldCount={YieldCount})";
+                $"HleTask(Id={Id}, Priority={PriorityValue}, Name='{Name}', Status={CurrentStatus}, WaitDescription='{WaitDescription}', YieldCount={YieldCount})";
         }
 
         public string ToExtendedString()
         {
             var Ret =
-                $"HleThread(Id={Id}, Priority={PriorityValue}, PC=0x{CpuThreadState.Pc:X}, LastValidPC=0x{CpuThreadState.LastValidPc:X}, SP=0x{CpuThreadState.Sp:X}, Name='{Name}', Status={CurrentStatus}, YieldCount={YieldCount}";
+                $"HleTask(Id={Id}, Priority={PriorityValue}, PC=0x{CpuThreadState.Pc:X}, LastValidPC=0x{CpuThreadState.LastValidPc:X}," +
+                $" SP=0x{CpuThreadState.Sp:X}, Name='{Name}', Status={CurrentStatus}, YieldCount={YieldCount}";
             switch (CurrentStatus)
             {
                 case Status.Waiting:
@@ -401,7 +392,7 @@ namespace ScePSP.Hle
         public void Dispose()
         {
             Coroutine?.Dispose();
-            GreenThread?.Dispose();
+            HleTask?.Dispose();
         }
 
         public void DumpStack(TextWriter TextWriter)

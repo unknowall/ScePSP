@@ -391,7 +391,7 @@ namespace ScePSP.Hle.Modules.ge
                 case SyncTypeEnum.WaitForCompletion:
                     if (ThreadManager.Current == null)
                     {
-                        Console.WriteLine("sceGeListSync: ThreadManager.Current is null!");
+                        //Console.WriteLine("sceGeListSync: ThreadManager.Current is null!");
                         return 0;
                     }
                     ThreadManager.Current.SetWaitAndPrepareWakeUp(
@@ -421,7 +421,7 @@ namespace ScePSP.Hle.Modules.ge
                 case SyncTypeEnum.WaitForCompletion:
                     if (ThreadManager.Current == null)
                     {
-                        Console.WriteLine("sceGeDrawSync: ThreadManager.Current is null!");
+                        //Console.WriteLine("sceGeDrawSync: ThreadManager.Current is null!");
                         return 0;
                     }
                     ThreadManager.Current.SetWaitAndPrepareWakeUp(

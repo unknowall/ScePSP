@@ -1,14 +1,32 @@
 ﻿using ScePSP.Core.Components.Rtc;
 using ScePSP.Core.Memory;
-using ScePSP.Core.Threading.Synchronization;
 using ScePSP.Core.Types;
 using ScePSP.GE;
 using ScePSP.Utils;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace ScePSP.Core.Components.Display
 {
+    public class PspWaitEvent
+    {
+        protected Queue<Action> Notifications = new Queue<Action>();
+
+        public void Signal()
+        {
+            while (Notifications.Count > 0)
+            {
+                Notifications.Dequeue()();
+            }
+        }
+
+        public void CallbackOnStateOnce(Action Callback)
+        {
+            Notifications.Enqueue(Callback);
+        }
+    }
+
     public class PspDisplay
     {
         public const double ProcessedPixelsPerSecond = 9000000; // hz

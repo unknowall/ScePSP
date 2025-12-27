@@ -7,7 +7,6 @@ using ScePSP.Core.Memory;
 using ScePSP.Hle;
 using ScePSP.Hle.Loader;
 using ScePSP.Hle.Managers;
-using ScePSP.Inject;
 using ScePSP.Runner;
 using ScePSP.TextureHook;
 using System;
@@ -39,7 +38,7 @@ namespace ScePSP
 
         [Inject] TextureHookPlugin TextureHookPlugin;
 
-        [Inject] MessageBus MessageBus;
+        [Inject] InjectMessageBus MessageBus;
 
         public InjectContext InjectContext
         {
@@ -111,7 +110,7 @@ namespace ScePSP
             Start(() =>
                     {
                         LoadFile(File);
-                    }, GuiRunner , TraceSyscalls, TrackCallStack, GpuWindowHandle
+                    }, GuiRunner, TraceSyscalls, TrackCallStack, GpuWindowHandle
                 );
         }
 
@@ -157,7 +156,7 @@ namespace ScePSP
             //}
             //Environment.Exit(0);
             return;
-        }        
+        }
 
         public void LoadFile(string FileName)
         {
@@ -170,9 +169,9 @@ namespace ScePSP
 
             MessageBus.Dispatch(new LoadFileMessage() { FileName = FileName });
 
-            PspRunner.CpuComponentThread.ThreadTaskQueue.EnqueueAndWaitCompleted(() =>
+            PspRunner.CpuTask.ThreadTaskQueue.EnqueueAndWaitCompleted(() =>
             {
-                PspRunner.CpuComponentThread._LoadFile(FileName);
+                PspRunner.CpuTask._LoadFile(FileName);
             });
         }
 
@@ -251,7 +250,7 @@ namespace ScePSP
             Console.WriteLine("-----------------------------------------------------------------");
             try
             {
-                PspRunner.CpuComponentThread.DumpThreads();
+                PspRunner.CpuTask.DumpThreads();
             }
             catch (Exception Exception)
             {

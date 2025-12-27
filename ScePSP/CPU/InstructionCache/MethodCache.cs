@@ -4,15 +4,51 @@ using ScePSP.Core.Cpu.Dynarec.Ast;
 using ScePSP.Core.Cpu.Emitter;
 using ScePSP.Core.Memory;
 using ScePSPUtils;
-using ScePSPUtils.Threading;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ScePSP.Core.Cpu.InstructionCache
 {
+    public class MethodMessageBus<T>
+    {
+        private LinkedList<T> Queue = new LinkedList<T>();
+        private ManualResetEvent HasItems = new ManualResetEvent(false);
+
+        public void AddFirst(T item)
+        {
+            lock (this)
+            {
+                Queue.AddFirst(item);
+                HasItems.Set();
+            }
+        }
+
+        public void AddLast(T item)
+        {
+            lock (this)
+            {
+                Queue.AddLast(item);
+                HasItems.Set();
+            }
+        }
+
+        public T ReadOne()
+        {
+            lock (this)
+            {
+                HasItems.WaitOne();
+                var item = Queue.First.Value;
+                Queue.RemoveFirst();
+                if (Queue.Count == 0) HasItems.Reset();
+                return item;
+            }
+        }
+    }
+
     public sealed class MethodCache : IInjectInitialize
     {
         public static readonly MethodCache Methods = new MethodCache();
@@ -20,16 +56,15 @@ namespace ScePSP.Core.Cpu.InstructionCache
         private static readonly AstMipsGenerator Ast = AstMipsGenerator.Instance;
         private static readonly GeneratorIl GeneratorIlInstance = new GeneratorIl();
 
-        private readonly Dictionary<uint, MethodCacheInfo> _methodMapping =
-            new Dictionary<uint, MethodCacheInfo>(64 * 1024);
+        private readonly Dictionary<uint, MethodCacheInfo> _methodMapping = new Dictionary<uint, MethodCacheInfo>(64 * 1024);
 
         public IEnumerable<uint> PCs => _methodMapping.Keys;
 
         [Inject] public CpuProcessor CpuProcessor;
 
-        MethodCompilerThread _methodCompilerThread;
+        MethodCompilerTask _methodCompilerTask;
 
-        void IInjectInitialize.Initialize() => _methodCompilerThread = new MethodCompilerThread(CpuProcessor, this);
+        void IInjectInitialize.Initialize() => _methodCompilerTask = new MethodCompilerTask(CpuProcessor, this);
 
         public MethodCacheInfo GetForPc(uint pc)
         {
@@ -75,31 +110,32 @@ namespace ScePSP.Core.Cpu.InstructionCache
             }
         }
 
-        public void _MethodCacheInfo_SetInternal(CpuThreadState cpuThreadState, MethodCacheInfo methodCacheInfo,
-            uint pc)
+        public void _MethodCacheInfo_SetInternal(CpuThreadState cpuThreadState, MethodCacheInfo methodCacheInfo, uint pc)
         {
-            methodCacheInfo.SetDynarecFunction(_methodCompilerThread.GetDynarecFunctionForPc(pc));
+            methodCacheInfo.SetDynarecFunction(_methodCompilerTask.GetDynarecFunctionForPc(pc));
         }
     }
 
-    internal class MethodCompilerThread
+    internal class MethodCompilerTask
     {
         private readonly Dictionary<uint, DynarecFunction> _functions = new Dictionary<uint, DynarecFunction>();
         private readonly HashSet<uint> _exploringPCs = new HashSet<uint>();
-        private readonly ThreadMessageBus<uint> _exploreQueue = new ThreadMessageBus<uint>();
+        private readonly MethodMessageBus<uint> _exploreQueue = new MethodMessageBus<uint>();
         private readonly CpuProcessor _cpuProcessor;
         private MethodCache _methodCache;
+        private CancellationTokenSource _cts;
 
-        public MethodCompilerThread(CpuProcessor cpuProcessor, MethodCache methodCache)
+        public MethodCompilerTask(CpuProcessor cpuProcessor, MethodCache methodCache)
         {
             _cpuProcessor = cpuProcessor;
             _methodCache = methodCache;
-            var thread = new Thread(Main)
-            {
-                Name = "MethodCompilerThread",
-                IsBackground = true
-            };
-            thread.Start();
+            _cts = new CancellationTokenSource();
+            Task.Run(() => Main(_cts.Token), _cts.Token);
+        }
+
+        ~MethodCompilerTask()
+        {
+            _cts.Cancel();
         }
 
         private bool _ShouldAdd(uint pc) => !_functions.ContainsKey(pc) && !_exploringPCs.Contains(pc);
@@ -128,12 +164,12 @@ namespace ScePSP.Core.Cpu.InstructionCache
 
         private readonly AutoResetEvent _completedFunction = new AutoResetEvent(false);
 
-        private void Main()
+        private void Main(CancellationToken cancellationToken)
         {
             //Console.WriteLine("MethodCache.Start()");
             try
             {
-                while (true)
+                while (!cancellationToken.IsCancellationRequested)
                 {
                     var pc = _exploreQueue.ReadOne();
                     //Console.Write("Compiling {0:X8}...", PC);
@@ -247,7 +283,8 @@ namespace ScePSP.Core.Cpu.InstructionCache
                 {
                     _functions[pc] =
                         _cpuProcessor.DynarecFunctionCompiler.CreateFunction(
-                            new InstructionStreamReader(new PspMemoryStream(_cpuProcessor.Memory)), pc);
+                            new InstructionStreamReader(new PspMemoryStream(_cpuProcessor.Memory)), pc
+                            );
                 }
                 return _functions[pc];
             }

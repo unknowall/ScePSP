@@ -12,7 +12,7 @@ using ScePSP.Core.Memory;
 using ScePSP.Core.Types.Controller;
 using ScePSP.Hle.Modules.emulator;
 using ScePSP.Runner;
-using ScePSP.Runner.Components.Display;
+using ScePSP.Runner.Tasks.Display;
 using ScePSPPlatform.GL;
 using ScePSPUtils;
 using SDL2;
@@ -64,7 +64,7 @@ class Program
 
                 var rtc = emulator.InjectContext.GetInstance<PspRtc>();
                 var display = emulator.InjectContext.GetInstance<PspDisplay>();
-                var displayComponent = emulator.InjectContext.GetInstance<DisplayComponentThread>();
+                var displayComponent = emulator.InjectContext.GetInstance<DisplayTask>();
                 var memory = emulator.InjectContext.GetInstance<PspMemory>();
                 var controller = emulator.InjectContext.GetInstance<PspController>();
 

@@ -26,8 +26,7 @@ namespace ScePSP.Core.Types
             A = color.A;
         }
 
-        public static OutputPixel FromRgba(byte r, byte g, byte b, byte a) =>
-            new OutputPixel() { R = r, G = g, B = b, A = a };
+        public static OutputPixel FromRgba(byte r, byte g, byte b, byte a) => new OutputPixel() { R = r, G = g, B = b, A = a };
 
         public OutputPixel Transform(Func<byte, byte, byte, byte, OutputPixel> action) => action(R, G, B, A);
 

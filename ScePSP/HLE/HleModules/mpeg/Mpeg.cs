@@ -7,7 +7,7 @@ using ScePSP.Core.Gpu;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
 using ScePSP.Hle.Formats.video;
-using ScePSP.Utils.Utils;
+using ScePSP.Utils;
 using ScePSPUtils;
 using ScePSPUtils.Drawing.Extensions;
 using ScePSPUtils.Extensions;

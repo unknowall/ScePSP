@@ -60,8 +60,7 @@ namespace ScePSPPlatform.GL.Utils
                 Shader.GetAttribute("a_position").NoWarning().SetData<float>(PositionBuffer, 2);
                 Shader.GetAttribute("a_texcoords").NoWarning().SetData<float>(TexcoordsBuffer, 2);
                 Shader.GetUniform("u_textureSize").NoWarning().Set(new Vector4(Width, Height, 0, 0));
-                Shader.GetUniform("u_pixelSize").NoWarning()
-                    .Set(new Vector4(1.0f / Width, 1.0f / Height, 0, 0));
+                Shader.GetUniform("u_pixelSize").NoWarning().Set(new Vector4(1.0f / Width, 1.0f / Height, 0, 0));
                 Shader.Draw(GLGeometry.GL_TRIANGLE_STRIP, 4, () => { Action(Shader); });
             });
             return RenderTarget.TextureColor;

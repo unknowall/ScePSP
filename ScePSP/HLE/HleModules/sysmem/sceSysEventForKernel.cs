@@ -32,12 +32,12 @@ namespace ScePSP.Hle.Modules.sysmem
         [HlePspFunction(NID = 0xCD9E4BB5, FirmwareVersion = 150)]
         public int sceKernelRegisterSysEventHandler(PspSysEventHandler* PspSysEventHandler)
         {
-            /*
-            logInfo("sceKernelRegisterSysEventHandler");
-            pspSysEventHandler = *PspSysEventHandler;
+            
+            //logInfo("sceKernelRegisterSysEventHandler");
+            //pspSysEventHandler = *PspSysEventHandler;
             return 0;
-            */
-            throw new NotImplementedException();
+            
+            //throw new NotImplementedException();
         }
 
         /// <summary>
@@ -55,15 +55,15 @@ namespace ScePSP.Hle.Modules.sysmem
         public int sceKernelSysEventDispatch(int EventTypeMask, int EventId, uint EventNamePointer, uint Parameter,
             uint Result, int BreakNonZero, PspSysEventHandler* BreakHandler)
         {
-            /*
-            logWarning("Not fully implemented sceKernelSysEventDispatch");
-            hleEmulatorState.callbacksHandler.addToExecuteQueue(
-                pspSysEventHandler.handler,
-                [EventId, EventNamePointer, Parameter, Result]
-            );
+            
+            //logWarning("Not fully implemented sceKernelSysEventDispatch");
+            //HleEmulatorState.callbacksHandler.addToExecuteQueue(
+            //    pspSysEventHandler.handler,
+            //    [EventId, EventNamePointer, Parameter, Result]
+            //);
             return 0;
-            */
-            throw new NotImplementedException();
+
+            //throw new NotImplementedException();
         }
     }
 }

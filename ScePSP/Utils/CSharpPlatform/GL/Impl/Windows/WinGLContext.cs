@@ -295,7 +295,7 @@ namespace ScePSPPlatform.GL.Impl.Windows
             {
                 if (!Wgl.wglMakeCurrent(_dc, _context))
                 {
-                    Console.WriteLine($"Can't MakeCurrent DC {_dc} context {_context}");
+                    //Console.WriteLine($"Can't MakeCurrent DC {_dc} context {_context}");
                 }
                 GlContextFactory.Current = this;
             }
@@ -309,7 +309,7 @@ namespace ScePSPPlatform.GL.Impl.Windows
             {
                 if (!Wgl.wglMakeCurrent(_dc, IntPtr.Zero))
                 {
-                    Console.WriteLine($"Can't MakeCurrent DC {_dc} context {_context}");
+                    //Console.WriteLine($"Can't ReleaseCurrent DC {_dc} context {_context}");
                 }
                 GlContextFactory.Current = null;
             }

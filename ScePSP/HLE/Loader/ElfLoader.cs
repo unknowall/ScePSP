@@ -42,13 +42,21 @@ namespace ScePSP.Hle.Loader
 
             Header = fileStream.ReadStruct<Elf.HeaderStruct>();
             if (Header.Magic != Elf.HeaderStruct.MagicEnum.ExpectedValue)
-                throw new InvalidProgramException($"Not an ELF File \'{name}\'");
+            {
+                //throw new InvalidProgramException($"Not an ELF File \'{name}\'");
+                Console.Error.WriteLine($"Not an ELF File \'{name}\'");
+                return;
+            }
 
             if (Header.Machine != Elf.HeaderStruct.MachineEnum.Allegrex)
-                throw new InvalidProgramException("Invalid Elf.Header.Machine");
+            {
+                //throw new InvalidProgramException("Invalid Elf.Header.Machine");
+                Console.Error.WriteLine("Invalid Elf.Header.Machine");
+                return;
+            }
 
             ProgramHeaders = fileStream.ReadStructVectorAt<Elf.ProgramHeader>(Header.ProgramHeaderOffset,
-                Header.ProgramHeaderCount, Header.ProgramHeaderEntrySize);
+                    Header.ProgramHeaderCount, Header.ProgramHeaderEntrySize);
             SectionHeaders = fileStream.ReadStructVectorAt<Elf.SectionHeader>(Header.SectionHeaderOffset,
                 Header.SectionHeaderCount, Header.SectionHeaderEntrySize);
 

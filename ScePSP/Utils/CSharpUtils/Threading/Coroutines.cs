@@ -6,9 +6,6 @@ using System.Threading;
 
 namespace ScePSPUtils.Threading
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class CoroutinePool : IDisposable
     {
         internal Coroutine CurrentCoroutine;
@@ -16,51 +13,31 @@ namespace ScePSPUtils.Threading
         internal AutoResetEvent CallerContinueEvent = new AutoResetEvent(false);
         internal Thread CallerThread;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
         public Coroutine CreateCoroutine(string name, Action action)
         {
             return new Coroutine(name, this, action);
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
         public void YieldInPool()
         {
             CurrentCoroutine.YieldInPool();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void Dispose()
         {
             foreach (var coroutine in Coroutines.ToArray()) coroutine.Dispose();
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public sealed class Coroutine : IDisposable
     {
         internal CoroutinePool Pool;
         internal AutoResetEvent CoroutineContinueEvent = new AutoResetEvent(false);
         internal Thread Thread;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public string Name { set; get; }
 
         Exception _rethrowException;
-
 
         private void CoroutineContinueEvent_WaitOne()
         {
@@ -68,7 +45,6 @@ namespace ScePSPUtils.Threading
 
             if (!IsAlive) throw new InterruptException();
         }
-
 
         private void PoolCallerContinueEvent_WaitOne()
         {
@@ -115,11 +91,6 @@ namespace ScePSPUtils.Threading
             _mustStart = true;
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <exception cref="GreenThreadException"></exception>
         public void ExecuteStep()
         {
             if (_mustStart)
@@ -154,11 +125,6 @@ namespace ScePSPUtils.Threading
             }
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <exception cref="InvalidOperationException"></exception>
         public void YieldInPool()
         {
             //Debug.WriteLine("YieldInPool");
@@ -197,19 +163,10 @@ namespace ScePSPUtils.Threading
             CoroutineContinueEvent_WaitOne();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public bool IsAlive { get; private set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public bool IsCurrentlyActive => Pool.CurrentCoroutine == this;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void Dispose()
         {
             IsAlive = false;

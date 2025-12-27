@@ -164,15 +164,15 @@ namespace ScePSP.Core.Memory
 
         public static void ValidateRange(uint Address, int Size)
         {
-            if (!IsAddressValid((uint)(Address + 0))) throw new InvalidAddressException(Address);
+            //if (!IsAddressValid((uint)(Address + 0))) throw new InvalidAddressException(Address);
+
             if (Size > 1)
             {
                 if (!IsAddressValid((uint)(Address + Size - 1))) throw new InvalidAddressException(Address);
             }
         }
 
-        public virtual void* PspAddressToPointerSafe(uint Address, int Size = 0, bool CanBeNull = true,
-            bool InvalidAsNull = false)
+        public virtual void* PspAddressToPointerSafe(uint Address, int Size = 0, bool CanBeNull = true, bool InvalidAsNull = false)
         {
             if (Address == 0 && CanBeNull) return null;
             ValidateRange(Address, Size);

@@ -60,7 +60,6 @@ namespace ScePSP.Core.Gpu
 
         internal PspMemory Memory;
 
-
         //PspWaitEvent OnFreed = new PspWaitEvent();
         //public enum Status2Enum
         //{
@@ -262,7 +261,6 @@ namespace ScePSP.Core.Gpu
                         else
                         {
                             //Console.WriteLine("{0:X8}", PC);
-
                             _primCount = 0;
                             GpuProcessor.GpuImpl.PrimEnd();
                         }
@@ -374,6 +372,11 @@ namespace ScePSP.Core.Gpu
                         GpuStateData[GpuOpCodes.BONE_MATRIX_BASE + (ushort)pos] = Params24 << 8;
                         break;
                     }
+
+                //default:
+                //    Console.Error.WriteLine("Unknown GE OpCode Instruction: PC=0x{0:X8} OpCode={1} Params=0x{2:X6}",
+                //        Pc - 4, Instruction.OpCode, Instruction.Params);
+                //    break;
             }
 
             if (Debug)

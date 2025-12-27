@@ -135,9 +135,13 @@ namespace ScePSP.Hle.Modules.audio
 #endif
         }
 
-        private int _sceAudioOutputPannedBlocking(PspAudioChannel Channel, int LeftVolume, int RightVolume,
-            short* Buffer, bool Blocking)
+        private int _sceAudioOutputPannedBlocking(PspAudioChannel Channel, int LeftVolume, int RightVolume, short* Buffer, bool Blocking)
         {
+            if (ThreadManager.Current == null)
+            {
+                //Console.WriteLine("_sceAudioOutputPannedBlocking: No current thread!");
+                return 0;
+            }
             ThreadManager.Current.SetWaitAndPrepareWakeUp(HleThread.WaitType.Audio,
                 $"_sceAudioOutputPannedBlocking({Channel}, Volume({LeftVolume}, {RightVolume}), Blocking({Blocking}))", Channel, WakeUpCallback =>
                 {

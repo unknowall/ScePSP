@@ -4,14 +4,8 @@ using System.Threading;
 
 namespace ScePSPUtils.Threading
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class CustomThreadPool
     {
-        /// <summary>
-        /// 
-        /// </summary>
         public class WorkerThread
         {
             private bool _running;
@@ -19,9 +13,6 @@ namespace ScePSPUtils.Threading
             private Queue<Action> Tasks;
             internal long LoopIterCount;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public WorkerThread()
             {
                 _running = true;
@@ -44,9 +35,6 @@ namespace ScePSPUtils.Threading
                 AddTask(() => { _running = false; });
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
             protected void ThreadBody()
             {
                 //Console.WriteLine("CustomThreadPool.ThreadBody.Start()");
@@ -72,10 +60,6 @@ namespace ScePSPUtils.Threading
 
         internal WorkerThread[] WorkerThreads;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="numberOfThreads"></param>
         public CustomThreadPool(int numberOfThreads)
         {
             WorkerThreads = new WorkerThread[numberOfThreads];
@@ -85,29 +69,16 @@ namespace ScePSPUtils.Threading
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="threadAffinity"></param>
-        /// <returns></returns>
         public long GetLoopIterCount(int threadAffinity)
         {
             return WorkerThreads[threadAffinity % WorkerThreads.Length].LoopIterCount;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="threadAffinity"></param>
-        /// <param name="task"></param>
         public void AddTask(int threadAffinity, Action task)
         {
             WorkerThreads[threadAffinity % WorkerThreads.Length].AddTask(task);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void Stop()
         {
             foreach (var workerThread in WorkerThreads)

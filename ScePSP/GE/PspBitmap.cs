@@ -1,11 +1,12 @@
 ﻿using ScePSP.Core.Types;
+using ScePSP.Utils;
 using ScePSPUtils.Drawing;
 using ScePSPUtils.Drawing.Extensions;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace ScePSP.Utils.Utils
+namespace ScePSP.GE
 {
     public unsafe class PspBitmap
     {
@@ -67,7 +68,7 @@ namespace ScePSP.Utils.Utils
             {
                 for (var x = 0; x < Width; x++)
                 {
-                    o[n++] = this.GetPixel(x, y);
+                    o[n++] = GetPixel(x, y);
                 }
             }
             return o;

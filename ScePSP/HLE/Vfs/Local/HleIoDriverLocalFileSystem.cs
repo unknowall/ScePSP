@@ -14,11 +14,6 @@ namespace ScePSP.Hle.Vfs.Local
             this.BasePath = BasePath;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Path"></param>
-        /// <returns></returns>
         public static string GetSanitizedPath(string Path)
         {
             var Parts = new Stack<string>();

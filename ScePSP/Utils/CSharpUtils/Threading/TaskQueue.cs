@@ -4,32 +4,17 @@ using System.Threading;
 
 namespace ScePSPUtils.Threading
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public sealed class TaskQueue
     {
-        /// <summary>
-        /// 
-        /// </summary>
         public readonly AutoResetEvent EnqueuedEvent;
 
-        /// <summary>
-        /// 
-        /// </summary>
         private readonly Queue<Action> _tasks = new Queue<Action>();
 
-        /// <summary>
-        /// 
-        /// </summary>
         public TaskQueue()
         {
             EnqueuedEvent = new AutoResetEvent(false);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void WaitAndHandleEnqueued()
         {
             //Console.WriteLine("WaitEnqueued");
@@ -38,9 +23,6 @@ namespace ScePSPUtils.Threading
             HandleEnqueued();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void WaitEnqueued()
         {
             int tasksCount;
@@ -52,9 +34,6 @@ namespace ScePSPUtils.Threading
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void HandleEnqueued()
         {
             while (true)
@@ -71,10 +50,6 @@ namespace ScePSPUtils.Threading
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="action"></param>
         public void EnqueueWithoutWaiting(Action action)
         {
             lock (_tasks)
@@ -84,10 +59,6 @@ namespace ScePSPUtils.Threading
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="action"></param>
         public void EnqueueAndWaitStarted(Action action)
         {
             var Event = new AutoResetEvent(false);
@@ -101,12 +72,6 @@ namespace ScePSPUtils.Threading
             Event.WaitOne();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="action"></param>
-        /// <param name="timeout"></param>
-        /// <param name="actionTimeout"></param>
         public void EnqueueAndWaitStarted(Action action, TimeSpan timeout, Action actionTimeout = null)
         {
             var Event = new AutoResetEvent(false);
@@ -124,10 +89,6 @@ namespace ScePSPUtils.Threading
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="action"></param>
         public void EnqueueAndWaitCompleted(Action action)
         {
             var Event = new AutoResetEvent(false);

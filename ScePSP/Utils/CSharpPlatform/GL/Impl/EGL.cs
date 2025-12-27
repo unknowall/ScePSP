@@ -10,9 +10,6 @@ using EGLNativePixmapType = System.IntPtr;
 using EGLNativeWindowType = System.IntPtr;
 using EGLSurface = System.IntPtr;
 
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
-
 namespace ScePSPPlatform.GL.Impl
 {
     public unsafe class Egl

@@ -1,7 +1,6 @@
 ﻿#define ENABLE_TEXTURES
 
 using ScePSP.Core.Gpu.Formats;
-using ScePSP.Core.Gpu.Impl.Opengl.Utils;
 using ScePSP.Core.Gpu.State;
 using ScePSP.Core.Gpu.VertexReading;
 using ScePSP.Core.Types;

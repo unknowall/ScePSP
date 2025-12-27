@@ -2,7 +2,7 @@
 
 using ScePSP.Core.Gpu.State;
 using ScePSP.Core.Types;
-using ScePSP.Utils.Utils;
+using ScePSP.Utils;
 using System;
 
 namespace ScePSP.Core.Gpu.VertexReading

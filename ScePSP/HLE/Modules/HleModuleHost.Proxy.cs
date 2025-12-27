@@ -47,16 +47,14 @@ namespace ScePSP.Hle
                 .Get(typeof(TType), Index);
         }
 
-        public static object GetObjectFromPoolHelper(CpuThreadState CpuThreadState, Type Type, int Index,
-            bool CanReturnNull)
+        public static object GetObjectFromPoolHelper(CpuThreadState CpuThreadState, Type Type, int Index, bool CanReturnNull)
         {
             //Console.Error.WriteLine("GetObjectFromPoolHelper");
             return CpuThreadState.CpuProcessor.InjectContext.GetInstance<HleUidPoolManager>()
                 .Get(Type, Index, CanReturnNull: CanReturnNull);
         }
 
-        public static uint GetOrAllocIndexFromPoolHelper(CpuThreadState CpuThreadState, Type Type,
-            IHleUidPoolClass Item)
+        public static uint GetOrAllocIndexFromPoolHelper(CpuThreadState CpuThreadState, Type Type, IHleUidPoolClass Item)
         {
             //Console.Error.WriteLine("AllocIndexFromPoolHelper");
             return (uint)CpuThreadState.CpuProcessor.InjectContext.GetInstance<HleUidPoolManager>()

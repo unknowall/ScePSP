@@ -254,6 +254,7 @@ namespace ScePSP.Hle.Managers
             // Run that thread
             this.Current = NextThread;
             var CurrentCurrent = Current;
+            if (CurrentCurrent != null)
             {
                 // Ready -> Running
                 CurrentCurrent.SetStatus(HleThread.Status.Running);

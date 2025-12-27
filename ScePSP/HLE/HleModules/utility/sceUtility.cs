@@ -953,7 +953,7 @@ namespace ScePSP.Hle.Modules.utility
         /// <param name="_module">Module number to load (PSP_AV_MODULE_xxx)</param>
         /// <returns>0 on success, less than 0 on error</returns>
         [HlePspFunction(NID = 0xC629AF26, FirmwareVersion = 200)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceUtilityLoadAvModule(PSP_AV_MODULE _module)
         {
             return 0;
@@ -966,7 +966,7 @@ namespace ScePSP.Hle.Modules.utility
         /// <param name="_module">Module number to be unloaded</param>
         /// <returns>0 on success, less than 0 on error</returns>
         [HlePspFunction(NID = 0xF7D8D092, FirmwareVersion = 200)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceUtilityUnloadAvModule(PSP_AV_MODULE _module)
         {
             return 0;
@@ -981,7 +981,7 @@ namespace ScePSP.Hle.Modules.utility
         /// <param name="_module">Module number to load (PSP_NET_MODULE_xxx)</param>
         /// <returns>0 on success, less than 0 on error</returns>
         [HlePspFunction(NID = 0x1579A159, FirmwareVersion = 200)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceUtilityLoadNetModule(int _module)
         {
             //unimplemented();
@@ -1000,7 +1000,7 @@ namespace ScePSP.Hle.Modules.utility
         ///		less than 0 on error
         /// </returns>
         [HlePspFunction(NID = 0x2A2B3DE0, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceUtilityLoadModule(CpuThreadState CpuThreadState, PspModule PspModule)
         {
             if (PspModule == Hle.PspModule.PSP_MODULE_AV_SASCORE)
@@ -1020,7 +1020,7 @@ namespace ScePSP.Hle.Modules.utility
         ///		less than 0 on error
         /// </returns>
         [HlePspFunction(NID = 0xE49BFE92, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceUtilityUnloadModule(PspModule _module)
         {
             //throw (new NotImplementedException());
@@ -1078,14 +1078,14 @@ namespace ScePSP.Hle.Modules.utility
         }
 
         [HlePspFunction(NID = 0x1579A159, FirmwareVersion = 200)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceUtilityLoadNetModule()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x64D50C56, FirmwareVersion = 200)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceUtilityUnloadNetModule()
         {
             return 0;

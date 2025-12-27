@@ -2,14 +2,10 @@
 using ScePSP.Core.Components.Display;
 using System;
 using System.Drawing.Imaging;
-//using System.Drawing.Imaging;
 using System.Text;
 
 namespace ScePSP.Hle.Vfs.Emulator
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public enum EmulatorDevclEnum : int
     {
         GetHasDisplay = 0x00000001,

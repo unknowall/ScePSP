@@ -1,7 +1,7 @@
 ﻿using ScePSP.Core.Types;
 using ScePSPUtils.Drawing;
 
-namespace ScePSP.Utils.Utils
+namespace ScePSP.Utils
 {
     public static class ColorFormatExtensions
     {

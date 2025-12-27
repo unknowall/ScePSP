@@ -3,19 +3,11 @@ using System.Threading;
 
 namespace ScePSPUtils.Threading
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
     public class ThreadMessageBus<T>
     {
         private LinkedList<T> Queue = new LinkedList<T>();
         private ManualResetEvent HasItems = new ManualResetEvent(false);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="item"></param>
         public void AddFirst(T item)
         {
             lock (this)
@@ -25,10 +17,6 @@ namespace ScePSPUtils.Threading
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="item"></param>
         public void AddLast(T item)
         {
             lock (this)
@@ -38,10 +26,6 @@ namespace ScePSPUtils.Threading
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public T ReadOne()
         {
             lock (this)

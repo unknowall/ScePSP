@@ -58,10 +58,12 @@ namespace ScePSPUtils.Threading
 
             if (Kill || !ParentThread.IsAlive)
             {
-                //throw(new StopException());
-                cts.Cancel();
-                CurrentThread.Join();
-                //Thread.CurrentThread.Abort();
+                try
+                {
+                    cts.Cancel();
+                }
+                catch { }
+                return;
             }
         }
 
@@ -80,7 +82,11 @@ namespace ScePSPUtils.Threading
                 while (!cts.Token.IsCancellationRequested)
                 {
                     ThisGreenThreadList.Value = This;
+
                     ThisSemaphoreWaitOrParentThreadStopped();
+
+                    if (cts.Token.IsCancellationRequested) break;
+
                     try
                     {
                         Running = true;
@@ -120,9 +126,16 @@ namespace ScePSPUtils.Threading
             ThisEvent.Set();
             if (Kill)
             {
-                cts.Cancel();
-                CurrentThread.Join();
-                //Thread.CurrentThread.Abort();
+                try
+                {
+                    cts.Cancel();
+                }
+                catch { }
+                try
+                {
+                    CurrentThread.Join();
+                }
+                catch { }
             }
             //ThisSemaphoreWaitOrParentThreadStopped();
             ParentEvent.WaitOne();
@@ -176,8 +189,16 @@ namespace ScePSPUtils.Threading
         {
             Kill = true;
             ThisEvent.Set();
-            cts.Cancel();
-            CurrentThread.Join();
+            try
+            {
+                cts.Cancel();
+            }
+            catch { }
+            try
+            {
+                CurrentThread.Join();
+            }
+            catch { }
             //CurrentThread.Abort();
         }
 
@@ -194,7 +215,7 @@ namespace ScePSPUtils.Threading
             }
             set
             {
-                CurrentThread.Name = Name;
+                if (CurrentThread != null) CurrentThread.Name = value;
             }
         }
     }

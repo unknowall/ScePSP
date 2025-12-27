@@ -484,7 +484,8 @@ namespace ScePSP.Hle.Formats
 
             if (!ChildsByNameUpperCase.ContainsKey(childName))
             {
-                throw new FileNotFoundException($"Can't find '{childName}' on '{this}'");
+                Console.WriteLine($"IsoNode AccessChild Can't find '{childName}' on '{this}'");
+                return this;
             }
             return ChildsByNameUpperCase[childName];
         }

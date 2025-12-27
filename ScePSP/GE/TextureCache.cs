@@ -5,7 +5,7 @@ using ScePSP.Core.Gpu.State;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
 using ScePSP.Inject;
-using ScePSP.Utils.Utils;
+using ScePSP.Utils;
 using ScePSPUtils;
 using ScePSPUtils.Drawing;
 using ScePSPUtils.Drawing.Extensions;

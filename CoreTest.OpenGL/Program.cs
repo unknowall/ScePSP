@@ -1,4 +1,5 @@
-﻿using ScePSP;
+﻿using cscodec.util;
+using ScePSP;
 using ScePSP.Core;
 using ScePSP.Core.Components.Controller;
 using ScePSP.Core.Components.Display;
@@ -14,7 +15,9 @@ using ScePSPPlatform.GL.Utils;
 using ScePSPUtils;
 using SDL2;
 using System;
+using System.Diagnostics;
 using System.Windows.Forms;
+using static ScePSPUtils.Logger;
 
 #pragma warning disable CS0436
 #pragma warning disable CS8602
@@ -92,6 +95,8 @@ class Program
         //TestTexture = GLTexture.Create().SetFormat(TextureFormat.RGBA).SetSize(2, 2).SetData(new uint[] { 0xFF0000FF, 0xFF00FFFF, 0xFFFF00FF, 0xFFFFFFFF });
         Context.ReleaseCurrent();
 
+        //Logger.OnGlobalLog += Log;
+
         injector = PspInjectContext.CreateInjectContext(PspStoredConfig.Load(), PspGpuType.OpenGL, PspAudioType.SDL);
 
         pspEmulator = injector.GetInstance<PspEmulator>();
@@ -116,6 +121,18 @@ class Program
         pspEmulator.StartAndLoad(ofn.FileName, RunMainLoop, false, false);
     }
 
+    private static void Log(string name, Level level, string message, StackFrame stack)
+    {
+        switch (level)
+        {
+            case Level.Fatal:
+            case Level.Warning:
+            case Level.Error:
+                Console.WriteLine($"[{level}] {name}: {message}");
+                break;
+        }
+    }
+
     private static void GetTextureFromGpu()
     {
         var OpengImpl = (gpu.GpuImpl as OpenglGpuImpl);
@@ -128,14 +145,14 @@ class Program
                     var RenderTarget = DrawBuffer.RenderTarget;
                     if (GL.glIsTexture(RenderTarget.TextureColor.Texture))
                     {
-                        TextureVerticalFlip = false;
+                        TextureVerticalFlip = true;
                         DrawTexture = RenderTarget.TextureColor;
                         //DrawDepth = RenderTarget.TextureDepth;
                         return;
                     }
                     else
                     {
-                        Console.WriteLine("Not shared contexts");
+                        GetTextureFromRam();
                     }
                 }
             });

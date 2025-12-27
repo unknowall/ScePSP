@@ -93,7 +93,6 @@ namespace ScePSP.Hle.Modules.display
             return PspDisplay.IsVblank;
         }
 
-
         /// <summary>
         /// Display set framebuf
         /// </summary>
@@ -104,8 +103,7 @@ namespace ScePSP.Hle.Modules.display
         /// <returns></returns>
         [HlePspFunction(NID = 0x289D82FE, FirmwareVersion = 150)]
         //[HlePspNotImplemented]
-        public int sceDisplaySetFrameBuf(uint Address, int BufferWidth, GuPixelFormats PixelFormat,
-            PspDisplay.SyncMode Sync)
+        public int sceDisplaySetFrameBuf(uint Address, int BufferWidth, GuPixelFormats PixelFormat, PspDisplay.SyncMode Sync)
         {
             Action UpdateInfo = () =>
             {
@@ -158,11 +156,9 @@ namespace ScePSP.Hle.Modules.display
         /// <remarks>(pixel_clk_freq * cycles_per_pixel)/(row_pixels * column_pixel)</remarks>
         /// <returns></returns>
         [HlePspFunction(NID = 0xDBA6C4C4, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
         public float sceDisplayGetFramePerSec()
         {
-            return (float)(PspDisplay.ProcessedPixelsPerSecond * PspDisplay.CyclesPerPixel /
-                            (PspDisplay.PixelsInARow * PspDisplay.NumberOfRows));
+            return (float)(PspDisplay.ProcessedPixelsPerSecond * PspDisplay.CyclesPerPixel / (PspDisplay.PixelsInARow * PspDisplay.NumberOfRows));
         }
 
         /// <summary>
@@ -196,8 +192,7 @@ namespace ScePSP.Hle.Modules.display
         /// <returns>0 on success</returns>
         [HlePspFunction(NID = 0xEEDA2E54, FirmwareVersion = 150)]
         //public int sceDisplayGetFrameBuf(uint* topaddr, int* bufferwidth, PspDisplayPixelFormats* pixelformat, PspDisplaySetBufSync sync)
-        public int sceDisplayGetFrameBuf(ref uint topaddr, ref int bufferwidth, ref GuPixelFormats pixelformat,
-            uint sync)
+        public int sceDisplayGetFrameBuf(ref uint topaddr, ref int bufferwidth, ref GuPixelFormats pixelformat, uint sync)
         {
             topaddr = PspDisplay.CurrentInfo.FrameAddress;
             bufferwidth = PspDisplay.CurrentInfo.BufferWidth;

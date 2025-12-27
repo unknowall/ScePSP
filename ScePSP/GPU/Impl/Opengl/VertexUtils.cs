@@ -1,11 +1,10 @@
 ﻿using System.Numerics;
 
-namespace ScePSP.Core.Gpu.Impl.Opengl.Utils
+namespace ScePSP.Core.Gpu.Impl.Opengl
 {
     public class VertexUtils
     {
-        public static void GenerateTriangleStripFromSpriteVertices(ref VertexInfo v0, out VertexInfo v1,
-            out VertexInfo v2, ref VertexInfo v3)
+        public static void GenerateTriangleStripFromSpriteVertices(ref VertexInfo v0, out VertexInfo v1, out VertexInfo v2, ref VertexInfo v3)
         {
             var color = v3.Color;
             var tz = v0.Texture.Z;

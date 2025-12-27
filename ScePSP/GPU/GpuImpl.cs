@@ -47,7 +47,7 @@ namespace ScePSP.Core.Gpu
                                                Matrix4x4.CreateScale(.5f, .5f, 1f) *
                                                Matrix4x4.CreateScale(480, 272, 1f);
 
-        protected GpuStateStruct GpuState;
+        public GpuStateStruct GpuState;
         protected uint DrawAddress;
         protected GuPrimitiveType PrimitiveType;
 
@@ -63,7 +63,7 @@ namespace ScePSP.Core.Gpu
             var model = gpuState.VertexState.WorldMatrix;
             var view = gpuState.VertexState.ViewMatrix;
             var projection3D = gpuState.VertexState.ProjectionMatrix;
-            var projection2D = Matrix4x4.CreateOrthographic(512, 272, -1f, +1f);
+            var projection2D = Matrix4x4.CreateOrthographic(480, 272, -1f, +1f);
             //Matrix4x4.Invert(projection2D, out unitToScreenCoords);
             modelView = model * view;
             worldViewProjection3D = modelView * projection3D;

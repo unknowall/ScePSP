@@ -8,50 +8,18 @@ using static System.String;
 
 namespace ScePSPUtils
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public sealed class Logger
     {
-        /// <summary>
-        /// 
-        /// </summary>
         public enum Level
         {
-            /// <summary>
-            /// 
-            /// </summary>
             Notice,
-
-            /// <summary>
-            /// 
-            /// </summary>
             Info,
-
-            /// <summary>
-            /// 
-            /// </summary>
             Warning,
-
-            /// <summary>
-            /// 
-            /// </summary>
             Unimplemented,
-
-            /// <summary>
-            /// 
-            /// </summary>
             Error,
-
-            /// <summary>
-            /// 
-            /// </summary>
             Fatal,
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public string Name { get; private set; }
 
         //private bool Enabled = true;
@@ -63,20 +31,11 @@ namespace ScePSPUtils
         {
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public static Logger CreateAnonymousLogger()
         {
             return new Logger();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
         public static Logger GetLogger(string name)
         {
             lock (Loggers)
@@ -93,14 +52,8 @@ namespace ScePSPUtils
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public static event Action<string, Level, string, StackFrame> OnGlobalLog;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public event Action<Level, string, StackFrame> OnLog;
 
         private Logger Log(Level level, object format, params object[] Params)
@@ -131,45 +84,21 @@ namespace ScePSPUtils
             return this;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="format"></param>
-        /// <param name="Params"></param>
-        /// <returns></returns>
         public Logger Notice(object format, params object[] Params)
         {
             return Log(Level.Notice, format, Params);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="format"></param>
-        /// <param name="Params"></param>
-        /// <returns></returns>
         public Logger Info(object format, params object[] Params)
         {
             return Log(Level.Info, format, Params);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="format"></param>
-        /// <param name="Params"></param>
-        /// <returns></returns>
         public Logger Warning(object format, params object[] Params)
         {
             return Log(Level.Warning, format, Params);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="format"></param>
-        /// <param name="Params"></param>
-        /// <returns></returns>
         public Logger Unimplemented(object format, params object[] Params) => Log(Level.Unimplemented, format, Params);
 
         public Logger Error(object format, params object[] Params) => Log(Level.Error, format, Params);
@@ -184,9 +113,6 @@ namespace ScePSPUtils
             return end - start;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public class Stopwatch
         {
             protected List<DateTime> DateTimeList = new List<DateTime>();
@@ -213,10 +139,6 @@ namespace ScePSPUtils
                 }
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <returns></returns>
             public override string ToString()
             {
                 var timeSpans = new List<TimeSpan>();
@@ -225,10 +147,6 @@ namespace ScePSPUtils
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="action"></param>
         public void TryCatch(Action action)
         {
             if (Debugger.IsAttached)

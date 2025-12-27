@@ -132,15 +132,17 @@ namespace ScePSPPlatform.GL.Utils
                 GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_TEXTURE_2D, TextureDepth.Texture, 0);
             }
 
-            if ((RenderTargetLayers & RenderTargetLayers.Stencil) != 0)
-            {
-                //GL.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_STENCIL_ATTACHMENT, GL.GL_RENDERBUFFER, RenderBufferStencil.Index);
-            }
+            //if ((RenderTargetLayers & RenderTargetLayers.Stencil) != 0)
+            //{
+            //    GL.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_STENCIL_ATTACHMENT, GL.GL_RENDERBUFFER, RenderBufferStencil.Index);
+            //}
 
             var Status = GL.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER);
             if (Status != GL.GL_FRAMEBUFFER_COMPLETE)
             {
-                throw new Exception($"Failed to bind FrameBuffer 0x{Status:X4} : {GL.GetConstantString(Status)}, {RenderTargetLayers}, {Width}x{Height}");
+                if (GL.glGetError() != 0)
+                    Console.WriteLine($"Failed to bind FrameBuffer 0x{Status:X4} Error 0x{GL.glGetError():X4}" +
+                        $" {GL.GetConstantString(Status)}, {RenderTargetLayers}, {Width}x{Height}");
             }
             //Console.WriteLine($"Bound FrameBuffer {FrameBufferId} : {RenderTargetLayers}, {Width}x{Height}");
             GL.glViewport(0, 0, Width, Height);

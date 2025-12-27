@@ -2,7 +2,8 @@
 using ScePSP.Core.Memory;
 using ScePSP.Core.Threading.Synchronization;
 using ScePSP.Core.Types;
-using ScePSP.Utils.Utils;
+using ScePSP.GE;
+using ScePSP.Utils;
 using System;
 using System.Drawing;
 

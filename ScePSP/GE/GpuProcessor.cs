@@ -101,12 +101,15 @@ namespace ScePSP.Core.Gpu
 
         public GpuDisplayList DequeueFreeDisplayList()
         {
+            GpuDisplayList result;
+            //Console.WriteLine("DequeueFreeDisplayList: {0}", this.DisplayListFreeQueue.Count);
             lock (DisplayListFreeQueue)
             {
-                var DisplayList = DisplayListFreeQueue.Dequeue();
-                DisplayList.Available = false;
-                return DisplayList;
+                result = DisplayListFreeQueue.Dequeue();
+                result.Available = false;
             }
+
+            return result;
         }
 
         public void EnqueueFreeDisplayList(GpuDisplayList GpuDisplayList)
@@ -115,7 +118,8 @@ namespace ScePSP.Core.Gpu
             lock (DisplayListFreeQueue)
             {
                 DisplayListFreeQueue.Enqueue(GpuDisplayList);
-                GpuDisplayList.SetFree();
+                if (GpuDisplayList != null)
+                    GpuDisplayList.SetFree();
             }
             DisplayListFreeEvent.Set();
         }
@@ -169,6 +173,11 @@ namespace ScePSP.Core.Gpu
                     CurrentGpuDisplayList.SetDequeued();
                     LastProcessedGpuDisplayList = CurrentGpuDisplayList;
                     CurrentGpuDisplayList.Process();
+                    if (CurrentGpuDisplayList == null)
+                    {
+                        Console.Error.WriteLine("??? CurrentGpuDisplayList = NULL.");
+                        continue;
+                    }
                     EnqueueFreeDisplayList(CurrentGpuDisplayList);
                 }
                 CurrentGpuDisplayList = null;

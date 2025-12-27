@@ -1,6 +1,6 @@
 ﻿using ScePSPPlatform.GL;
 
-namespace ScePSP.Core.Gpu.Impl.Opengl.Utils
+namespace ScePSP.Core.Gpu.Impl.Opengl
 {
     internal static class OpenglGpuImplConversionTables
     {

@@ -3,7 +3,7 @@ using ScePSPUtils;
 using ScePSPUtils.Drawing;
 using System;
 
-namespace ScePSP.Utils.Utils
+namespace ScePSP.Utils
 {
     public sealed unsafe class PixelFormatDecoder
     {
@@ -205,8 +205,8 @@ namespace ScePSP.Utils.Utils
                     // Create Alpha Lookup
                     var alphaLookup = new byte[8];
                     var alphas = (ushort)(block.Alpha >> 48);
-                    var alpha0 = (byte)((alphas >> 0) & 0xFF);
-                    var alpha1 = (byte)((alphas >> 8) & 0xFF);
+                    var alpha0 = (byte)(alphas >> 0 & 0xFF);
+                    var alpha1 = (byte)(alphas >> 8 & 0xFF);
 
                     alphaLookup[0] = alpha0;
                     alphaLookup[1] = alpha1;
@@ -225,8 +225,8 @@ namespace ScePSP.Utils.Utils
                         alphaLookup[3] = (byte)((3 * alpha0 + 2 * alpha1) / 5);
                         alphaLookup[4] = (byte)((2 * alpha0 + 3 * alpha1) / 5);
                         alphaLookup[5] = (byte)((alpha0 + 4 * alpha1) / 5);
-                        alphaLookup[6] = (byte)0x00;
-                        alphaLookup[7] = (byte)0xFF;
+                        alphaLookup[6] = 0x00;
+                        alphaLookup[7] = 0xFF;
                     }
 
                     var no = 0;
@@ -234,8 +234,8 @@ namespace ScePSP.Utils.Utils
                     {
                         for (var x2 = 0; x2 < 4; x2++, no++)
                         {
-                            var alpha = alphaLookup[(block.Alpha >> (3 * no)) & 0x7];
-                            var color = (block.ColorLookup >> (2 * no)) & 0x3;
+                            var alpha = alphaLookup[block.Alpha >> 3 * no & 0x7];
+                            var color = block.ColorLookup >> 2 * no & 0x3;
 
                             var rx = x + x2;
                             var ry = y + y2;
@@ -282,8 +282,8 @@ namespace ScePSP.Utils.Utils
                     {
                         for (var x2 = 0; x2 < 4; x2++, no++)
                         {
-                            var alpha = (block.Alpha >> (4 * no)) & 0xF;
-                            var color = (block.ColorLookup >> (2 * no)) & 0x3;
+                            var alpha = block.Alpha >> 4 * no & 0xF;
+                            var color = block.ColorLookup >> 2 * no & 0x3;
 
                             var rx = x + x2;
                             var ry = y + y2;
@@ -331,7 +331,7 @@ namespace ScePSP.Utils.Utils
                     {
                         for (var x2 = 0; x2 < 4; x2++, no++)
                         {
-                            var color = (block.ColorLookup >> (2 * no)) & 0x3;
+                            var color = block.ColorLookup >> 2 * no & 0x3;
 
                             var rx = x + x2;
                             var ry = y + y2;
@@ -378,7 +378,7 @@ namespace ScePSP.Utils.Utils
                 }
                 for (int n = 0; n < paletteSize; n++)
                 {
-                    translate[n] = ((_paletteStart + n) >> _paletteShift) & _paletteMask;
+                    translate[n] = _paletteStart + n >> _paletteShift & _paletteMask;
                 }
 
                 for (int y = 0, n = 0; y < _height; y++)
@@ -387,7 +387,7 @@ namespace ScePSP.Utils.Utils
                     for (var x = 0; x < _width; x++, n++)
                     {
                         var value = inputRow[x];
-                        _output[n] = palettePixels[translate[(value >> 0) & 0xFF]];
+                        _output[n] = palettePixels[translate[value >> 0 & 0xFF]];
                     }
                 }
             }
@@ -412,7 +412,7 @@ namespace ScePSP.Utils.Utils
             //Console.WriteLine(PalettePixels.Length);
             for (var n = 0; n < 16; n++)
             {
-                translate[n] = ((_paletteStart + n) >> _paletteShift) & _paletteMask;
+                translate[n] = _paletteStart + n >> _paletteShift & _paletteMask;
                 //Console.WriteLine(PalettePixels[Translate[n]]);
             }
 
@@ -422,8 +422,8 @@ namespace ScePSP.Utils.Utils
                 for (var x = 0; x < _width / 2; x++, n++)
                 {
                     var value = inputRow[x];
-                    _output[n * 2 + 0] = palettePixels[translate[(value >> 0) & 0xF]];
-                    _output[n * 2 + 1] = palettePixels[translate[(value >> 4) & 0xF]];
+                    _output[n * 2 + 0] = palettePixels[translate[value >> 0 & 0xF]];
+                    _output[n * 2 + 1] = palettePixels[translate[value >> 4 & 0xF]];
                 }
             }
         }

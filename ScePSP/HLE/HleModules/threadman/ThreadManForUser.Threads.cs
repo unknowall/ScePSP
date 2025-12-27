@@ -115,8 +115,7 @@ namespace ScePSP.Hle.Modules.threadman
             return (uint)Thread.Id;
         }
 
-        public void _sceKernelStartThread(CpuThreadState CpuThreadState, int ThreadId, int UserDataLength,
-            uint UserDataPointer)
+        public void _sceKernelStartThread(CpuThreadState CpuThreadState, int ThreadId, int UserDataLength, uint UserDataPointer)
         {
             var ThreadToStart = GetThreadById((int)ThreadId);
             //Console.WriteLine("LEN: {0:X}", ArgumentsLength);
@@ -153,8 +152,7 @@ namespace ScePSP.Hle.Modules.threadman
         /// <param name="UserDataPointer">Pointer to the arguments.</param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xF475845D, FirmwareVersion = 150)]
-        public int sceKernelStartThread(CpuThreadState CpuThreadState, int ThreadId, int UserDataLength,
-            uint UserDataPointer)
+        public int sceKernelStartThread(CpuThreadState CpuThreadState, int ThreadId, int UserDataLength, uint UserDataPointer)
         {
             var ThreadToStart = GetThreadById((int)ThreadId);
             _sceKernelStartThread(CpuThreadState, ThreadId, UserDataLength, UserDataPointer);
@@ -171,6 +169,11 @@ namespace ScePSP.Hle.Modules.threadman
         /// <returns></returns>
         private int _sceKernelSleepThreadCB(CpuThreadState CpuThreadState, bool HandleCallbacks)
         {
+            if (ThreadManager.Current == null)
+            {
+                Console.WriteLine("_sceKernelSleepThreadCB: ThreadManager.Current is null!");
+                return 0;
+            }
             var ThreadToSleep = ThreadManager.Current;
             ThreadToSleep.ChangeWakeUpCount(-1, null, HandleCallbacks: HandleCallbacks);
             return 0;
@@ -268,7 +271,7 @@ namespace ScePSP.Hle.Modules.threadman
         /// <param name="ThreadId">UID of the thread to cancel.</param>
         /// <returns>Success if greater or equal than 0, an error if less  than 0.</returns>
         [HlePspFunction(NID = 0xFCCFAD26, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceKernelCancelWakeupThread(int ThreadId)
         {
             return 0;
@@ -296,6 +299,12 @@ namespace ScePSP.Hle.Modules.threadman
             }
 
             bool TimedOut = false;
+
+            if (ThreadManager.Current == null)
+            {
+                Console.WriteLine("_sceKernelWaitThreadEndCB: ThreadManager.Current is null!");
+                return 0;
+            }
 
             ThreadManager.Current.SetWaitAndPrepareWakeUp(HleThread.WaitType.None,
                 $"sceKernelWaitThreadEnd('{ThreadToWaitEnd.Name}')", ThreadToWaitEnd, WakeUpCallback =>
@@ -359,6 +368,11 @@ namespace ScePSP.Hle.Modules.threadman
 
         private int _sceKernelDelayThreadCB(uint DelayInMicroseconds, bool HandleCallbacks)
         {
+            if (ThreadManager.Current == null)
+            {
+                //Console.WriteLine("_sceKernelDelayThreadCB: ThreadManager.Current is null!");
+                return 0;
+            }
             var CurrentThread = ThreadManager.Current;
 
             CurrentThread.SetWaitAndPrepareWakeUp(HleThread.WaitType.Timer,
@@ -407,10 +421,13 @@ namespace ScePSP.Hle.Modules.threadman
         /// <param name="AddAttributes">The thread attributes to modify. One of <see cref="PspThreadAttributes"/>.</param>
         /// <returns>Less than 0 on error</returns>
         [HlePspFunction(NID = 0xEA748E31, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
-        public int sceKernelChangeCurrentThreadAttr(PspThreadAttributes RemoveAttributes,
-            PspThreadAttributes AddAttributes)
+        public int sceKernelChangeCurrentThreadAttr(PspThreadAttributes RemoveAttributes, PspThreadAttributes AddAttributes)
         {
+            if (ThreadManager.Current == null)
+            {
+                Console.WriteLine("sceKernelChangeCurrentThreadAttr: ThreadManager.Current is null!");
+                return 0;
+            }
             ThreadManager.Current.Attribute &= ~RemoveAttributes;
             ThreadManager.Current.Attribute |= AddAttributes;
             return 0;
@@ -429,7 +446,6 @@ namespace ScePSP.Hle.Modules.threadman
         /// </example>
         /// <returns>0 if successful, otherwise the error code.</returns>
         [HlePspFunction(NID = 0x71BC9871, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
         public int sceKernelChangeThreadPriority(CpuThreadState CpuThreadState, int ThreadId, int Priority)
         {
             var Thread = GetThreadById(ThreadId);
@@ -459,7 +475,11 @@ namespace ScePSP.Hle.Modules.threadman
         [HlePspFunction(NID = 0x809CE29B, FirmwareVersion = 150)]
         public int sceKernelExitDeleteThread(int ExitStatus)
         {
-            if (ThreadManager.Current == null) throw new Exception("ThreadManager.Current == null");
+            if (ThreadManager.Current == null)
+            {
+                Console.WriteLine("sceKernelExitDeleteThread: ThreadManager.Current is null!");
+                return 0;
+            }
             var CurrentThreadId = ThreadManager.Current.Id;
             int ResultExit = sceKernelExitThread(ExitStatus);
             int ResultDelete = sceKernelDeleteThread(CurrentThreadId);
@@ -487,6 +507,7 @@ namespace ScePSP.Hle.Modules.threadman
         [HlePspFunction(NID = 0xAA73C935, FirmwareVersion = 150)]
         public int sceKernelExitThread(int ExitStatus)
         {
+            if (ThreadManager.Current == null) return 0;
             var Thread = ThreadManager.Current;
             ThreadManager.ExitThread(Thread, ExitStatus);
             return 0;
@@ -526,7 +547,7 @@ namespace ScePSP.Hle.Modules.threadman
         /// <param name="priority">The priority of the queue</param>
         /// <returns>0 on success, less than 0 on error.</returns>
         [HlePspFunction(NID = 0x912354A7, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceKernelRotateThreadReadyQueue(CpuThreadState CpuThreadState, int priority)
         {
             // @TODO!
@@ -655,9 +676,10 @@ namespace ScePSP.Hle.Modules.threadman
         /// <param name="ThreadId">UID of the thread to terminate.</param>
         /// <returns>Success if greater than 0, an error if less than 0.</returns>
         [HlePspFunction(NID = 0x616403BA, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public uint sceKernelTerminateThread(int ThreadId)
         {
+            if (ThreadManager.Current == null) return 0;
             if (ThreadId == 0 || ThreadId == ThreadManager.Current.Id)
                 throw new SceKernelException(SceKernelErrors.ERROR_KERNEL_ILLEGAL_THREAD);
             //SCE_KERNEL_ERROR_THREAD_TERMINATED
@@ -674,9 +696,10 @@ namespace ScePSP.Hle.Modules.threadman
         /// <param name="ThreadId">The UID of the thread.</param>
         /// <returns>0 on success, less than 0 on error</returns>
         [HlePspFunction(NID = 0x2C34E053, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceKernelReleaseWaitThread(int ThreadId)
         {
+            if (ThreadManager.Current == null) return 0;
             var Thread = GetThreadById(ThreadId);
             var CurrentThread = ThreadManager.Current;
             if (Thread == CurrentThread) throw new SceKernelException(SceKernelErrors.ERROR_KERNEL_ILLEGAL_THREAD);
@@ -729,7 +752,7 @@ namespace ScePSP.Hle.Modules.threadman
         /// <param name="?"></param>
         /// <param name="SceKernelSystemStatus"></param>
         [HlePspFunction(NID = 0x627E6F3A, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceKernelReferSystemStatus(ref SceKernelSystemStatus SceKernelSystemStatus)
         {
             SceKernelSystemStatus.Status = 0;
@@ -742,7 +765,7 @@ namespace ScePSP.Hle.Modules.threadman
         /// </summary>
         /// <returns></returns>
         [HlePspFunction(NID = 0x8218B4DD, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceKernelReferGlobalProfiler()
         {
             // Can be safely ignored. Only valid in debug mode on a real PSP.
@@ -767,7 +790,7 @@ namespace ScePSP.Hle.Modules.threadman
         /// </param>
         /// <returns>The free size.</returns>
         [HlePspFunction(NID = 0x52089CA1, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceKernelGetThreadStackFreeSize(int ThreadId)
         {
             var HleThread = ThreadManager.GetThreadById(ThreadId, AllowSelf: true);

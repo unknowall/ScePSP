@@ -45,29 +45,33 @@ namespace ScePSP.Core.Gpu
 
         public GlobalGpuState GlobalGpuState = new GlobalGpuState();
 
-        internal volatile LinkedList<GpuDisplayList> DisplayListQueue;
+        internal volatile LinkedList<GEProcess> GEProcessQueue;
 
-        public volatile AutoResetEvent DisplayListQueueUpdated = new AutoResetEvent(false);
+        public volatile AutoResetEvent GEProcessQueueUpdated = new AutoResetEvent(false);
 
-        protected volatile Queue<GpuDisplayList> DisplayListFreeQueue;
+        protected volatile Queue<GEProcess> GEProcessFreeQueue;
 
-        public const int DisplayListsCount = 64;
+        public const int GEProcessCount = 64;
 
-        /// <summary>
-        /// All the supported Psp Display Lists (Available and not available).
-        /// </summary>
-        private readonly GpuDisplayList[] DisplayLists = new GpuDisplayList[DisplayListsCount];
+        private readonly GEProcess[] GEProcessLists = new GEProcess[GEProcessCount];
 
-        public GpuDisplayList GetDisplayList(int Index)
-        {
-            lock (DisplayLists) return DisplayLists[Index];
-        }
+        AutoResetEvent GEProcessreeEvent = new AutoResetEvent(false);
 
-        public enum Status2Enum
-        {
-            Completed = 0,
-            HavePendingLists = 1,
-        }
+        public AutoResetEvent ListEnqueuedEvent = new AutoResetEvent(false);
+
+        private volatile GEProcess CurrentGEProcess = null;
+
+        private volatile GEProcess LastProcessedGEProcess = null;
+
+        public bool UsingGe { get; private set; }
+
+        public bool IsBreak = false;
+
+        bool StartCapturingFrame = false;
+
+        bool CapturingFrame = false;
+
+        internal bool Syncing = false;
 
         public readonly WaitableStateMachine<Status2Enum> Status2 = new WaitableStateMachine<Status2Enum>(Status2Enum.Completed, Debug: false);
 
@@ -79,73 +83,82 @@ namespace ScePSP.Core.Gpu
 
         [Inject] public IGpuConnector Connector;
 
+        public enum Status2Enum
+        {
+            Completed = 0,
+            HavePendingLists = 1,
+        }
+
+        public GEProcess GetGEProcess(int Index)
+        {
+            lock (GEProcessLists) return GEProcessLists[Index];
+        }
+
         private GpuProcessor()
         {
         }
 
         void IInjectInitialize.Initialize()
         {
-            DisplayListQueue = new LinkedList<GpuDisplayList>();
-            DisplayListFreeQueue = new Queue<GpuDisplayList>();
-            for (int n = 0; n < DisplayListsCount; n++)
+            GEProcessQueue = new LinkedList<GEProcess>();
+            GEProcessFreeQueue = new Queue<GEProcess>();
+            for (int n = 0; n < GEProcessCount; n++)
             {
-                var DisplayList = new GpuDisplayList(Memory, this, n);
-                DisplayLists[n] = DisplayList;
-                //this.DisplayListFreeQueue.Enqueue(DisplayLists[n]);
-                EnqueueFreeDisplayList(DisplayLists[n]);
+                var GE = new GEProcess(Memory, this, n);
+                GEProcessLists[n] = GE;
+                //GEProcessFreeQueue.Enqueue(DisplayLists[n]);
+                EnqueueFreeGEProcess(GEProcessLists[n]);
             }
         }
 
-        AutoResetEvent DisplayListFreeEvent = new AutoResetEvent(false);
-
-        public GpuDisplayList DequeueFreeDisplayList()
+        public GEProcess DequeueFreeGEProcess()
         {
-            GpuDisplayList result;
-            //Console.WriteLine("DequeueFreeDisplayList: {0}", this.DisplayListFreeQueue.Count);
-            lock (DisplayListFreeQueue)
+            GEProcess result;
+            //Console.WriteLine("DequeueFreeGEProcess: {0}", GEProcessFreeQueue.Count);
+            lock (GEProcessFreeQueue)
             {
-                result = DisplayListFreeQueue.Dequeue();
+                result = GEProcessFreeQueue.Dequeue();
                 result.Available = false;
             }
 
             return result;
         }
 
-        public void EnqueueFreeDisplayList(GpuDisplayList GpuDisplayList)
+        public void EnqueueFreeGEProcess(GEProcess GE)
         {
-            //Console.WriteLine("EnqueueFreeDisplayList: {0}", this.DisplayListFreeQueue.Count);
-            lock (DisplayListFreeQueue)
+            //Console.WriteLine("EnqueueFreeGEProcess: {0}", GEProcessFreeQueue.Count);
+            lock (GEProcessFreeQueue)
             {
-                DisplayListFreeQueue.Enqueue(GpuDisplayList);
-                if (GpuDisplayList != null)
-                    GpuDisplayList.SetFree();
+                GEProcessFreeQueue.Enqueue(GE);
+                if (GE != null)
+                    GE.SetFree();
             }
-            DisplayListFreeEvent.Set();
+            GEProcessreeEvent.Set();
         }
 
-        public void EnqueueDisplayListFirst(GpuDisplayList DisplayList)
+        public void EnqueueGEProcessFirst(GEProcess GE)
         {
-            //Console.WriteLine("EnqueueDisplayListFirst: {0}", this.DisplayListFreeQueue.Count);
-            AddedDisplayList();
-            lock (DisplayListQueue)
+            //Console.WriteLine("EnqueueGEProcessFirst: {0}", GEProcessFreeQueue.Count);
+            AddedGEProcess();
+            lock (GEProcessQueue)
             {
-                DisplayListQueue.AddFirst(DisplayList);
-                DisplayList.SetQueued();
+                GEProcessQueue.AddFirst(GE);
+                GE.SetQueued();
             }
-            DisplayListQueueUpdated.Set();
+            GEProcessQueueUpdated.Set();
             ListEnqueuedEvent.Set();
         }
 
-        public void EnqueueDisplayListLast(GpuDisplayList DisplayList)
+        public void EnqueueGEProcessLast(GEProcess GE)
         {
-            //Console.WriteLine("EnqueueDisplayListLast: {0}", this.DisplayListFreeQueue.Count);
-            AddedDisplayList();
-            lock (DisplayListQueue)
+            //Console.WriteLine("EnqueueGEProcessLast: {0}", GEProcessFreeQueue.Count);
+            AddedGEProcess();
+            lock (GEProcessQueue)
             {
-                DisplayListQueue.AddLast(DisplayList);
-                DisplayList.SetQueued();
+                GEProcessQueue.AddLast(GE);
+                GE.SetQueued();
             }
-            DisplayListQueueUpdated.Set();
+            GEProcessQueueUpdated.Set();
             ListEnqueuedEvent.Set();
         }
 
@@ -153,46 +166,44 @@ namespace ScePSP.Core.Gpu
         {
         }
 
-        public AutoResetEvent ListEnqueuedEvent = new AutoResetEvent(false);
-
-        private volatile GpuDisplayList CurrentGpuDisplayList = null;
-        private volatile GpuDisplayList LastProcessedGpuDisplayList = null;
-        public bool UsingGe { get; private set; }
-
         public void ProcessStep()
         {
-            CurrentGpuDisplayList = null;
+            CurrentGEProcess = null;
 
-            if (DisplayListQueue.GetCountLock() > 0)
+            if (GEProcessQueue.GetCountLock() > 0)
             {
                 UsingGe = true;
-                while (DisplayListQueue.GetCountLock() > 0)
+                while (GEProcessQueue.GetCountLock() > 0)
                 {
-                    CurrentGpuDisplayList = DisplayListQueue.RemoveFirstAndGet();
-                    CurrentGpuDisplayList.SetDequeued();
-                    LastProcessedGpuDisplayList = CurrentGpuDisplayList;
-                    CurrentGpuDisplayList.Process();
-                    if (CurrentGpuDisplayList == null)
+                    var GE = GEProcessQueue.RemoveFirstAndGet();
+                    CurrentGEProcess = GE;
+                    GE.SetDequeued();
+                    if (GE == null)
                     {
-                        Console.Error.WriteLine("??? CurrentGpuDisplayList = NULL.");
+                        Console.Out.WriteLineColored(ConsoleColor.Red, "0 GEProcess = NULL.");
                         continue;
                     }
-                    EnqueueFreeDisplayList(CurrentGpuDisplayList);
+                    GE.Process();
+                    if (GE == null)
+                    {
+                        Console.Out.WriteLineColored(ConsoleColor.Red, "1 GEProcess = NULL.");
+                        continue;
+                    }
+                    EnqueueFreeGEProcess(GE);
+                    LastProcessedGEProcess = GE;
                 }
-                CurrentGpuDisplayList = null;
+                CurrentGEProcess = null;
 
                 Status2.SetValue(Status2Enum.Completed);
             }
         }
 
-        protected void AddedDisplayList()
+        protected void AddedGEProcess()
         {
             //Console.WriteLine("Running");
             Status2.SetValue(Status2Enum.HavePendingLists);
-            GpuImpl.AddedDisplayList();
+            GpuImpl.AddedGEProcess();
         }
-
-        internal bool Syncing = false;
 
         public void GeDrawSync(Action SyncCallback)
         {
@@ -200,7 +211,7 @@ namespace ScePSP.Core.Gpu
             Status2.CallbackOnStateOnce(Status2Enum.Completed, () =>
             {
                 CapturingWaypoint();
-                GpuImpl.Sync(LastProcessedGpuDisplayList.GpuStateStructPointer);
+                GpuImpl.Sync(LastProcessedGEProcess.GpuStateStructPointer);
                 SyncCallback();
                 Syncing = false;
             });
@@ -239,9 +250,6 @@ namespace ScePSP.Core.Gpu
             GpuImpl.UnsetCurrent();
         }
 
-        bool StartCapturingFrame = false;
-        bool CapturingFrame = false;
-
         public void CaptureFrame()
         {
             StartCapturingFrame = true;
@@ -253,17 +261,15 @@ namespace ScePSP.Core.Gpu
             throw new NotImplementedException();
         }
 
-        public GpuDisplayList GetCurrentGpuDisplayList()
+        public GEProcess GetCurrentGEProcess()
         {
-            return CurrentGpuDisplayList;
+            return CurrentGEProcess;
         }
 
-        public bool IsBreak = false;
-
-        public DisplayListStatusEnum PeekStatus()
+        public GEProcesStatusEnum PeekStatus()
         {
-            var GpuDisplayList = CurrentGpuDisplayList;
-            if (GpuDisplayList == null) return DisplayListStatusEnum.Completed;
+            var GpuDisplayList = CurrentGEProcess;
+            if (GpuDisplayList == null) return GEProcesStatusEnum.Completed;
             return GpuDisplayList.PeekStatus();
         }
     }
@@ -318,7 +324,7 @@ namespace ScePSP.Core.Gpu
         PSP_GE_SIGNAL_BREAK2 = 0xFF,
     }
 
-    public enum DisplayListStatusEnum
+    public enum GEProcesStatusEnum
     {
         /// <summary>
         /// The list has been completed (PSP_GE_LIST_COMPLETED)
@@ -358,9 +364,6 @@ namespace ScePSP.Core.Gpu
         /// </summary>
         public uint Size;
 
-        /// <summary>
-        /// Pointer to a GpuStateStruct
-        /// </summary>
         public uint GpuStateStructAddress;
 
         public uint NumberOfStacks;

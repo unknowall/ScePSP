@@ -284,7 +284,7 @@ namespace ScePSP.Core.Gpu
         {
         }
 
-        public virtual void AddedDisplayList()
+        public virtual void AddedGEProcess()
         {
         }
 

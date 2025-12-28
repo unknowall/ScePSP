@@ -14,8 +14,7 @@ using System.Linq;
 
 namespace ScePSP.Core.Cpu
 {
-    internal unsafe delegate void* GetMemoryPtrSafeWithErrorDelegate(uint address, string errorDescription,
-        bool canBeNull);
+    internal unsafe delegate void* GetMemoryPtrSafeWithErrorDelegate(uint address, string errorDescription, bool canBeNull);
 
     internal unsafe delegate void* GetMemoryPtrNotNullDelegate(uint address);
 

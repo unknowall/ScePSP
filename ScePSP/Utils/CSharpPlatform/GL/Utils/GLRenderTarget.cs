@@ -19,13 +19,12 @@ namespace ScePSPPlatform.GL.Utils
         protected uint FrameBufferId;
         public GLTexture TextureColor { get; private set; }
         public GLTexture TextureDepth { get; private set; }
-        public GLRenderBuffer RenderBufferStencil { get; private set; }
+        //public GLRenderBuffer RenderBufferStencil { get; private set; }
         private int _Width;
         private int _Height;
         public RenderTargetLayers RenderTargetLayers { get; private set; }
 
         public virtual int Width => _Width;
-
         public virtual int Height => _Height;
 
         protected GLRenderTarget()
@@ -75,8 +74,8 @@ namespace ScePSPPlatform.GL.Utils
                     TextureColor = GLTexture.Create().SetFormat(TextureFormat.RGBA).SetSize(_Width, _Height);
                 if ((RenderTargetLayers & RenderTargetLayers.Depth) != 0)
                     TextureDepth = GLTexture.Create().SetFormat(TextureFormat.DEPTH).SetSize(_Width, _Height);
-                if ((RenderTargetLayers & RenderTargetLayers.Stencil) != 0)
-                    RenderBufferStencil = new GLRenderBuffer(_Width, _Height, GL.GL_STENCIL_INDEX8);
+                //if ((RenderTargetLayers & RenderTargetLayers.Stencil) != 0)
+                //    RenderBufferStencil = new GLRenderBuffer(_Width, _Height, GL.GL_STENCIL_INDEX8);
             }
         }
 
@@ -85,6 +84,7 @@ namespace ScePSPPlatform.GL.Utils
             fixed (uint* FrameBufferPtr = &FrameBufferId)
             {
                 GL.glDeleteFramebuffers(1, FrameBufferPtr);
+
                 if ((RenderTargetLayers & RenderTargetLayers.Color) != 0)
                 {
                     TextureColor.Dispose();
@@ -95,10 +95,10 @@ namespace ScePSPPlatform.GL.Utils
                     TextureDepth.Dispose();
                 }
 
-                if ((RenderTargetLayers & RenderTargetLayers.Stencil) != 0)
-                {
-                    RenderBufferStencil.Dispose();
-                }
+                //if ((RenderTargetLayers & RenderTargetLayers.Stencil) != 0)
+                //{
+                //    RenderBufferStencil.Dispose();
+                //}
             }
         }
 
@@ -140,9 +140,8 @@ namespace ScePSPPlatform.GL.Utils
             var Status = GL.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER);
             if (Status != GL.GL_FRAMEBUFFER_COMPLETE)
             {
-                if (GL.glGetError() != 0)
-                    Console.WriteLine($"Failed to bind FrameBuffer 0x{Status:X4} Error 0x{GL.glGetError():X4}" +
-                        $" {GL.GetConstantString(Status)}, {RenderTargetLayers}, {Width}x{Height}");
+                Console.WriteLine($"Failed to bind FrameBuffer 0x{Status:X4} Error 0x{GL.glGetError():X4}" +
+                    $" {GL.GetConstantString(Status)}, {RenderTargetLayers}, {Width}x{Height}");
             }
             //Console.WriteLine($"Bound FrameBuffer {FrameBufferId} : {RenderTargetLayers}, {Width}x{Height}");
             GL.glViewport(0, 0, Width, Height);
@@ -169,6 +168,7 @@ namespace ScePSPPlatform.GL.Utils
         public byte[] ReadPixels()
         {
             var Data = new byte[Width * Height * 4];
+
             fixed (byte* DataPtr = Data)
             {
                 GL.glReadPixels(0, 0, Width, Height, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, DataPtr);

@@ -26,8 +26,6 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         AutoResetEvent StopEvent = new AutoResetEvent(false);
 
-        bool Running = true;
-
         public static IGlContext OpenglContext;
 
         public static bool AlreadyInitialized;
@@ -167,15 +165,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
             ShaderInfo.matrixWorldViewProjection.Set(_worldViewProjectionMatrix);
             ShaderInfo.matrixTexture.Set(_textureMatrix);
-
-            try
-            {
-                ShaderInfo.uniformColor.NoWarning().Set(GpuState.LightingState.AmbientModelColor.ToVector4());
-            }
-            catch
-            {
-            }
-
+            ShaderInfo.uniformColor.NoWarning().Set(GpuState.LightingState.AmbientModelColor.ToVector4());
             ShaderInfo.hasPerVertexColor.Set(vertexType.HasColor);
             ShaderInfo.clearingMode.Set(GpuState.ClearingMode);
             ShaderInfo.hasTexture.Set(GpuState.TextureMappingState.Enabled);
@@ -204,15 +194,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                             default: bones[i] = Matrix4x4.Identity; break;
                         }
                     }
-
-                    try
-                    {
-                        ShaderInfo.matrixBones.Set(bones);
-                    }
-                    catch (Exception)
-                    {
-                        //shader 可能没有该 uniform 或长度不匹配
-                    }
+                    ShaderInfo.matrixBones.Set(bones);
                 }
             }
 
@@ -383,7 +365,6 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             var count = VertexType.RealSkinningWeightCount;
             if (count <= 0) count = 0; // defensive
             float sum = 0f;
-            // sum 仅计算前 count 个权重
             for (int i = 0; i < count && i < 8; i++)
             {
                 sum += weightsStruct.W[i];
@@ -459,7 +440,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             }
         }
 
-        private static readonly GuPrimitiveType[] patch_prim_types = { GuPrimitiveType.TriangleStrip, GuPrimitiveType.LineStrip, GuPrimitiveType.Points };
+        //private static readonly GuPrimitiveType[] patch_prim_types = { GuPrimitiveType.TriangleStrip, GuPrimitiveType.LineStrip, GuPrimitiveType.Points };
         public override void DrawCurvedSurface(GlobalGpuState GlobalGpuState, GpuStateStruct GpuStateStruct, VertexInfo[,] Patch, int UCount, int VCount)
         {
             if (Patch == null) return;
@@ -737,7 +718,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         {
         }
 
-        public override void AddedDisplayList()
+        public override void AddedGEProcess()
         {
         }
 
@@ -765,74 +746,39 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
             if (!AlreadyInitialized)
             {
+                if (TargetHwnd == IntPtr.Zero)
+                {
+                    Console.Out.WriteLineColored(ConsoleColor.White, $"## OpenGL Windowless Mode");
+                    OpenglContext = GlContextFactory.CreateWindowless();
+                }
+                else
+                {
+                    Console.Out.WriteLineColored(ConsoleColor.White, $"## OpenGL Window HWND: {TargetHwnd}");
+                    OpenglContext = GlContextFactory.CreateFromWindowHandle(TargetHwnd);
+                }
+
+                OpenglContext.MakeCurrent();
+
+
+                Console.Out.WriteLineColored(ConsoleColor.White, "## OpenGL Context Version: {0}",
+                    GlGetString(GL.GL_VERSION));
+                Console.Out.WriteLineColored(ConsoleColor.White, "## Depth Bits: {0}",
+                    GL.glGetInteger(GL.GL_DEPTH_BITS));
+                Console.Out.WriteLineColored(ConsoleColor.White, "## Stencil Bits: {0}",
+                    GL.glGetInteger(GL.GL_STENCIL_BITS));
+                Console.Out.WriteLineColored(ConsoleColor.White, "## Color Bits: {0},{1},{2},{3}",
+                    GL.glGetInteger(GL.GL_RED_BITS), GL.glGetInteger(GL.GL_GREEN_BITS),
+                    GL.glGetInteger(GL.GL_BLUE_BITS), GL.glGetInteger(GL.GL_ALPHA_BITS));
+
+                if (GL.glGetInteger(GL.GL_STENCIL_BITS) <= 0)
+                {
+                    Console.Error.WriteLineColored(ConsoleColor.Red, "No stencil bits available!");
+                    //throw new Exception("Couldn't initialize opengl");
+                }
+
+                OpenglContext.ReleaseCurrent();
+
                 AlreadyInitialized = true;
-
-                var completedEvent = new AutoResetEvent(false);
-
-                new Thread(() =>
-                {
-                    Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
-
-                    if (TargetHwnd == IntPtr.Zero)
-                    {
-                        Console.Out.WriteLineColored(ConsoleColor.White, $"## OpenGL Windowless Mode");
-                        OpenglContext = GlContextFactory.CreateWindowless();
-                    }
-                    else
-                    {
-                        Console.Out.WriteLineColored(ConsoleColor.White, $"## OpenGL Window HWND: {TargetHwnd}");
-                        OpenglContext = GlContextFactory.CreateFromWindowHandle(TargetHwnd);
-                    }
-
-                    OpenglContext.MakeCurrent();
-
-                    try
-                    {
-                        Console.Out.WriteLineColored(ConsoleColor.White, "## OpenGL Context Version: {0}",
-                            GlGetString(GL.GL_VERSION));
-                        Console.Out.WriteLineColored(ConsoleColor.White, "## Depth Bits: {0}",
-                            GL.glGetInteger(GL.GL_DEPTH_BITS));
-                        Console.Out.WriteLineColored(ConsoleColor.White, "## Stencil Bits: {0}",
-                            GL.glGetInteger(GL.GL_STENCIL_BITS));
-                        Console.Out.WriteLineColored(ConsoleColor.White, "## Color Bits: {0},{1},{2},{3}",
-                            GL.glGetInteger(GL.GL_RED_BITS), GL.glGetInteger(GL.GL_GREEN_BITS),
-                            GL.glGetInteger(GL.GL_BLUE_BITS), GL.glGetInteger(GL.GL_ALPHA_BITS));
-
-                        if (GL.glGetInteger(GL.GL_STENCIL_BITS) <= 0)
-                        {
-                            Console.Error.WriteLineColored(ConsoleColor.Red, "No stencil bits available!");
-                            //throw new Exception("Couldn't initialize opengl");
-                        }
-
-                        OpenglContext.ReleaseCurrent();
-
-                        completedEvent.Set();
-
-                        Console.WriteLine("Opengl Initialize.");
-                        try
-                        {
-                            while (Running)
-                            {
-                                Thread.Sleep(10);
-                            }
-                            StopEvent.Set();
-                        }
-                        finally
-                        {
-                            Console.WriteLine("Opengl Uninitialize.");
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Opengl initialize Error: {0}", e);
-                    }
-                })
-                {
-                    Name = "GpuImplEventHandling",
-                    IsBackground = true
-                }.Start();
-
-                completedEvent.WaitOne();
             }
         }
 
@@ -994,13 +940,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         private void PrepareState_Colors_3D(GpuStateStruct gpuState)
         {
-            try
-            {
-                ShaderInfo.uniformColor.Set(gpuState.LightingState.AmbientModelColor.ToVector4());
-            }
-            catch
-            {
-            }
+            ShaderInfo.uniformColor.Set(gpuState.LightingState.AmbientModelColor.ToVector4());
 
             // 对固定管线无害，在着色器管线中也不会破坏行为
             GL.EnableDisable(GL.GL_COLOR_MATERIAL, VertexType.HasColor);

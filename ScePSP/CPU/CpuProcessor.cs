@@ -27,11 +27,9 @@ namespace ScePSP.Core.Cpu
 
         [Inject] public MethodCache MethodCache;
 
-        public Dictionary<uint, NativeSyscallInfo> RegisteredNativeSyscallMethods =
-            new Dictionary<uint, NativeSyscallInfo>();
+        public Dictionary<uint, NativeSyscallInfo> RegisteredNativeSyscallMethods = new Dictionary<uint, NativeSyscallInfo>();
 
-        private readonly Dictionary<int, Action<CpuThreadState, int>> _registeredNativeSyscalls =
-            new Dictionary<int, Action<CpuThreadState, int>>();
+        private readonly Dictionary<int, Action<CpuThreadState, int>> _registeredNativeSyscalls = new Dictionary<int, Action<CpuThreadState, int>>();
 
         public HashSet<uint> NativeBreakpoints = new HashSet<uint>();
 
@@ -49,8 +47,7 @@ namespace ScePSP.Core.Cpu
             }
         }
 
-        public CpuProcessor RegisterNativeSyscall(int code, Action callback) =>
-            RegisterNativeSyscall(code, (_, processor) => callback());
+        public CpuProcessor RegisterNativeSyscall(int code, Action callback) => RegisterNativeSyscall(code, (_, processor) => callback());
 
         public CpuProcessor RegisterNativeSyscall(int code, Action<CpuThreadState, int> callback)
         {
@@ -93,18 +90,13 @@ namespace ScePSP.Core.Cpu
         {
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public void SceKernelDcacheWritebackAll()
         {
         }
 
         public void SceKernelIcacheInvalidateAll() => MethodCache.FlushAll();
 
-        public void SceKernelIcacheInvalidateRange(uint address, uint size) =>
-            MethodCache.FlushRange(address, address + size);
+        public void SceKernelIcacheInvalidateRange(uint address, uint size) => MethodCache.FlushRange(address, address + size);
 
         public static void DebugCurrentThread(CpuThreadState cpuThreadState)
         {

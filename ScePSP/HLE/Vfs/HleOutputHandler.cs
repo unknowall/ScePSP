@@ -6,7 +6,6 @@ namespace ScePSP.Hle
     {
         public HleOutputHandler()
         {
-            Console.WriteLine($"Built HleOutputHandler! {GetType()}");
         }
 
         public virtual void Output(string Output)

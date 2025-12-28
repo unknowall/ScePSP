@@ -43,7 +43,7 @@ namespace ScePSP.Hle.Managers
             }
 
             HleModuleTypes = GetAllHleModules(HleConfig.HleModulesDll).ToDictionary(Type => Type.Name);
-            Console.WriteLine("HleModuleTypes: {0}", HleModuleTypes.Count);
+            Console.Out.WriteLineColored(ConsoleColor.Yellow,"HleModuleTypes: {0}", HleModuleTypes.Count);
 
             if (HleModuleTypes.Count < 10)
             {
@@ -144,8 +144,7 @@ namespace ScePSP.Hle.Managers
             {
                 Action = (CpuThreadState) =>
                 {
-                    throw new NotImplementedException("Not Implemented Syscall '" + ModuleImportName + ":" +
-                                                      FunctionEntry + "'");
+                    throw new NotImplementedException("Not Implemented Syscall '" + ModuleImportName + ":" + FunctionEntry + "'");
                 };
             }
             CpuProcessor.RegisteredNativeSyscallMethods[DelegateId] = new NativeSyscallInfo()

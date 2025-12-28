@@ -25,11 +25,11 @@ namespace ScePSP.Core.Gpu
         public override string ToString() => $"GpuInstruction({OpCode}, {Params})";
     }
 
-    public sealed unsafe class GpuDisplayList
+    public sealed unsafe class GEProcess
     {
         public static uint[] DummyData = new uint[GpuStateStruct.StructSizeInBytes];
 
-        private static readonly Logger Logger = Logger.GetLogger("Gpu");
+        private static readonly Logger Logger = Logger.GetLogger("GE");
 
         private static bool Debug = false;
         //private static bool Debug = true;
@@ -51,7 +51,7 @@ namespace ScePSP.Core.Gpu
         public GpuStateData GpuStateData => GpuStateStructPointer.data;
         private GlobalGpuState GlobalGpuState;
         private readonly Stack<IntPtr> ExecutionStack = new Stack<IntPtr>();
-        public readonly WaitableStateMachine<DisplayListStatusEnum> Status = new WaitableStateMachine<DisplayListStatusEnum>();
+        public readonly WaitableStateMachine<GEProcesStatusEnum> Status = new WaitableStateMachine<GEProcesStatusEnum>();
         public bool Available { set; get; }
         public OptionalParams pspGeListOptParam;
         internal bool Done;
@@ -74,7 +74,7 @@ namespace ScePSP.Core.Gpu
 
         //Action[] InstructionSwitch = new Action[256];
 
-        internal GpuDisplayList(PspMemory Memory, GpuProcessor GpuProcessor, int Id)
+        internal GEProcess(PspMemory Memory, GpuProcessor GpuProcessor, int Id)
         {
             this.Memory = Memory;
             this.GpuProcessor = GpuProcessor;
@@ -95,16 +95,13 @@ namespace ScePSP.Core.Gpu
             {
                 throw new InvalidOperationException($"Invalid StallAddress! 0x{InstructionAddressStall}");
             }
-            if (Debug) Console.WriteLine("GpuDisplayList.SetInstructionAddressStall:{0:X8}", value);
+            if (Debug) Console.WriteLine("GEProcess.SetInstructionAddressStall:{0:X8}", value);
             StallAddressUpdated.Set();
         }
 
-        /// <summary>
-        /// Executes this Display List.
-        /// </summary>
         internal void Process()
         {
-            Status.SetValue(DisplayListStatusEnum.Drawing);
+            Status.SetValue(GEProcesStatusEnum.Drawing);
 
             if (Debug)
                 Console.WriteLine("Process() : {0} : 0x{1:X8} : 0x{2:X8} : 0x{3:X8}", Id,
@@ -117,18 +114,18 @@ namespace ScePSP.Core.Gpu
                 {
                     if (Debug)
                         Console.WriteLine("- STALLED --------------------------------------------------------------------");
-                    Status.SetValue(DisplayListStatusEnum.Stalling);
+                    Status.SetValue(GEProcesStatusEnum.Stalling);
                     while (!StallAddressUpdated.WaitOne(TimeSpan.FromSeconds(2)))
                     {
                         ConsoleUtils.SaveRestoreConsoleColor(ConsoleColor.Magenta, () =>
                         {
-                            Console.WriteLine("DisplayListQueue.GetCountLock(): {0}", GpuProcessor.DisplayListQueue.GetCountLock());
-                            Console.WriteLine("CurrentGpuDisplayList.Status: {0}", Status.ToStringDefault());
+                            Console.WriteLine("GEProcessQueue.GetCountLock(): {0}", GpuProcessor.GEProcessQueue.GetCountLock());
+                            Console.WriteLine("CurrentGEProcess.Status: {0}", Status.ToStringDefault());
                         });
                         if (GpuProcessor.Syncing)
                         {
                             Done = true;
-                            Status.SetValue(DisplayListStatusEnum.Completed);
+                            Status.SetValue(GEProcesStatusEnum.Completed);
                             return;
                         }
                     }
@@ -137,7 +134,7 @@ namespace ScePSP.Core.Gpu
                 ProcessInstruction();
             }
 
-            Status.SetValue(DisplayListStatusEnum.Completed);
+            Status.SetValue(GEProcesStatusEnum.Completed);
         }
 
         internal GpuInstruction ReadInstructionAndMoveNext()
@@ -208,7 +205,6 @@ namespace ScePSP.Core.Gpu
                     GpuProcessor.GpuImpl.TextureSync(GpuStateStructPointer);
                     break;
 
-                // Kicking
                 case GpuOpCodes.SPLINE:
                     // @TODO
                     //auto sp_ucount = command.extract!(uint,  0, 8); 
@@ -595,7 +591,7 @@ namespace ScePSP.Core.Gpu
         {
             //Thread.Sleep(200);
             //Status2.CallbackOnStateOnce(Status2Enum.Free, NotifyOnceCallback);
-            Status.CallbackOnStateOnce(DisplayListStatusEnum.Completed, NotifyOnceCallback);
+            Status.CallbackOnStateOnce(GEProcesStatusEnum.Completed, NotifyOnceCallback);
         }
 
         public void DoFinish(uint PC, uint Arg, bool ExecuteNow)
@@ -612,7 +608,7 @@ namespace ScePSP.Core.Gpu
         {
             if (Debug) Console.WriteLine("SIGNAL : {0}: Behavior:{1}", Signal, Behavior);
 
-            Status.SetValue(DisplayListStatusEnum.Paused);
+            Status.SetValue(GEProcesStatusEnum.Paused);
 
             if (Callbacks.SignalFunction != 0)
             {
@@ -620,12 +616,12 @@ namespace ScePSP.Core.Gpu
                 GpuProcessor.Connector.Signal(PC, Callbacks, Signal, Behavior, ExecuteNow);
             }
 
-            Status.SetValue(DisplayListStatusEnum.Drawing);
+            Status.SetValue(GEProcesStatusEnum.Drawing);
         }
 
         public void SetQueued()
         {
-            Status.SetValue(DisplayListStatusEnum.Queued);
+            Status.SetValue(GEProcesStatusEnum.Queued);
         }
 
         public void SetDequeued()
@@ -639,7 +635,7 @@ namespace ScePSP.Core.Gpu
             Available = true;
         }
 
-        public DisplayListStatusEnum PeekStatus()
+        public GEProcesStatusEnum PeekStatus()
         {
             return Status.Value;
         }
@@ -647,7 +643,7 @@ namespace ScePSP.Core.Gpu
         public void DeQueue()
         {
             Done = true;
-            GpuProcessor.DisplayListQueue.Remove(this);
+            GpuProcessor.GEProcessQueue.Remove(this);
         }
     }
 }

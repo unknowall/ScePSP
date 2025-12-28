@@ -1,5 +1,4 @@
-﻿using cscodec.util;
-using ScePSP;
+﻿using ScePSP;
 using ScePSP.Core;
 using ScePSP.Core.Components.Controller;
 using ScePSP.Core.Components.Display;
@@ -145,7 +144,7 @@ class Program
                     var RenderTarget = DrawBuffer.RenderTarget;
                     if (GL.glIsTexture(RenderTarget.TextureColor.Texture))
                     {
-                        TextureVerticalFlip = true;
+                        TextureVerticalFlip = false;
                         DrawTexture = RenderTarget.TextureColor;
                         //DrawDepth = RenderTarget.TextureDepth;
                         return;
@@ -237,7 +236,7 @@ class Program
     {
         var running = true;
 
-        Console.WriteLine("Starting main loop");
+        //Console.WriteLine("Starting main loop");
 
         PspCtrlButtons UpdatePressing(ref int value, bool pressing)
         {

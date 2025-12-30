@@ -43,7 +43,7 @@ namespace ScePSP.Hle.Managers
             }
 
             HleModuleTypes = GetAllHleModules(HleConfig.HleModulesDll).ToDictionary(Type => Type.Name);
-            Console.Out.WriteLineColored(ConsoleColor.Yellow,"HleModuleTypes: {0}", HleModuleTypes.Count);
+            Console.Out.WriteLineColored(ConsoleColor.Yellow, "HleModuleTypes: {0}", HleModuleTypes.Count);
 
             if (HleModuleTypes.Count < 10)
             {

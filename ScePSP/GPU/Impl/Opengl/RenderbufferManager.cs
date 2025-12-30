@@ -1,8 +1,7 @@
-﻿using ScePSP.Core.Cpu;
+﻿using LightGL;
+using ScePSP.Core.Cpu;
 using ScePSP.Core.Gpu.State;
 using ScePSP.Core.Types;
-using ScePSPPlatform.GL;
-using ScePSPPlatform.GL.Utils;
 using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
@@ -134,7 +133,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         public DrawBufferValue CurrentDrawBuffer { get; private set; }
 
-        public GLTexture TextureCacheGetAndBind(GpuStateStruct gpuState)
+        public GLTexture2D TextureCacheGetAndBind(GpuStateStruct gpuState)
         {
             if (DynarecConfig.EnableRenderTarget)
             {
@@ -219,8 +218,8 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         {
             if (_cachedBindAddress != gpuState.DrawBufferState.Address)
             {
-                GL.glFlush();
-                GL.glFinish();
+                GL.Flush();
+                GL.Finish();
 
                 _cachedBindAddress = gpuState.DrawBufferState.Address;
                 var key = new DrawBufferKey()

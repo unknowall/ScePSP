@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using LightGL.DynamicLibrary;
+using ScePSP.Utils;
 
 namespace ScePSP.Core.Memory
 {
@@ -91,12 +93,12 @@ namespace ScePSP.Core.Memory
                     Console.WriteLine("FastPspMemory.AllocMemoryOnce: Trying Base ... 0x{0:X}", TryBase);
 
                     StaticNullPtr = _Base;
-                    Platform.AllocRangeGuard(_Base, _Base + ScratchPadOffset);
-                    StaticScratchPadPtr = (byte*)Platform.AllocRange(_Base + ScratchPadOffset, ScratchPadAllocSize);
-                    Platform.AllocRangeGuard(_Base + ScratchPadOffset + ScratchPadAllocSize, _Base + FrameBufferOffset);
-                    StaticFrameBufferPtr = (byte*)Platform.AllocRange(_Base + FrameBufferOffset, FrameBufferAllocSize);
-                    Platform.AllocRangeGuard(_Base + FrameBufferOffset + FrameBufferAllocSize, _Base + MainOffset);
-                    StaticMainPtr = (byte*)Platform.AllocRange(_Base + MainOffset, MainAllocSize);
+                    PlatformMemory.AllocRangeGuard(_Base, _Base + ScratchPadOffset);
+                    StaticScratchPadPtr = (byte*)PlatformMemory.AllocRange(_Base + ScratchPadOffset, ScratchPadAllocSize);
+                    PlatformMemory.AllocRangeGuard(_Base + ScratchPadOffset + ScratchPadAllocSize, _Base + FrameBufferOffset);
+                    StaticFrameBufferPtr = (byte*)PlatformMemory.AllocRange(_Base + FrameBufferOffset, FrameBufferAllocSize);
+                    PlatformMemory.AllocRangeGuard(_Base + FrameBufferOffset + FrameBufferAllocSize, _Base + MainOffset);
+                    StaticMainPtr = (byte*)PlatformMemory.AllocRange(_Base + MainOffset, MainAllocSize);
 
                     if (StaticScratchPadPtr != null && StaticFrameBufferPtr != null && StaticMainPtr != null)
                     {
@@ -105,9 +107,9 @@ namespace ScePSP.Core.Memory
                     }
                     else
                     {
-                        if (StaticScratchPadPtr != null) Platform.Free(StaticScratchPadPtr, ScratchPadAllocSize);
-                        if (StaticFrameBufferPtr != null) Platform.Free(StaticFrameBufferPtr, FrameBufferAllocSize);
-                        if (StaticMainPtr != null) Platform.Free(StaticMainPtr, MainAllocSize);
+                        if (StaticScratchPadPtr != null) PlatformMemory.Free(StaticScratchPadPtr, ScratchPadAllocSize);
+                        if (StaticFrameBufferPtr != null) PlatformMemory.Free(StaticFrameBufferPtr, FrameBufferAllocSize);
+                        if (StaticMainPtr != null) PlatformMemory.Free(StaticMainPtr, MainAllocSize);
                     }
                 }
 

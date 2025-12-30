@@ -9,14 +9,14 @@ using ScePSP.Core.Memory;
 using ScePSP.Core.Types.Controller;
 using ScePSP.Runner;
 using ScePSP.Runner.Tasks.Display;
-using ScePSPPlatform.GL;
-using ScePSPPlatform.GL.Utils;
 using ScePSPUtils;
 using SDL2;
 using System;
 using System.Diagnostics;
 using System.Windows.Forms;
 using static ScePSPUtils.Logger;
+
+using LightGL;
 
 #pragma warning disable CS0436
 #pragma warning disable CS8602
@@ -43,8 +43,8 @@ class Program
     static GLShader? Shader;
     static GLBuffer? VertexBuffer;
     static GLBuffer? TexCoordsBuffer;
-    static GLTexture? TexVram;
-    static GLTexture? DrawTexture;
+    static GLTexture2D? TexVram;
+    static GLTexture2D? DrawTexture;
     //static GLTexture? DrawDepth;
     static bool TextureVerticalFlip;
     //static GLTexture? TestTexture;
@@ -89,7 +89,7 @@ class Program
             "attribute vec4 position; attribute vec4 texCoords; varying vec2 v_texCoord; void main() { gl_Position = position; v_texCoord = texCoords.xy; }",
             "uniform sampler2D texture; varying vec2 v_texCoord; void main() { gl_FragColor = texture2D(texture, v_texCoord); }"
         );
-        VertexBuffer = GLBuffer.Create().SetData(ScePSPPlatform.RectangleF.FromCoords(-1, -1, +1, +1).GetFloat2TriangleStripCoords());
+        VertexBuffer = GLBuffer.Create().SetData(RectangleF.FromCoords(-1, -1, +1, +1).GetFloat2TriangleStripCoords());
         Shader.BindUniformsAndAttributes(ShaderInfo);
         //TestTexture = GLTexture.Create().SetFormat(TextureFormat.RGBA).SetSize(2, 2).SetData(new uint[] { 0xFF0000FF, 0xFF00FFFF, 0xFFFF00FF, 0xFFFFFFFF });
         Context.ReleaseCurrent();
@@ -142,7 +142,7 @@ class Program
                 if (DrawBuffer != null)
                 {
                     var RenderTarget = DrawBuffer.RenderTarget;
-                    if (GL.glIsTexture(RenderTarget.TextureColor.Texture))
+                    if (GL.IsTexture(RenderTarget.TextureColor.Texture))
                     {
                         TextureVerticalFlip = false;
                         DrawTexture = RenderTarget.TextureColor;
@@ -161,7 +161,7 @@ class Program
     {
         if (TexVram == null)
         {
-            TexVram = GLTexture.Create().SetFormat(TextureFormat.RGBA).SetSize(1, 1);
+            TexVram = GLTexture2D.Create().SetFormat(TextureFormat.RGBA).SetSize(1, 1);
         }
 
         TexVram.Bind();
@@ -181,7 +181,7 @@ class Program
         }
         fixed (uint* pp = pixels2)
         {
-            GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, 512, 272, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, pp);
+            GL.TexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, 512, 272, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, pp);
         }
 
         DrawTexture = TexVram;
@@ -212,13 +212,13 @@ class Program
             GetTextureFromRam();
         }
 
-        GL.glViewport(0, 0, PspDisplay.MaxVisibleWidth * 2, PspDisplay.MaxVisibleHeight * 2);
-        GL.glClearColor(0, 0, 0, 1);
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT);
+        GL.Viewport(0, 0, PspDisplay.MaxVisibleWidth * 2, PspDisplay.MaxVisibleHeight * 2);
+        GL.ClearColor(0, 0, 0, 1);
+        GL.Clear(GL.GL_COLOR_BUFFER_BIT);
 
         Shader.Draw(GLGeometry.GL_TRIANGLE_STRIP, 4, () =>
         {
-            var TextureRect = ScePSPPlatform.RectangleF.FromCoords(0, 0, (float)display.CurrentInfo.Width / 512f, (float)display.CurrentInfo.Height / 272f);
+            var TextureRect = RectangleF.FromCoords(0, 0, (float)display.CurrentInfo.Width / 512f, (float)display.CurrentInfo.Height / 272f);
             if (TextureVerticalFlip) TextureRect = TextureRect.VFlip();
             TexCoordsBuffer = GLBuffer.Create().SetData(TextureRect.GetFloat2TriangleStripCoords());
             ShaderInfo.texture.Set(GLTextureUnit.CreateAtIndex(0).SetFiltering(GLScaleFilter.Nearest).SetWrap(GLWrap.ClampToEdge).SetTexture(DrawTexture));

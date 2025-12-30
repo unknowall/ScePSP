@@ -1,6 +1,8 @@
 ﻿using ScePSPUtils;
 using System;
 
+using LightGL.DynamicLibrary;
+
 namespace ScePSP.Core.Components.Rtc
 {
     public struct PspTimeStruct

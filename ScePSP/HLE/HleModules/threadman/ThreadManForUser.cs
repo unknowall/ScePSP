@@ -1,5 +1,4 @@
-﻿using ScePSP.Core;
-using ScePSP.Core.Components.Rtc;
+﻿using ScePSP.Core.Components.Rtc;
 using ScePSP.Hle.Attributes;
 using ScePSPUtils;
 using System;
@@ -13,8 +12,16 @@ namespace ScePSP.Hle.Modules.threadman
 
         static Logger Logger = Logger.GetLogger("ThreadManForUser");
 
+        public static DateTime UnixStart;
+
+        public static long CurrentUnixMicroseconds => (DateTime.UtcNow - UnixStart).Ticks / (TimeSpan.TicksPerMillisecond / 1000);
+
+        public ThreadManForUser()
+        {
+            UnixStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        }
+
         /*
-        
         public uint Test(CpuThreadState CpuThreadState, int a, int b, string c)
         {
             //Console.WriteLine(CpuThreadState);
@@ -42,7 +49,7 @@ namespace ScePSP.Hle.Modules.threadman
         {
             //PspRtc.Update();
             //return PspRtc.ElapsedTime.TotalMicroseconds;
-            return Platform.CurrentUnixMicroseconds;
+            return CurrentUnixMicroseconds;
         }
 
         /// <summary>

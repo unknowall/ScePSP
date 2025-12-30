@@ -5,14 +5,13 @@ using ScePSP.Core.Gpu.State;
 using ScePSP.Core.Gpu.VertexReading;
 using ScePSP.Core.Types;
 using ScePSP.Utils;
-using ScePSPPlatform.GL;
-using ScePSPPlatform.GL.Utils;
 using ScePSPUtils;
 using ScePSPUtils.Drawing;
 using System;
-using System.Globalization;
 using System.Numerics;
 using System.Threading;
+
+using LightGL;
 
 namespace ScePSP.Core.Gpu.Impl.Opengl
 {
@@ -535,7 +534,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                 {
                     if (_logicOpsRenderTarget == null)
                     {
-                        _logicOpsRenderTarget = GLRenderTarget.Create(512, 272, RenderTargetLayers.Color);
+                        _logicOpsRenderTarget = GLRenderTarget.Create(512, 272, TargetLayers.Color);
                     }
                     GLRenderTarget.CopyFromTo(GLRenderTarget.Current, _logicOpsRenderTarget);
 
@@ -643,7 +642,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
                 if (_primitiveType == GuPrimitiveType.Sprites)
                 {
-                    GL.glDisable(GL.GL_CULL_FACE);
+                    GL.Disable(GL.GL_CULL_FACE);
                     for (var n = 0; n < vertexCount; n += 2)
                     {
                         VertexInfo v0, v1, v2, v3;
@@ -737,7 +736,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             IsCurrentWindow = false;
         }
 
-        public static string GlGetString(int name) => GL.GetString(name);
+        public static string GlGetString(int name) => GL.GetStringStr(name);
 
         public override void InitSynchronizedOnce(IntPtr TargetHwnd)
         {
@@ -763,14 +762,14 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                 Console.Out.WriteLineColored(ConsoleColor.White, "## OpenGL Context Version: {0}",
                     GlGetString(GL.GL_VERSION));
                 Console.Out.WriteLineColored(ConsoleColor.White, "## Depth Bits: {0}",
-                    GL.glGetInteger(GL.GL_DEPTH_BITS));
+                    GL.GetInteger(GL.GL_DEPTH_BITS));
                 Console.Out.WriteLineColored(ConsoleColor.White, "## Stencil Bits: {0}",
-                    GL.glGetInteger(GL.GL_STENCIL_BITS));
+                    GL.GetInteger(GL.GL_STENCIL_BITS));
                 Console.Out.WriteLineColored(ConsoleColor.White, "## Color Bits: {0},{1},{2},{3}",
-                    GL.glGetInteger(GL.GL_RED_BITS), GL.glGetInteger(GL.GL_GREEN_BITS),
-                    GL.glGetInteger(GL.GL_BLUE_BITS), GL.glGetInteger(GL.GL_ALPHA_BITS));
+                    GL.GetInteger(GL.GL_RED_BITS), GL.GetInteger(GL.GL_GREEN_BITS),
+                    GL.GetInteger(GL.GL_BLUE_BITS), GL.GetInteger(GL.GL_ALPHA_BITS));
 
-                if (GL.glGetInteger(GL.GL_STENCIL_BITS) <= 0)
+                if (GL.GetInteger(GL.GL_STENCIL_BITS) <= 0)
                 {
                     Console.Error.WriteLineColored(ConsoleColor.Red, "No stencil bits available!");
                     //throw new Exception("Couldn't initialize opengl");
@@ -791,7 +790,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         private void PrepareStateDraw(GpuStateStruct gpuState)
         {
-            GL.glColorMask(true, true, true, true);
+            GL.ColorMask(true, true, true, true);
 
 #if ENABLE_TEXTURES
             PrepareState_Texture_Common(gpuState);
@@ -802,11 +801,11 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             if (gpuState.VertexState.Type.Transform2D)
             {
                 PrepareState_Colors_2D(gpuState);
-                GL.glDisable(GL.GL_STENCIL_TEST);
-                GL.glDisable(GL.GL_CULL_FACE);
+                GL.Disable(GL.GL_STENCIL_TEST);
+                GL.Disable(GL.GL_CULL_FACE);
                 GL.DepthRange(0, 1);
-                GL.glDisable(GL.GL_DEPTH_TEST);
-                //GL.glDisable(EnableCap.Lighting);
+                GL.Disable(GL.GL_DEPTH_TEST);
+                //GL.Disable(EnableCap.Lighting);
             }
             else
             {
@@ -828,7 +827,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                 return;
             }
             var scissor = gpuState.ClipPlaneState.Scissor;
-            GL.glScissor(
+            GL.Scissor(
                 scissor.Left * ScaleViewport,
                 scissor.Top * ScaleViewport,
                 scissor.Width * ScaleViewport,
@@ -836,19 +835,19 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             );
         }
 
-        private GL.DepthFunction DepthFunctionTranslate(int pspFunc)
+        private DepthFunction DepthFunctionTranslate(int pspFunc)
         {
             return pspFunc switch
             {
-                0 => GL.DepthFunction.Never,       // 永不通过
-                1 => GL.DepthFunction.Less,        // 小于阈值
-                2 => GL.DepthFunction.Equal,       // 等于阈值
-                3 => GL.DepthFunction.Lequal,      // 小于等于阈值
-                4 => GL.DepthFunction.Greater,     // 大于阈值
-                5 => GL.DepthFunction.Notequal,    // 不等于阈值
-                6 => GL.DepthFunction.Gequal,      // 大于等于阈值
-                7 => GL.DepthFunction.Always,      // 始终通过
-                _ => GL.DepthFunction.Always       // 未知值默认始终通过，避免渲染崩溃
+                0 => DepthFunction.Never,       // 永不通过
+                1 => DepthFunction.Less,        // 小于阈值
+                2 => DepthFunction.Equal,       // 等于阈值
+                3 => DepthFunction.Lequal,      // 小于等于阈值
+                4 => DepthFunction.Greater,     // 大于阈值
+                5 => DepthFunction.Notequal,    // 不等于阈值
+                6 => DepthFunction.Gequal,      // 大于等于阈值
+                7 => DepthFunction.Always,      // 始终通过
+                _ => DepthFunction.Always       // 未知值默认始终通过，避免渲染崩溃
             };
         }
 
@@ -856,17 +855,17 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         {
             if (!gpuState.AlphaTestState.Enabled)
             {
-                GL.glDisable(GL.GL_ALPHA_TEST);
+                GL.Disable(GL.GL_ALPHA_TEST);
                 return;
             }
 
-            GL.glEnable(GL.GL_ALPHA_TEST);
+            GL.Enable(GL.GL_ALPHA_TEST);
 
             var glCompareFunc = DepthFunctionTranslate((int)gpuState.AlphaTestState.Function);
 
             float alphaThreshold = gpuState.AlphaTestState.Value / 255.0f;
 
-            GL.glAlphaFunc((int)glCompareFunc, alphaThreshold);
+            GL.AlphaFunc((int)glCompareFunc, alphaThreshold);
         }
 
         private void PrepareState_Stencil(GpuStateStruct gpuState)
@@ -887,13 +886,13 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 				StencilOperationTranslate[(int)GpuState->StencilState.OperationZPass]
 			);
 #endif
-            GL.glStencilFunc(
+            GL.StencilFunc(
                 OpenglGpuImplConversionTables.StencilFunctionTranslate[(int)gpuState.StencilState.Function],
                 gpuState.StencilState.FunctionRef,
                 gpuState.StencilState.FunctionMask
             );
 
-            GL.glStencilOp(
+            GL.StencilOp(
                 OpenglGpuImplConversionTables.StencilOperationTranslate[(int)gpuState.StencilState.OperationFail],
                 OpenglGpuImplConversionTables.StencilOperationTranslate[(int)gpuState.StencilState.OperationZFail],
                 OpenglGpuImplConversionTables.StencilOperationTranslate[(int)gpuState.StencilState.OperationZPass]
@@ -909,7 +908,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
             //GL.EnableDisable(EnableCap.CullFace, false);
 
-            GL.glCullFace(gpuState.BackfaceCullingState.FrontFaceDirection == FrontFaceDirectionEnum.ClockWise
+            GL.CullFace(gpuState.BackfaceCullingState.FrontFaceDirection == FrontFaceDirectionEnum.ClockWise
                 ? GL.GL_FRONT
                 : GL.GL_BACK);
         }
@@ -925,12 +924,12 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             {
                 Console.Error.WriteLine("WARNING! DepthTestState.Mask: {0}", gpuState.DepthTestState.Mask);
             }
-            GL.glDepthMask(gpuState.DepthTestState.Mask == 0);
+            GL.DepthMask(gpuState.DepthTestState.Mask == 0);
             if (!GL.EnableDisable(GL.GL_DEPTH_TEST, gpuState.DepthTestState.Enabled))
             {
                 return;
             }
-            GL.glDepthFunc(OpenglGpuImplConversionTables.DepthFunctionTranslate[(int)gpuState.DepthTestState.Function]);
+            GL.DepthFunc(OpenglGpuImplConversionTables.DepthFunctionTranslate[(int)gpuState.DepthTestState.Function]);
         }
 
         private void PrepareState_Colors_2D(GpuStateStruct gpuState)
@@ -1062,11 +1061,11 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             );
             */
 
-            GL.glBlendEquation(openglBlendEquation);
+            GL.BlendEquation(openglBlendEquation);
 
-            GL.glBlendFunc(openglFunctionSource, openglFunctionDestination);
+            GL.BlendFunc(openglFunctionSource, openglFunctionDestination);
 
-            GL.glBlendColor(
+            GL.BlendColor(
                 blendingState.FixColorDestination.Red,
                 blendingState.FixColorDestination.Green,
                 blendingState.FixColorDestination.Blue,
@@ -1087,11 +1086,11 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                         1.0f
                 );
 
-                //GL.glActiveTexture(TextureUnit.Texture0);
-                //GL.glMatrixMode(MatrixMode.Texture);
-                //GL.glLoadIdentity();
+                //GL.ActiveTexture(TextureUnit.Texture0);
+                //GL.MatrixMode(MatrixMode.Texture);
+                //GL.LoadIdentity();
                 //
-                //GL.glScale(
+                //GL.Scale(
                 //	1.0f / Mipmap0->BufferWidth,
                 //	1.0f / Mipmap0->TextureHeight,
                 //	1.0f
@@ -1159,7 +1158,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
             //CurrentTexture.Save("test.png");
 
-            //GL.glTexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvModeTranslate[(int)TextureState.Effect]);
+            //GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvModeTranslate[(int)TextureState.Effect]);
         }
 
         public static void PrepareStateCommon(GpuStateStruct gpuState, int scaleViewport)
@@ -1173,10 +1172,10 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             var width = Math.Max(1, (int)viewport.RegionSize.X * scaleViewport);
             var height = Math.Max(1, (int)viewport.RegionSize.Y * scaleViewport);
 
-            GL.glViewport(left, top, width, height);
+            GL.Viewport(left, top, width, height);
 
-            GL.glDisable(GL.GL_LIGHTING);
-            GL.glDisable(GL.GL_POLYGON_OFFSET_FILL);
+            GL.Disable(GL.GL_LIGHTING);
+            GL.Disable(GL.GL_POLYGON_OFFSET_FILL);
 
             try
             {
@@ -1212,16 +1211,16 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             bool depthMask = gpuState.ClearFlags.HasFlag(ClearBufferSet.DepthBuffer);
             bool stencilMask = gpuState.ClearFlags.HasFlag(ClearBufferSet.StencilBuffer);
 
-            GL.glDisable(GL.GL_BLEND);
-            GL.glDisable(GL.GL_LIGHTING);
-            GL.glDisable(GL.GL_TEXTURE_2D);
-            GL.glDisable(GL.GL_ALPHA_TEST);
-            GL.glDisable(GL.GL_DEPTH_TEST);
-            GL.glDisable(GL.GL_STENCIL_TEST);
-            GL.glDisable(GL.GL_FOG);
-            GL.glDisable(GL.GL_LOGIC_OP);
-            GL.glDisable(GL.GL_CULL_FACE);
-            GL.glDepthMask(false);
+            GL.Disable(GL.GL_BLEND);
+            GL.Disable(GL.GL_LIGHTING);
+            GL.Disable(GL.GL_TEXTURE_2D);
+            GL.Disable(GL.GL_ALPHA_TEST);
+            GL.Disable(GL.GL_DEPTH_TEST);
+            GL.Disable(GL.GL_STENCIL_TEST);
+            GL.Disable(GL.GL_FOG);
+            GL.Disable(GL.GL_LOGIC_OP);
+            GL.Disable(GL.GL_CULL_FACE);
+            GL.DepthMask(false);
 
             if (gpuState.ClearFlags.HasFlag(ClearBufferSet.ColorBuffer))
             {
@@ -1231,23 +1230,23 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             if (GL.EnableDisable(GL.GL_STENCIL_TEST, stencilMask))
             {
                 alphaMask = true;
-                GL.glStencilFunc(GL.GL_ALWAYS, 0x00, 0xFF);
-                GL.glStencilOp(GL.GL_REPLACE, GL.GL_REPLACE, GL.GL_REPLACE);
-                GL.glStencilMask(0xFF);
+                GL.StencilFunc(GL.GL_ALWAYS, 0x00, 0xFF);
+                GL.StencilOp(GL.GL_REPLACE, GL.GL_REPLACE, GL.GL_REPLACE);
+                GL.StencilMask(0xFF);
             }
 
             if (depthMask)
             {
-                GL.glEnable(GL.GL_DEPTH_TEST);
-                GL.glDepthFunc(GL.GL_ALWAYS);
-                GL.glDepthMask(true);
-                GL.glDepthRange(0.0f, 0.0f);
-                //GL.glDepthRange(0.0f, 1.0f); // Original value
+                GL.Enable(GL.GL_DEPTH_TEST);
+                GL.DepthFunc(GL.GL_ALWAYS);
+                GL.DepthMask(true);
+                GL.DepthRange(0.0f, 0.0f);
+                //GL.DepthRange(0.0f, 1.0f); // Original value
             }
 
-            GL.glColorMask(colorMask, colorMask, colorMask, alphaMask);
+            GL.ColorMask(colorMask, colorMask, colorMask, alphaMask);
 
-            GL.glClearDepthf(1.0f);
+            GL.ClearDepthf(1.0f);
 
             uint clearBits = 0;
             if (colorMask) clearBits |= GL.GL_COLOR_BUFFER_BIT;
@@ -1255,7 +1254,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             if (stencilMask) clearBits |= GL.GL_STENCIL_BUFFER_BIT;
             if (clearBits != 0)
             {
-                GL.glClear(clearBits);
+                GL.Clear(clearBits);
             }
         }
 

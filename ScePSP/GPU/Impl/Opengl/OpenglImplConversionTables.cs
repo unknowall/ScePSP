@@ -1,4 +1,4 @@
-﻿using ScePSPPlatform.GL;
+﻿using LightGL;
 
 namespace ScePSP.Core.Gpu.Impl.Opengl
 {

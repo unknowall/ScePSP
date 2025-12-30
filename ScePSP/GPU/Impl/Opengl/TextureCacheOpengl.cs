@@ -1,6 +1,6 @@
-﻿using ScePSP.Core.Memory;
+﻿using LightGL;
+using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
-using ScePSPPlatform.GL.Utils;
 
 namespace ScePSP.Core.Gpu.Impl.Opengl
 {
@@ -14,13 +14,13 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
     public class TextureOpengl : Texture<OpenglGpuImpl>
     {
-        public GLTexture Texture;
+        public GLTexture2D Texture;
 
         public int TextureId => (int)Texture.Texture;
 
         protected override void Init()
         {
-            Texture = GLTexture.Create();
+            Texture = GLTexture2D.Create();
         }
 
         public override bool SetData(OutputPixel[] pixels, int textureWidth, int textureHeight)

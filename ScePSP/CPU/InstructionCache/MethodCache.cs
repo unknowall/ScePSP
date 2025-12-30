@@ -11,6 +11,8 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
+using LightGL.DynamicLibrary;
+
 namespace ScePSP.Core.Cpu.InstructionCache
 {
     public class MethodMessageBus<T>

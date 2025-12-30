@@ -1,4 +1,4 @@
-﻿using ScePSPPlatform.UI;
+﻿using ScePSP.Utils.UI;
 
 namespace ScePSP.Hle.Modules.utility
 {

@@ -9,6 +9,8 @@ using ScePSP.Core.Cpu.Dynarec.Ast;
 using System;
 using System.Reflection;
 
+using LightGL.DynamicLibrary;
+
 namespace ScePSP.Core.Cpu.Emitter
 {
     /// <summary>

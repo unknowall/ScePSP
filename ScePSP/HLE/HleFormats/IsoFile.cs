@@ -47,9 +47,7 @@ namespace ScePSP.Hle.Formats
                 directoryStream.Read(directoryRecordBytes, 0, directoryRecordSize);
                 var directoryRecord = StructUtils.BytesToStruct<DirectoryRecord>(directoryRecordBytes);
 
-                var name =
-                    Encoding.UTF8.GetString(directoryRecordBytes.Slice(sizeof(DirectoryRecord),
-                        directoryRecord.NameLength));
+                var name = Encoding.UTF8.GetString(directoryRecordBytes.Slice(sizeof(DirectoryRecord), directoryRecord.NameLength));
 
                 //Console.WriteLine("{0}", name); Console.ReadKey();
 

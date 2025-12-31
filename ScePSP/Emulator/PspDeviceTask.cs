@@ -12,7 +12,7 @@ namespace ScePSP.Runner.Tasks
         static Logger Logger = Logger.GetLogger("DeviceTask");
 
         protected AutoResetEvent RunningUpdatedEvent = new AutoResetEvent(false);
-        public bool Running = true;
+        public bool Running = false;
 
         protected Task Task;
         protected CancellationTokenSource TaskCts;
@@ -29,6 +29,8 @@ namespace ScePSP.Runner.Tasks
 
         public void StartSynchronized()
         {
+            if (Running) return;
+
             var ElapsedTime = Logger.Measure(() =>
             {
                 TaskCts = new CancellationTokenSource();
@@ -38,6 +40,8 @@ namespace ScePSP.Runner.Tasks
                 {
                     try
                     {
+                        Running = true;
+
                         Main();
                     }
                     catch (OperationCanceledException)
@@ -121,6 +125,8 @@ namespace ScePSP.Runner.Tasks
 
         public void ResumeSynchronized()
         {
+            if (!Running) return;
+
             Logger.Notice("Task {0} ResumeSynchronized!", this);
 
             PauseEvent.Set();

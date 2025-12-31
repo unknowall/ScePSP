@@ -175,22 +175,11 @@ namespace ScePSP.Core.Gpu
                 UsingGe = true;
                 while (GEProcessQueue.GetCountLock() > 0)
                 {
-                    var GE = GEProcessQueue.RemoveFirstAndGet();
-                    CurrentGEProcess = GE;
-                    GE.SetDequeued();
-                    if (GE == null)
-                    {
-                        Console.Out.WriteLineColored(ConsoleColor.Red, "0 GEProcess = NULL.");
-                        continue;
-                    }
-                    GE.Process();
-                    if (GE == null)
-                    {
-                        Console.Out.WriteLineColored(ConsoleColor.Red, "1 GEProcess = NULL.");
-                        continue;
-                    }
-                    EnqueueFreeGEProcess(GE);
-                    LastProcessedGEProcess = GE;
+                    CurrentGEProcess = GEProcessQueue.RemoveFirstAndGet();
+                    CurrentGEProcess.SetDequeued();
+                    CurrentGEProcess.Process();
+                    EnqueueFreeGEProcess(CurrentGEProcess);
+                    LastProcessedGEProcess = CurrentGEProcess;
                 }
                 CurrentGEProcess = null;
 

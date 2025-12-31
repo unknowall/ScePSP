@@ -136,8 +136,7 @@ namespace LightGL
             try
             {
                 Action();
-            }
-            finally
+            } finally
             {
                 GL.BindFramebuffer(GL.GL_FRAMEBUFFER, (uint)OldFrameBuffer);
             }
@@ -175,7 +174,7 @@ namespace LightGL
             var Status = GL.CheckFramebufferStatus(GL.GL_FRAMEBUFFER);
             if (Status != GL.GL_FRAMEBUFFER_COMPLETE)
             {
-                Console.WriteLine($"Failed to bind FrameBuffer 0x{Status:X4} GlError 0x{GL.GetError():X4}" +
+                throw new Exception($"Failed to bind FrameBuffer 0x{Status:X4} GlError 0x{GL.GetError():X4}" +
                     $" {GL.GetConstantString(Status)}, {TargetLayers}, {Width}x{Height}");
             }
         }

@@ -54,9 +54,10 @@ namespace ScePSP.Runner.Tasks.Display
 
         protected override void Main()
         {
-            vBlankInterruptHandler = _hleInterruptManager.GetInterruptHandler(PspInterrupts.PspVblankInt);
+            var threadId = Environment.CurrentManagedThreadId;
+            Console.Out.WriteLineColored(ConsoleColor.White, $"## DISPLAY Runing ThreadId={threadId}");
 
-            //Console.WriteLine("DisplayTask.Start()");
+            vBlankInterruptHandler = _hleInterruptManager.GetInterruptHandler(PspInterrupts.PspVblankInt);
 
             try
             {

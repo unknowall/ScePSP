@@ -1,6 +1,7 @@
 ﻿using ScePSP.Core.Components.Display;
 using ScePSP.Core.Gpu;
 using ScePSP.Utils;
+using System;
 using System.Threading;
 
 namespace ScePSP.Runner.Tasks.Gpu
@@ -17,11 +18,13 @@ namespace ScePSP.Runner.Tasks.Gpu
 
         protected override void Main()
         {
+            var threadId = Environment.CurrentManagedThreadId;
+            Console.Out.WriteLineColored(ConsoleColor.White, $"## GE Runing ThreadId={threadId}");
+
             GpuImpl.InitSynchronizedOnce(DisplayConfig.WindowHandle);
 
             GpuProcessor.ProcessInit();
 
-            //Console.WriteLine("GpuTask.Start()");
             try
             {
                 while (true)

@@ -1,6 +1,6 @@
 ﻿namespace LightGL
 {
-    public class RectangleF
+    public class GLRectangleF
     {
         public readonly float X;
         public readonly float Y;
@@ -15,7 +15,7 @@
 
         public float Bottom => Y + Height;
 
-        public RectangleF(float X, float Y, float Width, float Height)
+        public GLRectangleF(float X, float Y, float Width, float Height)
         {
             this.X = X;
             this.Y = Y;
@@ -34,12 +34,12 @@
             };
         }
 
-        public static RectangleF FromCoords(float Left, float Top, float Right, float Bottom)
+        public static GLRectangleF FromCoords(float Left, float Top, float Right, float Bottom)
         {
-            return new RectangleF(Left, Top, Right - Left, Bottom - Top);
+            return new GLRectangleF(Left, Top, Right - Left, Bottom - Top);
         }
 
-        public RectangleF VFlip()
+        public GLRectangleF VFlip()
         {
             return FromCoords(this.Left, this.Bottom, this.Right, this.Top);
         }

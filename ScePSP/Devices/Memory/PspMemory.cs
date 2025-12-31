@@ -297,8 +297,7 @@ namespace ScePSP.Core.Memory
             {
                 using (var Stream = File.OpenWrite(OutputFile))
                 {
-                    Stream.WriteStream(
-                        new PspMemoryStream(this).SliceWithBounds(MainSegment.Low, MainSegment.High - 1));
+                    Stream.WriteStream(new PspMemoryStream(this).SliceWithBounds(MainSegment.Low, MainSegment.High - 1));
                     Stream.Flush();
                     Stream.Close();
                 }

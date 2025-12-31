@@ -1,4 +1,5 @@
 ﻿using ScePSP.Core.Audio;
+using System;
 using System.Threading;
 
 namespace ScePSP.Runner.Tasks.Audio
@@ -11,7 +12,8 @@ namespace ScePSP.Runner.Tasks.Audio
 
         protected override void Main()
         {
-            //Console.WriteLine("AudioTask.Start()");
+            var threadId = Environment.CurrentManagedThreadId;
+            Console.Out.WriteLineColored(ConsoleColor.White, $"## AUDIO Runing ThreadId={threadId}");
             try
             {
                 while (true)

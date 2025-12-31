@@ -1,4 +1,5 @@
-﻿using ScePSP.Core.Cpu;
+﻿using ScePSP.Core;
+using ScePSP.Core.Cpu;
 using ScePSP.Hle.Formats;
 using ScePSP.Hle.Managers;
 using ScePSPUtils;
@@ -77,7 +78,7 @@ namespace ScePSP.Hle.Loader
                 try
                 {
                     var decryptedData = new EncryptedPrx().Decrypt(fileStream.ReadAll(), true);
-                    File.WriteAllBytes("last_decoded_prx.bin", decryptedData);
+                    File.WriteAllBytes(ApplicationPaths.AssertPath+"/last_decoded_prx.bin", decryptedData);
                     fileStream = new MemoryStream(decryptedData);
                 }
                 catch (Exception exception)
@@ -94,8 +95,7 @@ namespace ScePSP.Hle.Loader
             if (ElfLoader.NeedsRelocation)
             {
                 var dummyPartition = memoryPartition.Allocate(0x4000, Name: "Dummy");
-                BaseAddress = memoryPartition.ChildPartitions.OrderByDescending(partition => partition.Size).First()
-                    .Low;
+                BaseAddress = memoryPartition.ChildPartitions.OrderByDescending(partition => partition.Size).First().Low;
                 _logger.Info("BASE ADDRESS (Try    ): 0x{0:X}", BaseAddress);
                 BaseAddress = MathUtils.NextAligned(BaseAddress, 0x1000);
                 _logger.Info("BASE ADDRESS (Aligned): 0x{0:X}", BaseAddress);
@@ -144,13 +144,11 @@ namespace ScePSP.Hle.Loader
             {
                 var sectionHeader = ElfLoader.SectionHeadersByName[".rodata.sceModuleInfo"];
                 stream = ElfLoader.SectionHeaderMemoryStream(sectionHeader);
-                Logger.Info("LoadModuleInfo: .rodata.sceModuleInfo 0x{0:X8}[{1}]",
-                    BaseAddress + sectionHeader.Address, sectionHeader.Size);
+                Logger.Info("LoadModuleInfo: .rodata.sceModuleInfo 0x{0:X8}[{1}]", BaseAddress + sectionHeader.Address, sectionHeader.Size);
             }
             else
             {
-                var moduleInfoAddress =
-                    (uint)(BaseAddress + (programHeader.PsysicalAddress & 0x7FFFFFFFL) - programHeader.Offset);
+                var moduleInfoAddress = (uint)(BaseAddress + (programHeader.PsysicalAddress & 0x7FFFFFFFL) - programHeader.Offset);
                 var size = Marshal.SizeOf(typeof(ElfPsp.ModuleInfo));
                 stream = ElfLoader.MemoryStream.SliceWithLength(moduleInfoAddress, size);
                 Logger.Info("LoadModuleInfo: 0x{0:X8}[{1}]", moduleInfoAddress, size);

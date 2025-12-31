@@ -386,6 +386,10 @@ namespace ScePSP.Runner.Tasks.Cpu
 
         protected override void Main()
         {
+            var threadId = Environment.CurrentManagedThreadId;
+            Console.Out.WriteLineColored(ConsoleColor.White,$"## CPU Runing ThreadId={threadId}");
+            Console.Out.WriteLineColored(ConsoleColor.White, $"  -> Hle Version: {HleConfig.FirmwareVersion.VersionStr}");
+
             while (Running)
             {
 #if !DO_NOT_PROPAGATE_EXCEPTIONS

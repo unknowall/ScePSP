@@ -747,31 +747,29 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             {
                 if (TargetHwnd == IntPtr.Zero)
                 {
-                    Console.Out.WriteLineColored(ConsoleColor.White, $"## OpenGL Windowless Mode");
+                    Console.Out.WriteLineColored(ConsoleColor.White, $"   -> OpenGL Windowless Mode");
                     OpenglContext = GlContextFactory.CreateWindowless();
                 }
                 else
                 {
-                    Console.Out.WriteLineColored(ConsoleColor.White, $"## OpenGL Window HWND: {TargetHwnd}");
+                    Console.Out.WriteLineColored(ConsoleColor.White, $"   -> OpenGL Window HWND: {TargetHwnd}");
                     OpenglContext = GlContextFactory.CreateFromWindowHandle(TargetHwnd);
                 }
 
                 OpenglContext.MakeCurrent();
 
 
-                Console.Out.WriteLineColored(ConsoleColor.White, "## OpenGL Context Version: {0}",
-                    GlGetString(GL.GL_VERSION));
-                Console.Out.WriteLineColored(ConsoleColor.White, "## Depth Bits: {0}",
-                    GL.GetInteger(GL.GL_DEPTH_BITS));
-                Console.Out.WriteLineColored(ConsoleColor.White, "## Stencil Bits: {0}",
-                    GL.GetInteger(GL.GL_STENCIL_BITS));
-                Console.Out.WriteLineColored(ConsoleColor.White, "## Color Bits: {0},{1},{2},{3}",
+                Console.Out.WriteLineColored(ConsoleColor.White, "   -> OpenGL Context Version: {0}", GlGetString(GL.GL_VERSION));
+                Console.Out.WriteLineColored(ConsoleColor.White, "   -> Color Bits: {0},{1},{2},{3}, Depth Bits: {0}, Stencil Bits: {0}",
                     GL.GetInteger(GL.GL_RED_BITS), GL.GetInteger(GL.GL_GREEN_BITS),
-                    GL.GetInteger(GL.GL_BLUE_BITS), GL.GetInteger(GL.GL_ALPHA_BITS));
+                    GL.GetInteger(GL.GL_BLUE_BITS), GL.GetInteger(GL.GL_ALPHA_BITS),
+                    GL.GetInteger(GL.GL_DEPTH_BITS),
+                    GL.GetInteger(GL.GL_STENCIL_BITS)
+                    );
 
                 if (GL.GetInteger(GL.GL_STENCIL_BITS) <= 0)
                 {
-                    Console.Error.WriteLineColored(ConsoleColor.Red, "No stencil bits available!");
+                    Console.Error.WriteLineColored(ConsoleColor.Red, "   -> No stencil bits available!");
                     //throw new Exception("Couldn't initialize opengl");
                 }
 

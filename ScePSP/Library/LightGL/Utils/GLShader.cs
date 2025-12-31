@@ -75,8 +75,7 @@ namespace LightGL
             if (ShaderCompileStatus == 0)
             {
                 Console.WriteLine("Shader ERROR: {0}", ShaderInfo);
-            }
-            else
+            } else
             {
                 Console.WriteLine("OpenGL Shader Compiled.");
             }
@@ -116,8 +115,7 @@ namespace LightGL
             if (VertexShaderCompileStatus == 0 || FragmentShaderCompileStatus == 0)
             {
                 Console.WriteLine("Shader ERROR: {0}, {1}", VertexShaderInfo, FragmentShaderInfo);
-            }
-            else
+            } else
             {
                 Console.WriteLine("OpenGL Shader Compiled.");
             }
@@ -302,8 +300,7 @@ namespace LightGL
                 if (Field.FieldType == typeof(GlAttribute))
                 {
                     Field.SetValue(Object, GetAttribute(Field.Name));
-                }
-                else if (Field.FieldType == typeof(GlUniform))
+                } else if (Field.FieldType == typeof(GlUniform))
                 {
                     Field.SetValue(Object, GetUniform(Field.Name));
                 }

@@ -125,18 +125,15 @@ namespace ScePSP
                 // Creates a temporal context.
                 //PspEmulatorContext = new PspEmulatorContext(PspConfig);
 
-                // Creates a new context.
-                CreateNewContextAndRemoveOldOne();
+                PspRunner.StartSynchronized();
 
                 CallbackOnInit?.Invoke();
 
-                // GUI Thread.
                 Thread.CurrentThread.Name = "GuiThread";
 
                 //ContextInitialized.WaitOne();
 
                 GuiRunner?.Invoke(this);
-                //new GuiRunner(this).Start();
 
                 PspRunner.StopSynchronized();
             }
@@ -165,7 +162,8 @@ namespace ScePSP
             {
                 throw new Exception($"File '{FileName}' doesn't exists");
             }
-            CreateNewContextAndRemoveOldOne();
+
+            PspRunner.StartSynchronized();
 
             MessageBus.Dispatch(new LoadFileMessage() { FileName = FileName });
 
@@ -173,40 +171,6 @@ namespace ScePSP
             {
                 PspRunner.CpuTask._LoadFile(FileName);
             });
-        }
-
-        public void CreateNewContextAndRemoveOldOne()
-        {
-            //Console.WriteLine("----- CreateNewContextAndRemoveOldOne -----------------------------------------");
-            // Stops the current context if it has one already.
-            /*
-            if (PspRunner != null)
-            {
-                PspRunner.StopSynchronized();
-
-                InjectContext.GetInstance<PspMemory>().Dispose();
-                InjectContext.GetInstance<GpuImpl>().StopSynchronized();
-                InjectContext.GetInstance<PspAudioImpl>().StopSynchronized();
-
-                PspRunner = null;
-                _InjectContext.Dispose();
-                _InjectContext = null;
-                GC.Collect();
-            }
-            */
-
-            lock (this)
-            {
-                //PspRunner.StopSynchronized();
-                //_InjectContext = PspInjectContext.CreateInjectContext(StoredConfig, test: false);
-                //_InjectContext.SetInstanceType<IGuiExternalInterface, PspEmulator>();
-
-                //_InjectContext.InjectDependencesTo(this);
-
-                PspRunner.StartSynchronized();
-            }
-
-            //GpuImpl.InitSynchronizedOnce();
         }
 
         public void ShowDebugInformation()

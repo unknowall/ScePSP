@@ -46,8 +46,7 @@ namespace LightGL
                 {
                     GL.BufferData((int)target, (uint)(size * sizeof(T)), ptr, (int)usage);
                 }
-            }
-            else
+            } else
             {
                 GL.BufferData((int)target, (uint)(size * sizeof(T)), null, (int)usage);
             }
@@ -64,8 +63,7 @@ namespace LightGL
                     Length * Marshal.SizeOf(typeof(T)),
                     (byte*)Handle.AddrOfPinnedObject().ToPointer() + Offset * Marshal.SizeOf(typeof(T))
                 );
-            }
-            finally
+            } finally
             {
                 Handle.Free();
             }
@@ -78,12 +76,12 @@ namespace LightGL
             return this;
         }
 
-        public unsafe void SubData<T>(int size, T[] data) where T : unmanaged
+        public unsafe void SubData<T>(int size, T[] data, int offset = 0) where T : unmanaged
         {
             Bind();
             fixed (void* ptr = data)
             {
-                GL.BufferSubData((int)target, 0, (uint)(size * sizeof(T)), ptr);
+                GL.BufferSubData((int)target, offset, (uint)(size * sizeof(T)), ptr);
             }
         }
 

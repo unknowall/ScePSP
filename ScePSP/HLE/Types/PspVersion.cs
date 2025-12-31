@@ -12,8 +12,11 @@ namespace ScePSP.Hle.Types
 
         public int Revision => Version.Revision;
 
+        public string VersionStr;
+
         public PspVersion(string VersionString)
         {
+            VersionStr = VersionString;
             this.SetVersion(VersionString);
         }
 

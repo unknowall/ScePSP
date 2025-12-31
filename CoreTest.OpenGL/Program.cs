@@ -89,7 +89,7 @@ class Program
             "attribute vec4 position; attribute vec4 texCoords; varying vec2 v_texCoord; void main() { gl_Position = position; v_texCoord = texCoords.xy; }",
             "uniform sampler2D texture; varying vec2 v_texCoord; void main() { gl_FragColor = texture2D(texture, v_texCoord); }"
         );
-        VertexBuffer = GLBuffer.Create().SetData(RectangleF.FromCoords(-1, -1, +1, +1).GetFloat2TriangleStripCoords());
+        VertexBuffer = GLBuffer.Create().SetData(GLRectangleF.FromCoords(-1, -1, +1, +1).GetFloat2TriangleStripCoords());
         Shader.BindUniformsAndAttributes(ShaderInfo);
         //TestTexture = GLTexture.Create().SetFormat(TextureFormat.RGBA).SetSize(2, 2).SetData(new uint[] { 0xFF0000FF, 0xFF00FFFF, 0xFFFF00FF, 0xFFFFFFFF });
         Context.ReleaseCurrent();
@@ -218,7 +218,7 @@ class Program
 
         Shader.Draw(GLGeometry.GL_TRIANGLE_STRIP, 4, () =>
         {
-            var TextureRect = RectangleF.FromCoords(0, 0, (float)display.CurrentInfo.Width / 512f, (float)display.CurrentInfo.Height / 272f);
+            var TextureRect = GLRectangleF.FromCoords(0, 0, (float)display.CurrentInfo.Width / 512f, (float)display.CurrentInfo.Height / 272f);
             if (TextureVerticalFlip) TextureRect = TextureRect.VFlip();
             TexCoordsBuffer = GLBuffer.Create().SetData(TextureRect.GetFloat2TriangleStripCoords());
             ShaderInfo.texture.Set(GLTextureUnit.CreateAtIndex(0).SetFiltering(GLScaleFilter.Nearest).SetWrap(GLWrap.ClampToEdge).SetTexture(DrawTexture));
@@ -229,7 +229,7 @@ class Program
 
         Context.SwapBuffers();
 
-        //Context.ReleaseCurrent();
+        Context.ReleaseCurrent();
     }
 
     private static void RunMainLoop(PspEmulator emulator)

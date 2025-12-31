@@ -42,6 +42,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                 DrawBufferKey = drawBufferKey;
 
                 openglGpuImpl.OnScaleViewport += UpdateTextures_External;
+
                 UpdateTextures(openglGpuImpl.ScaleViewport);
             }
 
@@ -92,6 +93,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
                 if (_mustUpdateRenderTarget)
                 {
                     Unbind();
+
                     UpdateTextures(_mustUpdateRenderTargetScaleViewport);
                 }
                 if (!Binded)
@@ -106,7 +108,9 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
             public void Dispose()
             {
                 Unbind();
+
                 _openglGpuImpl.OnScaleViewport -= UpdateTextures_External;
+
                 RenderTarget.Dispose();
             }
 
@@ -216,6 +220,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         public void BindCurrentDrawBufferTexture(GpuStateStruct gpuState)
         {
+
             if (_cachedBindAddress != gpuState.DrawBufferState.Address)
             {
                 GL.Flush();

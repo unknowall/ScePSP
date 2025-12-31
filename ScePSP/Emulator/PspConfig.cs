@@ -78,8 +78,6 @@ namespace ScePSP.Core
     {
         public static Logger Logger = Logger.GetLogger("Config");
 
-        public bool EnableSmaa = false;
-
         public DateTime LastCheckedTime;
         public bool LimitVerticalSync = true;
         public int DisplayScale = 2;

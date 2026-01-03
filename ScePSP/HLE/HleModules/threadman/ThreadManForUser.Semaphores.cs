@@ -8,7 +8,7 @@ namespace ScePSP.Hle.Modules.threadman
 {
     public unsafe partial class ThreadManForUser
     {
-        [Inject] HleSemaphoreManager SemaphoreManager;
+        HleSemaphoreManager SemaphoreManager => PSPDrivers.HLE.SemaphoreManager;
 
         HleSemaphore GetSemaphoreById(SemaphoreId SemaphoreId)
         {

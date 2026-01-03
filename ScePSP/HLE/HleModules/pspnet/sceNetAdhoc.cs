@@ -86,7 +86,7 @@ namespace ScePSP.Hle.Modules.pspnet
         [HlePspNotImplemented]
         public int sceNetAdhocPdpDelete(PDP PDP, int unk1)
         {
-            PDP.RemoveUid(InjectContext);
+            PDP.RemoveUid();
             return 0;
         }
 

@@ -2,9 +2,9 @@
 using System;
 using static SDL2.SDL;
 
-namespace ScePSP.Core.Audio.Impl.SDL
+namespace ScePSP.Core.AudioBackEnd.SDL
 {
-    public unsafe class SDLAudioImpl : AudioImpl
+    public unsafe class SDLAudioBackEnd : AudioBackEnd
     {
         private static uint audiodeviceid;
         private SDL_AudioCallback audioCallbackDelegate;
@@ -19,7 +19,7 @@ namespace ScePSP.Core.Audio.Impl.SDL
         public const int BufferMilliseconds = 10;
         public const int SamplesPerBuffer = (int)(SamplesPerMillisecond * BufferMilliseconds * NumberOfChannels);
 
-        public SDLAudioImpl()
+        public SDLAudioBackEnd()
         {
             SDL_Init(SDL_INIT_AUDIO);
 
@@ -47,7 +47,7 @@ namespace ScePSP.Core.Audio.Impl.SDL
                 SDL_PauseAudioDevice(audiodeviceid, 0);
         }
 
-        ~SDLAudioImpl()
+        ~SDLAudioBackEnd()
         {
             if (audiodeviceid != 0)
                 SDL_CloseAudioDevice(audiodeviceid);
@@ -92,14 +92,6 @@ namespace ScePSP.Core.Audio.Impl.SDL
         {
             if (audiodeviceid != 0)
                 SDL_PauseAudioDevice(audiodeviceid, 1);
-        }
-
-        public override bool IsWorking
-        {
-            get
-            {
-                return (audiodeviceid != 0);
-            }
         }
     }
 }

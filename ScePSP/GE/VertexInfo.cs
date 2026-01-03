@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
 
-namespace ScePSP.Core.Gpu
+namespace ScePSP.Core.GpuBackEnd
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public unsafe struct VertexInfoWeights

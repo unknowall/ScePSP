@@ -17,11 +17,9 @@ namespace ScePSP.Core.Cpu.Dynarec
 {
     public class DynarecFunctionCompiler
     {
-        [Inject] CpuProcessor CpuProcessor;
+        CpuProcessor CpuProcessor => PSPDrivers.CPU;
 
-        [Inject] InjectContext InjectContext;
-
-        private DynarecFunctionCompiler()
+        public DynarecFunctionCompiler()
         {
         }
 
@@ -48,7 +46,7 @@ namespace ScePSP.Core.Cpu.Dynarec
                     };
                 default:
                     var mipsMethodEmiter = new MipsMethodEmitter(CpuProcessor, pc, doDebug, doLog);
-                    var internalFunctionCompiler = new InternalFunctionCompiler(InjectContext, mipsMethodEmiter, this,
+                    var internalFunctionCompiler = new InternalFunctionCompiler( mipsMethodEmiter, this,
                         instructionReader, exploreNewPcCallback, pc, doLog, checkValidAddress: checkValidAddress);
                     return internalFunctionCompiler.CreateFunction();
             }
@@ -65,9 +63,9 @@ namespace ScePSP.Core.Cpu.Dynarec
             DynarecFunctionCompiler _dynarecFunctionCompiler;
             IInstructionReader _instructionReader;
 
-            [Inject] CpuProcessor _cpuProcessor;
+            CpuProcessor _cpuProcessor => PSPDrivers.CPU;
 
-            [Inject] PspMemory _memory;
+            PspMemory _memory => PSPDrivers.PspMemory;
 
             MipsMethodEmitter _mipsMethodEmitter;
 
@@ -107,14 +105,13 @@ namespace ScePSP.Core.Cpu.Dynarec
                 _exploreNewPcCallback?.Invoke(pc);
             }
 
-            internal InternalFunctionCompiler(InjectContext injectContext, MipsMethodEmitter mipsMethodEmitter,
+            internal InternalFunctionCompiler(MipsMethodEmitter mipsMethodEmitter,
                 DynarecFunctionCompiler dynarecFunctionCompiler, IInstructionReader instructionReader,
                 Action<uint> exploreNewPcCallback, uint entryPc, bool doLog, bool checkValidAddress = true)
             {
-                injectContext.InjectDependencesTo(this);
                 _exploreNewPcCallback = exploreNewPcCallback;
                 _mipsMethodEmitter = mipsMethodEmitter;
-                _cpuEmitter = new CpuEmitter(injectContext, mipsMethodEmitter, instructionReader);
+                _cpuEmitter = new CpuEmitter(mipsMethodEmitter, instructionReader);
                 _globalInstructionStats = _cpuProcessor.GlobalInstructionStats;
                 //this.InstructionStats = MipsMethodEmitter.InstructionStats;
                 _instructionStats = new Dictionary<string, uint>();

@@ -45,7 +45,7 @@ namespace ScePSP.Hle.Modules.threadman
         [HlePspFunction(NID = 0xEF9E4C70, FirmwareVersion = 150)]
         public int sceKernelDeleteEventFlag(HleEventFlag EventFlag)
         {
-            EventFlag.RemoveUid(InjectContext);
+            EventFlag.RemoveUid();
             return 0;
         }
 
@@ -88,7 +88,7 @@ namespace ScePSP.Hle.Modules.threadman
 
             ThreadManager.Current.SetWaitAndPrepareWakeUp(
                 HleThread.WaitType.Semaphore,
-                $"_sceKernelWaitEventFlagCB(EventId={EventFlag.GetUidIndex(InjectContext)}, Bits={Bits:X}, Wait={Wait})",
+                $"_sceKernelWaitEventFlagCB(EventId={EventFlag.GetUidIndex()}, Bits={Bits:X}, Wait={Wait})",
                 EventFlag,
                 WakeUpCallback =>
                 {

@@ -2,7 +2,7 @@
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
 
-namespace ScePSP.Core.Gpu.Impl.Opengl
+namespace ScePSP.Core.GpuBackEnd.OpenGL
 {
     public class TextureHookInfo
     {
@@ -12,7 +12,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         public TextureCacheKey TextureCacheKey;
     }
 
-    public class TextureOpengl : Texture<OpenglGpuImpl>
+    public class TextureOpengl : Texture<OpenglBackEnd>
     {
         public GLTexture2D Texture;
 
@@ -56,10 +56,9 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         }
     }
 
-    public class TextureCacheOpengl : TextureCache<OpenglGpuImpl, TextureOpengl>
+    public class TextureCacheOpengl : TextureCache<OpenglBackEnd, TextureOpengl>
     {
-        public TextureCacheOpengl(PspMemory pspMemory, OpenglGpuImpl gpuImpl, InjectContext injectContext)
-            : base(pspMemory, gpuImpl, injectContext)
+        public TextureCacheOpengl(PspMemory pspMemory, OpenglBackEnd gpuImpl) : base(pspMemory, gpuImpl)
         {
         }
     }

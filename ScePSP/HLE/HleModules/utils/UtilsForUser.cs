@@ -13,9 +13,9 @@ namespace ScePSP.Hle.Modules.utils
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe class UtilsForUser : HleModuleHost
     {
-        [Inject] public PspRtc PspRtc;
+        public PspRtc PspRtc => PSPDrivers.PspRtc;
 
-        [Inject] public new CpuProcessor CpuProcessor;
+        public new CpuProcessor CpuProcessor => PSPDrivers.CPU;
 
         public struct TimeValStruct
         {
@@ -382,9 +382,6 @@ namespace ScePSP.Hle.Modules.utils
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     /// <seealso cref="http://takel.jp/mt/MT19937.cs"/>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public unsafe struct SceKernelUtilsMt19937Context

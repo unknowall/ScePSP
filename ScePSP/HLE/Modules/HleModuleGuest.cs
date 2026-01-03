@@ -50,13 +50,13 @@ namespace ScePSP.Hle
         public List<HleModuleImports> ModulesImports = new List<HleModuleImports>();
         public List<HleModuleExports> ModulesExports = new List<HleModuleExports>();
 
-        [Inject] HleModuleManager ModuleManager;
+        HleModuleManager ModuleManager => PSPDrivers.HLE.HleModuleManager;
 
-        [Inject] CpuProcessor CpuProcessor;
+        CpuProcessor CpuProcessor => PSPDrivers.CPU;
 
-        [Inject] HleThreadManager HleThreadManager;
+         HleThreadManager HleThreadManager => PSPDrivers.HLE.HleThreadManager;
 
-        private HleModuleGuest()
+        public HleModuleGuest()
         {
         }
 
@@ -76,8 +76,7 @@ namespace ScePSP.Hle
         {
             //Console.WriteLine(NativeFunction);
 
-            CpuProcessor.Memory.WriteSafe(CallAddress + 0,
-                SyscallInfo.NativeCallSyscallOpCode); // syscall NativeCallSyscallCode
+            CpuProcessor.Memory.WriteSafe(CallAddress + 0, SyscallInfo.NativeCallSyscallOpCode); // syscall NativeCallSyscallCode
             CpuProcessor.Memory.WriteSafe(CallAddress + 4, (uint)ModuleManager.AllocDelegateSlot(
                 Action: CreateDelegate(
                     ModuleManager: ModuleManager,
@@ -214,8 +213,7 @@ namespace ScePSP.Hle
                             ModuleImportName, NIDName
                         );
                     }
-                    throw new NotImplementedException("Not Implemented '" +
-                                                      $"{ModuleImportName}:{NIDName}" + "'");
+                    throw new NotImplementedException($"Not Implemented {ModuleImportName}:{NIDName}");
                 }
                 else
                 {

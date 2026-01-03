@@ -93,7 +93,7 @@ namespace ScePSP.Core
 
         private static XmlSerializer Serializer;
 
-        private PspStoredConfig()
+        public PspStoredConfig()
         {
         }
 
@@ -117,9 +117,9 @@ namespace ScePSP.Core
                         return (PspStoredConfig)Serializer.Deserialize(Stream);
                     }
                 }
-                catch (Exception Exception)
+                catch// (Exception Exception)
                 {
-                    Logger.Error(Exception);
+                    //Logger.Error(Exception);
                     return new PspStoredConfig();
                 }
             }

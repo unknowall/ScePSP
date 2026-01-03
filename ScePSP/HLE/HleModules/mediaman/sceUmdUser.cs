@@ -10,11 +10,11 @@ namespace ScePSP.Hle.Modules.mediaman
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe class sceUmdUser : HleModuleHost
     {
-        [Inject] HleCallbackManager CallbackManager;
+        HleCallbackManager CallbackManager => PSPDrivers.HLE.HleCallbackManager;
 
-        [Inject] ThreadManForUser ThreadManForUser;
+        ThreadManForUser ThreadManForUser => PSPDrivers.HLE.ThreadManForUser;
 
-        [Inject] HleThreadManager HleThreadManager;
+        HleThreadManager HleThreadManager => PSPDrivers.HLE.HleThreadManager;
 
         Dictionary<int, HleCallback> RegisteredCallbacks = new Dictionary<int, HleCallback>();
 

@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Audio;
+﻿using ScePSP.Core.AudioBackEnd;
 using ScePSP.Core.Cpu;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
@@ -23,11 +23,9 @@ namespace ScePSP.Hle.Modules.libatrac3plus
     {
         static Logger Logger = Logger.GetLogger("sceAtrac3plus");
 
-        [Inject] public sceAudio sceAudio;
+        public sceAudio sceAudio => PSPDrivers.HleModules.sceAudio;
 
-        [Inject] public HleMemoryManager HleMemoryManager;
-
-        [Inject] new InjectContext InjectContext;
+        public HleMemoryManager HleMemoryManager => PSPDrivers.HLE.MemoryManager;
 
         public enum CodecType
         {
@@ -80,7 +78,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         [HleUidPoolClass(NotFoundError = SceKernelErrors.ERROR_ATRAC_BAD_ID, FirstItem = 0, ReuseIds = true)]
         public class Atrac : IHleUidPoolClass
         {
-            [Inject] protected HleMemoryManager HleMemoryManager;
+            protected HleMemoryManager HleMemoryManager => PSPDrivers.HLE.MemoryManager;
 
             public At3FormatStruct Format;
             public FactStruct Fact;
@@ -344,22 +342,19 @@ new ArrayWrapper<StereoShortSoundSample>(PointerUtils.ByteArrayToArray<StereoSho
                 public int PlayCount;
             }
 
-            public Atrac(InjectContext InjectContext, CodecType CodecType)
+            public Atrac(CodecType CodecType)
             {
-                InjectContext.InjectDependencesTo(this);
-
                 PrimaryBuffer = HleMemoryManager.GetPartition(MemoryPartitions.User).Allocate(1024);
 
                 this.CodecType = CodecType;
             }
 
-            public Atrac(InjectContext InjectContext, byte* Data, int DataLength)
+            public Atrac(byte* Data, int DataLength)
             {
-                InjectContext.InjectDependencesTo(this);
-
                 PrimaryBuffer = HleMemoryManager.GetPartition(MemoryPartitions.User).Allocate(1024);
 
                 CodecType = CodecType.PSP_MODE_AT_3_PLUS;
+
                 SetData(Data, DataLength);
             }
 
@@ -514,7 +509,7 @@ new ArrayWrapper<StereoShortSoundSample>(PointerUtils.ByteArrayToArray<StereoSho
         public Atrac sceAtracSetDataAndGetID(byte* DataPointer, int DataLength)
         {
             //var Data = ArrayUtils.CreateArray<byte>(DataPointer, DataLength);
-            return TryToAlloc(new Atrac(InjectContext, DataPointer, DataLength));
+            return TryToAlloc(new Atrac(DataPointer, DataLength));
         }
 
         /// <summary>
@@ -698,7 +693,7 @@ new ArrayWrapper<StereoShortSoundSample>(PointerUtils.ByteArrayToArray<StereoSho
         [HlePspNotImplemented]
         public int sceAtracReleaseAtracID(Atrac Atrac)
         {
-            Atrac.RemoveUid(InjectContext);
+            Atrac.RemoveUid();
             return 0;
         }
 
@@ -716,14 +711,13 @@ new ArrayWrapper<StereoShortSoundSample>(PointerUtils.ByteArrayToArray<StereoSho
                 throw new SceKernelException(SceKernelErrors.ATRAC_ERROR_INVALID_CODECTYPE);
             }
 
-            return TryToAlloc(new Atrac(InjectContext, CodecType));
+            return TryToAlloc(new Atrac( CodecType));
         }
 
         private Atrac TryToAlloc(Atrac Atrac)
         {
             var CodecType = Atrac.CodecType;
-            var Count = InjectContext.GetInstance<HleUidPoolManager>().List<Atrac>()
-                .Count(_Atrac => _Atrac.CodecType == CodecType);
+            var Count = PSPDrivers.HLE.HleUidPoolManager.List<Atrac>().Count(_Atrac => _Atrac.CodecType == CodecType);
             if (CodecType == CodecType.PSP_MODE_AT_3_PLUS)
             {
                 if (Count >= MaxAtrac3Plus)
@@ -995,7 +989,7 @@ new ArrayWrapper<StereoShortSoundSample>(PointerUtils.ByteArrayToArray<StereoSho
             //	throw (new SceKernelException(SceKernelErrors.ERROR_BUSY));
             //}
 
-            InjectContext.GetInstance<HleUidPoolManager>().RemoveAll<Atrac>();
+            PSPDrivers.HLE.HleUidPoolManager.RemoveAll<Atrac>();
 
             int Space = MAX_PSP_NUM_ATRAC_IDS;
             MaxAtrac3Plus = 0;

@@ -38,9 +38,7 @@ namespace ScePSP.Hle
 
         public string Name => this.GetType().Name;
 
-        [Inject] protected PspMemory Memory;
-
-        [Inject] protected InjectContext InjectContext;
+        protected PspMemory Memory => PSPDrivers.PspMemory;
 
         protected HleModuleHost()
         {

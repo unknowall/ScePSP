@@ -12,15 +12,15 @@ namespace ScePSP.Hle.Modules.threadman
     [HleUidPoolClass(NotFoundError = SceKernelErrors.ERROR_KERNEL_NOT_FOUND_VTIMER)]
     public unsafe class VirtualTimer : IHleUidPoolClass, IDisposable
     {
-        [Inject] PspRtc PspRtc;
+        PspRtc PspRtc => PSPDrivers.PspRtc;
 
-        [Inject] HleMemoryManager MemoryManager;
+        HleMemoryManager MemoryManager => PSPDrivers.HLE.MemoryManager;
 
-        [Inject] CpuProcessor CpuProcessor;
+        CpuProcessor CpuProcessor => PSPDrivers.CPU;
 
-        [Inject] PspMemory Memory;
+        PspMemory Memory => PSPDrivers.PspMemory;
 
-        [Inject] HleInterop HleInterop;
+        HleInterop HleInterop => PSPDrivers.HLE.HleInterop;
 
         protected PspVirtualTimer Timer;
         public int Id;
@@ -45,10 +45,8 @@ namespace ScePSP.Hle.Modules.threadman
         MemoryPartition PspSharedInfoMemoryPartition;
         PspSharedInfoStruct* PspSharedInfo;
 
-        public VirtualTimer(InjectContext InjectContext, string Name)
+        public VirtualTimer(string Name)
         {
-            InjectContext.InjectDependencesTo(this);
-
             this.Timer = PspRtc.CreateVirtualTimer(Handler);
             this.Name = Name;
             this.Timer.Enabled = false;

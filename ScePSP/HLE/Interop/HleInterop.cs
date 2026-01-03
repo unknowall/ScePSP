@@ -11,13 +11,12 @@ namespace ScePSP.Hle.Interop
     {
         //ThreadLocal<HleThread> CurrentFakeHleThreads;
 
-        [Inject] protected HleThreadManager HleThreadManager;
+        protected HleThreadManager HleThreadManager => PSPDrivers.HLE.HleThreadManager;
 
-        [Inject] protected CpuProcessor CpuProcessor;
+        protected CpuProcessor CpuProcessor => PSPDrivers.CPU;
 
-        [Inject] protected InjectContext InjectContext;
 
-        private HleInterop()
+        public HleInterop()
         {
         }
 
@@ -112,8 +111,7 @@ namespace ScePSP.Hle.Interop
             return currentFakeHleThread;
         }
 
-        public static void SetArgumentsToCpuThreadState(CpuThreadState cpuThreadState, uint function,
-            params object[] arguments)
+        public static void SetArgumentsToCpuThreadState(CpuThreadState cpuThreadState, uint function, params object[] arguments)
         {
             var gprIndex = 4;
 

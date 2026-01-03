@@ -18,9 +18,10 @@ namespace ScePSP.Hle.Modules.threadman
         [HlePspFunction(NID = 0x20FFF560, FirmwareVersion = 150)]
         public VirtualTimer sceKernelCreateVTimer(string Name, SceKernelVTimerOptParam* SceKernelVTimerOptParam)
         {
-            var VirtualTimer = new VirtualTimer(InjectContext, Name);
+            var VirtualTimer = new VirtualTimer(Name);
+            PSPDrivers.VirtualTimerList.Add(VirtualTimer);
             if (SceKernelVTimerOptParam != null) VirtualTimer.SceKernelVTimerOptParam = *SceKernelVTimerOptParam;
-            VirtualTimer.Id = VirtualTimer.GetUidIndex(InjectContext);
+            VirtualTimer.Id = VirtualTimer.GetUidIndex();
             return VirtualTimer;
         }
 
@@ -143,7 +144,7 @@ namespace ScePSP.Hle.Modules.threadman
         [HlePspFunction(NID = 0x328F9E52, FirmwareVersion = 150)]
         public int sceKernelDeleteVTimer(VirtualTimer VirtualTimer)
         {
-            VirtualTimer.RemoveUid(InjectContext);
+            VirtualTimer.RemoveUid();
             return 0;
         }
     }

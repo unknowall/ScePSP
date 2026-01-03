@@ -7,7 +7,7 @@ namespace ScePSP.Hle.Modules.interruptman
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00000011)]
     public unsafe class InterruptManager : HleModuleHost
     {
-        [Inject] HleInterruptManager HleInterruptManager;
+        HleInterruptManager HleInterruptManager => PSPDrivers.HLE.HleInterruptManager;
 
         private static void CheckImplementedInterruptType(PspInterrupts PspInterrupt)
         {

@@ -13,19 +13,17 @@ namespace ScePSP.Core.Cpu
     {
         public readonly Dictionary<string, uint> GlobalInstructionStats = new Dictionary<string, uint>();
 
-        [Inject] public InjectContext InjectContext;
+        public CpuConfig CpuConfig => PSPDrivers.Config.CpuConfig;
 
-        [Inject] public CpuConfig CpuConfig;
+        public PspMemory Memory => PSPDrivers.PspMemory;
 
-        [Inject] public PspMemory Memory;
+        public ICpuConnector CpuConnector => PSPDrivers.CpuConnector;
 
-        [Inject] public ICpuConnector CpuConnector;
+        public DynarecFunctionCompiler DynarecFunctionCompiler => PSPDrivers.DynarecFunctionCompiler;
 
-        [Inject] public DynarecFunctionCompiler DynarecFunctionCompiler;
+        public IInterruptManager InterruptManager => PSPDrivers.InterruptManager;
 
-        [Inject] public IInterruptManager InterruptManager;
-
-        [Inject] public MethodCache MethodCache;
+        public MethodCache MethodCache => PSPDrivers.MethodCache;
 
         public Dictionary<uint, NativeSyscallInfo> RegisteredNativeSyscallMethods = new Dictionary<uint, NativeSyscallInfo>();
 

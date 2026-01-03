@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics;
 using System.Numerics;
 
-namespace ScePSP.Rasterizer
+namespace ScePSP.Core.GpuBackEnd.Soft
 {
     public delegate void RasterizeDelegate<T>(int y, ref RasterizerResult left, ref RasterizerResult right, ref T context);
 

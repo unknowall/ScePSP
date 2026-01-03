@@ -1,6 +1,6 @@
 ﻿using ScePSPUtils.Extensions;
 
-namespace ScePSP.Core.Gpu
+namespace ScePSP.Core.GpuBackEnd
 {
     /// <summary>
     /// alias void function(int id, void *arg) PspGeCallback;

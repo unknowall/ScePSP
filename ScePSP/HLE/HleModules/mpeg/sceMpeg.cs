@@ -25,45 +25,24 @@ namespace ScePSP.Hle.Modules.mpeg
         /// </summary>
         protected const int MPEG_ATRAC_ES_SIZE = 2112;
 
-        /// <summary>
-        /// 
-        /// </summary>
         protected const int RingBufferPacketSize = 0x800;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public const int MPEG_ATRAC_ES_OUTPUT_SIZE = 8192;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        [Inject] new HleConfig HleConfig;
+        new HleConfig HleConfig => PSPDrivers.Config.HleConfig;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        [Inject] HleInterop HleInterop;
+        HleInterop HleInterop => PSPDrivers.HLE.HleInterop;
 
-        /// <summary>
-        /// 
-        /// </summary>
         private Mpeg __SingleInstance = null;
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="mpeg"></param>
         /// <returns></returns>
         private Mpeg GetMpeg(SceMpegPointer* mpeg)
         {
-            if (__SingleInstance == null) __SingleInstance = new Mpeg(InjectContext);
+            if (__SingleInstance == null) __SingleInstance = new Mpeg();
             return __SingleInstance;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="sceMpeg"></param>
         /// <returns></returns>
         public SceMpeg* GetSceMpegData(SceMpegPointer* sceMpeg)

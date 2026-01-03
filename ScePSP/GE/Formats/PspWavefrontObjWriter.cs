@@ -1,9 +1,9 @@
-﻿using ScePSP.Core.Gpu.State;
+﻿using ScePSP.Core.GpuBackEnd.State;
 using ScePSP.Utils;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace ScePSP.Core.Gpu.Formats
+namespace ScePSP.Core.GpuBackEnd.Formats
 {
     public unsafe class PspWavefrontObjWriter
     {

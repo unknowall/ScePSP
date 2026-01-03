@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace ScePSP.Core.Audio
+namespace ScePSP.Core.AudioBackEnd
 {
-    public abstract class AudioImpl : PspPluginImpl
+    public abstract class AudioBackEnd
     {
         public abstract void Update(Action<short[]> ReadStream);
 

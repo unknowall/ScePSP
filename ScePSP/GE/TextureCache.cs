@@ -1,7 +1,7 @@
 ﻿//#define DEBUG_TEXTURE_CACHE
 
-using ScePSP.Core.Gpu.Impl.Opengl;
-using ScePSP.Core.Gpu.State;
+using ScePSP.Core.GpuBackEnd.OpenGL;
+using ScePSP.Core.GpuBackEnd.State;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
 using ScePSP.Utils;
@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using Hashing = ScePSP.Utils.Hashing;
 
-namespace ScePSP.Core.Gpu
+namespace ScePSP.Core.GpuBackEnd
 {
     public abstract unsafe class Texture<TGpuImpl> : IDisposable
     {
@@ -65,8 +65,7 @@ namespace ScePSP.Core.Gpu
         public Texture<TGpuImpl> Load(string FileName)
         {
             var Bitmap = new Bitmap(Image.FromFile(FileName));
-            SetData(Bitmap.GetChannelsDataInterleaved(BitmapChannelList.Argb).CastToStructArray<OutputPixel>(),
-                Bitmap.Width, Bitmap.Height);
+            SetData(Bitmap.GetChannelsDataInterleaved(BitmapChannelList.Argb).CastToStructArray<OutputPixel>(), Bitmap.Width, Bitmap.Height);
             return this;
         }
 
@@ -113,13 +112,10 @@ namespace ScePSP.Core.Gpu
         private byte[] SwizzlingBuffer = new byte[4 * 1024 * 1024];
         private OutputPixel[] DecodedTextureBuffer = new OutputPixel[1024 * 1024];
 
-        InjectMessageBus MessageBus;
-
-        public TextureCache(PspMemory PspMemory, TGpuImpl GpuImpl, InjectContext InjectContext)
+        public TextureCache(PspMemory PspMemory, TGpuImpl GpuImpl)
         {
             this.PspMemory = PspMemory;
             this.GpuImpl = GpuImpl;
-            MessageBus = InjectContext.GetInstance<InjectMessageBus>();
         }
 
         TTexture InvalidTexture;
@@ -255,7 +251,8 @@ namespace ScePSP.Core.Gpu
                                          "_" + Swizzled;
 #if DEBUG_TEXTURE_CACHE
 
-					Console.Error.WriteLine("UPDATE_TEXTURE(TEX={0},CLUT={1}:{2}:{3}:{4}:0x{5:X},SIZE={6}x{7},{8},Swizzled={9})", TextureFormat, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask, BufferWidth, Height, BufferWidth, Swizzled);
+					Console.Error.WriteLine("UPDATE_TEXTURE(TEX={0},CLUT={1}:{2}:{3}:{4}:0x{5:X},SIZE={6}x{7},{8},Swizzled={9})",
+                        TextureFormat, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask, BufferWidth, Height, BufferWidth, Swizzled);
 #endif
                     Texture = new TTexture();
                     Texture.Init(GpuImpl);
@@ -354,7 +351,7 @@ namespace ScePSP.Core.Gpu
                                 Width = TextureWidth,
                                 Height = TextureHeight
                             };
-                            MessageBus.Dispatch(TextureInfo);
+                            //MessageBus.Dispatch(TextureInfo);
 
                             var Result = Texture.SetData(TextureInfo.Data, TextureInfo.Width, TextureInfo.Height);
                         }

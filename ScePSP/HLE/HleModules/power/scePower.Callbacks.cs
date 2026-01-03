@@ -6,7 +6,7 @@ namespace ScePSP.Hle.Modules.power
 {
     public unsafe partial class scePower
     {
-        [Inject] HleCallbackManager CallbackManager;
+        HleCallbackManager CallbackManager => PSPDrivers.HLE.HleCallbackManager;
 
         private const int NumberOfCBPowerSlots = 16;
         private const int NumberOfCBPowerSlotsPrivate = 32;
@@ -81,8 +81,7 @@ namespace ScePSP.Hle.Modules.power
             }
         }
 
-        private readonly Slot[] Callbacks =
-            Enumerable.Range(0, NumberOfCBPowerSlots).Select(Index => new Slot(Index)).ToArray();
+        private readonly Slot[] Callbacks = Enumerable.Range(0, NumberOfCBPowerSlots).Select(Index => new Slot(Index)).ToArray();
 
         private void CheckSlotIndex(int SlotIndex, bool AllowMinusOne)
         {

@@ -3,8 +3,8 @@ using ScePSP.Core;
 using ScePSP.Core.Components.Controller;
 using ScePSP.Core.Components.Display;
 using ScePSP.Core.Components.Rtc;
-using ScePSP.Core.Gpu;
-using ScePSP.Core.Gpu.Impl.Opengl;
+using ScePSP.Core.GpuBackEnd;
+using ScePSP.Core.GpuBackEnd.OpenGL;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types.Controller;
 using ScePSP.Runner;
@@ -14,9 +14,11 @@ using SDL2;
 using System;
 using System.Diagnostics;
 using System.Windows.Forms;
+
 using static ScePSPUtils.Logger;
 
 using LightGL;
+using System.Threading;
 
 #pragma warning disable CS0436
 #pragma warning disable CS8602
@@ -27,18 +29,11 @@ class Program
     static IntPtr window;
     static IGlContext? Context;
 
-    static InjectContext? injector;
-    static PspRtc? rtc;
-    static PspDisplay? display;
-    static DisplayTask? displayComponent;
-    static PspMemory? memory;
-    static PspController? controller;
-    static GpuProcessor? gpu;
-    static PspEmulator? pspEmulator;
-
     static SceCtrlData ctrlData;
     static int lx, ly;
     static int pressingAnalogLeft, pressingAnalogRight, pressingAnalogUp, pressingAnalogDown;
+
+    static PspEmulator? pspEmulator;
 
     static GLShader? Shader;
     static GLBuffer? VertexBuffer;
@@ -94,18 +89,7 @@ class Program
         //TestTexture = GLTexture.Create().SetFormat(TextureFormat.RGBA).SetSize(2, 2).SetData(new uint[] { 0xFF0000FF, 0xFF00FFFF, 0xFFFF00FF, 0xFFFFFFFF });
         Context.ReleaseCurrent();
 
-        //Logger.OnGlobalLog += Log;
-
-        injector = PspInjectContext.CreateInjectContext(PspStoredConfig.Load(), PspGpuType.OpenGL, PspAudioType.SDL);
-
-        pspEmulator = injector.GetInstance<PspEmulator>();
-
-        rtc = pspEmulator.InjectContext.GetInstance<PspRtc>();
-        display = pspEmulator.InjectContext.GetInstance<PspDisplay>();
-        displayComponent = pspEmulator.InjectContext.GetInstance<DisplayTask>();
-        memory = pspEmulator.InjectContext.GetInstance<PspMemory>();
-        controller = pspEmulator.InjectContext.GetInstance<PspController>();
-        gpu = pspEmulator.InjectContext.GetInstance<GpuProcessor>();
+        Logger.OnGlobalLog += Log;
 
         PspDisplay.DrawEvent += DrawFrame;
 
@@ -117,13 +101,18 @@ class Program
         pressingAnalogUp = 0;
         pressingAnalogDown = 0;
 
-        pspEmulator.StartAndLoad(ofn.FileName, RunMainLoop, false, false);
+        pspEmulator = new PspEmulator();
+
+        pspEmulator.Start(ofn.FileName, false, false);
+
+        RunMainLoop();
     }
 
     private static void Log(string name, Level level, string message, StackFrame stack)
     {
         switch (level)
         {
+            //case Level.Notice:
             case Level.Fatal:
             case Level.Warning:
             case Level.Error:
@@ -134,9 +123,9 @@ class Program
 
     private static void GetTextureFromGpu()
     {
-        var OpengImpl = (gpu.GpuImpl as OpenglGpuImpl);
+        var OpengImpl = (PSPDrivers.GpuBackEnd as OpenglBackEnd);
         OpengImpl.RenderbufferManager.GetDrawBufferTextureAndLock(
-            new DrawBufferKey() { Address = display.CurrentInfo.FrameAddress },
+            new DrawBufferKey() { Address = PSPDrivers.Devices.Display.CurrentInfo.FrameAddress },
             (DrawBuffer) =>
             {
                 if (DrawBuffer != null)
@@ -166,10 +155,10 @@ class Program
 
         TexVram.Bind();
 
-        var width = display.CurrentInfo.Width;
-        var height = display.CurrentInfo.Height;
+        var width = PSPDrivers.Devices.Display.CurrentInfo.Width;
+        var height = PSPDrivers.Devices.Display.CurrentInfo.Height;
         var pixels2 = new uint[PspDisplay.MaxBufferArea];
-        var displayData = memory.Range<uint>(display.CurrentInfo.FrameAddress, PspDisplay.MaxBufferArea);
+        var displayData = PSPDrivers.PspMemory.Range<uint>(PSPDrivers.Devices.Display.CurrentInfo.FrameAddress, PspDisplay.MaxBufferArea);
         for (var m = 0; m < PspDisplay.MaxBufferArea; m++)
         {
             var color = displayData[m];
@@ -197,13 +186,13 @@ class Program
         ctrlData.X = lx / 3f;
         ctrlData.Y = ly / 3f;
 
-        ctrlData.TimeStamp = (uint)rtc.UnixTimeStampTS.Milliseconds;
+        ctrlData.TimeStamp = (uint)PSPDrivers.PspRtc.UnixTimeStampTS.Milliseconds;
 
-        controller.InsertSceCtrlData(ctrlData);
+        PSPDrivers.Devices.PspController.InsertSceCtrlData(ctrlData);
 
         Context.MakeCurrent();
 
-        if (!display.CurrentInfo.PlayingVideo && gpu.UsingGe)
+        if (!PSPDrivers.Devices.Display.CurrentInfo.PlayingVideo && PSPDrivers.GE.UsingGe)
         {
             GetTextureFromGpu();
         }
@@ -218,12 +207,18 @@ class Program
 
         Shader.Draw(GLGeometry.GL_TRIANGLE_STRIP, 4, () =>
         {
-            var TextureRect = GLRectangleF.FromCoords(0, 0, (float)display.CurrentInfo.Width / 512f, (float)display.CurrentInfo.Height / 272f);
+            var TextureRect = GLRectangleF.FromCoords(0, 0, 
+                (float)PSPDrivers.Devices.Display.CurrentInfo.Width / 512f, (float)PSPDrivers.Devices.Display.CurrentInfo.Height / 272f);
+
             if (TextureVerticalFlip) TextureRect = TextureRect.VFlip();
+
             TexCoordsBuffer = GLBuffer.Create().SetData(TextureRect.GetFloat2TriangleStripCoords());
+
             ShaderInfo.texture.Set(GLTextureUnit.CreateAtIndex(0).SetFiltering(GLScaleFilter.Nearest).SetWrap(GLWrap.ClampToEdge).SetTexture(DrawTexture));
             //ShaderInfo.texture.Set(GLTextureUnit.CreateAtIndex(0).SetFiltering(GLScaleFilter.Nearest).SetWrap(GLWrap.ClampToEdge).SetTexture(DrawDepth));
+
             ShaderInfo.position.SetData<float>(VertexBuffer, 2);
+
             ShaderInfo.texCoords.SetData<float>(TexCoordsBuffer, 2);
         });
 
@@ -232,11 +227,9 @@ class Program
         Context.ReleaseCurrent();
     }
 
-    private static void RunMainLoop(PspEmulator emulator)
+    private static void RunMainLoop()
     {
         var running = true;
-
-        //Console.WriteLine("Starting main loop");
 
         PspCtrlButtons UpdatePressing(ref int value, bool pressing)
         {
@@ -254,12 +247,15 @@ class Program
 
         while (running)
         {
+            //Thread.Sleep(10);
+
             while (SDL.SDL_PollEvent(out var e) != 0)
             {
                 switch (e.type)
                 {
                     case SDL.SDL_EventType.SDL_QUIT:
                         running = false;
+                        pspEmulator.Stop();
                         break;
                     case SDL.SDL_EventType.SDL_KEYDOWN:
                     case SDL.SDL_EventType.SDL_KEYUP:

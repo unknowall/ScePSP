@@ -7,13 +7,11 @@ using System.IO;
 
 namespace ScePSP.cheats
 {
-    public class CWCheatPlugin : IInjectInitialize
+    public class CWCheatPlugin
     {
-        [Inject] PspDisplay PspDisplay;
+        PspDisplay PspDisplay => PSPDrivers.PspDisplay;
 
-        [Inject] PspMemory PspMemory;
-
-        [Inject] InjectMessageBus MessageBus;
+        PspMemory PspMemory => PSPDrivers.PspMemory;
 
         protected List<CWCheatEntry> CWCheats = new List<CWCheatEntry>();
         //public bool UseFastMemory;
@@ -48,25 +46,21 @@ namespace ScePSP.cheats
             }
         }
 
-        void IInjectInitialize.Initialize()
+        public CWCheatPlugin()
         {
             PspDisplay.VBlankEventCall += new Action(PspEmulator_VBlankEventCall);
 
-            MessageBus.Register<LoadFileMessage>((LoadFileMessage) =>
+            LinkedCwcheatsFile = PSPDrivers.GameInfo.ID + ".cwcheat";
+            if (File.Exists(LinkedCwcheatsFile))
             {
-                LinkedCwcheatsFile = LoadFileMessage.FileName + ".cwcheat";
-                if (File.Exists(LinkedCwcheatsFile))
-                {
-                    ConsoleUtils.SaveRestoreConsoleColor(ConsoleColor.Magenta,
-                        () => { Console.WriteLine("Loaded... {0}", LoadFileMessage.FileName); });
-                    LinkedCwcheatsFileMustWrite = true;
-                    this.Cheats = File.ReadAllText(LoadFileMessage.FileName + ".cwcheat");
-                }
-                else
-                {
-                    this.Cheats = "";
-                }
-            });
+                ConsoleUtils.SaveRestoreConsoleColor(ConsoleColor.Magenta, () => { Console.WriteLine("Loaded... {0}", PSPDrivers.GameInfo.ID); });
+                LinkedCwcheatsFileMustWrite = true;
+                this.Cheats = File.ReadAllText(PSPDrivers.GameInfo.ID + ".cwcheat");
+            }
+            else
+            {
+                this.Cheats = "";
+            }
         }
 
         //public void AddCwCheat(uint Code, uint Value)

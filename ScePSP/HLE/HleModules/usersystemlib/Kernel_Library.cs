@@ -8,10 +8,11 @@ namespace ScePSP.Hle.Modules.usersystemlib
     [HlePspModule(ModuleFlags = ModuleFlags.KernelMode | ModuleFlags.Flags0x00010011)]
     public unsafe class Kernel_Library : HleModuleHost
     {
-        [Inject] public HleInterruptManager HleInterruptManager;
+        public HleInterruptManager HleInterruptManager => PSPDrivers.HLE.HleInterruptManager;
 
-        [Inject] public ThreadManForUser ThreadManForUser;
+        public ThreadManForUser ThreadManForUser => PSPDrivers.HLE.ThreadManForUser;
 
+        HleThreadManager HleThreadManager => PSPDrivers.HLE.HleThreadManager;
 
         private int _sceKernelLockLwMutexCB(SceLwMutexWorkarea* workarea, int count, int* TimeOut, bool HandleCallbacks)
         {
@@ -58,8 +59,6 @@ namespace ScePSP.Hle.Modules.usersystemlib
         {
             return 0;
         }
-
-        [Inject] HleThreadManager HleThreadManager;
 
         private int _sceKernelUnlockLwMutex(SceLwMutexWorkarea* workarea, int count)
         {

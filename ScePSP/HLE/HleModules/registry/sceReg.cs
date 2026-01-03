@@ -9,9 +9,9 @@ namespace ScePSP.Hle.Modules.registry
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe class sceReg : HleModuleHost
     {
-        [Inject] HleRegistryManager HleRegistryManager;
+        HleRegistryManager HleRegistryManager => PSPDrivers.HLE.HleRegistryManager;
 
-        [Inject] new HleConfig HleConfig;
+        new HleConfig HleConfig => PSPDrivers.Config.HleConfig;
 
         /// <summary>
         /// Open the registry

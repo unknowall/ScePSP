@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ScePSP.Core.Audio
+namespace ScePSP.Core.AudioBackEnd
 {
     public unsafe class PspAudioChannel
     {
@@ -172,11 +172,11 @@ namespace ScePSP.Core.Audio
 
             switch (Format)
             {
-                case Audio.PspAudio.FormatEnum.Mono:
+                case Core.AudioBackEnd.PspAudio.FormatEnum.Mono:
                     StereoSamples = MonoToStereo(Samples);
                     break;
                 default:
-                case Audio.PspAudio.FormatEnum.Stereo:
+                case Core.AudioBackEnd.PspAudio.FormatEnum.Stereo:
                     StereoSamples = Samples;
                     break;
             }

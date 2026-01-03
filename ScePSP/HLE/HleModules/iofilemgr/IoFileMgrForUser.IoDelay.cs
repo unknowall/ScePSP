@@ -8,11 +8,11 @@ namespace ScePSP.Hle.Modules.iofilemgr
 {
     public partial class IoFileMgrForUser
     {
-        [Inject] PspRtc PspRtc;
+        PspRtc PspRtc => PSPDrivers.PspRtc;
 
-        [Inject] PspHleRunningConfig PspHleRunningConfig;
+        PspHleRunningConfig PspHleRunningConfig => PSPDrivers.Config.PspHleRunningConfig;
 
-        [Inject] new HleThreadManager ThreadManager;
+        new HleThreadManager ThreadManager => PSPDrivers.HLE.HleThreadManager;
 
         private class IoDelayType
         {

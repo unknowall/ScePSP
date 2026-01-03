@@ -9,7 +9,7 @@ namespace ScePSP.Hle.Modules.libfont
 {
     public unsafe partial class sceLibFont
     {
-        [Inject] HleIoManager HleIoManager;
+        HleIoManager HleIoManager => PSPDrivers.HLE.HleIoManager;
 
         /// <summary>
         /// Opens a new font.

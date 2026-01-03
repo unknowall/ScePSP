@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace ScePSP.Hle.Managers
 {
-    public sealed class HleModuleManager : IInjectInitialize, IDisposable
+    public sealed class HleModuleManager : IDisposable
     {
         private readonly Dictionary<Type, HleModuleHost> HleModules = new Dictionary<Type, HleModuleHost>();
         public readonly List<HleModuleGuest> LoadedGuestModules = new List<HleModuleGuest>();
@@ -16,13 +16,15 @@ namespace ScePSP.Hle.Managers
         public readonly Queue<DelegateInfo> LastCalledCallbacks = new Queue<DelegateInfo>();
         private uint DelegateLastId = 0;
 
-        [Inject] HleThreadManager HleThreadManager;
+        public Dictionary<string, Type> HleModuleTypes;
 
-        [Inject] CpuProcessor CpuProcessor;
+        //int LastCallIndex = 0;
 
-        [Inject] InjectContext InjectContext;
+        HleThreadManager HleThreadManager => PSPDrivers.HLE.HleThreadManager;
 
-        [Inject] HleConfig HleConfig;
+        CpuProcessor CpuProcessor => PSPDrivers.CPU;
+
+        HleConfig HleConfig => PSPDrivers.Config.HleConfig;
 
         public static IEnumerable<Type> GetAllHleModules(Assembly ModulesAssembly)
         {
@@ -31,11 +33,7 @@ namespace ScePSP.Hle.Managers
             return ModulesAssembly.GetTypes().Where(Type => FindType.IsAssignableFrom(Type));
         }
 
-        public Dictionary<string, Type> HleModuleTypes;
-
-        //int LastCallIndex = 0;
-
-        void IInjectInitialize.Initialize()
+        public HleModuleManager()
         {
             if (HleConfig.HleModulesDll == null)
             {
@@ -43,7 +41,18 @@ namespace ScePSP.Hle.Managers
             }
 
             HleModuleTypes = GetAllHleModules(HleConfig.HleModulesDll).ToDictionary(Type => Type.Name);
+
             Console.Out.WriteLineColored(ConsoleColor.Yellow, "HleModuleTypes: {0}", HleModuleTypes.Count);
+
+            //foreach (var type in HleModuleTypes)
+            //{
+            //    Console.Out.WriteLineColored(ConsoleColor.Yellow, "  Key {0}  -> Name {1}", type.Key, type.Value);
+            //}
+
+            //foreach (var type in HleModules)
+            //{
+            //    Console.Out.WriteLineColored(ConsoleColor.Green, "  Key {0}  -> Name {1}", type.Key, type.Value);
+            //}
 
             if (HleModuleTypes.Count < 10)
             {
@@ -98,10 +107,13 @@ namespace ScePSP.Hle.Managers
 
         public HleModuleHost GetModuleByType(Type Type)
         {
+            //Console.WriteLine("GetModuleByType('{0}')", Type);
+
             if (!HleModules.ContainsKey(Type))
             {
-                var HleModule = HleModules[Type] = (HleModuleHost)InjectContext.GetInstance(Type);
-                InjectContext.InjectDependencesTo(HleModule);
+                var HleModule = HleModules[Type] = (HleModuleHost)Activator.CreateInstance(Type);
+
+                PSPDrivers.HleModuleHostList.Add(HleModule);
             }
 
             return (HleModuleHost)HleModules[Type];
@@ -110,6 +122,7 @@ namespace ScePSP.Hle.Managers
         public HleModuleHost GetModuleByName(string ModuleNameToFind)
         {
             //Console.WriteLine("GetModuleByName('{0}')", ModuleNameToFind);
+
             if (!HleModuleTypes.ContainsKey(ModuleNameToFind))
             {
                 throw new KeyNotFoundException("Can't find module '" + ModuleNameToFind + "'");
@@ -136,8 +149,7 @@ namespace ScePSP.Hle.Managers
             return EntriesByName[FunctionName].Delegate;
         }
 
-        public uint AllocDelegateSlot(Action<CpuThreadState> Action, string ModuleImportName,
-            HleFunctionEntry FunctionEntry)
+        public uint AllocDelegateSlot(Action<CpuThreadState> Action, string ModuleImportName, HleFunctionEntry FunctionEntry)
         {
             uint DelegateId = DelegateLastId++;
             if (Action == null)

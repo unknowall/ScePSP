@@ -16,13 +16,14 @@ namespace ScePSP.Hle
 
     public class HleConfig
     {
-        [Inject] PspStoredConfig PspStoredConfig;
+        PspStoredConfig PspStoredConfig => PSPDrivers.Config.StoredConfig;
 
         public bool DebugThreadSwitching = false;
+
         public bool DebugNotImplemented = true;
 
         //public PspConfirmButton ConfirmButton;
-        //public bool WlanIsOn = false;
+
         public bool WlanIsOn = true;
 
         public bool UseCoRoutines = false;
@@ -30,10 +31,10 @@ namespace ScePSP.Hle
 
         public bool DebugSyscalls = false;
 
-        //public PspVersion FirmwareVersion = new PspVersion(6, 3, 0);
         public PspVersion FirmwareVersion = new PspVersion("6.6.0.0");
 
         public Assembly HleModulesDll;
+
         public bool TraceLastSyscalls;
 
         public SdkFlags SdkFlags;
@@ -48,11 +49,7 @@ namespace ScePSP.Hle
         public PSP_SYSTEMPARAM_TIME_FORMAT TimeFormat = PSP_SYSTEMPARAM_TIME_FORMAT._24HR;
         public PSP_SYSTEMPARAM_DAYLIGHTSAVINGS DaylightSavings = PSP_SYSTEMPARAM_DAYLIGHTSAVINGS.STD;
         public double Timezone = -7;
-        public string UserName = Environment.GetEnvironmentVariable("ScePSP");
-
-        private HleConfig()
-        {
-        }
+        public string UserName = Environment.GetEnvironmentVariable("UserName");
     }
 
     class HleConfigUtils

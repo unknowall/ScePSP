@@ -1,14 +1,11 @@
-﻿using ScePSP.Rasterizer;
-using ScePSP.Utils;
+﻿using ScePSP.Utils;
 using ScePSPUtils.Drawing;
 using System.Numerics;
 
-namespace ScePSP.Core.Gpu.Impl.Soft
+namespace ScePSP.Core.GpuBackEnd.Soft
 {
-    unsafe public class GpuImplSoft : GpuImpl
+    unsafe public class GpuImplSoft : GpuBackEnd
     {
-        public override bool IsWorking => true;
-
         private TriangleRasterizer<Triangle> TriangleRasterizer;
 
         public GpuImplSoft()

@@ -265,7 +265,7 @@ namespace ScePSP.Hle.Modules.threadman
         [HlePspFunction(NID = 0x89B3D48C, FirmwareVersion = 150)]
         public int sceKernelDeleteVpl(VariablePool VariablePool)
         {
-            VariablePool.RemoveUid(InjectContext);
+            VariablePool.RemoveUid();
             return 0;
         }
 

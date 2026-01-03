@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace ScePSP.Core.Gpu
+namespace ScePSP.Core.GpuBackEnd
 {
     public sealed class WaitableStateMachine<TEnum>
     {

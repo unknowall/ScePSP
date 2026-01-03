@@ -3,7 +3,7 @@
 using cscodec;
 using cscodec.h264.player;
 using ScePSP.Core.Components.Display;
-using ScePSP.Core.Gpu;
+using ScePSP.Core.GpuBackEnd;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
 using ScePSP.Hle.Formats.video;
@@ -25,14 +25,15 @@ namespace ScePSP.Hle.Modules.mpeg
 
     unsafe class Mpeg
     {
-        [Inject] public PspMemory Memory;
+        public PspMemory Memory => PSPDrivers.PspMemory;
 
-        [Inject] public GpuImpl GpuImpl;
+        public GpuBackEnd Gpubackend => PSPDrivers.GpuBackEnd;
 
-        [Inject] public PspDisplay PspDisplay;
+        public PspDisplay PspDisplay => PSPDrivers.PspDisplay;
 
         public SceMpegPointer* _Mpeg;
         public SceMpeg* Data;
+
         public MpegAu AvcAu = new MpegAu();
 
         public MpegAu AtracAu = new MpegAu();
@@ -56,9 +57,8 @@ namespace ScePSP.Hle.Modules.mpeg
 
         private const bool DumpStreams = false;
 
-        public Mpeg(InjectContext InjectContext)
+        public Mpeg()
         {
-            InjectContext.InjectDependencesTo(this);
             Create();
         }
 
@@ -182,8 +182,7 @@ namespace ScePSP.Hle.Modules.mpeg
             return AvcAu.SceMpegAu;
         }
 
-        public void AvcDecode(SceMpegAu* MpegAccessUnit, int FrameWidth, GuPixelFormats GuPixelFormat,
-            PspPointer OutputBuffer)
+        public void AvcDecode(SceMpegAu* MpegAccessUnit, int FrameWidth, GuPixelFormats GuPixelFormat, PspPointer OutputBuffer)
         {
             if (MpegAccessUnit != null) *MpegAccessUnit = GetAvcAu(StreamId.Avc);
 
@@ -237,7 +236,7 @@ namespace ScePSP.Hle.Modules.mpeg
                         });
                         PspDisplay.CurrentInfo.PlayingVideo = true;
                         Memory.WriteBytes(OutputBuffer.Address, TempBufferPtr, TempBuffer.Length);
-                        GpuImpl.InvalidateCache(OutputBuffer.Address, TempBuffer.Length);
+                        Gpubackend.InvalidateCache(OutputBuffer.Address, TempBuffer.Length);
                     }
 
                     //if (SaveBitmapFrame) Bitmap.Save(ApplicationPaths.AssertPath + "/" + FrameIndex + ".png");

@@ -1,13 +1,13 @@
 ﻿using LightGL;
 using ScePSP.Core.Cpu;
-using ScePSP.Core.Gpu.State;
+using ScePSP.Core.GpuBackEnd.State;
 using ScePSP.Core.Types;
 using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace ScePSP.Core.Gpu.Impl.Opengl
+namespace ScePSP.Core.GpuBackEnd.OpenGL
 {
     public struct DrawBufferKey
     {
@@ -24,19 +24,19 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         //static int ScreenWidth = 480 * 2;
         //static int ScreenHeight = 272 * 2;
 
-        OpenglGpuImpl OpenglGpuImpl;
+        OpenglBackEnd OpenglGpuImpl;
 
         public class DrawBufferValue : IDisposable
         {
             public DrawBufferKey DrawBufferKey;
             public GLRenderTarget RenderTarget;
             public int Width, Height;
-            private readonly OpenglGpuImpl _openglGpuImpl;
+            private readonly OpenglBackEnd _openglGpuImpl;
             private int _currentScaleViewport;
             private bool _mustUpdateRenderTarget;
             private int _mustUpdateRenderTargetScaleViewport;
 
-            public DrawBufferValue(OpenglGpuImpl openglGpuImpl, DrawBufferKey drawBufferKey)
+            public DrawBufferValue(OpenglBackEnd openglGpuImpl, DrawBufferKey drawBufferKey)
             {
                 _openglGpuImpl = openglGpuImpl;
                 DrawBufferKey = drawBufferKey;
@@ -166,7 +166,7 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
         //	return GetCurrentDrawBufferTexture(Key).TextureColor;
         //}
 
-        public RenderbufferManager(OpenglGpuImpl openglGpuImpl)
+        public RenderbufferManager(OpenglBackEnd openglGpuImpl)
         {
             OpenglGpuImpl = openglGpuImpl;
         }

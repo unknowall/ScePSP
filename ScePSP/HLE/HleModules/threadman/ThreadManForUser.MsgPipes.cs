@@ -187,7 +187,7 @@ namespace ScePSP.Hle.Modules.threadman
         public int sceKernelDeleteMsgPipe(MsgPipe MsgPipe)
         {
             MsgPipe.Delete();
-            MsgPipe.RemoveUid(InjectContext);
+            MsgPipe.RemoveUid();
             return 0;
         }
 

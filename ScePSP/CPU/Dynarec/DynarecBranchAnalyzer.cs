@@ -2,8 +2,6 @@
 using ScePSP.Core.Cpu.Table;
 using System;
 
-// ReSharper disable InconsistentNaming
-
 namespace ScePSP.Core.Cpu.Dynarec
 {
     public sealed class DynarecBranchAnalyzer

@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Audio;
+﻿using ScePSP.Core.AudioBackEnd;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
 
@@ -7,11 +7,11 @@ namespace ScePSP.Hle.Modules.audio
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe class sceVaudio : HleModuleHost
     {
-        [Inject] public sceAudio sceAudio;
+        public sceAudio sceAudio => PSPDrivers.HleModules.sceAudio;
 
-        [Inject] public PspAudio PspAudio;
+        public PspAudio PspAudio => PSPDrivers.PspAudio;
 
-        [Inject] public HleThreadManager HleThreadManager;
+        public HleThreadManager HleThreadManager =>PSPDrivers.HLE.HleThreadManager;
 
         PspAudioChannel PspVaudioChannel => PspAudio.SrcOutput2Channel;
 

@@ -1,6 +1,6 @@
 ﻿using ScePSP.Core.Cpu;
-using ScePSP.Core.Gpu;
-using ScePSP.Core.Gpu.State;
+using ScePSP.Core.GpuBackEnd;
+using ScePSP.Core.GpuBackEnd.State;
 using ScePSP.Core.Memory;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
@@ -16,15 +16,15 @@ namespace ScePSP.Hle.Modules.ge
     {
         static Logger Logger = Logger.GetLogger("sceGe");
 
-        [Inject] new HleThreadManager ThreadManager;
+        new HleThreadManager ThreadManager => PSPDrivers.HLE.HleThreadManager;
 
-        [Inject] HleMemoryManager MemoryManager;
+        HleMemoryManager MemoryManager => PSPDrivers.HLE.MemoryManager;
 
-        [Inject] public GpuProcessor GpuProcessor;
+        public GpuProcessor GpuProcessor => PSPDrivers.GE;
 
-        [Inject] public new CpuProcessor CpuProcessor;
+        public new CpuProcessor CpuProcessor => PSPDrivers.CPU;
 
-        [Inject] public SysMemUserForUser SysMemUserForUser;
+        public SysMemUserForUser SysMemUserForUser => PSPDrivers.HleModules.SysMemUserForUser;
 
         private MemoryPartition GpuStateStructPartition = null;
         private int eDRAMMemoryWidth;

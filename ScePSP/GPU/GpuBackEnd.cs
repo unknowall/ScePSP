@@ -1,19 +1,19 @@
-﻿using ScePSP.Core.Gpu.State;
-using ScePSP.Core.Gpu.VertexReading;
+﻿using ScePSP.Core.GpuBackEnd.State;
+using ScePSP.Core.GpuBackEnd.VertexReading;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
-using ScePSP.Rasterizer;
+using ScePSP.Core.GpuBackEnd.Soft;
 using ScePSP.Utils;
 using ScePSPUtils.Drawing;
 using System;
 using System.Numerics;
 
-namespace ScePSP.Core.Gpu
+namespace ScePSP.Core.GpuBackEnd
 {
-    public abstract unsafe class GpuImpl : PspPluginImpl
+    public abstract unsafe class GpuBackEnd
     {
-        [Inject] protected PspMemory Memory;
-        [Inject] protected PspStoredConfig PspStoredConfig;
+        protected PspMemory Memory => PSPDrivers.PspMemory;
+        protected PspStoredConfig PspStoredConfig => PSPDrivers.Config.StoredConfig;
 
         protected int _ScaleViewport = 2;
 
@@ -327,7 +327,7 @@ namespace ScePSP.Core.Gpu
         protected ReadVertexDelegate ReadVertex_Byte_delegate;
         protected ReadVertexDelegate ReadVertex_Short_delegate;
 
-        public GpuImpl()
+        public GpuBackEnd()
         {
             ReadVertex_Void_delegate = ReadVertex_Void;
             ReadVertex_Byte_delegate = ReadVertex_Byte;

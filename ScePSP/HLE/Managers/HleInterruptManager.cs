@@ -54,11 +54,11 @@ namespace ScePSP.Hle.Managers
 
     public sealed class HleInterruptManager : IInterruptManager
     {
-        [Inject] private HleCallbackManager _hleCallbackManager;
+        private HleCallbackManager _hleCallbackManager => PSPDrivers.HLE.HleCallbackManager;
 
-        [Inject] private CpuProcessor _cpuProcessor;
+        private CpuProcessor _cpuProcessor => PSPDrivers.CPU;
 
-        [Inject] private HleInterop _hleInterop;
+        private HleInterop _hleInterop => PSPDrivers.HLE.HleInterop;
 
         /// <summary>
         /// Global Interrupt Enable
@@ -68,6 +68,7 @@ namespace ScePSP.Hle.Managers
             get => _cpuProcessor.InterruptEnabled;
             set => _cpuProcessor.InterruptEnabled = value;
         }
+
         //public bool Enabled;
 
         /// <summary>
@@ -80,15 +81,11 @@ namespace ScePSP.Hle.Managers
         }
         //public bool Flag;
 
-        /// <summary>
-        /// 
-        /// </summary>
         private readonly HleInterruptHandler[] _interruptHandlers = new HleInterruptHandler[(int)PspInterrupts.Max];
 
-        public HleInterruptHandler GetInterruptHandler(PspInterrupts pspInterrupt) =>
-            _interruptHandlers[(int)pspInterrupt];
+        public HleInterruptHandler GetInterruptHandler(PspInterrupts pspInterrupt) => _interruptHandlers[(int)pspInterrupt];
 
-        private HleInterruptManager()
+        public HleInterruptManager()
         {
             for (var n = 0; n < _interruptHandlers.Length; n++)
             {

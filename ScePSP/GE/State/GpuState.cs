@@ -7,7 +7,7 @@ using System;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
-namespace ScePSP.Core.Gpu.State
+namespace ScePSP.Core.GpuBackEnd.State
 {
     public class GlobalGpuState
     {

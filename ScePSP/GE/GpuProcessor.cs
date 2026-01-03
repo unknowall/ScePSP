@@ -1,13 +1,13 @@
-﻿using ScePSP.Core.Gpu.State;
+﻿using ScePSP.Core.GpuBackEnd.State;
 using ScePSP.Core.Memory;
 using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace ScePSP.Core.Gpu
+namespace ScePSP.Core.GpuBackEnd
 {
-    public unsafe class GpuProcessor : IInjectInitialize
+    public unsafe class GpuProcessor
     {
         /*
          *   - GU_SYNC_FINISH - 0 - Wait until the last sceGuFinish command is reached
@@ -75,13 +75,13 @@ namespace ScePSP.Core.Gpu
 
         public readonly WaitableStateMachine<Status2Enum> Status2 = new WaitableStateMachine<Status2Enum>(Status2Enum.Completed, Debug: false);
 
-        [Inject] public GpuImpl GpuImpl;
+        public GpuBackEnd GpuImpl => PSPDrivers.GpuBackEnd;
 
-        [Inject] public GpuConfig GpuConfig;
+        public GpuConfig GpuConfig => PSPDrivers.Config.GpuConfig;
 
-        [Inject] public PspMemory Memory;
+        public PspMemory Memory => PSPDrivers.PspMemory;
 
-        [Inject] public IGpuConnector Connector;
+        public IGpuConnector Connector => PSPDrivers.GpuConnector;
 
         public enum Status2Enum
         {
@@ -94,11 +94,7 @@ namespace ScePSP.Core.Gpu
             lock (GEProcessLists) return GEProcessLists[Index];
         }
 
-        private GpuProcessor()
-        {
-        }
-
-        void IInjectInitialize.Initialize()
+        public GpuProcessor()
         {
             GEProcessQueue = new LinkedList<GEProcess>();
             GEProcessFreeQueue = new Queue<GEProcess>();

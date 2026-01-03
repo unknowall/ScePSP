@@ -1,11 +1,11 @@
 ﻿//#define USE_VERTEX_READER_DYNAREC
 
-using ScePSP.Core.Gpu.State;
+using ScePSP.Core.GpuBackEnd.State;
 using ScePSP.Core.Types;
 using ScePSP.Utils;
 using System;
 
-namespace ScePSP.Core.Gpu.VertexReading
+namespace ScePSP.Core.GpuBackEnd.VertexReading
 {
     public unsafe class VertexReader
     {

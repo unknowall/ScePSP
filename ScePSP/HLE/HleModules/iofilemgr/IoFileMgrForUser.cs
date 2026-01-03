@@ -10,13 +10,8 @@ namespace ScePSP.Hle.Modules.iofilemgr
     {
         static Logger Logger = Logger.GetLogger("IoFileMgrForUser");
 
-        [Inject] protected HleIoManager HleIoManager;
+        protected HleIoManager HleIoManager => PSPDrivers.HLE.HleIoManager;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="FileHandle"></param>
-        /// <returns></returns>
         public HleIoDrvFileArg GetFileArgFromHandle(SceUID FileHandle)
         {
             return HleIoManager.HleIoDrvFileArgPool.Get(FileHandle);

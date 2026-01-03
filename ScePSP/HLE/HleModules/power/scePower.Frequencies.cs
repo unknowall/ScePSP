@@ -4,7 +4,7 @@ namespace ScePSP.Hle.Modules.power
 {
     public partial class scePower
     {
-        [Inject] CpuConfig CpuConfig;
+        CpuConfig CpuConfig => PSPDrivers.Config.CpuConfig;
 
         /// <summary>
         /// Set CPU Frequency
@@ -111,10 +111,6 @@ namespace ScePSP.Hle.Modules.power
             return 0;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         [HlePspFunction(NID = 0x34F9C463, FirmwareVersion = 150)]
         public int scePowerGetPllClockFrequencyInt()
         {

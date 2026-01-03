@@ -21,17 +21,16 @@ namespace ScePSP.Hle.Loader
     public class ElfPspLoader
     {
         static Logger _logger = Logger.GetLogger(nameof(ElfPspLoader));
+
         static public Logger Logger = _logger;
 
-        [Inject] protected ElfLoader ElfLoader;
+        protected ElfLoader ElfLoader;// => PSPDrivers.Loader.ElfLoader;
 
-        [Inject] protected HleModuleManager ModuleManager;
+        protected HleModuleManager ModuleManager;// => PSPDrivers.HLE.HleModuleManager;
 
-        [Inject] protected ElfConfig ElfConfig;
+        protected ElfConfig ElfConfig => PSPDrivers.Config.ElfConfig;
 
-        [Inject] protected InjectContext InjectContext;
-
-        private ElfPspLoader()
+        public ElfPspLoader()
         {
         }
 
@@ -66,9 +65,14 @@ namespace ScePSP.Hle.Loader
         public HleModuleGuest LoadModule(Stream fileStream, Stream memoryStream, MemoryPartition memoryPartition,
             HleModuleManager moduleManager, string gameTitle, string moduleName, bool isMainModule)
         {
-            HleModuleGuest = InjectContext.NewInstance<HleModuleGuest>();
+            HleModuleGuest = new HleModuleGuest();//InjectContext.NewInstance<HleModuleGuest>();
+            
+            PSPDrivers.HleModuleGuestList.Add(HleModuleGuest);
 
             ElfLoader = new ElfLoader();
+
+            PSPDrivers.ElfLoaderList.Add(ElfLoader);
+
             ModuleManager = moduleManager;
 
             var magic = fileStream.SliceWithLength(0, 4).ReadString(4);
@@ -397,9 +401,6 @@ namespace ScePSP.Hle.Loader
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         protected void UpdateModuleImports()
         {
             ConsoleUtils.SaveRestoreConsoleState(() =>
@@ -409,9 +410,6 @@ namespace ScePSP.Hle.Loader
             });
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         protected void UpdateModuleExports()
         {
             ConsoleUtils.SaveRestoreConsoleState(() =>
@@ -493,9 +491,6 @@ namespace ScePSP.Hle.Loader
             HleModuleGuest.ExportModules();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public enum SpecialFunctionNids : uint
         {
             ModuleStart = 0xD632ACDB,
@@ -505,9 +500,6 @@ namespace ScePSP.Hle.Loader
             ModuleBootstart = 0xD3744BE0,
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public enum SpecialVariableNids : uint
         {
             ModuleInfo = 0xF01D73A7,
@@ -517,9 +509,6 @@ namespace ScePSP.Hle.Loader
             ModuleSdkVersion = 0x11B97506,
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         private void _UpdateModuleImports()
         {
             //var BaseMemoryStream = ElfLoader.MemoryStream.SliceWithLength(BaseAddress);
@@ -530,8 +519,7 @@ namespace ScePSP.Hle.Loader
 
             Logger.Info("BASE ADDRESS: 0x{0:X}", BaseAddress);
 
-            Logger.Info("Imports ({0:X8}-{1:X8}):", HleModuleGuest.ModuleInfo.ImportsStart,
-                HleModuleGuest.ModuleInfo.ImportsEnd);
+            Logger.Info("Imports ({0:X8}-{1:X8}):", HleModuleGuest.ModuleInfo.ImportsStart, HleModuleGuest.ModuleInfo.ImportsEnd);
 
             foreach (var moduleImport in moduleImports)
             {

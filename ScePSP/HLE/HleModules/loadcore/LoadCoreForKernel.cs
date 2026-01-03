@@ -9,20 +9,18 @@ namespace ScePSP.Hle.Modules.loadcore
     [HlePspModule(ModuleFlags = ModuleFlags.KernelMode | ModuleFlags.Flags0x00010011)]
     public class LoadCoreForKernel : HleModuleHost
     {
-        [Inject] HleModuleManager ModuleManager;
+        HleModuleManager ModuleManager => PSPDrivers.HLE.HleModuleManager;
 
-        [Inject] ModuleMgrForUser ModuleMgrForUser;
+        ModuleMgrForUser ModuleMgrForUser => PSPDrivers.HLE.ModuleMgrForUser;
 
-        [Inject] new CpuProcessor CpuProcessor;
+        new CpuProcessor CpuProcessor => PSPDrivers.CPU;
 
         //public enum SceModule : uint { }
+
         public enum SceUID : int
         {
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         [HlePspFunction(NID = 0xACE23476, FirmwareVersion = 150)]
         [HlePspNotImplemented]
         [HlePspUnknownDefinitionAttribute]
@@ -31,9 +29,6 @@ namespace ScePSP.Hle.Modules.loadcore
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         [HlePspFunction(NID = 0xBF983EF2, FirmwareVersion = 150)]
         [HlePspNotImplemented]
         [HlePspUnknownDefinitionAttribute]

@@ -5,7 +5,7 @@ namespace ScePSP.Hle.Modules.threadman
 {
     public unsafe partial class ThreadManForUser : HleModuleHost
     {
-        [Inject] HleCallbackManager CallbackManager;
+        HleCallbackManager CallbackManager => PSPDrivers.HLE.HleCallbackManager;
 
         public enum SceKernelCallbackFunction : uint
         {

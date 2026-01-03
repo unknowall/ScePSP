@@ -11,7 +11,8 @@ namespace ScePSP.Hle.Modules.rtc
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe class sceRtc : HleModuleHost
     {
-        [Inject] PspRtc PspRtc;
+        PspRtc PspRtc => PSPDrivers.PspRtc;
+        new HleConfig HleConfig => PSPDrivers.Config.HleConfig;
 
         /// <summary>
         /// Get the resolution of the tick counter
@@ -541,8 +542,6 @@ namespace ScePSP.Hle.Modules.rtc
         {
             return 0;
         }
-
-        [Inject] new HleConfig HleConfig;
 
         private long GetUTCOffsetInTicks()
         {

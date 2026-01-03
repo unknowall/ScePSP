@@ -27,9 +27,12 @@ namespace ScePSP.Runner.Tasks
         {
         }
 
-        public void StartSynchronized()
+        public void StartSynchronized(bool ForceRun = false)
         {
-            if (Running) return;
+            if (Running && !ForceRun)
+            {
+                return;
+            }
 
             var ElapsedTime = Logger.Measure(() =>
             {
@@ -56,7 +59,7 @@ namespace ScePSP.Runner.Tasks
                         Running = false;
                         RunningUpdatedEvent.Set();
                         StopCompleteEvent.Set();
-                        //Console.WriteLine("Task {0} Stopped!", this);
+                        Console.WriteLine("Task {0} Stopped!", this);
                     }
                 }, token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
@@ -76,6 +79,7 @@ namespace ScePSP.Runner.Tasks
                     StopCompleteEvent.Reset();
 
                     Running = false;
+
                     RunningUpdatedEvent.Set();
 
                     try

@@ -8,7 +8,7 @@ namespace ScePSP.Hle.Modules.threadman
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe partial class ThreadManForUser : HleModuleHost
     {
-        [Inject] PspRtc PspRtc;
+        PspRtc PspRtc => PSPDrivers.PspRtc;
 
         static Logger Logger = Logger.GetLogger("ThreadManForUser");
 

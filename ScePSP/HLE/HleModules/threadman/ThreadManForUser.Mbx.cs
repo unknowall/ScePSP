@@ -135,7 +135,7 @@ namespace ScePSP.Hle.Modules.threadman
         [HlePspFunction(NID = 0x86255ADA, FirmwareVersion = 150)]
         public int sceKernelDeleteMbx(MessageBox MessageBox)
         {
-            MessageBox.RemoveUid(InjectContext);
+            MessageBox.RemoveUid();
             return 0;
         }
 

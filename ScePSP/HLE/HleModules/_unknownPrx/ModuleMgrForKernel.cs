@@ -7,19 +7,11 @@ namespace ScePSP.Hle.Modules._unknownPrx
     [HlePspModule(ModuleFlags = ModuleFlags.KernelMode | ModuleFlags.Flags0x00010011)]
     public unsafe class ModuleMgrForKernel : ModuleMgrForUser
     {
-        [Inject] HleModuleManager ModuleManager;
+         HleModuleManager ModuleManager => PSPDrivers.HLE.HleModuleManager;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="FileName"></param>
-        /// <param name="Flags"></param>
-        /// <param name="option"></param>
-        /// <returns></returns>
         [HlePspFunction(NID = 0xA1A78C58, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceKernelLoadModuleForLoadExecVSHDisc(string FileName, uint Flags,
-            ModuleMgrForUser.SceKernelLMOption* option)
+        public int sceKernelLoadModuleForLoadExecVSHDisc(string FileName, uint Flags, ModuleMgrForUser.SceKernelLMOption* option)
         {
             return sceKernelLoadModule(FileName, Flags, option);
         }

@@ -1,5 +1,5 @@
 ﻿using ScePSP.Core;
-using ScePSP.Core.Gpu.Impl.Opengl;
+using ScePSP.Core.GpuBackEnd.OpenGL;
 using ScePSP.Core.Types;
 using ScePSPUtils.Drawing;
 using ScePSPUtils.Drawing.Extensions;
@@ -10,22 +10,20 @@ using System.IO;
 
 namespace ScePSP.TextureHook
 {
-    public class TextureHookPlugin : IInjectInitialize, IDisposable
+    public class TextureHookPlugin : IDisposable
     {
-        [Inject] InjectMessageBus MessageBus;
-
-        [Inject] PspStoredConfig PspStoredConfig;
+        PspStoredConfig PspStoredConfig => PSPDrivers.Config.StoredConfig;
 
         string LinkedTextureMapFile;
 
-        void IInjectInitialize.Initialize()
+        public TextureHookPlugin()
         {
-            MessageBus.Register<TextureHookInfo>(Hook);
-            MessageBus.Register<LoadFileMessage>((LoadFileMessage) =>
-            {
-                LinkedTextureMapFile = LoadFileMessage.FileName + ".texmap";
-                LoadTexMapFile();
-            });
+            //MessageBus.Register<TextureHookInfo>(Hook);
+            //MessageBus.Register<LoadFileMessage>((LoadFileMessage) =>
+            //{
+            //    LinkedTextureMapFile = LoadFileMessage.FileName + ".texmap";
+            //    LoadTexMapFile();
+            //});
         }
 
         private void LoadTexMapFile()
@@ -59,7 +57,7 @@ namespace ScePSP.TextureHook
 
         public void Dispose()
         {
-            MessageBus.Unregister<TextureHookInfo>(Hook);
+
         }
 
         public void AddMapping(ulong cacheHash, string fileName)

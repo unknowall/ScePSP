@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace ScePSP.Core.Gpu.Impl.Opengl
+namespace ScePSP.Core.GpuBackEnd.OpenGL
 {
     public class VertexUtils
     {

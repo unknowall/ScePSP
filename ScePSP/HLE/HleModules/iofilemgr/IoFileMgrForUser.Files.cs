@@ -14,13 +14,14 @@ namespace ScePSP.Hle.Modules.iofilemgr
     {
         public class GuestHleIoDriver : IHleIoDriver, IDisposable
         {
-            [Inject] protected HleInterop HleInterop;
+            protected HleInterop HleInterop => PSPDrivers.HLE.HleInterop;
 
-            [Inject] protected PspMemory PspMemory;
+            protected PspMemory PspMemory => PSPDrivers.PspMemory;
 
-            [Inject] protected HleMemoryManager HleMemoryManager;
+            protected HleMemoryManager HleMemoryManager => PSPDrivers.HLE.MemoryManager;
 
             protected PspIoDrvArg* PspIoDrvArg;
+
             protected PspIoDrv* PspIoDrv;
 
             protected PspIoDrvFuncs* PspIoDrvFuncs => (PspIoDrvFuncs*)PspIoDrv->funcs.GetPointer<PspIoDrvFuncs>(PspMemory);
@@ -37,10 +38,8 @@ namespace ScePSP.Hle.Modules.iofilemgr
                 return HleMemoryManager.GetPartition(MemoryPartitions.Kernel0).AllocateItem(Value);
             }
 
-            public GuestHleIoDriver(InjectContext InjectContext, PspIoDrv* PspIoDrv)
+            public GuestHleIoDriver(PspIoDrv* PspIoDrv)
             {
-                InjectContext.InjectDependencesTo(this);
-
                 this.PspIoDrvArgPartition = Alloc(new PspIoDrvArg()
                 {
                     DriverPointer = PspMemory.PointerToPspAddressUnsafe(PspIoDrv),

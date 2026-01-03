@@ -12,9 +12,9 @@ namespace ScePSP.Hle.Modules.threadman
 {
     public unsafe partial class ThreadManForUser
     {
-        [Inject] public new HleThreadManager ThreadManager;
+        public new HleThreadManager ThreadManager => PSPDrivers.HLE.HleThreadManager;
 
-        [Inject] public HleMemoryManager MemoryManager;
+        public HleMemoryManager MemoryManager => PSPDrivers.HLE.MemoryManager;
 
         private HleThread GetThreadById(int ThreadId)
         {

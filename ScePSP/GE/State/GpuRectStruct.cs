@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace ScePSP.Core.Gpu.State
+namespace ScePSP.Core.GpuBackEnd.State
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct GpuRectStruct

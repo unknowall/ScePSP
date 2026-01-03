@@ -3,13 +3,10 @@ using System.Net.NetworkInformation;
 
 namespace ScePSP.Hle.Modules.wlan
 {
-    /// <summary>
-    /// 
-    /// </summary>
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe class sceWlanDrv : HleModuleHost
     {
-        [Inject] new HleConfig HleConfig;
+        new HleConfig HleConfig => PSPDrivers.Config.HleConfig;
 
         /// <summary>
         /// Determine the state of the WLAN power switch
@@ -52,7 +49,7 @@ namespace ScePSP.Hle.Modules.wlan
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe class sceWlanDrv_lib : HleModuleHost
     {
-        [Inject] new HleConfig HleConfig;
+        new HleConfig HleConfig => PSPDrivers.Config.HleConfig;
 
         /// <summary>
         /// Determine if the WLAN device is currently powered on

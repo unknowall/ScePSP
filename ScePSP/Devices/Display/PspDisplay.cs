@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
+using Bitmap = System.Drawing.Bitmap;
+
 namespace ScePSP.Core.Components.Display
 {
     public class PspWaitEvent
@@ -42,15 +44,14 @@ namespace ScePSP.Core.Components.Display
         public const int MaxVisibleHeight = 272;
         public const int MaxVisibleArea = MaxVisibleWidth * MaxVisibleHeight;
 
-
         public const double HorizontalSyncHertz = ProcessedPixelsPerSecond * CyclesPerPixel / PixelsInARow;
         public const double VerticalSyncHertz = HorizontalSyncHertz / NumberOfRows;
 
-        [Inject] PspRtc _pspRtc;
+        PspRtc _pspRtc => PSPDrivers.PspRtc;
 
-        [Inject] PspMemory _memory;
+        PspMemory _memory => PSPDrivers.PspMemory;
 
-        private PspDisplay()
+        public PspDisplay()
         {
         }
 

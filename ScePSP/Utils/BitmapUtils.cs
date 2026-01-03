@@ -5,14 +5,8 @@ using System.Drawing.Imaging;
 
 namespace ScePSPUtils.Drawing
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class BitmapUtils
     {
-        /// <summary>
-        /// 
-        /// </summary>
         public static BitmapChannel[] Rgb => new[]
         {
             BitmapChannel.Red,
@@ -20,44 +14,19 @@ namespace ScePSPUtils.Drawing
             BitmapChannel.Blue,
         };
 
-        /// <summary>
-        /// 
-        /// </summary>
         public struct CompareResult
         {
-            /// <summary>
-            /// 
-            /// </summary>
             public bool Equal;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public int PixelTotalDifference;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public int DifferentPixelCount;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public int TotalPixelCount;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public double PixelTotalDifferencePercentage;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="referenceBitmap"></param>
-        /// <param name="outputBitmap"></param>
-        /// <param name="threshold"></param>
-        /// <returns></returns>
         public static CompareResult CompareBitmaps(Bitmap referenceBitmap, Bitmap outputBitmap, double threshold = 0.01)
         {
             var compareResult = default(CompareResult);
@@ -92,11 +61,6 @@ namespace ScePSPUtils.Drawing
             return compareResult;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="nColors"></param>
-        /// <returns></returns>
         public static ColorPalette GetColorPalette(int nColors)
         {
             // Assume monochrome image.
@@ -118,56 +82,24 @@ namespace ScePSPUtils.Drawing
             return palette; // Send the palette back
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public enum Direction
         {
-            /// <summary>
-            /// 
-            /// </summary>
             FromBitmapToData = 0,
-
-            /// <summary>
-            /// 
-            /// </summary>
             FromDataToBitmap = 1,
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="bitmap"></param>
-        /// <param name="newData"></param>
-        /// <param name="direction"></param>
-        /// <param name="channels"></param>
         public static void TransferChannelsDataLinear(Bitmap bitmap, byte[] newData, Direction direction,
             params BitmapChannel[] channels)
         {
             TransferChannelsDataLinear(bitmap.GetFullRectangle(), bitmap, newData, direction, channels);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="bitmap"></param>
-        /// <param name="newDataPtr"></param>
-        /// <param name="direction"></param>
-        /// <param name="channels"></param>
         public static unsafe void TransferChannelsDataLinear(Bitmap bitmap, byte* newDataPtr, Direction direction,
             params BitmapChannel[] channels)
         {
             TransferChannelsDataLinear(bitmap.GetFullRectangle(), bitmap, newDataPtr, direction, channels);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="rectangle"></param>
-        /// <param name="bitmap"></param>
-        /// <param name="newData"></param>
-        /// <param name="direction"></param>
-        /// <param name="channels"></param>
         public static unsafe void TransferChannelsDataLinear(Rectangle rectangle, Bitmap bitmap, byte[] newData,
             Direction direction, params BitmapChannel[] channels)
         {
@@ -177,15 +109,6 @@ namespace ScePSPUtils.Drawing
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="rectangle"></param>
-        /// <param name="bitmap"></param>
-        /// <param name="newDataPtr"></param>
-        /// <param name="direction"></param>
-        /// <param name="channels"></param>
-        /// <exception cref="InvalidOperationException"></exception>
         public static unsafe void TransferChannelsDataLinear(Rectangle rectangle, Bitmap bitmap, byte* newDataPtr,
             Direction direction, params BitmapChannel[] channels)
         {
@@ -253,14 +176,6 @@ namespace ScePSPUtils.Drawing
                 });
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="rectangle"></param>
-        /// <param name="bitmap"></param>
-        /// <param name="newDataPtr"></param>
-        /// <param name="direction"></param>
-        /// <param name="channels"></param>
         public static unsafe void TransferChannelsDataInterleaved(Rectangle rectangle, Bitmap bitmap, byte* newDataPtr,
             Direction direction, params BitmapChannel[] channels)
         {

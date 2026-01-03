@@ -18,7 +18,7 @@ namespace cscodec
             var YEdge = (f.imageHeight - f.imageHeightWOEdge) / 2;
             var Out = new Bitmap(Math.Min(Width, f.imageWidthWOEdge), Math.Min(Height, f.imageHeightWOEdge));
             var In = imageFromFrame(f);
-            Graphics.FromImage(Out).DrawImage(In, new Point(-XEdge, -YEdge));
+            Graphics.FromImage(Out).DrawImage(In, new System.Drawing.Point(-XEdge, -YEdge));
             return Out;
         }
 
@@ -29,8 +29,7 @@ namespace cscodec
 
             YUV2RGB(f, rgb);
 
-            var BitmapData = bi.LockBits(new System.Drawing.Rectangle(0, 0, bi.Width, bi.Height),
-                ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            var BitmapData = bi.LockBits(new System.Drawing.Rectangle(0, 0, bi.Width, bi.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
             var Ptr = (int*)BitmapData.Scan0.ToPointer();
             for (int j = 0; j < f.imageHeight; j++)
             {

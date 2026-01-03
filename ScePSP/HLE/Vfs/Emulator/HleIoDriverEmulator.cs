@@ -17,13 +17,13 @@ namespace ScePSP.Hle.Vfs.Emulator
 
     public class HleIoDriverEmulator : AbstractHleIoDriver, IHleIoDriver
     {
-        [Inject] PspDisplay PspDisplay;
+        PspDisplay PspDisplay => PSPDrivers.PspDisplay;
 
-        [Inject] DisplayConfig DisplayConfig;
+        DisplayConfig DisplayConfig => PSPDrivers.Config.DisplayConfig;
 
-        [Inject] HleOutputHandler HleOutputHandler;
+        HleOutputHandler HleOutputHandler => PSPDrivers.HLE.HleOutputHandler;
 
-        [Inject] PspHleRunningConfig PspHleRunningConfig;
+        PspHleRunningConfig PspHleRunningConfig => PSPDrivers.Config.PspHleRunningConfig;
 
         public unsafe int IoInit()
         {

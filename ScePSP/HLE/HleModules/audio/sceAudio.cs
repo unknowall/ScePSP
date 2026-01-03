@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Audio;
+﻿using ScePSP.Core.AudioBackEnd;
 using ScePSP.Core.Cpu;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
@@ -10,13 +10,10 @@ namespace ScePSP.Hle.Modules.audio
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe class sceAudio : HleModuleHost
     {
-        [Inject] PspAudio PspAudio;
+        PspAudio PspAudio => PSPDrivers.PspAudio;
 
-        [Inject] new HleThreadManager ThreadManager;
+        new HleThreadManager ThreadManager => PSPDrivers.HLE.HleThreadManager;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public struct pspAudioInputParams
         {
             /// <summary>
@@ -513,7 +510,7 @@ namespace ScePSP.Hle.Modules.audio
             if (!IsValidSampleCountOutput2(SampleCount))
                 throw new SceKernelException(SceKernelErrors.ERROR_INVALID_SIZE);
             _sceAudioChReserve(() => PspAudio.SrcOutput2Channel, SampleCount,
-                Channels == 2 ? Core.Audio.PspAudio.FormatEnum.Stereo : Core.Audio.PspAudio.FormatEnum.Mono);
+                Channels == 2 ? Core.AudioBackEnd.PspAudio.FormatEnum.Stereo : Core.AudioBackEnd.PspAudio.FormatEnum.Mono);
             PspAudio.SrcOutput2Channel.Frequency = Frequency;
             return 0;
         }

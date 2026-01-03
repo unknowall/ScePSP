@@ -6,17 +6,8 @@ using System.Drawing.Imaging;
 
 namespace ScePSPUtils.Drawing.Distance
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public unsafe class DistanceMap
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="bitmap"></param>
-        /// <param name="alphaThresold"></param>
-        /// <returns></returns>
         public static bool[,] GetMask(Bitmap bitmap, byte alphaThresold = 1)
         {
             var width = bitmap.Width;
@@ -40,13 +31,6 @@ namespace ScePSPUtils.Drawing.Distance
             return mask;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="from"></param>
-        /// <param name="to"></param>
-        /// <param name="step"></param>
-        /// <returns></returns>
         public static IEnumerable<int> Range(int @from, int to, int step = 1)
         {
             if (@from < to)
@@ -59,11 +43,6 @@ namespace ScePSPUtils.Drawing.Distance
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="mask"></param>
-        /// <returns></returns>
         public static DistanceEntry[,] GetDistanceMap(bool[,] mask)
         {
             var width = mask.GetLength(0);

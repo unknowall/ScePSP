@@ -1,6 +1,6 @@
 ﻿using LightGL;
 
-namespace ScePSP.Core.Gpu.Impl.Opengl
+namespace ScePSP.Core.GpuBackEnd.OpenGL
 {
     internal static class OpenglGpuImplConversionTables
     {

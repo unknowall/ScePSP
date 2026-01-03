@@ -12,48 +12,27 @@ namespace ScePSP.Hle.Modules.utility
 {
     public unsafe partial class sceUtility
     {
-        [Inject] HleIoManager HleIoManager;
+        HleIoManager HleIoManager => PSPDrivers.HLE.HleIoManager;
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct ListRequest
         {
-            /// <summary>
-            /// 
-            /// </summary>
             public uint MaxEntries;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public uint NumEntriesReaded;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public PspPointer Entries;
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct SizeFreeInfo
         {
-            /// <summary>
-            /// 
-            /// </summary>
             public uint SectorSize;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public uint FreeSectors;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public uint FreeKb;
 
-            /// <summary>
-            /// 
-            /// </summary>
             private fixed byte FreeKbStringFixed[8];
 
             public string FreeKbString
@@ -159,19 +138,10 @@ namespace ScePSP.Hle.Modules.utility
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct SizeRequiredSpaceInfo
         {
-            /// <summary>
-            /// 
-            /// </summary>
             public uint RequiredSpaceSectors;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public uint RequiredSpaceKb;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public fixed byte RequiredSpaceStringFixed[8];
 
             public string RequiredSpaceString
@@ -186,14 +156,8 @@ namespace ScePSP.Hle.Modules.utility
                 }
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
             public uint RequiredSpace32KB;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public fixed byte RequiredSpace32KBStringFixed[8];
 
             public string RequiredSpace32KBString
@@ -217,7 +181,7 @@ namespace ScePSP.Hle.Modules.utility
         /// <param name="Params">Savedata parameters</param>
         /// <returns>0 on success</returns>
         [HlePspFunction(NID = 0x50C4CD57, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceUtilitySavedataInitStart(ref SceUtilitySavedataParam Params)
         {
             Console.WriteLine(Params.Mode);

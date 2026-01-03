@@ -51,7 +51,12 @@ namespace ScePSP.Hle.Modules.iofilemgr
         public int sceIoAddDrv(PspIoDrv* PspIoDrv)
         {
             var Name = Memory.ReadStringz(PspIoDrv->name, Encoding.UTF8);
-            HleIoManager.SetDriver(Name + ":", new GuestHleIoDriver(InjectContext, PspIoDrv));
+
+            var Guest = new GuestHleIoDriver(PspIoDrv);
+
+            PSPDrivers.GuestHleIoDriverList.Add(Guest);
+
+            HleIoManager.SetDriver(Name + ":", Guest);
             return 0;
         }
 

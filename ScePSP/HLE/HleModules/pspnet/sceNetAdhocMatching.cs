@@ -151,15 +151,13 @@ namespace ScePSP.Hle.Modules.pspnet
 
         public class Matching : IHleUidPoolClass
         {
-            [Inject] public HleInterop HleInterop;
+            public HleInterop HleInterop => PSPDrivers.HLE.HleInterop;
 
-            [Inject] public sceNetAdhocctl sceNetAdhocctl;
+            public sceNetAdhocctl sceNetAdhocctl => PSPDrivers.HleModules.sceNetAdhocctl;
 
-            [Inject] public HleMemoryManager HleMemoryManager;
+            public HleMemoryManager HleMemoryManager => PSPDrivers.HLE.MemoryManager;
 
-            [Inject] public sceNet sceNet;
-
-            [Inject] public InjectContext InjectContext;
+            public sceNet sceNet => PSPDrivers.HleModules.sceNet;
 
             public Mode Mode;
             public int MaxPeers;
@@ -177,14 +175,10 @@ namespace ScePSP.Hle.Modules.pspnet
             /// </summary>
             public uint Callback;
 
-            public Matching(InjectContext InjectContext)
+            public Matching()
             {
-                InjectContext.InjectDependencesTo(this);
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
             /// <param name="Event"></param>
             /// <param name="Mac"></param>
             /// <param name="Data"></param>
@@ -199,11 +193,11 @@ namespace ScePSP.Hle.Modules.pspnet
 
                     Console.WriteLine(
                         "Executing callback. Matching.NotifyEvent: 0x{0:X8}, {1}, {2}, 0x{3:X8}, {4}, 0x{5:X8}",
-                        this.Callback, this.GetUidIndex(InjectContext), Event, MacPartition.Low, DataPartition.Size,
+                        this.Callback, this.GetUidIndex(), Event, MacPartition.Low, DataPartition.Size,
                         DataPartition.Low);
                     HleInterop.ExecuteFunctionLater(
                         this.Callback,
-                        this.GetUidIndex(InjectContext),
+                        this.GetUidIndex(),
                         (int)Event,
                         MacPartition.Low,
                         DataPartition.Size,
@@ -441,7 +435,8 @@ namespace ScePSP.Hle.Modules.pspnet
             int PingDelay, int InitCount, int MsgDelay, uint Callback)
         {
             //throw (new NotImplementedException());
-            return new Matching(InjectContext)
+
+            Matching matching = new Matching()
             {
                 Mode = Mode,
                 MaxPeers = MaxPeers,
@@ -453,6 +448,10 @@ namespace ScePSP.Hle.Modules.pspnet
                 MsgDelay = MsgDelay,
                 Callback = Callback,
             };
+
+            PSPDrivers.MatchingList.Add(matching);
+
+            return matching;
         }
 
         /// <summary>
@@ -498,7 +497,7 @@ namespace ScePSP.Hle.Modules.pspnet
         [HlePspNotImplemented]
         public int sceNetAdhocMatchingDelete(Matching Matching)
         {
-            Matching.RemoveUid(InjectContext);
+            Matching.RemoveUid();
             return 0;
         }
 

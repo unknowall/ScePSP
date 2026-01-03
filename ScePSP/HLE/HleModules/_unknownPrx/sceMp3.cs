@@ -8,8 +8,6 @@ namespace ScePSP.Hle.Modules._unknownPrx
     [HlePspModule(ModuleFlags = ModuleFlags.KernelMode | ModuleFlags.Flags0x00010011)]
     public unsafe class sceMp3 : HleModuleHost
     {
-        [Inject] new InjectContext InjectContext;
-
         public struct SceMp3InitArg
         {
             /// <summary>
@@ -227,7 +225,7 @@ namespace ScePSP.Hle.Modules._unknownPrx
         [HlePspFunction(NID = 0xF5478233, FirmwareVersion = 150)]
         public int sceMp3ReleaseMp3Handle(Mp3Stream Mp3Stream)
         {
-            Mp3Stream.RemoveUid(InjectContext);
+            Mp3Stream.RemoveUid();
             return 0;
         }
 

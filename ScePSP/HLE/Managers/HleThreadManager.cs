@@ -4,7 +4,7 @@
 
 using ScePSP.Core.Components.Display;
 using ScePSP.Core.Cpu;
-using ScePSP.Core.Gpu;
+using ScePSP.Core.GpuBackEnd;
 using ScePSP.Hle.Interop;
 using ScePSP.HLE;
 using ScePSPUtils;
@@ -15,23 +15,21 @@ using System.Threading;
 
 namespace ScePSP.Hle.Managers
 {
-    public class HleThreadManager : IInjectInitialize, ICpuConnector, IGpuConnector
+    public class HleThreadManager : ICpuConnector, IGpuConnector
     {
         private static readonly Logger Logger = Logger.GetLogger("HleThreadManager");
 
-        [Inject] internal CpuProcessor Processor;
+        internal CpuProcessor Processor => PSPDrivers.CPU;
 
-        [Inject] DisplayConfig DisplayConfig;
+        DisplayConfig DisplayConfig => PSPDrivers.Config.DisplayConfig;
 
-        [Inject] HleConfig HleConfig;
+        HleConfig HleConfig => PSPDrivers.Config.HleConfig;
 
-        [Inject] private HleCallbackManager HleCallbackManager;
+        private HleCallbackManager HleCallbackManager => PSPDrivers.HLE.HleCallbackManager;
 
-        [Inject] private HleInterruptManager HleInterruptManager;
+        private HleInterruptManager HleInterruptManager => PSPDrivers.HLE.HleInterruptManager;
 
-        [Inject] private HleInterop HleInterop;
-
-        [Inject] private InjectContext InjectContext;
+        private HleInterop HleInterop => PSPDrivers.HLE.HleInterop;
 
         public readonly List<HleThread> Threads = new List<HleThread>(128);
 
@@ -43,8 +41,9 @@ namespace ScePSP.Hle.Managers
 
         public CoroutinePool CoroutinePool = new CoroutinePool();
 
-        private HleThreadManager()
+        public HleThreadManager()
         {
+            Processor.DebugCurrentThreadEvent += DebugCurrentThread;
         }
 
         void ICpuConnector.Yield(CpuThreadState CpuThreadState)
@@ -59,8 +58,7 @@ namespace ScePSP.Hle.Managers
             }
         }
 #pragma warning disable CS0162
-        void IGpuConnector.Signal(uint PC, PspGeCallbackData CallbackData, uint Signal, SignalBehavior Behavior,
-            bool ExecuteNow)
+        void IGpuConnector.Signal(uint PC, PspGeCallbackData CallbackData, uint Signal, SignalBehavior Behavior, bool ExecuteNow)
         {
             if (DynarecConfig.EnableGpuSignalsCallback)
             {
@@ -90,10 +88,6 @@ namespace ScePSP.Hle.Managers
             }
         }
 #pragma warning restore CS0162
-        void IInjectInitialize.Initialize()
-        {
-            Processor.DebugCurrentThreadEvent += DebugCurrentThread;
-        }
 
         public PreemptiveScheduler<HleThread> PreemptiveScheduler = new PreemptiveScheduler<HleThread>(NewItemsFirst: true, ThrowException: false);
 
@@ -302,7 +296,7 @@ namespace ScePSP.Hle.Managers
 
         public HleThread Create()
         {
-            var HlePspThread = new HleThread(InjectContext, new CpuThreadState(Processor));
+            var HlePspThread = new HleThread(new CpuThreadState(Processor));
             HlePspThread.Id = LastId++;
             HlePspThread.Name = "PspThread-" + HlePspThread.Id;
             HlePspThread.SetStatus(HleThread.Status.Stopped);

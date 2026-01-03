@@ -16,7 +16,7 @@ namespace ScePSP.Hle.Modules.libfont
         [HlePspFunction(NID = 0x3AEA8CB6, FirmwareVersion = 150)]
         public int sceFontClose(Font Font)
         {
-            Font.RemoveUid(InjectContext);
+            Font.RemoveUid();
             return 0;
         }
 

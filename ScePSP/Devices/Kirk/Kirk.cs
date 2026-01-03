@@ -27,15 +27,12 @@ namespace ScePSP.Core.Components.Crypto
 
         //#if !USE_DOTNET_CRYPTO
         Crypto.AesCtx _aesKirk1; //global
-                                 //#endif
+        //#endif
 
         Random _random;
 
         bool _isKirkInitialized; //"init" emulation
 
-        /// <summary>
-        /// 
-        /// </summary>
         public Kirk()
         {
             kirk_init();

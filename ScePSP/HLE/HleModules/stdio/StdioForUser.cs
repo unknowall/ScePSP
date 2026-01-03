@@ -8,9 +8,9 @@ namespace ScePSP.Hle.Modules.stdio
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public class StdioForUser : HleModuleHost
     {
-        [Inject] HleModuleManager ModuleManager;
+        HleModuleManager ModuleManager => PSPDrivers.HLE.HleModuleManager;
 
-        [Inject] IoFileMgrForUser IoFileMgrForUser;
+        IoFileMgrForUser IoFileMgrForUser => PSPDrivers.HLE.IoFileMgrForUser;
 
         // ::TODO Faked STD. We should properly open streams.
         public enum StdHandle : int

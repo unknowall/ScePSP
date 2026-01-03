@@ -5,7 +5,7 @@
         /// <summary>
         /// Starts the component and waits until it have been successfully started.
         /// </summary>
-        void StartSynchronized();
+        void StartSynchronized(bool ForceRun = false);
 
         /// <summary>
         /// Stops the component and waits until it have been successfully stopped.

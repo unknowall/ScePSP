@@ -139,7 +139,7 @@ namespace ScePSP.Hle.Modules.threadman
         [HlePspFunction(NID = 0xF8170FBE, FirmwareVersion = 150)]
         public int sceKernelDeleteMutex(CpuThreadState CpuThreadState, PspMutex Mutex)
         {
-            Mutex.RemoveUid(InjectContext);
+            Mutex.RemoveUid();
             return 0;
         }
 

@@ -51,7 +51,7 @@ namespace ScePSP.Core.Cpu.InstructionCache
         }
     }
 
-    public sealed class MethodCache : IInjectInitialize
+    public sealed class MethodCache
     {
         public static readonly MethodCache Methods = new MethodCache();
 
@@ -62,11 +62,14 @@ namespace ScePSP.Core.Cpu.InstructionCache
 
         public IEnumerable<uint> PCs => _methodMapping.Keys;
 
-        [Inject] public CpuProcessor CpuProcessor;
+        public CpuProcessor CpuProcessor => PSPDrivers.CPU;
 
         MethodCompilerTask _methodCompilerTask;
 
-        void IInjectInitialize.Initialize() => _methodCompilerTask = new MethodCompilerTask(CpuProcessor, this);
+        public MethodCache()
+        {
+            _methodCompilerTask = new MethodCompilerTask(CpuProcessor, this);
+        }
 
         public MethodCacheInfo GetForPc(uint pc)
         {

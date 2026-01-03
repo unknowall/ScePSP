@@ -20,21 +20,21 @@ namespace ScePSP.Hle
 
     public static class IHleUidPoolClassExtensions
     {
-        public static T AllocateUid<T>(this T IHleUidPoolClass, InjectContext InjectContext) where T : IHleUidPoolClass
+        public static T AllocateUid<T>(this T IHleUidPoolClass) where T : IHleUidPoolClass
         {
-            InjectContext.GetInstance<HleUidPoolManager>().Alloc(IHleUidPoolClass.GetType(), IHleUidPoolClass);
+            PSPDrivers.HLE.HleUidPoolManager.Alloc(IHleUidPoolClass.GetType(), IHleUidPoolClass);
+
             return IHleUidPoolClass;
         }
 
-        public static void RemoveUid(this IHleUidPoolClass IHleUidPoolClass, InjectContext InjectContext)
+        public static void RemoveUid(this IHleUidPoolClass IHleUidPoolClass)
         {
-            InjectContext.GetInstance<HleUidPoolManager>().RemoveItem(IHleUidPoolClass.GetType(), IHleUidPoolClass);
+            PSPDrivers.HLE.HleUidPoolManager.RemoveItem(IHleUidPoolClass.GetType(), IHleUidPoolClass);
         }
 
-        public static int GetUidIndex(this IHleUidPoolClass IHleUidPoolClass, InjectContext InjectContext)
+        public static int GetUidIndex(this IHleUidPoolClass IHleUidPoolClass)
         {
-            return InjectContext.GetInstance<HleUidPoolManager>()
-                .GetOrAllocIndex(IHleUidPoolClass.GetType(), IHleUidPoolClass);
+            return PSPDrivers.HLE.HleUidPoolManager.GetOrAllocIndex(IHleUidPoolClass.GetType(), IHleUidPoolClass);
         }
     }
 }
@@ -69,6 +69,7 @@ namespace ScePSP.Hle.Managers
             {
                 if (Item.GetType() != this.Type)
                     throw new InvalidOperationException("Trying to insert invalid object type");
+
                 int Index = -1;
 
                 if (ReuseIds)

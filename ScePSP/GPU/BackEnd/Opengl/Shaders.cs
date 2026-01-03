@@ -1,4 +1,4 @@
-namespace ScePSP.Core.Gpu.Impl.Opengl
+namespace ScePSP.Core.GpuBackEnd.OpenGL
 {
     public class Shaders
     {

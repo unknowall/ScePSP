@@ -19,15 +19,15 @@ namespace ScePSP.Hle.Modules.modulemgr
     {
         static Logger Logger = Logger.GetLogger("ModuleMgr");
 
-        [Inject] HleMemoryManager MemoryManager;
+        HleMemoryManager MemoryManager => PSPDrivers.HLE.MemoryManager;
 
-        [Inject] HleModuleManager ModuleManager;
+        HleModuleManager ModuleManager => PSPDrivers.HLE.HleModuleManager;
 
-        [Inject] ThreadManForUser ThreadManForUser;
+        ThreadManForUser ThreadManForUser => PSPDrivers.HLE.ThreadManForUser;
 
-        [Inject] IoFileMgrForUser IoFileMgrForUser;
+        IoFileMgrForUser IoFileMgrForUser => PSPDrivers.HLE.IoFileMgrForUser;
 
-        [Inject] HleIoManager HleIoManager;
+        HleIoManager HleIoManager => PSPDrivers.HLE.HleIoManager;
 
         public struct SceKernelLMOption
         {
@@ -141,13 +141,13 @@ namespace ScePSP.Hle.Modules.modulemgr
         //public HleUidPool<HleModule> Modules = new HleUidPool<HleModule>();
         public HleUidPool<HleModuleGuest> Modules = new HleUidPool<HleModuleGuest>();
 
-        [Inject] public ElfPspLoader Loader;
-
-        [Inject] new InjectContext InjectContext;
+        public ElfPspLoader Loader => PSPDrivers.Loader;
 
         public int sceKernelLoadModuleWithStream(Func<Stream> GetStreamAction, string Path, uint Flags, SceKernelLMOption* SceKernelLMOption)
         {
-            var Module = InjectContext.NewInstance<HleModuleGuest>();
+            var Module = new HleModuleGuest();
+
+            PSPDrivers.HleModuleGuestList.Add(Module);
 
             try
             {

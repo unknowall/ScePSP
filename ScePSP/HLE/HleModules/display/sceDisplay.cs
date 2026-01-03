@@ -11,13 +11,13 @@ namespace ScePSP.Hle.Modules.display
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public class sceDisplay : HleModuleHost
     {
-        [Inject] PspDisplay PspDisplay;
+        PspDisplay PspDisplay => PSPDrivers.PspDisplay;
 
-        [Inject] DisplayConfig DisplayConfig;
+        DisplayConfig DisplayConfig => PSPDrivers.Config.DisplayConfig;
 
-        [Inject] PspRtc PspRtc;
+        PspRtc PspRtc => PSPDrivers.PspRtc;
 
-        [Inject] new HleThreadManager ThreadManager;
+        new HleThreadManager ThreadManager => PSPDrivers.HLE.HleThreadManager;
 
         /// <summary>
         /// Set display mode

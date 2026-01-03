@@ -2,28 +2,20 @@
 {
     public class Battery
     {
-        /// <summary />
         public bool IsPluggedIn = true;
 
-        /// <summary />
         public bool IsPresent = true;
 
-        /// <summary />
         public bool BatteryExists = true;
 
-        /// <summary />
         public bool IsStandBy = false;
 
-        /// <summary />
         public bool IsBatteryCharging = true;
 
-        /// <summary />
         public int BatteryLifeTimeInMinutes = 5 * 60;
 
-        /// <summary />
         public bool IsPowerOnline = true;
 
-        /// <summary />
         public double BatteryLifePercent = 1.0;
 
         /// <summary>Some standard battery temperature 28 deg C</summary>

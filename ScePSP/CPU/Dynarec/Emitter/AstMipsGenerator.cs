@@ -28,14 +28,13 @@ namespace ScePSP.Core.Cpu.Emitter
             if (DynarecConfig.FunctionCallWithStaticReferences)
             {
                 var methodCacheInfo = cpuProcessor.MethodCache.GetForPc(pc);
-                return Ast.CallDelegate(Ast.StaticFieldAccess(methodCacheInfo.StaticField.FieldInfo),
-                    Ast.CpuThreadStateExpr);
+                return Ast.CallDelegate(Ast.StaticFieldAccess(methodCacheInfo.StaticField.FieldInfo), Ast.CpuThreadStateExpr);
             }
             else
             {
                 return Ast.CallDelegate(
                     Ast.CallInstance(Ast.CpuThreadStateExpr,
-                        (Func<uint, Action<CpuThreadState>>)CpuThreadStateMethods.GetFuncAtPc, pc),
+                    (Func<uint, Action<CpuThreadState>>)CpuThreadStateMethods.GetFuncAtPc, pc),
                     Ast.CpuThreadStateExpr);
             }
         }
@@ -75,8 +74,7 @@ namespace ScePSP.Core.Cpu.Emitter
             }
         }
 
-        static readonly FieldInfo CpuThreadStateMethodCacheFieldInfo =
-            typeof(CpuThreadState).GetField(nameof(CpuThreadState.MethodCache));
+        static readonly FieldInfo CpuThreadStateMethodCacheFieldInfo = typeof(CpuThreadState).GetField(nameof(CpuThreadState.MethodCache));
 
         public AstNodeExpr GetMethodCacheInfoAtPc(AstNodeExpr pc)
         {
@@ -125,8 +123,7 @@ namespace ScePSP.Core.Cpu.Emitter
 
         public AstNodeExprLValue Fpr(int index) => Reg(CpuThreadState.FprNames[index]);
 
-        public AstNodeExprLValue HI_LO() =>
-            Ast.PropertyAccess(Ast.CpuThreadStateExpr, nameof(CpuThreadState.HiLo));
+        public AstNodeExprLValue HI_LO() => Ast.PropertyAccess(Ast.CpuThreadStateExpr, nameof(CpuThreadState.HiLo));
 
         public AstNodeExprLValue FPR_I(int index) =>
             Ast.Indirect(Ast.Cast(typeof(int*), Ast.GetAddress(Reg(CpuThreadState.FprNames[index])), Explicit: false));
@@ -197,8 +194,7 @@ namespace ScePSP.Core.Cpu.Emitter
 
         public AstNodeExprLValue C0R(int index) => Reg(CpuThreadState.C0RNames[index]);
 
-        public AstNodeExprLValue Gpr(int index) =>
-            index == 0 ? throw new Exception("Can't get reference to GPR0") : RefGprIndex(index);
+        public AstNodeExprLValue Gpr(int index) => index == 0 ? throw new Exception("Can't get reference to GPR0") : RefGprIndex(index);
 
         public AstNodeExprLValue GPR_l(int index) => Ast.Indirect(Ast.Cast(typeof(long*), Ast.GetAddress(Gpr(index))));
 
@@ -229,8 +225,7 @@ namespace ScePSP.Core.Cpu.Emitter
 
         public AstNodeExpr HILO_ul() => Ast.Cast<ulong>(HILO_sl());
 
-        private delegate void* AddressToPointerWithErrorFunc(uint address, string errorDescription, bool canBeNull,
-            InvalidAddressAsEnum invalid);
+        private delegate void* AddressToPointerWithErrorFunc(uint address, string errorDescription, bool canBeNull, InvalidAddressAsEnum invalid);
 
         private delegate void* AddressToPointerFunc(uint address);
 
@@ -274,14 +269,12 @@ namespace ScePSP.Core.Cpu.Emitter
             }
         }
 
-        public AstNodeExpr MemoryGetPointer(PspMemory memory, AstNodeExpr address) =>
-            MemoryGetPointer(memory, address, false);
+        public AstNodeExpr MemoryGetPointer(PspMemory memory, AstNodeExpr address) =>  MemoryGetPointer(memory, address, false);
 
         public AstNodeExprLValue MemoryGetPointerRef(Type type, PspMemory memory, AstNodeExpr address) =>
             Ast.Indirect(Ast.Cast(type.MakePointerType(), MemoryGetPointer(memory, address), false));
 
-        public AstNodeExprLValue MemoryGetPointerRef<TType>(PspMemory memory, AstNodeExpr address) =>
-            MemoryGetPointerRef(typeof(TType), memory, address);
+        public AstNodeExprLValue MemoryGetPointerRef<TType>(PspMemory memory, AstNodeExpr address) => MemoryGetPointerRef(typeof(TType), memory, address);
 
         public AstNodeStm MemorySetValue(Type type, PspMemory memory, AstNodeExpr address, AstNodeExpr value) =>
             Ast.Assign(

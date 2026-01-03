@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace ScePSP.Core.Audio.Impl.Null
+namespace ScePSP.Core.AudioBackEnd.Null
 {
-    public class AudioImplNull : AudioImpl
+    public class AudioImplNull : AudioBackEnd
     {
         public override void Update(Action<short[]> readStream)
         {
@@ -11,7 +11,5 @@ namespace ScePSP.Core.Audio.Impl.Null
         public override void StopSynchronized()
         {
         }
-
-        public override bool IsWorking => true;
     }
 }

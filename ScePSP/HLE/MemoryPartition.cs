@@ -27,9 +27,7 @@ namespace ScePSP.Hle
             Set = 3,
         }
 
-        [Inject] InjectContext InjectContext;
-
-        [Inject] PspMemory PspMemory;
+        PspMemory PspMemory => PSPDrivers.PspMemory;
 
         public bool Allocated;
         public string Name;
@@ -65,7 +63,7 @@ namespace ScePSP.Hle
                 return ChildPartitions
                         .Where(Partition => !Partition.Allocated)
                         .OrderByDescending(Partition => Partition.Size)
-                        .LinqExFirstOrDefault(new MemoryPartition(InjectContext, 0, 0))
+                        .LinqExFirstOrDefault(new MemoryPartition(0, 0))
                         .Size
                     ;
             }
@@ -84,11 +82,11 @@ namespace ScePSP.Hle
 
         public IEnumerable<MemoryPartition> ChildPartitions => _ChildPartitions;
 
-        public MemoryPartition(InjectContext InjectContext, uint Low, uint High, bool Allocated = true,
+        public MemoryPartition(uint Low, uint High, bool Allocated = true,
             string Name = "<Unknown>", MemoryPartition ParentPartition = null)
         {
             if (Low > High) throw new InvalidOperationException();
-            InjectContext.InjectDependencesTo(this);
+
             this.ParentPartition = ParentPartition;
             this.Name = Name;
             this.Low = Low;
@@ -127,7 +125,6 @@ namespace ScePSP.Hle
                         _ChildPartitions.Remove(Previous);
                         _ChildPartitions.Remove(Current);
                         _ChildPartitions.Add(new MemoryPartition(
-                            InjectContext,
                             Math.Min(Previous.Low, Current.Low),
                             Math.Max(Previous.High, Current.High),
                             false,
@@ -202,8 +199,7 @@ namespace ScePSP.Hle
             {
                 if (_ChildPartitions.Count == 0)
                 {
-                    _ChildPartitions.Add(new MemoryPartition(InjectContext, Low, High, false, ParentPartition: this,
-                        Name: Name));
+                    _ChildPartitions.Add(new MemoryPartition(Low, High, false, ParentPartition: this, Name: Name));
                 }
                 MemoryPartition OldFreePartition;
                 MemoryPartition NewPartiton;
@@ -260,25 +256,35 @@ namespace ScePSP.Hle
                 {
                     default:
                     case Anchor.Low:
-                        _ChildPartitions.Add(NewPartiton = new MemoryPartition(InjectContext, OldFreePartition.Low,
+
+                        _ChildPartitions.Add(NewPartiton = new MemoryPartition(OldFreePartition.Low,
                             (uint)(OldFreePartition.Low + Size), true, ParentPartition: this, Name: Name));
-                        _ChildPartitions.Add(new MemoryPartition(InjectContext, (uint)(OldFreePartition.Low + Size),
+
+                        _ChildPartitions.Add(new MemoryPartition((uint)(OldFreePartition.Low + Size),
                             OldFreePartition.High, false, ParentPartition: this, Name: "<Free>"));
+
                         break;
                     case Anchor.High:
-                        _ChildPartitions.Add(NewPartiton = new MemoryPartition(InjectContext,
+
+                        _ChildPartitions.Add(NewPartiton = new MemoryPartition(
                             (uint)(OldFreePartition.High - Size), OldFreePartition.High, true, ParentPartition: this,
                             Name: Name));
-                        _ChildPartitions.Add(new MemoryPartition(InjectContext, OldFreePartition.Low,
+
+                        _ChildPartitions.Add(new MemoryPartition(OldFreePartition.Low,
                             (uint)(OldFreePartition.High - Size), false, ParentPartition: this, Name: "<Free>"));
+
                         break;
                     case Anchor.Set:
-                        _ChildPartitions.Add(new MemoryPartition(InjectContext, OldFreePartition.Low, Position, false,
+
+                        _ChildPartitions.Add(new MemoryPartition(OldFreePartition.Low, Position, false,
                             ParentPartition: this, Name: "<Free>"));
-                        _ChildPartitions.Add(NewPartiton = new MemoryPartition(InjectContext, Position,
+
+                        _ChildPartitions.Add(NewPartiton = new MemoryPartition(Position,
                             (uint)(Position + Size), true, ParentPartition: this, Name: Name));
-                        _ChildPartitions.Add(new MemoryPartition(InjectContext, (uint)(Position + Size),
+
+                        _ChildPartitions.Add(new MemoryPartition( (uint)(Position + Size),
                             OldFreePartition.High, false, ParentPartition: this, Name: "<Free>"));
+
                         break;
                 }
 

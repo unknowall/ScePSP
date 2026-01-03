@@ -48,13 +48,13 @@ namespace ScePSP.Hle
             }
         }
 
-        [Inject] HleInterruptManager HleInterruptManager;
+        HleInterruptManager HleInterruptManager => PSPDrivers.HLE.HleInterruptManager;
 
-        [Inject] private HleThreadManager HleThreadManager;
+        private HleThreadManager HleThreadManager => PSPDrivers.HLE.HleThreadManager;
 
-        [Inject] private HleConfig HleConfig;
+        private HleConfig HleConfig => PSPDrivers.Config.HleConfig;
 
-        [Inject] private ElfConfig ElfConfig;
+        private ElfConfig ElfConfig => PSPDrivers.Config.ElfConfig;
 
         public event Action OnTerminate;
 
@@ -152,9 +152,8 @@ namespace ScePSP.Hle
             }
         }
 
-        public HleThread(InjectContext InjectContext, CpuThreadState CpuThreadState)
+        public HleThread(CpuThreadState CpuThreadState)
         {
-            InjectContext.InjectDependencesTo(this);
             //this.PspConfig = CpuThreadState.CpuProcessor.CpuConfig;
 
             if (this.HleConfig.UseCoRoutines)

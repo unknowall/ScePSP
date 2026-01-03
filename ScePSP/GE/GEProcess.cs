@@ -1,7 +1,7 @@
 ﻿#define PRIM_BATCH
 
-using ScePSP.Core.Gpu.State;
-using ScePSP.Core.Gpu.VertexReading;
+using ScePSP.Core.GpuBackEnd.State;
+using ScePSP.Core.GpuBackEnd.VertexReading;
 using ScePSP.Core.Memory;
 using ScePSPUtils;
 using ScePSPUtils.Extensions;
@@ -11,7 +11,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace ScePSP.Core.Gpu
+namespace ScePSP.Core.GpuBackEnd
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4)]
     public struct GpuInstruction

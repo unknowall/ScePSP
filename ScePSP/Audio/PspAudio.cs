@@ -2,9 +2,9 @@
 using System;
 using System.Linq;
 
-namespace ScePSP.Core.Audio
+namespace ScePSP.Core.AudioBackEnd
 {
-    public sealed unsafe class PspAudio : IInjectInitialize, IDisposable
+    public sealed unsafe class PspAudio : IDisposable
     {
         /// Output formats for PSP audio.
         public enum FormatEnum
@@ -31,13 +31,9 @@ namespace ScePSP.Core.Audio
 
         public PspAudioChannel SrcOutput2Channel;
 
-        [Inject] public AudioImpl PspAudioImpl;
+        public AudioBackEnd AudioBackEnd => PSPDrivers.AudioBackEnd;
 
-        private PspAudio()
-        {
-        }
-
-        void IInjectInitialize.Initialize()
+        public PspAudio()
         {
             Channels = new PspAudioChannel[MaxChannels];
             for (int n = 0; n < MaxChannels; n++)
@@ -87,7 +83,7 @@ namespace ScePSP.Core.Audio
 
         public void Update()
         {
-            PspAudioImpl.Update((MixedSamples) =>
+            AudioBackEnd.Update((MixedSamples) =>
             {
                 var RequiredSamples = MixedSamples.Length;
                 fixed (short* MixedSamplesPtr = MixedSamples)
@@ -122,7 +118,7 @@ namespace ScePSP.Core.Audio
             if (!Disposed)
             {
                 Disposed = true;
-                PspAudioImpl.StopSynchronized();
+                AudioBackEnd.StopSynchronized();
             }
         }
 

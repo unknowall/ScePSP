@@ -6,8 +6,7 @@ namespace ScePSP.Hle.Modules.pspnet
 {
     public unsafe partial class sceNetAdhocctl : HleModuleHost
     {
-        [Inject] HleInterop HleInterop;
-
+         HleInterop HleInterop => PSPDrivers.HLE.HleInterop;
 
         /// <summary>
         /// Initialise the Adhoc control library
@@ -94,15 +93,10 @@ namespace ScePSP.Hle.Modules.pspnet
             _notifyAdhocctlHandler(Event.Error, Error);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="event"></param>
-        /// <param name="Error"></param>
         private void _notifyAdhocctlHandler(Event @event, Errors Error = Errors.SUCCESS)
         {
             Console.Error.WriteLine("_notifyAdhocctlHandler:");
-            foreach (var Handler in InjectContext.GetInstance<HleUidPoolManager>().List<AdhocctlHandler>())
+            foreach (var Handler in  PSPDrivers.HLE.HleUidPoolManager.List<AdhocctlHandler>())
             {
                 Console.Error.WriteLine("_notifyAdhocctlHandler: {0:X8}: {1}: {2}, {3}", Handler.callback, @event,
                     Error, Handler.parameter);
@@ -290,14 +284,8 @@ namespace ScePSP.Hle.Modules.pspnet
             /// </summary>
             public uint callback;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public uint parameter;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public void Dispose()
             {
             }
@@ -361,7 +349,7 @@ namespace ScePSP.Hle.Modules.pspnet
         [HlePspNotImplemented]
         public int sceNetAdhocctlDelHandler(AdhocctlHandler handler)
         {
-            handler.RemoveUid(InjectContext);
+            handler.RemoveUid();
             return 0;
         }
 
@@ -425,9 +413,6 @@ namespace ScePSP.Hle.Modules.pspnet
         /// </summary>
         public struct SceNetAdhocctlPeerInfo
         {
-            /// <summary>
-            /// 
-            /// </summary>
             //public SceNetAdhocctlPeerInfo *next;
             public uint nextPointer;
 
@@ -457,9 +442,6 @@ namespace ScePSP.Hle.Modules.pspnet
         /// </summary>
         public struct SceNetAdhocctlScanInfo
         {
-            /// <summary>
-            /// 
-            /// </summary>
             //SceNetAdhocctlScanInfo *next;
             public uint nextPointer;
 

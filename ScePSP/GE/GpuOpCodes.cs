@@ -1,4 +1,4 @@
-﻿namespace ScePSP.Core.Gpu
+﻿namespace ScePSP.Core.GpuBackEnd
 {
     public enum GpuOpCodes : ushort
     {

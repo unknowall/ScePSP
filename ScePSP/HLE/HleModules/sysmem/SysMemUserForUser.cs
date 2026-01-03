@@ -11,11 +11,11 @@ namespace ScePSP.Hle.Modules.sysmem
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00000011)]
     public class SysMemUserForUser : HleModuleHost
     {
-        [Inject] new HleConfig HleConfig;
+        new HleConfig HleConfig => PSPDrivers.Config.HleConfig;
 
-        [Inject] HleMemoryManager MemoryManager;
+        HleMemoryManager MemoryManager => PSPDrivers.HLE.MemoryManager;
 
-        [Inject] KDebugForKernel KDebugForKernel;
+        KDebugForKernel KDebugForKernel => PSPDrivers.HleModules.KDebugForKernel;
 
         /// <summary>
         /// Get the firmware version.

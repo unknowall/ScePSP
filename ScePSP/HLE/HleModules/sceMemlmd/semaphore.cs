@@ -7,7 +7,7 @@ namespace ScePSP.Hle.Modules.kirk
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe partial class Semaphore : HleModuleHost
     {
-        [Inject] Kirk Kirk;
+        Kirk Kirk = PSPDrivers.Devices.Kirk;
 
         [HlePspFunction(NID = 0x00EEC06A, FirmwareVersion = 150)]
         [HlePspNotImplemented()]
@@ -24,8 +24,7 @@ namespace ScePSP.Hle.Modules.kirk
         }
 
         [HlePspFunction(NID = 0x4C537C72, FirmwareVersion = 150)]
-        public int sceUtilsBufferCopyWithRange(byte* OutputBuffer, int OutputSize, byte* InputBuffer, int InputSize,
-            int Command)
+        public int sceUtilsBufferCopyWithRange(byte* OutputBuffer, int OutputSize, byte* InputBuffer, int InputSize, int Command)
         {
             return Kirk.SceUtilsBufferCopyWithRange(OutputBuffer, OutputSize, InputBuffer, InputSize, Command);
         }

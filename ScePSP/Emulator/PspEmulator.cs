@@ -1,12 +1,17 @@
 ﻿using ScePSP.cheats;
 using ScePSP.Core;
+using ScePSP.Core.AudioBackEnd;
 using ScePSP.Core.Components.Display;
+using ScePSP.Core.Components.Rtc;
 using ScePSP.Core.Cpu;
-using ScePSP.Core.Gpu;
+using ScePSP.Core.GpuBackEnd;
 using ScePSP.Core.Memory;
 using ScePSP.Hle;
 using ScePSP.Hle.Loader;
 using ScePSP.Hle.Managers;
+using ScePSP.Hle.Modules.threadman;
+using ScePSP.Hle.Vfs;
+using ScePSP.Hle.Vfs.Emulator;
 using ScePSP.Runner;
 using ScePSP.TextureHook;
 using System;
@@ -16,44 +21,8 @@ using System.Threading;
 
 namespace ScePSP
 {
-    public class PspEmulator : IGuiExternalInterface, IDisposable
+    public class PspEmulator : IDisposable
     {
-        [Inject] public CpuConfig CpuConfig;
-
-        [Inject] GpuConfig GpuConfig;
-
-        [Inject] HleConfig HleConfig;
-
-        [Inject] DisplayConfig DisplayConfig;
-
-        [Inject] PspMemory PspMemory;
-
-        [Inject] ElfConfig ElfConfig;
-
-        [Inject] GpuImpl GpuImpl;
-
-        [Inject] PspDisplay PspDisplay;
-
-        [Inject] CWCheatPlugin CWCheatPlugin;
-
-        [Inject] TextureHookPlugin TextureHookPlugin;
-
-        [Inject] InjectMessageBus MessageBus;
-
-        public InjectContext InjectContext
-        {
-            get
-            {
-                lock (this) return _InjectContext;
-            }
-        }
-
-        [Inject] private InjectContext _InjectContext;
-
-        [Inject] public PspRunner PspRunner;
-
-        PspStoredConfig StoredConfig;
-
         public void PauseResume(Action Action)
         {
             if (Paused)
@@ -75,14 +44,14 @@ namespace ScePSP
         }
 
         public bool IsPaused() => Paused;
-        public bool Paused => PspRunner?.Paused ?? false;
+        public bool Paused => PSPDrivers.PspRunner?.Paused ?? false;
 
         public void Pause()
         {
             if (!Paused)
             {
                 Console.WriteLine("Pausing...");
-                PspRunner.PauseSynchronized();
+                PSPDrivers.PspRunner.PauseSynchronized();
                 Console.WriteLine("Pausing...Ok");
             }
         }
@@ -91,97 +60,63 @@ namespace ScePSP
         {
             if (Paused)
             {
-                PspRunner.ResumeSynchronized();
+                PSPDrivers.PspRunner.ResumeSynchronized();
             }
         }
 
         public PspEmulator()
         {
-            StoredConfig = PspStoredConfig.Load();
+            PSPDrivers.Config.StoredConfig = PspStoredConfig.Load();
         }
 
-        public void StartAndLoad(
-            string File, Action<PspEmulator> GuiRunner = null,
-            bool TraceSyscalls = false, bool TrackCallStack = true,
-            IntPtr GpuWindowHandle = default,
-            bool EnableMpeg = false
-        )
+        public void Start(string File, bool TraceSyscalls = false, bool TrackCallStack = true, IntPtr GpuWindowHandle = default)
         {
-            Start(() =>
-                    {
-                        LoadFile(File);
-                    }, GuiRunner, TraceSyscalls, TrackCallStack, GpuWindowHandle
-                );
+            PSPDrivers.initialize(PSPDrivers.PspGpuType.OpenGL, PSPDrivers.PspAudioType.SDL);
+
+            PSPDrivers.Config.DisplayConfig.WindowHandle = GpuWindowHandle;
+            PSPDrivers.Config.CpuConfig.DebugSyscalls = TraceSyscalls;
+            PSPDrivers.Config.CpuConfig.TrackCallStack = TrackCallStack;
+
+            PSPDrivers.PspRunner.StartSynchronized();
+
+            LoadFile(File);
         }
 
-        public void Start(Action CallbackOnInit = null, Action<PspEmulator> GuiRunner = null, bool TraceSyscalls = false, bool TrackCallStack = true, IntPtr GpuWindowHandle = default)
+        public void Stop()
         {
-            try
-            {
-                CpuConfig.DebugSyscalls = TraceSyscalls;
-                CpuConfig.TrackCallStack = TrackCallStack;
-                DisplayConfig.WindowHandle = GpuWindowHandle;
+            PSPDrivers.PspRunner?.StopSynchronized();
 
-                // Creates a temporal context.
-                //PspEmulatorContext = new PspEmulatorContext(PspConfig);
+            PSPDrivers.Config.StoredConfig?.Save();
 
-                PspRunner.StartSynchronized();
-
-                CallbackOnInit?.Invoke();
-
-                Thread.CurrentThread.Name = "GuiThread";
-
-                //ContextInitialized.WaitOne();
-
-                GuiRunner?.Invoke(this);
-
-                PspRunner.StopSynchronized();
-            }
-            catch (Exception Exception)
-            {
-                Console.Error.WriteLine(Exception);
-            }
-            finally
-            {
-                StoredConfig.Save();
-            }
-
-            Console.WriteLine("Exiting...");
-            //foreach (var thread in Process.GetCurrentProcess().Threads.Cast<ProcessThread>())
-            //{
-            //	Console.WriteLine("Thread: {0}, {1}", thread.ThreadState, (thread.ThreadState == System.Diagnostics.ThreadState.Wait) ?  thread.WaitReason.ToString() : "");
-            //}
-            //Environment.Exit(0);
-            return;
+            PSPDrivers.free();
         }
 
         public void LoadFile(string FileName)
         {
             Console.WriteLine("LoadFile...{0}", FileName);
+
             if (!File.Exists(FileName))
             {
                 throw new Exception($"File '{FileName}' doesn't exists");
             }
 
-            PspRunner.StartSynchronized();
+            //for SFA3 Crash
+            //PSPDrivers.Tasks.CpuTask.StartSynchronized(true);
 
-            MessageBus.Dispatch(new LoadFileMessage() { FileName = FileName });
-
-            PspRunner.CpuTask.ThreadTaskQueue.EnqueueAndWaitCompleted(() =>
+            PSPDrivers.PspRunner.CpuTask.ThreadTaskQueue.EnqueueAndWaitCompleted(() =>
             {
-                PspRunner.CpuTask._LoadFile(FileName);
+                PSPDrivers.PspRunner.CpuTask._LoadFile(FileName);
             });
         }
 
         public void ShowDebugInformation()
         {
-            var CpuProcessor = InjectContext.GetInstance<CpuProcessor>();
             Console.WriteLine("-----------------------------------------------------------------");
             Console.WriteLine("ShowDebugInformation:");
             Console.WriteLine("-----------------------------------------------------------------");
             try
             {
-                foreach (var Pair in CpuProcessor.GlobalInstructionStats.OrderBy(Pair => Pair.Value))
+                foreach (var Pair in PSPDrivers.CPU.GlobalInstructionStats.OrderBy(Pair => Pair.Value))
                 {
                     Console.WriteLine("{0} -> {1}", Pair.Key, Pair.Value);
                 }
@@ -200,7 +135,7 @@ namespace ScePSP
             Console.WriteLine("Last called syscalls: ");
             try
             {
-                foreach (var CalledCallback in InjectContext.GetInstance<HleModuleManager>().LastCalledCallbacks
+                foreach (var CalledCallback in PSPDrivers.HLE.HleModuleManager.LastCalledCallbacks
                     .ToArray().Reverse())
                 {
                     Console.WriteLine("  {0}", CalledCallback);
@@ -214,7 +149,7 @@ namespace ScePSP
             Console.WriteLine("-----------------------------------------------------------------");
             try
             {
-                PspRunner.CpuTask.DumpThreads();
+                PSPDrivers.PspRunner.CpuTask.DumpThreads();
             }
             catch (Exception Exception)
             {
@@ -231,21 +166,11 @@ namespace ScePSP
             //Console.WriteLine("-----------------------------------------------------------------");
         }
 
-        public void CaptureGpuFrame()
-        {
-            InjectContext.GetInstance<GpuProcessor>().CaptureFrame();
-        }
-
-        public object GetCpuProcessor()
-        {
-            return InjectContext.GetInstance<CpuProcessor>();
-        }
-
         void IDisposable.Dispose()
         {
-            //Console.WriteLine("PspEmulator.Dispose()");
-            InjectContext.Dispose();
-            _InjectContext = null;
+            Stop();
+
+            Console.WriteLine("PspEmulator.Dispose()");
         }
     }
 }

@@ -7,7 +7,7 @@ namespace ScePSP.Hle.Modules.power
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe partial class scePower : HleModuleHost
     {
-        [Inject] Battery PspBattery;
+        Battery PspBattery => PSPDrivers.Devices.PspBattery;
 
         /// <summary>
         /// Power callback flags

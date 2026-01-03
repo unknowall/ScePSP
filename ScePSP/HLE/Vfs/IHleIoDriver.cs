@@ -281,14 +281,8 @@ namespace ScePSP.Hle.Vfs
     /// </summary>
     public struct SceIoStat
     {
-        /// <summary>
-        /// 
-        /// </summary>
         public SceMode Mode;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public IOFileModes Attributes;
 
         /// <summary>
@@ -364,14 +358,8 @@ namespace ScePSP.Hle.Vfs
         /// </summary>
         public uint PrivateData;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public uint Dummy;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void Dispose()
         {
         }
@@ -421,8 +409,7 @@ namespace ScePSP.Hle.Vfs
         int IoChdir(HleIoDrvFileArg HleIoDrvFileArg, string DirectoryName); // Changes the current directory.
         int IoMount(HleIoDrvFileArg HleIoDrvFileArg);
         int IoUmount(HleIoDrvFileArg HleIoDrvFileArg);
-        int IoDevctl(HleIoDrvFileArg HleIoDrvFileArg, string DeviceName, uint Command, Span<byte> Input,
-            Span<byte> Output, ref bool DoDleay);
+        int IoDevctl(HleIoDrvFileArg HleIoDrvFileArg, string DeviceName, uint Command, Span<byte> Input, Span<byte> Output, ref bool DoDleay);
         int IoUnk21(HleIoDrvFileArg HleIoDrvFileArg);
     }
 }

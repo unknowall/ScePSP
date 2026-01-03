@@ -5,7 +5,6 @@ using System;
 
 namespace ScePSP.Core.Cpu.Emitter
 {
-    // ReSharper disable UnusedMember.Global
     public sealed partial class CpuEmitter
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////

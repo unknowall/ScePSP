@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 
-namespace ScePSP.Core.Gpu.Formats
+namespace ScePSP.Core.GpuBackEnd.Formats
 {
     /// <summary>
     /// 

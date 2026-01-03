@@ -9,7 +9,7 @@ namespace ScePSP.Hle.Modules.loadexec
     {
         private Logger Logger = Logger.GetLogger("LoadExecForUser");
 
-        [Inject] HleCallbackManager CallbackManager;
+        HleCallbackManager CallbackManager => PSPDrivers.HLE.HleCallbackManager;
 
         /// <summary>
         /// Exit game and go back to the PSP browser.

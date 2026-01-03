@@ -12,8 +12,7 @@ namespace ScePSP.Core.Cpu.VFpu
 
     public sealed class VfpuUtils
     {
-        public static string GetRegisterName(int matrix, int column, int row) =>
-            $"VFR{GetIndexCell(matrix, column, row)}";
+        public static string GetRegisterName(int matrix, int column, int row) => $"VFR{GetIndexCell(matrix, column, row)}";
 
         //public static int GetIndexCell(int Matrix, int Column, int Row, bool Transposed)
         //{
@@ -98,8 +97,7 @@ namespace ScePSP.Core.Cpu.VFpu
             throw new Exception("Register doesn't have sufix");
         }
 
-        public static int[] GetIndices(string nameWithSufix) =>
-            GetIndices(GetSizeBySuffix(nameWithSufix), nameWithSufix.Substr(0, -2));
+        public static int[] GetIndices(string nameWithSufix) => GetIndices(GetSizeBySuffix(nameWithSufix), nameWithSufix.Substr(0, -2));
 
         public static int[] GetIndices(int size, string name) => GetIndices(VfpuRegisterInfo.Parse(size, name));
     }

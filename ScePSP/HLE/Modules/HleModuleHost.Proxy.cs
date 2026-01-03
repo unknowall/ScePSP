@@ -18,11 +18,11 @@ namespace ScePSP.Hle
 {
     public unsafe partial class HleModuleHost : HleModule
     {
-        [Inject] internal HleThreadManager ThreadManager;
+        internal HleThreadManager ThreadManager => PSPDrivers.HLE.HleThreadManager;
 
-        [Inject] internal CpuProcessor CpuProcessor;
+        internal CpuProcessor CpuProcessor => PSPDrivers.CPU;
 
-        [Inject] internal HleConfig HleConfig;
+        internal HleConfig HleConfig => PSPDrivers.Config.HleConfig;
 
         private IlInstanceHolderPoolItem _ThisILInstanceHolder = null;
 
@@ -43,22 +43,19 @@ namespace ScePSP.Hle
         public static TType GetObjectFromPoolHelper<TType>(CpuThreadState CpuThreadState, int Index)
         {
             //Console.Error.WriteLine("GetObjectFromPoolHelper");
-            return (TType)CpuThreadState.CpuProcessor.InjectContext.GetInstance<HleUidPoolManager>()
-                .Get(typeof(TType), Index);
+            return (TType)PSPDrivers.HLE.HleUidPoolManager.Get(typeof(TType), Index);
         }
 
         public static object GetObjectFromPoolHelper(CpuThreadState CpuThreadState, Type Type, int Index, bool CanReturnNull)
         {
             //Console.Error.WriteLine("GetObjectFromPoolHelper");
-            return CpuThreadState.CpuProcessor.InjectContext.GetInstance<HleUidPoolManager>()
-                .Get(Type, Index, CanReturnNull: CanReturnNull);
+            return PSPDrivers.HLE.HleUidPoolManager.Get(Type, Index, CanReturnNull: CanReturnNull);
         }
 
         public static uint GetOrAllocIndexFromPoolHelper(CpuThreadState CpuThreadState, Type Type, IHleUidPoolClass Item)
         {
             //Console.Error.WriteLine("AllocIndexFromPoolHelper");
-            return (uint)CpuThreadState.CpuProcessor.InjectContext.GetInstance<HleUidPoolManager>()
-                .GetOrAllocIndex(Type, Item);
+            return (uint)PSPDrivers.HLE.HleUidPoolManager.GetOrAllocIndex(Type, Item);
         }
 
         class NormalRegisterReader : RegisterReaderBase<object>

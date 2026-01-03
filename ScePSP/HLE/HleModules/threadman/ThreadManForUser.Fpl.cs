@@ -298,7 +298,7 @@ namespace ScePSP.Hle.Modules.threadman
         [HlePspFunction(NID = 0xED1410E0, FirmwareVersion = 150)]
         public int sceKernelDeleteFpl(FixedPool FixedPool)
         {
-            FixedPool.RemoveUid(InjectContext);
+            FixedPool.RemoveUid();
             return 0;
         }
     }

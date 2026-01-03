@@ -1,5 +1,5 @@
 ﻿using ScePSP.Core.Components.Display;
-using ScePSP.Core.Gpu;
+using ScePSP.Core.GpuBackEnd;
 using ScePSP.Utils;
 using System;
 using System.Threading;
@@ -10,18 +10,18 @@ namespace ScePSP.Runner.Tasks.Gpu
     {
         protected override string ThreadName => "GpuTask";
 
-        [Inject] private GpuProcessor GpuProcessor;
+        private GpuProcessor GpuProcessor => PSPDrivers.GE;
 
-        [Inject] private GpuImpl GpuImpl;
+        private GpuBackEnd GpuBackEnd => PSPDrivers.GpuBackEnd;
 
-        [Inject] private DisplayConfig DisplayConfig;
+        private DisplayConfig DisplayConfig => PSPDrivers.Config.DisplayConfig;
 
         protected override void Main()
         {
             var threadId = Environment.CurrentManagedThreadId;
             Console.Out.WriteLineColored(ConsoleColor.White, $"## GE Runing ThreadId={threadId}");
 
-            GpuImpl.InitSynchronizedOnce(DisplayConfig.WindowHandle);
+            GpuBackEnd.InitSynchronizedOnce(DisplayConfig.WindowHandle);
 
             GpuProcessor.ProcessInit();
 

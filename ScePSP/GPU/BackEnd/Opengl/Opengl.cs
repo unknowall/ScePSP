@@ -1,8 +1,8 @@
 ﻿#define ENABLE_TEXTURES
 
-using ScePSP.Core.Gpu.Formats;
-using ScePSP.Core.Gpu.State;
-using ScePSP.Core.Gpu.VertexReading;
+using ScePSP.Core.GpuBackEnd.Formats;
+using ScePSP.Core.GpuBackEnd.State;
+using ScePSP.Core.GpuBackEnd.VertexReading;
 using ScePSP.Core.Types;
 using ScePSP.Utils;
 using ScePSPUtils;
@@ -13,12 +13,10 @@ using System.Threading;
 
 using LightGL;
 
-namespace ScePSP.Core.Gpu.Impl.Opengl
+namespace ScePSP.Core.GpuBackEnd.OpenGL
 {
-    public unsafe class OpenglGpuImpl : GpuImpl, IInjectInitialize
+    public unsafe class OpenglBackEnd : GpuBackEnd
     {
-        public override bool IsWorking => true;
-
         public TextureCacheOpengl TextureCache;
 
         private new GpuStateStruct GpuState;
@@ -128,12 +126,10 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         ShaderInfoClass ShaderInfo = new ShaderInfoClass();
 
-        [Inject] InjectContext InjectContext;
-
-        void IInjectInitialize.Initialize()
+        public OpenglBackEnd()
         {
             RenderbufferManager = new RenderbufferManager(this);
-            TextureCache = new TextureCacheOpengl(Memory, this, InjectContext);
+            TextureCache = new TextureCacheOpengl(Memory, this);
             VertexReader = new VertexReader();
         }
 
@@ -760,12 +756,11 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
 
                 Console.Out.WriteLineColored(ConsoleColor.White, "   -> OpenGL Context Version: {0}", GlGetString(GL.GL_VERSION));
-                Console.Out.WriteLineColored(ConsoleColor.White, "   -> Color Bits: {0},{1},{2},{3}, Depth Bits: {0}, Stencil Bits: {0}",
+                Console.Out.WriteLineColored(ConsoleColor.White, "   -> Depth Bits: {0}", GL.GetInteger(GL.GL_DEPTH_BITS));
+                Console.Out.WriteLineColored(ConsoleColor.White, "   -> Stencil Bits: {0}", GL.GetInteger(GL.GL_STENCIL_BITS));
+                Console.Out.WriteLineColored(ConsoleColor.White, "   -> Color Bits: {0},{1},{2},{3}",
                     GL.GetInteger(GL.GL_RED_BITS), GL.GetInteger(GL.GL_GREEN_BITS),
-                    GL.GetInteger(GL.GL_BLUE_BITS), GL.GetInteger(GL.GL_ALPHA_BITS),
-                    GL.GetInteger(GL.GL_DEPTH_BITS),
-                    GL.GetInteger(GL.GL_STENCIL_BITS)
-                    );
+                    GL.GetInteger(GL.GL_BLUE_BITS), GL.GetInteger(GL.GL_ALPHA_BITS));
 
                 if (GL.GetInteger(GL.GL_STENCIL_BITS) <= 0)
                 {
@@ -937,9 +932,11 @@ namespace ScePSP.Core.Gpu.Impl.Opengl
 
         private void PrepareState_Colors_3D(GpuStateStruct gpuState)
         {
+            if (ShaderInfo.uniformColor == null)
+                return;
+
             ShaderInfo.uniformColor.Set(gpuState.LightingState.AmbientModelColor.ToVector4());
 
-            // 对固定管线无害，在着色器管线中也不会破坏行为
             GL.EnableDisable(GL.GL_COLOR_MATERIAL, VertexType.HasColor);
         }
 

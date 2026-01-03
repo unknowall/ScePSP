@@ -9,10 +9,12 @@ namespace ScePSP.Hle.Managers
         Kernel1 = 1,
         User = 2,
         VolatilePartition = 3,
-        UserStacks = 6,
+        UMD = 4,
+        ME = 5,
+        UserStacks = 12,
     }
 
-    public class HleMemoryManager : IInjectInitialize
+    public class HleMemoryManager
     {
         public enum BlockTypeEnum : int
         {
@@ -24,9 +26,7 @@ namespace ScePSP.Hle.Managers
         }
 
         //public MemoryPartition RootPartition = new MemoryPartition(PspMemory.MainOffset, PspMemory.MainOffset + PspMemory.MainSize);
-        [Inject] public PspMemory Memory;
-
-        [Inject] InjectContext InjectContext;
+        public PspMemory Memory => PSPDrivers.PspMemory;
 
         public HleUidPool<MemoryPartition> MemoryPartitionsUid = new HleUidPool<MemoryPartition>();
 
@@ -35,47 +35,51 @@ namespace ScePSP.Hle.Managers
             return MemoryPartitionsUid.Get((int)Partition);
         }
 
-        private HleMemoryManager()
-        {
-        }
-
-        void IInjectInitialize.Initialize()
+        public HleMemoryManager()
         {
             MemoryPartition mp;
 
             mp = MemoryPartitionsUid.Set((int)MemoryPartitions.Kernel0,
-                new MemoryPartition(InjectContext, Low: 0x88000000, High: 0x88300000, Allocated: false,
-                Name: "Kernel Partition 1")); // 3MB
+                    new MemoryPartition(Low: 0x88000000, High: 0x88300000, Allocated: false,
+                    Name: "Kernel Partition 1")); // 3MB
 
             Console.Out.WriteLineColored(ConsoleColor.White, $"  -> {mp.ToString()}");
 
             mp = MemoryPartitionsUid.Set((int)MemoryPartitions.Kernel1,
-                new MemoryPartition(InjectContext, Low: 0x88300000, High: 0x88400000, Allocated: false,
-                Name: "Kernel Partition 2")); // 1MB
+                    new MemoryPartition(Low: 0x88300000, High: 0x88400000, Allocated: false,
+                    Name: "Kernel Partition 2")); // 1MB
 
             Console.Out.WriteLineColored(ConsoleColor.White, $"  -> {mp.ToString()}");
 
             mp = MemoryPartitionsUid.Set((int)MemoryPartitions.User,
-                new MemoryPartition(InjectContext, Low: 0x08800000, High: PspMemory.MainSegment.High, Allocated: false,
+                    new MemoryPartition(Low: 0x08800000, High: PspMemory.MainSegment.High, Allocated: false,
                     Name: "User Partition")); // 24MB
 
             Console.Out.WriteLineColored(ConsoleColor.White, $"  -> {mp.ToString()}");
 
             mp = MemoryPartitionsUid.Set((int)MemoryPartitions.UserStacks,
-                new MemoryPartition(InjectContext, Low: 0x08800000, High: 0x0B000000, Allocated: false,
+                    new MemoryPartition(Low: 0x08800000, High: 0x0B000000, Allocated: false,
                     Name: "User Stacks Partition")); // 24MB
 
             Console.Out.WriteLineColored(ConsoleColor.White, $"  -> {mp.ToString()}");
 
-            mp = MemoryPartitionsUid.Set(5,
-                new MemoryPartition(InjectContext, Low: 0x08400000, High: 0x08800000, Allocated: false,
+            mp = MemoryPartitionsUid.Set((int)MemoryPartitions.VolatilePartition,
+                    new MemoryPartition(Low: 0x08400000, High: 0x08800000, Allocated: false,
                     Name: "Volatile Partition")); // 4MB
 
             Console.Out.WriteLineColored(ConsoleColor.White, $"  -> {mp.ToString()}");
 
-            //MemoryPartitionsUid.Set(4, new MemoryPartition(InjectContext, Low: 0x8A000000, High: 0x8BC00000, Allocated: false, Name: "UMD Cache Partition")); // 28MB
+            mp = MemoryPartitionsUid.Set((int)MemoryPartitions.UMD,
+                    new MemoryPartition(Low: 0x8A000000, High: 0x8C800000, Allocated: false,
+                    Name: "UMD Cache Partition")); // 28MB
 
-            //MemoryPartitionsUid.Set(6, new MemoryPartition(InjectContext, Low: 0x8BC00000, High: 0x8C000000, Allocated: false, Name: "ME Partition")); // 4MB
+            Console.Out.WriteLineColored(ConsoleColor.White, $"  -> {mp.ToString()}");
+
+            mp = MemoryPartitionsUid.Set((int)MemoryPartitions.ME,
+                    new MemoryPartition(Low: 0x8C800000, High: 0x8CC00000, Allocated: false,
+                    Name: "ME Partition")); // 4MB
+
+            Console.Out.WriteLineColored(ConsoleColor.White, $"  -> {mp.ToString()}");
         }
     }
 }

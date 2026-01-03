@@ -8,29 +8,21 @@ using System.Collections.Generic;
 
 namespace ScePSP.Runner
 {
-    public class PspRunner : IRunnableTask, IInjectInitialize
+    public class PspRunner : IRunnableTask
     {
-        [Inject]
-        public CpuTask CpuTask { get; protected set; }
+        public CpuTask CpuTask => PSPDrivers.Tasks.CpuTask;
 
-        [Inject]
-        public GpuTask GpuTask { get; protected set; }
+        public GpuTask GpuTask => PSPDrivers.Tasks.GpuTask;
 
-        [Inject]
-        public AudioTask AudioTask { get; protected set; }
+        public AudioTask AudioTask => PSPDrivers.Tasks.AudioTask;
 
-        [Inject]
-        public DisplayTask DisplayTask { get; protected set; }
+        public DisplayTask DisplayTask => PSPDrivers.Tasks.DisplayTask;
 
         protected List<IRunnableTask> RunnableTaskList = new List<IRunnableTask>();
 
         public bool Paused { get; protected set; }
 
-        private PspRunner()
-        {
-        }
-
-        void IInjectInitialize.Initialize()
+        public PspRunner()
         {
             RunnableTaskList.Add(CpuTask);
             RunnableTaskList.Add(GpuTask);
@@ -38,10 +30,10 @@ namespace ScePSP.Runner
             RunnableTaskList.Add(DisplayTask);
         }
 
-        public void StartSynchronized()
+        public void StartSynchronized(bool ForceRun = false)
         {
             RunnableTaskList.ForEach(runnableComponent =>
-                runnableComponent.StartSynchronized()
+                runnableComponent.StartSynchronized(ForceRun)
             );
         }
 

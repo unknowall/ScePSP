@@ -13,13 +13,14 @@ namespace ScePSP.Hle.Managers
     public class HleCallbackManager : IMemoryStickEventHandler
     {
         public HleUidPool<HleCallback> Callbacks { get; protected set; }
+
         private readonly Queue<HleCallback> _scheduledCallbacks = new Queue<HleCallback>();
 
-        [Inject] private CpuProcessor _cpuProcessor;
+        private CpuProcessor _cpuProcessor => PSPDrivers.CPU;
 
-        [Inject] private HleInterop _hleInterop;
+        private HleInterop _hleInterop => PSPDrivers.HLE.HleInterop;
 
-        private HleCallbackManager()
+        public HleCallbackManager()
         {
             Callbacks = new HleUidPool<HleCallback>();
         }

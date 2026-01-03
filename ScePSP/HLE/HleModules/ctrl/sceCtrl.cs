@@ -12,7 +12,7 @@ namespace ScePSP.Hle.Modules.ctrl
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe class sceCtrl : HleModuleHost
     {
-        [Inject] PspController PspController;
+        PspController PspController => PSPDrivers.Devices.PspController;
 
         protected void _ReadCount(SceCtrlData* SceCtrlData, int Count, bool Peek, bool Positive)
         {

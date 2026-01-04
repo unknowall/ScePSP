@@ -8,7 +8,6 @@ namespace ScePSP.Hle.Managers
 
     public class HleEventFlagManager
     {
-        public HleUidPoolSpecial<HleEventFlag, EventFlagId> EventFlags =
-            new HleUidPoolSpecial<HleEventFlag, EventFlagId>();
+        public HleUidPoolSpecial<HleEventFlag, EventFlagId> EventFlags = new HleUidPoolSpecial<HleEventFlag, EventFlagId>();
     }
 }

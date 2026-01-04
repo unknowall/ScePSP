@@ -27,27 +27,27 @@ using System.Threading;
 class Program
 {
     static IntPtr window;
-    static IGlContext? Context;
+    static IGlContext Context;
 
     static SceCtrlData ctrlData;
     static int lx, ly;
     static int pressingAnalogLeft, pressingAnalogRight, pressingAnalogUp, pressingAnalogDown;
 
-    static PspEmulator? pspEmulator;
+    static PspEmulator pspEmulator;
 
-    static GLShader? Shader;
-    static GLBuffer? VertexBuffer;
-    static GLBuffer? TexCoordsBuffer;
-    static GLTexture2D? TexVram;
-    static GLTexture2D? DrawTexture;
-    //static GLTexture? DrawDepth;
+    static GLShader Shader;
+    static GLBuffer VertexBuffer;
+    static GLBuffer TexCoordsBuffer;
+    static GLTexture2D TexVram;
+    static GLTexture2D DrawTexture;
+    //static GLTexture DrawDepth;
     static bool TextureVerticalFlip;
-    //static GLTexture? TestTexture;
+    //static GLTexture TestTexture;
     public class ShaderInfoClass
     {
-        public GlAttribute? position;
-        public GlAttribute? texCoords;
-        public GlUniform? texture;
+        public GlAttribute position;
+        public GlAttribute texCoords;
+        public GlUniform texture;
     }
     static ShaderInfoClass ShaderInfo = new ShaderInfoClass();
 

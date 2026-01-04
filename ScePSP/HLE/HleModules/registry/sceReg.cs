@@ -11,8 +11,6 @@ namespace ScePSP.Hle.Modules.registry
     {
         HleRegistryManager HleRegistryManager => PSPDrivers.HLE.HleRegistryManager;
 
-        new HleConfig HleConfig => PSPDrivers.Config.HleConfig;
-
         /// <summary>
         /// Open the registry
         /// </summary>

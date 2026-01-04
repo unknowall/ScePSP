@@ -16,13 +16,9 @@ namespace ScePSP.Hle.Modules.ge
     {
         static Logger Logger = Logger.GetLogger("sceGe");
 
-        new HleThreadManager ThreadManager => PSPDrivers.HLE.HleThreadManager;
-
         HleMemoryManager MemoryManager => PSPDrivers.HLE.MemoryManager;
 
         public GpuProcessor GpuProcessor => PSPDrivers.GE;
-
-        public new CpuProcessor CpuProcessor => PSPDrivers.CPU;
 
         public SysMemUserForUser SysMemUserForUser => PSPDrivers.HleModules.SysMemUserForUser;
 
@@ -62,7 +58,7 @@ namespace ScePSP.Hle.Modules.ge
         public int sceGeSaveContext(uint Address)
         {
             var pointer = Memory.PspAddressToSpan<uint>(Address, 0x200);
-            var current = GpuProcessor.GpuImpl.GpuState.data.Span;
+            var current = GpuProcessor.GpuBackEnd.GpuState.data.Span;
             current.CopyTo(pointer);
             return 0;
 
@@ -78,7 +74,7 @@ namespace ScePSP.Hle.Modules.ge
         public int sceGeRestoreContext(uint Address)
         {
             var pointer = Memory.PspAddressToSpan<uint>(Address, 0x200);
-            var current = GpuProcessor.GpuImpl.GpuState.data.Span;
+            var current = GpuProcessor.GpuBackEnd.GpuState.data.Span;
             pointer.CopyTo(current);
             return 0;
 
@@ -417,6 +413,7 @@ namespace ScePSP.Hle.Modules.ge
         public GEProcesStatusEnum sceGeDrawSync(SyncTypeEnum SyncType)
         {
             //Thread.Sleep(40);
+            //Console.WriteLine($"sceGeDrawSync: {SyncType}");
             switch (SyncType)
             {
                 case SyncTypeEnum.WaitForCompletion:

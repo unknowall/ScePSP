@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace ScePSP.Runner.Tasks.Display
 {
-    public sealed class DisplayTask : PspDeviceTask
+    public sealed class DisplayTask : PspMainTask
     {
         private HleInterruptManager _hleInterruptManager;
 
@@ -59,23 +59,16 @@ namespace ScePSP.Runner.Tasks.Display
 
             vBlankInterruptHandler = _hleInterruptManager.GetInterruptHandler(PspInterrupts.PspVblankInt);
 
-            try
+            while (Running)
             {
-                while (Running)
+                if (triggerStuff)
                 {
-                    if (triggerStuff)
-                    {
-                        Step(_pspDisplay.TriggerDrawStart, _pspDisplay.TriggerVBlankStart, _pspDisplay.TriggerVBlankEnd);
-                    }
-                    else
-                    {
-                        Thread.Sleep(16.Milliseconds());
-                    }
+                    Step(_pspDisplay.TriggerDrawStart, _pspDisplay.TriggerVBlankStart, _pspDisplay.TriggerVBlankEnd);
                 }
-            }
-            finally
-            {
-                //Console.WriteLine("DisplayTask.End()");
+                else
+                {
+                    Thread.Sleep(16.Milliseconds());
+                }
             }
         }
     }

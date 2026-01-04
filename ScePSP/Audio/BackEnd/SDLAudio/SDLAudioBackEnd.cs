@@ -1,5 +1,7 @@
-﻿using ScePSP.Utils;
-using System;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Drawing;
+using System.Runtime.InteropServices;
 using static SDL2.SDL;
 
 namespace ScePSP.Core.AudioBackEnd.SDL
@@ -8,29 +10,29 @@ namespace ScePSP.Core.AudioBackEnd.SDL
     {
         private static uint audiodeviceid;
         private SDL_AudioCallback audioCallbackDelegate;
-        private CircularBuffer<short> SamplesBuffer;
-        private static int bufferms = 50;
+
+        private ConcurrentQueue<short[]> Queue = new ConcurrentQueue<short[]>();
 
         public const int Frequency = 44100;
         public const double SamplesPerMillisecond = (double)Frequency / 500;
 
         public const int NumberOfBuffers = 4;
         public const int NumberOfChannels = 2;
-        public const int BufferMilliseconds = 10;
+        public const int BufferMilliseconds = 20;
         public const int SamplesPerBuffer = (int)(SamplesPerMillisecond * BufferMilliseconds * NumberOfChannels);
 
         public SDLAudioBackEnd()
         {
             SDL_Init(SDL_INIT_AUDIO);
 
-            audioCallbackDelegate = AudioCallbackImpl;
+            audioCallbackDelegate = AudioCallback;
 
             SDL_AudioSpec desired = new SDL_AudioSpec
             {
-                channels = 2,
-                format = AUDIO_S16LSB,
-                freq = 44100,
-                samples = 2048,
+                channels = NumberOfChannels,
+                format = AUDIO_S16,
+                freq = Frequency,
+                samples = SamplesPerBuffer / NumberOfChannels,
                 callback = audioCallbackDelegate,
                 userdata = IntPtr.Zero
 
@@ -39,59 +41,71 @@ namespace ScePSP.Core.AudioBackEnd.SDL
 
             audiodeviceid = SDL_OpenAudioDevice(null, 0, ref desired, out obtained, 0);
 
-            int alignedSize = ((bufferms * 176 + 2048 - 1) / 2048) * 2048;
-
-            SamplesBuffer = new CircularBuffer<short>(alignedSize / 2); // 300 ms = 52920
-
             if (audiodeviceid != 0)
                 SDL_PauseAudioDevice(audiodeviceid, 0);
         }
 
         ~SDLAudioBackEnd()
         {
-            if (audiodeviceid != 0)
-                SDL_CloseAudioDevice(audiodeviceid);
+            Stop();
         }
 
-        private unsafe void AudioCallbackImpl(IntPtr userdata, IntPtr stream, int len)
+        private unsafe void AudioCallback(IntPtr userdata, IntPtr stream, int len)
         {
-            int shortlen = len / 2;
-            short[] tempBuffer = new short[shortlen];
+            int requiredSamples = len / sizeof(short);
+            var streamSpan = new Span<short>((void*)stream, requiredSamples);
+            streamSpan.Fill(0);
 
-            int shortsRead = SamplesBuffer.Read(tempBuffer, 0, shortlen);
-
-            fixed (short* ptr = tempBuffer)
+            if (Queue.Count == 0)
             {
-                System.Buffer.MemoryCopy(ptr, (void*)stream, shortlen, shortsRead);
+                return;
             }
 
-            if (shortsRead < shortlen)
+            int filledSamples = 0;
+            while (filledSamples < requiredSamples && Queue.TryDequeue(out var buffer))
             {
-                new Span<short>((void*)(stream + shortsRead), shortlen - shortsRead).Fill(0);
+                if (buffer == null || buffer.Length == 0)
+                {
+                    continue;
+                }
+                int copyCount = Math.Min(buffer.Length, requiredSamples - filledSamples);
+                new Span<short>(buffer, 0, copyCount).CopyTo(streamSpan.Slice(filledSamples));
+                filledSamples += copyCount;
             }
         }
-
-        private short[] _bufferData;
 
         public override void Update(Action<short[]> readStream)
         {
-            const int readSamples = SamplesPerBuffer;
-            if (_bufferData == null || _bufferData.Length != readSamples)
+            while (Queue.Count < 2)
             {
-                _bufferData = new short[readSamples];
-                //Console.WriteLine("Created buffer");
+                var Data = new short[SamplesPerBuffer / 2];
+                readStream(Data);
+                //for (int n = 0; n < Data.Length; n++) Console.Write(Data[n]);
+                Queue.Enqueue(Data);
             }
-
-            readStream?.Invoke(_bufferData);
-            //if (_bufferData.Any(Item => Item != 0)) foreach (var C in _bufferData) Console.Write("{0},", C);
-
-            SamplesBuffer.Write(_bufferData);
         }
 
-        public override void StopSynchronized()
+        public override void Pause()
         {
             if (audiodeviceid != 0)
                 SDL_PauseAudioDevice(audiodeviceid, 1);
+        }
+
+        public override void Resume()
+        {
+            if (audiodeviceid != 0)
+                SDL_PauseAudioDevice(audiodeviceid, 0);
+        }
+
+        public override void Stop()
+        {
+            if (audiodeviceid != 0)
+            {
+                SDL_PauseAudioDevice(audiodeviceid, 0);
+                SDL_CloseAudioDevice(audiodeviceid);
+
+                audiodeviceid = 0;
+            }
         }
     }
 }

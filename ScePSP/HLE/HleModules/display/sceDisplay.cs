@@ -17,8 +17,6 @@ namespace ScePSP.Hle.Modules.display
 
         PspRtc PspRtc => PSPDrivers.PspRtc;
 
-        new HleThreadManager ThreadManager => PSPDrivers.HLE.HleThreadManager;
-
         /// <summary>
         /// Set display mode
         /// </summary>

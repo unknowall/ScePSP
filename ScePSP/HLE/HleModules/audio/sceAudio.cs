@@ -12,8 +12,6 @@ namespace ScePSP.Hle.Modules.audio
     {
         PspAudio PspAudio => PSPDrivers.PspAudio;
 
-        new HleThreadManager ThreadManager => PSPDrivers.HLE.HleThreadManager;
-
         public struct pspAudioInputParams
         {
             /// <summary>

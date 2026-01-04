@@ -107,10 +107,6 @@ namespace ScePSP.Core.AudioBackEnd
             this.VolumeRight = PspAudio.MaxVolume;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="PspAudio"></param>
         public PspAudioChannel(PspAudio PspAudio)
         {
             this.PspAudio = PspAudio;

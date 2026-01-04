@@ -97,29 +97,14 @@ namespace ScePSP.Hle.Modules.modulemgr
 
         public struct SceKernelSMOption
         {
-            /// <summary>
-            /// 
-            /// </summary>
             public uint Size;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public uint MpidStack;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public int StackSize;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public int Priority;
 
-            /// <summary>
-            /// 
-            /// </summary>
             public uint Attribute;
         }
 
@@ -146,6 +131,7 @@ namespace ScePSP.Hle.Modules.modulemgr
         public int sceKernelLoadModuleWithStream(Func<Stream> GetStreamAction, string Path, uint Flags, SceKernelLMOption* SceKernelLMOption)
         {
             var Module = new HleModuleGuest();
+            int ModuleId;
 
             PSPDrivers.HleModuleGuestList.Add(Module);
 
@@ -165,13 +151,14 @@ namespace ScePSP.Hle.Modules.modulemgr
                     Path.EndsWith(@"/mpeg.prx") ||
                     Path.EndsWith(@"/mpegbase.prx") ||
                     Path.EndsWith(@"/libfont.prx") ||
+                    Path.EndsWith(@"/sc_sascore.prx") ||
                     false)
                 {
                     Logger.Warning("Ignore {0}!", Path);
                     //throw new Exception("Ignore " + Path + "!");
-                    //var ModuleId = Modules.Create(new HleModule());
-                    //Module.ID = ModuleId;
-                    return Module.ID;
+                    ModuleId = Modules.Create(Module);
+                    Module.ID = ModuleId;
+                    return ModuleId;
                 }
 
                 var ModuleStream = GetStreamAction();
@@ -209,14 +196,14 @@ namespace ScePSP.Hle.Modules.modulemgr
 
                 //Loader.InitInfo.GP
             }
-            catch// (Exception Exception)
+            catch (Exception Exception)
             {
-                //Console.WriteLine(Exception);
-                Console.WriteLine($"sceKernelLoadModuleWithStream Fail: {Path}");
+                Console.WriteLine(Exception);
+                //Console.WriteLine($"sceKernelLoadModuleWithStream Fail: {Path}");
                 Module.Loaded = false;
             }
 
-            var ModuleId = Modules.Create(Module);
+            ModuleId = Modules.Create(Module);
             Module.ID = ModuleId;
             return ModuleId;
         }
@@ -291,8 +278,7 @@ namespace ScePSP.Hle.Modules.modulemgr
         /// </returns>
         [HlePspFunction(NID = 0xD1FF982A, FirmwareVersion = 150)]
         //[HlePspNotImplemented]
-        public int sceKernelStopModule(int ModuleId, int ArgumentsSize, void* ArgumentsPointer, int* Status,
-            void* SceKernelSMOption)
+        public int sceKernelStopModule(int ModuleId, int ArgumentsSize, void* ArgumentsPointer, int* Status, void* SceKernelSMOption)
         {
             return 0;
             //throw(new NotImplementedException());
@@ -358,10 +344,6 @@ namespace ScePSP.Hle.Modules.modulemgr
             return Module.ID;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         [HlePspFunction(NID = 0x8F2DF740, FirmwareVersion = 150)]
         public uint sceKernelStopUnloadSelfModuleWithStatus()
         {

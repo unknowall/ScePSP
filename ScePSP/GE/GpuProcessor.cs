@@ -75,7 +75,7 @@ namespace ScePSP.Core.GpuBackEnd
 
         public readonly WaitableStateMachine<Status2Enum> Status2 = new WaitableStateMachine<Status2Enum>(Status2Enum.Completed, Debug: false);
 
-        public GpuBackEnd GpuImpl => PSPDrivers.GpuBackEnd;
+        public GpuBackEnd GpuBackEnd => PSPDrivers.GpuBackEnd;
 
         public GpuConfig GpuConfig => PSPDrivers.Config.GpuConfig;
 
@@ -102,7 +102,7 @@ namespace ScePSP.Core.GpuBackEnd
             {
                 var GE = new GEProcess(Memory, this, n);
                 GEProcessLists[n] = GE;
-                //GEProcessFreeQueue.Enqueue(DisplayLists[n]);
+                //GEProcessFreeQueue.Enqueue(GEProcessLists[n]);
                 EnqueueFreeGEProcess(GEProcessLists[n]);
             }
         }
@@ -126,8 +126,7 @@ namespace ScePSP.Core.GpuBackEnd
             lock (GEProcessFreeQueue)
             {
                 GEProcessFreeQueue.Enqueue(GE);
-                if (GE != null)
-                    GE.SetFree();
+                GE.SetFree();
             }
             GEProcessreeEvent.Set();
         }
@@ -187,7 +186,7 @@ namespace ScePSP.Core.GpuBackEnd
         {
             //Console.WriteLine("Running");
             Status2.SetValue(Status2Enum.HavePendingLists);
-            GpuImpl.AddedGEProcess();
+            GpuBackEnd.AddedGEProcess();
         }
 
         public void GeDrawSync(Action SyncCallback)
@@ -196,7 +195,7 @@ namespace ScePSP.Core.GpuBackEnd
             Status2.CallbackOnStateOnce(Status2Enum.Completed, () =>
             {
                 CapturingWaypoint();
-                GpuImpl.Sync(LastProcessedGEProcess.GpuStateStructPointer);
+                GpuBackEnd.Sync(LastProcessedGEProcess.GpuStateStructPointer);
                 SyncCallback();
                 Syncing = false;
             });
@@ -208,14 +207,14 @@ namespace ScePSP.Core.GpuBackEnd
             {
                 CapturingFrame = false;
                 Console.WriteLine("EndCapturingFrame!");
-                GpuImpl.EndCapture();
+                GpuBackEnd.EndCapture();
             }
 
             if (StartCapturingFrame)
             {
                 StartCapturingFrame = false;
                 CapturingFrame = true;
-                GpuImpl.StartCapture();
+                GpuBackEnd.StartCapture();
                 Console.WriteLine("StartCapturingFrame!");
             }
         }
@@ -227,12 +226,12 @@ namespace ScePSP.Core.GpuBackEnd
 
         public void SetCurrent()
         {
-            GpuImpl.SetCurrent();
+            GpuBackEnd.SetCurrent();
         }
 
         public void UnsetCurrent()
         {
-            GpuImpl.UnsetCurrent();
+            GpuBackEnd.UnsetCurrent();
         }
 
         public void CaptureFrame()

@@ -778,7 +778,11 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
         {
             //Running = false;
             //StopEvent.WaitOne();
-            //NativeWindow.Dispose();
+
+            if (AlreadyInitialized)
+            {
+                OpenglContext.Dispose();
+            }
         }
 
         private void PrepareStateDraw(GpuStateStruct gpuState)

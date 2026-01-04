@@ -11,8 +11,7 @@ namespace ScePSP.Hle
 {
     public class MemoryPartitionNoMemoryException : Exception
     {
-        public MemoryPartitionNoMemoryException(string Text)
-            : base(Text)
+        public MemoryPartitionNoMemoryException(string Text) : base(Text)
         {
         }
     }
@@ -82,8 +81,7 @@ namespace ScePSP.Hle
 
         public IEnumerable<MemoryPartition> ChildPartitions => _ChildPartitions;
 
-        public MemoryPartition(uint Low, uint High, bool Allocated = true,
-            string Name = "<Unknown>", MemoryPartition ParentPartition = null)
+        public MemoryPartition(uint Low, uint High, bool Allocated = true, string Name = "<Unknown>", MemoryPartition ParentPartition = null)
         {
             if (Low > High) throw new InvalidOperationException();
 
@@ -102,6 +100,8 @@ namespace ScePSP.Hle
                     }
                     return Result;
                 }));
+
+            //Console.Out.WriteLineColored(ConsoleColor.White, $"  -> {this.ToString()}");
         }
 
         private void NormalizePartitions()

@@ -321,11 +321,6 @@ namespace ScePSP.Hle.Formats
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pbIn"></param>
-        /// <param name="showInfo"></param>
         public byte[] Decrypt(byte[] pbIn, bool showInfo = false)
         {
             _kirk = new Kirk();

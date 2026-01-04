@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,12 +36,17 @@ namespace ScePSP.HLE
     {
         internal CoroutinePool Pool;
         internal AutoResetEvent CoroutineContinueEvent = new AutoResetEvent(false);
-        internal Task WorkerTask;
-        private Thread _underlyingThread;
+        internal Thread WorkerThread;
+
+        public bool IsAlive { get; private set; }
+
+        public bool IsCurrentlyActive => Pool.CurrentCoroutine == this;
 
         public string Name { set; get; }
 
-        Exception _rethrowException;
+        private bool MustStart;
+
+        Exception RethrowException;
 
         private void CoroutineContinueEvent_WaitOne()
         {
@@ -58,94 +64,74 @@ namespace ScePSP.HLE
         {
         }
 
-        bool _mustStart;
-        private string _nameField;
-
         internal Coroutine(string name, CoroutinePool pool, Action action)
         {
             Pool = pool;
             IsAlive = true;
-            Name = name;
-            _mustStart = true;
-            _nameField = "Coroutine-" + name;
-
-            //延迟到 ExecuteStep 时启动
-            WorkerTask = new Task(() =>
+            WorkerThread = new Thread(delegate ()
             {
-                _underlyingThread = Thread.CurrentThread;
+                Console.WriteLine($"Coroutine Start ({this.Name})");
                 try
                 {
-                    if (string.IsNullOrEmpty(_underlyingThread.Name))
-                    {
-                        _underlyingThread.Name = _nameField;
-                    }
-                    _nameField = _underlyingThread.Name;
-                }
-                catch { }
 
-                try
-                {
                     CoroutineContinueEvent_WaitOne();
                     action();
                 }
-                catch (InterruptException)
+                catch (Coroutine.InterruptException)
                 {
                 }
-                catch (Exception e)
+                catch (Exception rethrowException)
                 {
-                    _rethrowException = e;
+
+                    RethrowException = rethrowException;
                 }
                 finally
                 {
+                    Console.WriteLine($"Coroutine Finished ({this.Name})");
+
                     IsAlive = false;
-                    pool.CallerContinueEvent.Set();
+                    Pool.CallerContinueEvent.Set();
                 }
-            }, TaskCreationOptions.LongRunning);
+            })
+            {
+                CurrentCulture = new CultureInfo("en-US"),
+                IsBackground = true
+            };
+            this.Name = Name;
+            this.MustStart = true;
         }
 
         public void ExecuteStep()
         {
-            if (_mustStart)
+            if (MustStart)
             {
-                _mustStart = false;
-                try
-                {
-                    WorkerTask.Start(TaskScheduler.Default);
-                }
-                catch// (Exception e)
-                {
-                    IsAlive = false;
-                    throw;
-                }
+                MustStart = false;
+                WorkerThread.Name = "Coroutine-" + this.Name;
+                WorkerThread.Start();
             }
-            //Debug.WriteLine("ExecuteStep");
             if (IsAlive)
             {
                 Pool.CurrentCoroutine = this;
                 Pool.CallerThread = Thread.CurrentThread;
-
                 Pool.CallerContinueEvent.Reset();
                 CoroutineContinueEvent.Set();
                 PoolCallerContinueEvent_WaitOne();
             }
-
-            if (_rethrowException != null)
+            if (RethrowException != null)
             {
                 try
                 {
-                    throw new HLETaskException("HLETask Exception", _rethrowException);
+                    throw new HLETaskException("Coroutine Exception", this.RethrowException);
                 }
                 finally
                 {
-                    _rethrowException = null;
+                    RethrowException = null;
                 }
             }
         }
 
         public void YieldInPool()
         {
-            //Debug.WriteLine("YieldInPool");
-
             if (Pool.CurrentCoroutine == null)
             {
                 throw new InvalidOperationException("Can't call YieldInPool outside the ExecuteStep");
@@ -153,7 +139,7 @@ namespace ScePSP.HLE
 
             if (Pool.CurrentCoroutine != this)
             {
-                Debug.WriteLine("Pool.CurrentCoroutine != this");
+                Console.WriteLine("Pool.CurrentCoroutine != this");
             }
 
             CoroutineContinueEvent.Reset();
@@ -161,22 +147,10 @@ namespace ScePSP.HLE
             CoroutineContinueEvent_WaitOne();
         }
 
-        public bool IsAlive { get; private set; }
-
-        public bool IsCurrentlyActive => Pool.CurrentCoroutine == this;
-
         public void Dispose()
         {
             IsAlive = false;
             CoroutineContinueEvent.Set();
-            try
-            {
-                if (WorkerTask != null && WorkerTask.Status == TaskStatus.Running)
-                {
-                    WorkerTask.Wait(50);
-                }
-            }
-            catch { }
             Pool.Coroutines.Remove(this);
         }
     }

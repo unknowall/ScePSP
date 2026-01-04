@@ -29,8 +29,6 @@ namespace ScePSP.Hle.Modules.mpeg
 
         public const int MPEG_ATRAC_ES_OUTPUT_SIZE = 8192;
 
-        new HleConfig HleConfig => PSPDrivers.Config.HleConfig;
-
         HleInterop HleInterop => PSPDrivers.HLE.HleInterop;
 
         private Mpeg __SingleInstance = null;

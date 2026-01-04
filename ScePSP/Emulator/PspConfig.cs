@@ -9,23 +9,23 @@ namespace ScePSP.Core
 {
     public class ControllerConfig
     {
-        public string DigitalUp = "Up";
-        public string DigitalDown = "Down";
-        public string DigitalLeft = "Left";
-        public string DigitalRight = "Right";
+        public string DigitalUp = "W";
+        public string DigitalDown = "S";
+        public string DigitalLeft = "A";
+        public string DigitalRight = "D";
 
-        public string AnalogUp = "I";
-        public string AnalogDown = "K";
-        public string AnalogLeft = "J";
-        public string AnalogRight = "L";
+        public string AnalogUp = "Up";
+        public string AnalogDown = "Down";
+        public string AnalogLeft = "Left";
+        public string AnalogRight = "Right";
 
         public string SelectButton = "Space";
         public string StartButton = "Return";
 
-        public string SquareButton = "A";
-        public string CircleButton = "D";
-        public string TriangleButton = "W";
-        public string CrossButton = "S";
+        public string SquareButton = "U";
+        public string CircleButton = "I";
+        public string TriangleButton = "J";
+        public string CrossButton = "K";
 
         public string LeftTriggerButton = "Q";
         public string RightTriggerButton = "E";

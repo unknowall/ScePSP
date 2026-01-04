@@ -37,49 +37,34 @@ namespace ScePSP.Hle.Managers
 
         public HleMemoryManager()
         {
-            MemoryPartition mp;
-
-            mp = MemoryPartitionsUid.Set((int)MemoryPartitions.Kernel0,
+            MemoryPartitionsUid.Set((int)MemoryPartitions.Kernel0,
                     new MemoryPartition(Low: 0x88000000, High: 0x88300000, Allocated: false,
                     Name: "Kernel Partition 1")); // 3MB
 
-            Console.Out.WriteLineColored(ConsoleColor.White, $"  -> {mp.ToString()}");
-
-            mp = MemoryPartitionsUid.Set((int)MemoryPartitions.Kernel1,
+            MemoryPartitionsUid.Set((int)MemoryPartitions.Kernel1,
                     new MemoryPartition(Low: 0x88300000, High: 0x88400000, Allocated: false,
                     Name: "Kernel Partition 2")); // 1MB
 
-            Console.Out.WriteLineColored(ConsoleColor.White, $"  -> {mp.ToString()}");
-
-            mp = MemoryPartitionsUid.Set((int)MemoryPartitions.User,
+            MemoryPartitionsUid.Set((int)MemoryPartitions.User,
                     new MemoryPartition(Low: 0x08800000, High: PspMemory.MainSegment.High, Allocated: false,
                     Name: "User Partition")); // 24MB
 
-            Console.Out.WriteLineColored(ConsoleColor.White, $"  -> {mp.ToString()}");
-
-            mp = MemoryPartitionsUid.Set((int)MemoryPartitions.UserStacks,
+            MemoryPartitionsUid.Set((int)MemoryPartitions.UserStacks,
                     new MemoryPartition(Low: 0x08800000, High: 0x0B000000, Allocated: false,
                     Name: "User Stacks Partition")); // 24MB
 
-            Console.Out.WriteLineColored(ConsoleColor.White, $"  -> {mp.ToString()}");
-
-            mp = MemoryPartitionsUid.Set((int)MemoryPartitions.VolatilePartition,
+            MemoryPartitionsUid.Set((int)MemoryPartitions.VolatilePartition,
                     new MemoryPartition(Low: 0x08400000, High: 0x08800000, Allocated: false,
                     Name: "Volatile Partition")); // 4MB
 
-            Console.Out.WriteLineColored(ConsoleColor.White, $"  -> {mp.ToString()}");
-
-            mp = MemoryPartitionsUid.Set((int)MemoryPartitions.UMD,
+            MemoryPartitionsUid.Set((int)MemoryPartitions.UMD,
                     new MemoryPartition(Low: 0x8A000000, High: 0x8C800000, Allocated: false,
                     Name: "UMD Cache Partition")); // 28MB
 
-            Console.Out.WriteLineColored(ConsoleColor.White, $"  -> {mp.ToString()}");
-
-            mp = MemoryPartitionsUid.Set((int)MemoryPartitions.ME,
+            MemoryPartitionsUid.Set((int)MemoryPartitions.ME,
                     new MemoryPartition(Low: 0x8C800000, High: 0x8CC00000, Allocated: false,
                     Name: "ME Partition")); // 4MB
 
-            Console.Out.WriteLineColored(ConsoleColor.White, $"  -> {mp.ToString()}");
         }
     }
 }

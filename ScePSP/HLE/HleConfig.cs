@@ -27,7 +27,6 @@ namespace ScePSP.Hle
         public bool WlanIsOn = true;
 
         public bool UseCoRoutines = false;
-        //public bool UseCoRoutines = true;
 
         public bool DebugSyscalls = false;
 
@@ -49,7 +48,7 @@ namespace ScePSP.Hle
         public PSP_SYSTEMPARAM_TIME_FORMAT TimeFormat = PSP_SYSTEMPARAM_TIME_FORMAT._24HR;
         public PSP_SYSTEMPARAM_DAYLIGHTSAVINGS DaylightSavings = PSP_SYSTEMPARAM_DAYLIGHTSAVINGS.STD;
         public double Timezone = -7;
-        public string UserName = Environment.GetEnvironmentVariable("UserName");
+        public string UserName = Environment.GetEnvironmentVariable("USERNAME");
     }
 
     class HleConfigUtils

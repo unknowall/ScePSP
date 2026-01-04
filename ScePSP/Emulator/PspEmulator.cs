@@ -23,35 +23,16 @@ namespace ScePSP
 {
     public class PspEmulator : IDisposable
     {
-        public void PauseResume(Action Action)
-        {
-            if (Paused)
-            {
-                Action();
-            }
-            else
-            {
-                Pause();
-                try
-                {
-                    Action();
-                }
-                finally
-                {
-                    Resume();
-                }
-            }
-        }
-
         public bool IsPaused() => Paused;
-        public bool Paused => PSPDrivers.PspRunner?.Paused ?? false;
+
+        public bool Paused => PSPDrivers.Runner?.Paused ?? false;
 
         public void Pause()
         {
             if (!Paused)
             {
                 Console.WriteLine("Pausing...");
-                PSPDrivers.PspRunner.PauseSynchronized();
+                PSPDrivers.Runner.PauseSynchronized();
                 Console.WriteLine("Pausing...Ok");
             }
         }
@@ -60,7 +41,7 @@ namespace ScePSP
         {
             if (Paused)
             {
-                PSPDrivers.PspRunner.ResumeSynchronized();
+                PSPDrivers.Runner.ResumeSynchronized();
             }
         }
 
@@ -77,21 +58,24 @@ namespace ScePSP
             PSPDrivers.Config.CpuConfig.DebugSyscalls = TraceSyscalls;
             PSPDrivers.Config.CpuConfig.TrackCallStack = TrackCallStack;
 
-            PSPDrivers.PspRunner.StartSynchronized();
+            PSPDrivers.Config.HleConfig.DebugSyscalls = TraceSyscalls;
+            PSPDrivers.Config.HleConfig.UseCoRoutines = false;
+
+            PSPDrivers.Runner.StartSynchronized();
 
             LoadFile(File);
         }
 
         public void Stop()
         {
-            PSPDrivers.PspRunner?.StopSynchronized();
+            PSPDrivers.Runner?.StopSynchronized();
 
             PSPDrivers.Config.StoredConfig?.Save();
 
             PSPDrivers.free();
         }
 
-        public void LoadFile(string FileName)
+        private void LoadFile(string FileName)
         {
             Console.WriteLine("LoadFile...{0}", FileName);
 
@@ -103,9 +87,9 @@ namespace ScePSP
             //for SFA3 Crash
             //PSPDrivers.Tasks.CpuTask.StartSynchronized(true);
 
-            PSPDrivers.PspRunner.CpuTask.ThreadTaskQueue.EnqueueAndWaitCompleted(() =>
+            PSPDrivers.Runner.CpuTask.ThreadTaskQueue.EnqueueAndWaitCompleted(() =>
             {
-                PSPDrivers.PspRunner.CpuTask._LoadFile(FileName);
+                PSPDrivers.Runner.CpuTask._LoadFile(FileName);
             });
         }
 
@@ -135,8 +119,7 @@ namespace ScePSP
             Console.WriteLine("Last called syscalls: ");
             try
             {
-                foreach (var CalledCallback in PSPDrivers.HLE.HleModuleManager.LastCalledCallbacks
-                    .ToArray().Reverse())
+                foreach (var CalledCallback in PSPDrivers.HLE.HleModuleManager.LastCalledCallbacks.ToArray().Reverse())
                 {
                     Console.WriteLine("  {0}", CalledCallback);
                 }
@@ -149,7 +132,7 @@ namespace ScePSP
             Console.WriteLine("-----------------------------------------------------------------");
             try
             {
-                PSPDrivers.PspRunner.CpuTask.DumpThreads();
+                PSPDrivers.Runner.CpuTask.DumpThreads();
             }
             catch (Exception Exception)
             {
@@ -169,8 +152,6 @@ namespace ScePSP
         void IDisposable.Dispose()
         {
             Stop();
-
-            Console.WriteLine("PspEmulator.Dispose()");
         }
     }
 }

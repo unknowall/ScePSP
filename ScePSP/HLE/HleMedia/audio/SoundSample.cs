@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ScePSP.Core.Types
+namespace ScePSP.Hle.Formats.audio
 {
     public struct MonoShortSoundSample
     {

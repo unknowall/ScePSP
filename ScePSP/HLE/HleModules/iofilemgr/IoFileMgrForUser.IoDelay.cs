@@ -12,8 +12,6 @@ namespace ScePSP.Hle.Modules.iofilemgr
 
         PspHleRunningConfig PspHleRunningConfig => PSPDrivers.Config.PspHleRunningConfig;
 
-        new HleThreadManager ThreadManager => PSPDrivers.HLE.HleThreadManager;
-
         private class IoDelayType
         {
             public static readonly IoDelayType Open = new IoDelayType("Open", 5.Milliseconds());

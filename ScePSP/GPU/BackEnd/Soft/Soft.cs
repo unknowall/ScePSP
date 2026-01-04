@@ -4,11 +4,11 @@ using System.Numerics;
 
 namespace ScePSP.Core.GpuBackEnd.Soft
 {
-    unsafe public class GpuImplSoft : GpuBackEnd
+    unsafe public class SoftBackEnd : GpuBackEnd
     {
         private TriangleRasterizer<Triangle> TriangleRasterizer;
 
-        public GpuImplSoft()
+        public SoftBackEnd()
         {
             TriangleRasterizer = new TriangleRasterizer<Triangle>((int y, ref RasterizerResult a, ref RasterizerResult b, ref Triangle triangle) =>
             {

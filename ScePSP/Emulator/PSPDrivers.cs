@@ -12,6 +12,7 @@ using ScePSP.Core.Cpu;
 using ScePSP.Core.Cpu.Dynarec;
 using ScePSP.Core.Cpu.InstructionCache;
 using ScePSP.Core.GpuBackEnd;
+using ScePSP.Core.GpuBackEnd.Null;
 using ScePSP.Core.GpuBackEnd.OpenGL;
 using ScePSP.Core.GpuBackEnd.Soft;
 using ScePSP.Core.Memory;
@@ -39,6 +40,7 @@ using ScePSP.TextureHook;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using static ScePSP.Hle.Modules.iofilemgr.IoFileMgrForUser;
@@ -48,7 +50,9 @@ namespace ScePSP
 {
     public static class PSPDrivers
     {
-        public static PspRunner PspRunner;
+        public static bool Inited = false;
+
+        public static PspRunner Runner;
 
         public static CpuProcessor CPU;
 
@@ -195,6 +199,7 @@ namespace ScePSP
         public enum PspGpuType
         {
             OpenGL,
+            Soft,
             Null
         }
 
@@ -216,9 +221,6 @@ namespace ScePSP
 
             Config.HleConfig.HleModulesDll = typeof(HleModulesRoot).Assembly;
 
-            PspRtc = new PspRtc();
-            PspAudio = new PspAudio();
-
             if (Config.StoredConfig.UseFastMemory)
             {
                 PspMemory = new FastPspMemory(); 
@@ -228,10 +230,13 @@ namespace ScePSP
             }
 
             CPU = new CpuProcessor();
-            MethodCache = new MethodCache();
+
             DynarecFunctionCompiler = new DynarecFunctionCompiler();
+            MethodCache = new MethodCache();
 
             GE = new GpuProcessor();
+            PspRtc = new PspRtc();
+            PspAudio = new PspAudio();
             PspDisplay = new PspDisplay();
 
             CWCheatPlugin = new CWCheatPlugin();
@@ -249,8 +254,11 @@ namespace ScePSP
                 case PspGpuType.OpenGL:
                     GpuBackEnd = new OpenglBackEnd();
                     break;
+                case PspGpuType.Soft:
+                    GpuBackEnd = new SoftBackEnd();
+                    break;
                 case PspGpuType.Null:
-                    GpuBackEnd = new GpuImplSoft();
+                    GpuBackEnd = new NullBackEnd();
                     break;
             }
 
@@ -260,7 +268,7 @@ namespace ScePSP
                     AudioBackEnd = new SDLAudioBackEnd();
                     break;
                 case PspAudioType.Null:
-                    AudioBackEnd = new AudioImplNull();
+                    AudioBackEnd = new NullAudio();
                     break;
             }
 
@@ -297,11 +305,15 @@ namespace ScePSP
             Tasks.DisplayTask = new DisplayTask(HLE.HleInterruptManager, Devices.Display);
             Tasks.CpuTask = new CpuTask();
 
-            PspRunner = new PspRunner();
+            Runner = new PspRunner();
+
+            Inited = true;
         }
 
         public static void free()
         {
+            if (!Inited) return;
+
             PspMemory.Dispose();
             TextureHookPlugin.Dispose();
 

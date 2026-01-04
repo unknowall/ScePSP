@@ -1,6 +1,6 @@
-﻿using ScePSP.Core.Types;
-using System;
+﻿using System;
 using System.Linq;
+using ScePSP.Hle.Formats.audio;
 
 namespace ScePSP.Core.AudioBackEnd
 {
@@ -118,13 +118,13 @@ namespace ScePSP.Core.AudioBackEnd
             if (!Disposed)
             {
                 Disposed = true;
-                AudioBackEnd.StopSynchronized();
+                AudioBackEnd.Stop();
             }
         }
 
         void IDisposable.Dispose()
         {
-            StopSynchronized();
+            AudioBackEnd.Stop();
         }
     }
 

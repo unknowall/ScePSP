@@ -6,8 +6,6 @@ namespace ScePSP.Hle.Modules.wlan
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe class sceWlanDrv : HleModuleHost
     {
-        new HleConfig HleConfig => PSPDrivers.Config.HleConfig;
-
         /// <summary>
         /// Determine the state of the WLAN power switch
         /// </summary>

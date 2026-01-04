@@ -115,12 +115,12 @@ namespace ScePSP.Core.GpuBackEnd
                     if (Debug)
                         Console.WriteLine("- STALLED --------------------------------------------------------------------");
                     Status.SetValue(GEProcesStatusEnum.Stalling);
-                    while (!StallAddressUpdated.WaitOne(TimeSpan.FromSeconds(2)))
+                    while (!StallAddressUpdated.WaitOne(1000))
                     {
                         ConsoleUtils.SaveRestoreConsoleColor(ConsoleColor.Magenta, () =>
                         {
-                            Console.WriteLine("GEProcessQueue.GetCountLock(): {0}", GpuProcessor.GEProcessQueue.GetCountLock());
-                            Console.WriteLine("CurrentGEProcess.Status: {0}", Status.ToStringDefault());
+                            Console.WriteLine($"GEProcessQueue.GetCountLock: {GpuProcessor.GEProcessQueue.GetCountLock()}");
+                            Console.WriteLine($"CurrentGEProcess.Status: {Status.ToStringDefault()}");
                         });
                         if (GpuProcessor.Syncing)
                         {
@@ -186,23 +186,23 @@ namespace ScePSP.Core.GpuBackEnd
                 case GpuOpCodes.END:
                     {
                         Done = true;
-                        GpuProcessor.GpuImpl.End(GpuStateStructPointer);
+                        GpuProcessor.GpuBackEnd.End(GpuStateStructPointer);
                         break;
                     }
                 case GpuOpCodes.FINISH:
                     {
-                        GpuProcessor.GpuImpl.Finish(GpuStateStructPointer);
+                        GpuProcessor.GpuBackEnd.Finish(GpuStateStructPointer);
                         DoFinish(InstructionAddressCurrent, Params24, ExecuteNow: true);
                         break;
                     }
 
                 // Texture
                 case GpuOpCodes.TFLUSH:
-                    GpuProcessor.GpuImpl.TextureFlush(GpuStateStructPointer);
+                    GpuProcessor.GpuBackEnd.TextureFlush(GpuStateStructPointer);
                     break;
 
                 case GpuOpCodes.TSYNC:
-                    GpuProcessor.GpuImpl.TextureSync(GpuStateStructPointer);
+                    GpuProcessor.GpuBackEnd.TextureSync(GpuStateStructPointer);
                     break;
 
                 case GpuOpCodes.SPLINE:
@@ -218,7 +218,7 @@ namespace ScePSP.Core.GpuBackEnd
                     {
                         var transfer = GpuStateStructPointer.TextureTransferState;
                         transfer.TexelSize = (TextureTransferStateStruct.TexelSizeEnum)Params24.Extract(0, 1);
-                        GpuProcessor.GpuImpl.Transfer(GpuStateStructPointer);
+                        GpuProcessor.GpuBackEnd.Transfer(GpuStateStructPointer);
                         break;
                     }
 
@@ -238,13 +238,13 @@ namespace ScePSP.Core.GpuBackEnd
 
                         if (_primCount == 0)
                         {
-                            GpuProcessor.GpuImpl.BeforeDraw(GpuStateStructPointer);
-                            GpuProcessor.GpuImpl.PrimStart(GlobalGpuState, GpuStateStructPointer, primitiveType);
+                            GpuProcessor.GpuBackEnd.BeforeDraw(GpuStateStructPointer);
+                            GpuProcessor.GpuBackEnd.PrimStart(GlobalGpuState, GpuStateStructPointer, primitiveType);
                         }
 
                         if (vertexCount > 0)
                         {
-                            GpuProcessor.GpuImpl.Prim(vertexCount);
+                            GpuProcessor.GpuBackEnd.Prim(vertexCount);
                         }
 
                         if (nextInstruction.OpCode == GpuOpCodes.PRIM &&
@@ -257,7 +257,7 @@ namespace ScePSP.Core.GpuBackEnd
                         {
                             //Console.WriteLine("{0:X8}", PC);
                             _primCount = 0;
-                            GpuProcessor.GpuImpl.PrimEnd();
+                            GpuProcessor.GpuBackEnd.PrimEnd();
                         }
 #else
                     GpuDisplayList.GpuProcessor.GpuImpl.BeforeDraw(GpuDisplayList.GpuStateStructPointer);
@@ -550,8 +550,8 @@ namespace ScePSP.Core.GpuBackEnd
                 }
             }
 
-            GpuProcessor.GpuImpl.BeforeDraw(GpuStateStructPointer);
-            GpuProcessor.GpuImpl.DrawCurvedSurface(GlobalGpuState, GpuStateStructPointer, patch, uCount, vCount);
+            GpuProcessor.GpuBackEnd.BeforeDraw(GpuStateStructPointer);
+            GpuProcessor.GpuBackEnd.DrawCurvedSurface(GlobalGpuState, GpuStateStructPointer, patch, uCount, vCount);
         }
 
 

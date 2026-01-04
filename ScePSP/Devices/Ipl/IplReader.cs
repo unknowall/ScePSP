@@ -9,31 +9,18 @@ using Kirk = ScePSP.Core.Components.Crypto.Kirk;
 
 namespace ScePSP.Core.Components.Ipl
 {
-    /// <summary>
-    // 
-    /// </summary>
     /// <see cref="http://silverspring.lan.st/NPSPTD_01.txt"/>
     /// <see cref="http://daxhordes.org/forum/viewtopic.php?f=33&t=808"/>
     public unsafe class IplReader
     {
-        /// <summary>
-        /// 
-        /// </summary>
+
         protected Stream Stream;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="nandReader"></param>
         public IplReader(NandReader nandReader)
         {
             Stream = nandReader.SliceWithLength();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public MemoryStream GetIplData()
         {
             var memoryStream = new MemoryStream();
@@ -73,13 +60,6 @@ namespace ScePSP.Core.Components.Ipl
             DecryptIplToMemory(GetIplData().ToArray().Skip(0x4000).ToArray(), streamOut, toMemoryAddress: false);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="iplData"></param>
-        /// <param name="outputStream"></param>
-        /// <param name="toMemoryAddress"></param>
-        /// <returns></returns>
         public static IplInfo DecryptIplToMemory(byte[] iplData, Stream outputStream, bool toMemoryAddress = true)
         {
             var buffer = new byte[0x1000];
@@ -118,10 +98,6 @@ namespace ScePSP.Core.Components.Ipl
             return iplInfo;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public IEnumerable<ushort> GetIplOffsets()
         {
             var stream = Stream.SliceWithLength(NandReader.BytesPerBlock * 4);

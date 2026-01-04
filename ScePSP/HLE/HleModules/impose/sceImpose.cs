@@ -6,15 +6,8 @@ namespace ScePSP.Hle.Modules.impose
     [HlePspModule(ModuleFlags = ModuleFlags.UserMode | ModuleFlags.Flags0x00010011)]
     public unsafe class sceImpose : HleModuleHost
     {
-        new HleConfig HleConfig => PSPDrivers.Config.HleConfig;
-
         uint umdPopupStatus;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="UmdPopupStatus"></param>
-        /// <returns></returns>
         [HlePspFunction(NID = 0x72189C48, FirmwareVersion = 150)]
         [HlePspNotImplemented]
         public uint sceImposeSetUMDPopupFunction(uint UmdPopupStatus)
@@ -23,10 +16,6 @@ namespace ScePSP.Hle.Modules.impose
             return 0;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         [HlePspFunction(NID = 0xE0887BC8, FirmwareVersion = 150)]
         [HlePspNotImplemented]
         public uint sceImposeGetUMDPopupFunction()

@@ -12,7 +12,6 @@ namespace ScePSP.Hle.Modules.rtc
     public unsafe class sceRtc : HleModuleHost
     {
         PspRtc PspRtc => PSPDrivers.PspRtc;
-        new HleConfig HleConfig => PSPDrivers.Config.HleConfig;
 
         /// <summary>
         /// Get the resolution of the tick counter
@@ -25,12 +24,6 @@ namespace ScePSP.Hle.Modules.rtc
             return (uint)TimeSpan.FromSeconds(1).GetTotalMicroseconds();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="DateTime"></param>
-        /// <param name="UnixTime"></param>
-        /// <returns></returns>
         [HlePspFunction(NID = 0x27C4594C, FirmwareVersion = 150)]
         [HlePspNotImplemented]
         public int sceRtcGetTime_t(ref ScePspDateTime DateTime, out uint UnixTime)

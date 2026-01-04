@@ -8,19 +8,10 @@ namespace ScePSP.Hle.Managers
 {
     public struct ParsePathInfo
     {
-        /// <summary>
-        /// 
-        /// </summary>
         public HleIoDrvFileArg HleIoDrvFileArg;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public string LocalPath;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public IHleIoDriver HleIoDriver => HleIoDrvFileArg.HleIoDriver;
     }
 

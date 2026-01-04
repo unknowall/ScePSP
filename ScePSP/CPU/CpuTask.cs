@@ -31,7 +31,7 @@ using System.Threading;
 
 namespace ScePSP.Runner.Tasks.Cpu
 {
-    public sealed unsafe class CpuTask : PspDeviceTask
+    public sealed unsafe class CpuTask : PspMainTask
     {
         static Logger Logger = Logger.GetLogger("CpuTask");
 
@@ -84,7 +84,6 @@ namespace ScePSP.Runner.Tasks.Cpu
                 Console.WriteLine(e);
             }
 
-            //MemoryStickMountable = new HleIoDriverMountable();
             MemoryStickMountable.Mount("/", new HleIoDriverLocalFileSystem(memoryStickRootFolder));
             var memoryStick = new HleIoDriverMemoryStick(PspMemory, HleCallbackManager, MemoryStickMountable);
             //var MemoryStick = new HleIoDriverMemoryStick(new HleIoDriverLocalFileSystem(VirtualDirectory).AsReadonlyHleIoDriver());
@@ -197,7 +196,6 @@ namespace ScePSP.Runner.Tasks.Cpu
 
         public void _LoadFile(string fileName)
         {
-            //GC.Collect();
             SetVirtualFolder(Path.GetDirectoryName(fileName));
 
             var memoryStream = new PspMemoryStream(PspMemory);
@@ -255,7 +253,7 @@ namespace ScePSP.Runner.Tasks.Cpu
                         string[] filesToTry = {
                             "/PSP_GAME/SYSDIR/BOOT.BIN",
                             "/PSP_GAME/SYSDIR/EBOOT.BIN",
-                            "/PSP_GAME/SYSDIR/EBOOT.OLD"
+                            //"/PSP_GAME/SYSDIR/EBOOT.OLD"
                         };
 
                         foreach (var fileToTry in filesToTry)
@@ -369,7 +367,7 @@ namespace ScePSP.Runner.Tasks.Cpu
         {
             var threadId = Environment.CurrentManagedThreadId;
             Console.Out.WriteLineColored(ConsoleColor.White, $"## CPU Runing ThreadId={threadId}");
-            Console.Out.WriteLineColored(ConsoleColor.White, $"  -> Hle Version: {HleConfig.FirmwareVersion.VersionStr}");
+            Console.Out.WriteLineColored(ConsoleColor.White, $"   -> HLE Firmware Version: {HleConfig.FirmwareVersion.VersionStr}");
 
             while (Running)
             {
@@ -383,12 +381,11 @@ namespace ScePSP.Runner.Tasks.Cpu
                     // threads has secondary effects that I have to consideer first.
                     var tickAlternate = false;
 
-                    //PspRtc.Update();
+                    PspRtc.Update();
                     while (true)
                     {
                         ThreadTaskQueue.HandleEnqueued();
                         if (!Running) return;
-
                         if (!tickAlternate) PspRtc.Update();
                         tickAlternate = !tickAlternate;
 

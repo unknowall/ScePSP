@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace ScePSP.Runner.Tasks.Gpu
 {
-    public sealed class GpuTask : PspDeviceTask
+    public sealed class GpuTask : PspMainTask
     {
         protected override string ThreadName => "GpuTask";
 
@@ -19,32 +19,26 @@ namespace ScePSP.Runner.Tasks.Gpu
         protected override void Main()
         {
             var threadId = Environment.CurrentManagedThreadId;
+
             Console.Out.WriteLineColored(ConsoleColor.White, $"## GE Runing ThreadId={threadId}");
 
             GpuBackEnd.InitSynchronizedOnce(DisplayConfig.WindowHandle);
 
             GpuProcessor.ProcessInit();
 
-            try
+            while (Running)
             {
-                while (true)
-                {
-                    WaitHandle.WaitAny(new WaitHandle[] { GpuProcessor.GEProcessQueueUpdated, ThreadTaskQueue.EnqueuedEvent, RunningUpdatedEvent }, 200.Milliseconds());
+                WaitHandle.WaitAny(new WaitHandle[] { GpuProcessor.GEProcessQueueUpdated, ThreadTaskQueue.EnqueuedEvent, RunningUpdatedEvent }, 200.Milliseconds());
 
-                    // TODO: Should wait until the Form has created its context.
+                // TODO: Should wait until the Form has created its context.
 
-                    ThreadTaskQueue.HandleEnqueued();
+                ThreadTaskQueue.HandleEnqueued();
 
-                    if (!Running) break;
+                if (!Running) break;
 
-                    GpuProcessor.SetCurrent();
-                    GpuProcessor.ProcessStep();
-                    GpuProcessor.UnsetCurrent();
-                }
-            }
-            finally
-            {
-                //Console.WriteLine("GpuTask.End()");
+                GpuProcessor.SetCurrent();
+                GpuProcessor.ProcessStep();
+                GpuProcessor.UnsetCurrent();
             }
         }
     }

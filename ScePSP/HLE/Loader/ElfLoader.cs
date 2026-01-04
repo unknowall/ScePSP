@@ -43,16 +43,12 @@ namespace ScePSP.Hle.Loader
             Header = fileStream.ReadStruct<Elf.HeaderStruct>();
             if (Header.Magic != Elf.HeaderStruct.MagicEnum.ExpectedValue)
             {
-                //throw new InvalidProgramException($"Not an ELF File \'{name}\'");
-                Console.Error.WriteLine($"Not an ELF File \'{name}\'");
-                return;
+                throw new InvalidProgramException($"Not an ELF File \'{name}\'");
             }
 
             if (Header.Machine != Elf.HeaderStruct.MachineEnum.Allegrex)
             {
-                //throw new InvalidProgramException("Invalid Elf.Header.Machine");
-                Console.Error.WriteLine("Invalid Elf.Header.Machine");
-                return;
+                throw new InvalidProgramException("Invalid Elf.Header.Machine");
             }
 
             ProgramHeaders = fileStream.ReadStructVectorAt<Elf.ProgramHeader>(Header.ProgramHeaderOffset,
@@ -61,8 +57,7 @@ namespace ScePSP.Hle.Loader
                 Header.SectionHeaderCount, Header.SectionHeaderEntrySize);
 
             NamesSectionHeader = SectionHeaders[Header.SectionHeaderStringTable];
-            StringTable = fileStream.SliceWithLength(NamesSectionHeader.Offset, NamesSectionHeader.Size)
-                .ReadAll();
+            StringTable = fileStream.SliceWithLength(NamesSectionHeader.Offset, NamesSectionHeader.Size).ReadAll();
 
             SectionHeadersByName = new Dictionary<string, Elf.SectionHeader>();
             foreach (var sectionHeader in SectionHeaders)
@@ -80,8 +75,7 @@ namespace ScePSP.Hle.Loader
             Logger.Info("SectionHeaders:{0}", SectionHeaders.Length);
             foreach (var sectionHeader in SectionHeaders)
             {
-                Logger.Info("{0}:{1}", GetStringFromStringTable(sectionHeader.Name),
-                    sectionHeader.ToStringDefault());
+                Logger.Info("{0}:{1}", GetStringFromStringTable(sectionHeader.Name), sectionHeader.ToStringDefault());
             }
 
             if (NeedsRelocation && ProgramHeaders.Length > 1)

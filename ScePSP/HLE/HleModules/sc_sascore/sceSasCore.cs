@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Types;
+﻿using ScePSP.Hle.Formats.audio;
 using ScePSP.Hle.Attributes;
 using ScePSPUtils;
 using System;
@@ -259,7 +259,7 @@ namespace ScePSP.Hle.Modules.sc_sascore
         //[HlePspNotImplemented]
         public int __sceSasGetPauseFlag(uint SasCorePointer)
         {
-            //return unchecked((int)0xFFFFFFFF);
+            //return 1;
             var SasCore = GetSasCore(SasCorePointer);
             uint Out = 0;
             foreach (var Voice in SasCore.Voices)

@@ -61,7 +61,7 @@ namespace ScePSP.Hle
         public DelegateInfo LastCalledHleFunction;
 
         //public int Priority = 1;
-        protected HLETasks HleTask;
+        protected HLEWorkThreads HleTask;
 
         protected Coroutine Coroutine;
 
@@ -162,7 +162,7 @@ namespace ScePSP.Hle
             }
             else
             {
-                this.HleTask = new HLETasks();
+                this.HleTask = new HLEWorkThreads();
                 HleTask.InitAndStartStopped(MainLoop);
             }
 

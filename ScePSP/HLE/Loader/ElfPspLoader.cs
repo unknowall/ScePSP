@@ -24,9 +24,9 @@ namespace ScePSP.Hle.Loader
 
         static public Logger Logger = _logger;
 
-        protected ElfLoader ElfLoader;// => PSPDrivers.Loader.ElfLoader;
+        protected ElfLoader ElfLoader;
 
-        protected HleModuleManager ModuleManager;// => PSPDrivers.HLE.HleModuleManager;
+        protected HleModuleManager ModuleManager;
 
         protected ElfConfig ElfConfig => PSPDrivers.Config.ElfConfig;
 
@@ -65,7 +65,7 @@ namespace ScePSP.Hle.Loader
         public HleModuleGuest LoadModule(Stream fileStream, Stream memoryStream, MemoryPartition memoryPartition,
             HleModuleManager moduleManager, string gameTitle, string moduleName, bool isMainModule)
         {
-            HleModuleGuest = new HleModuleGuest();//InjectContext.NewInstance<HleModuleGuest>();
+            HleModuleGuest = new HleModuleGuest();
             
             PSPDrivers.HleModuleGuestList.Add(HleModuleGuest);
 
@@ -82,7 +82,7 @@ namespace ScePSP.Hle.Loader
                 try
                 {
                     var decryptedData = new EncryptedPrx().Decrypt(fileStream.ReadAll(), true);
-                    File.WriteAllBytes(ApplicationPaths.AssertPath+"/last_decoded_prx.bin", decryptedData);
+                    File.WriteAllBytes(ApplicationPaths.AssertPath+ "/decoded.prx", decryptedData);
                     fileStream = new MemoryStream(decryptedData);
                 }
                 catch (Exception exception)
@@ -430,8 +430,7 @@ namespace ScePSP.Hle.Loader
         private void _UpdateModuleExports()
         {
             //var BaseMemoryStream = ElfLoader.MemoryStream.SliceWithLength(BaseAddress);
-            var exportsStream = ElfLoader.MemoryStream.SliceWithBounds(HleModuleGuest.ModuleInfo.ExportsStart,
-                HleModuleGuest.ModuleInfo.ExportsEnd);
+            var exportsStream = ElfLoader.MemoryStream.SliceWithBounds(HleModuleGuest.ModuleInfo.ExportsStart, HleModuleGuest.ModuleInfo.ExportsEnd);
             var moduleExports = exportsStream.ReadStructVectorUntilTheEndOfStream<ElfPsp.ModuleExport>();
 
             Logger.Info("Exports:");

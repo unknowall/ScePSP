@@ -6,8 +6,6 @@ namespace ScePSP.Hle.Modules.utility
 {
     public unsafe partial class sceUtility
     {
-        new HleConfig HleConfig => PSPDrivers.Config.HleConfig;
-
         private int _sceUtilityGetSystemParamInt(PSP_SYSTEMPARAM_ID id)
         {
             switch (id)

@@ -184,8 +184,8 @@ namespace ScePSP.Hle.Modules.utility
         //[HlePspNotImplemented]
         public int sceUtilitySavedataInitStart(ref SceUtilitySavedataParam Params)
         {
-            Console.WriteLine(Params.Mode);
-            Console.WriteLine(Params.ToStringDefault());
+            //Console.WriteLine(Params.Mode);
+            //Console.WriteLine(Params.ToStringDefault());
             //Params.DataBufPointer
             Params.Base.Result = 0;
 
@@ -193,6 +193,8 @@ namespace ScePSP.Hle.Modules.utility
             var SaveDataBin = SavePathFolder + "/DATA.BIN";
             var SaveIcon0 = SavePathFolder + "/ICON0.PNG";
             var SavePic1 = SavePathFolder + "/PIC1.PNG";
+
+            Console.WriteLine($" GameSaveInit Mode {Params.Mode} Folder {SavePathFolder}");
 
             Action<PspUtilitySavedataFileData, string> Save =
                 (PspUtilitySavedataFileData PspUtilitySavedataFileData, string FileName) =>
@@ -320,8 +322,8 @@ namespace ScePSP.Hle.Modules.utility
                                 if (SizeUsedInfo != null)
                                 {
 #if true
-                                    Console.WriteLine(SizeUsedInfo->saveName);
-                                    Console.WriteLine(SizeUsedInfo->gameName);
+                                    //Console.WriteLine(SizeUsedInfo->saveName);
+                                    //Console.WriteLine(SizeUsedInfo->gameName);
 
                                     SizeUsedInfo->UsedKb = UsedSize / 1024;
                                     SizeUsedInfo->UsedKb32 = UsedSize / (32 * 1024);

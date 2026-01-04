@@ -54,7 +54,7 @@ namespace ScePSP.Hle.Managers
             }
             else
             {
-                HLETasks.Yield();
+                HLEWorkThreads.Yield();
             }
         }
 #pragma warning disable CS0162

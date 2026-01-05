@@ -1,5 +1,6 @@
 ﻿#define PRIM_BATCH
 
+using ScePSP.Core.Cpu;
 using ScePSP.Core.GpuBackEnd.State;
 using ScePSP.Core.GpuBackEnd.VertexReading;
 using ScePSP.Core.Memory;
@@ -7,9 +8,11 @@ using ScePSPUtils;
 using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Design;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using static ScePSP.Core.GpuBackEnd.GpuBackEnd;
 
 namespace ScePSP.Core.GpuBackEnd
 {
@@ -30,9 +33,6 @@ namespace ScePSP.Core.GpuBackEnd
         public static uint[] DummyData = new uint[GpuStateStruct.StructSizeInBytes];
 
         private static readonly Logger Logger = Logger.GetLogger("GE");
-
-        private static bool Debug = false;
-        //private static bool Debug = true;
 
         public struct OptionalParams
         {
@@ -90,45 +90,52 @@ namespace ScePSP.Core.GpuBackEnd
 
         public void SetInstructionAddressStall(uint value)
         {
-            InstructionAddressStall = value & PspMemory.MemoryMask;
-            if (InstructionAddressStall != 0 && !PspMemory.IsAddressValid(InstructionAddressStall))
+            uint addr = value & PspMemory.MemoryMask;
+            if (addr != 0 && !PspMemory.IsAddressValid(addr))
             {
-                throw new InvalidOperationException($"Invalid StallAddress! 0x{InstructionAddressStall}");
+                throw new InvalidOperationException($"Invalid StallAddress! 0x{addr}");
             }
-            if (Debug) Console.WriteLine("GEProcess.SetInstructionAddressStall:{0:X8}", value);
-            StallAddressUpdated.Set();
+            if (addr != InstructionAddressStall)
+            {
+                InstructionAddressStall = addr;
+                StallAddressUpdated.Set();
+            }
         }
 
         internal void Process()
         {
             Status.SetValue(GEProcesStatusEnum.Drawing);
 
-            if (Debug)
-                Console.WriteLine("Process() : {0} : 0x{1:X8} : 0x{2:X8} : 0x{3:X8}", Id,
-                    InstructionAddressCurrent, InstructionAddressStart, InstructionAddressStall);
+            //Console.WriteLine("Process() : {0} : 0x{1:X8} : 0x{2:X8} : 0x{3:X8}", Id,
+            //    InstructionAddressCurrent, InstructionAddressStart, InstructionAddressStall);
 
             Done = false;
             while (!Done)
             {
+                //Console.WriteLine($"Process({Id}) Current 0x{InstructionAddressCurrent:X} Stall 0x{InstructionAddressStall:X} ");
                 if (InstructionAddressStall != 0 && InstructionAddressCurrent >= InstructionAddressStall)
                 {
-                    if (Debug)
-                        Console.WriteLine("- STALLED --------------------------------------------------------------------");
                     Status.SetValue(GEProcesStatusEnum.Stalling);
-                    while (!StallAddressUpdated.WaitOne(1000))
+
+                    do
                     {
-                        ConsoleUtils.SaveRestoreConsoleColor(ConsoleColor.Magenta, () =>
+                        if (!StallAddressUpdated.WaitOne(1000))
                         {
-                            Console.WriteLine($"GEProcessQueue.GetCountLock: {GpuProcessor.GEProcessQueue.GetCountLock()}");
-                            Console.WriteLine($"CurrentGEProcess.Status: {Status.ToStringDefault()}");
-                        });
-                        if (GpuProcessor.Syncing)
-                        {
-                            Done = true;
-                            Status.SetValue(GEProcesStatusEnum.Completed);
-                            return;
+                            ConsoleUtils.SaveRestoreConsoleColor(ConsoleColor.Magenta, () =>
+                            {
+                                Console.WriteLine($"GEProcessQueue.GetCountLock: {GpuProcessor.GEProcessQueue.GetCountLock()}");
+                                Console.WriteLine($"CurrentGEProcess.Status: {Status.ToStringDefault()}");
+                            });
+                            if (GpuProcessor.Syncing)
+                            {
+                                Done = true;
+                                Status.SetValue(GEProcesStatusEnum.Completed);
+                                return;
+                            }
                         }
-                    }
+                    } while (InstructionAddressStall != 0 && InstructionAddressCurrent >= InstructionAddressStall);
+
+                    Status.SetValue(GEProcesStatusEnum.Drawing);
                 }
 
                 ProcessInstruction();
@@ -140,7 +147,9 @@ namespace ScePSP.Core.GpuBackEnd
         internal GpuInstruction ReadInstructionAndMoveNext()
         {
             var Value = *(GpuInstruction*)Memory.PspAddressToPointerUnsafe(InstructionAddressCurrent);
+
             InstructionAddressCurrent += 4;
+
             return Value;
         }
 
@@ -149,21 +158,28 @@ namespace ScePSP.Core.GpuBackEnd
         private void ProcessInstruction()
         {
             var Instruction = ReadInstructionAndMoveNext();
+
             var Params24 = Instruction.Params;
 
             //Console.WriteLine($"ProcessInstruction: Pc={Pc}, Instruction={Instruction}");
 
             //InstructionSwitch(GpuDisplayListRunner, Instruction.OpCode, Instruction.Params);
+
             GpuStateStructPointer.data[Instruction.OpCode] = Instruction.Params;
+
             switch (Instruction.OpCode)
             {
                 // Address
                 case GpuOpCodes.ORIGIN_ADDR:
-                    break;
+                    {
+                        break;
+                    }
 
                 case GpuOpCodes.OFFSET_ADDR:
-                    GpuStateData[GpuOpCodes.OFFSET_ADDR] = Params24 << 8;
-                    break;
+                    {
+                        GpuStateData[GpuOpCodes.OFFSET_ADDR] = Params24 << 8;
+                        break;
+                    }
 
                 // Flow
                 case GpuOpCodes.JUMP:
@@ -171,11 +187,13 @@ namespace ScePSP.Core.GpuBackEnd
                         JumpRelativeOffset((uint)(Params24 & ~3));
                         break;
                     }
+
                 case GpuOpCodes.CALL:
                     {
                         CallRelativeOffset((uint)(Params24 & ~3));
                         break;
                     }
+
                 case GpuOpCodes.RET:
                     {
                         Ret();
@@ -184,11 +202,13 @@ namespace ScePSP.Core.GpuBackEnd
 
                 // Finishing
                 case GpuOpCodes.END:
+
                     {
                         Done = true;
                         GpuProcessor.GpuBackEnd.End(GpuStateStructPointer);
                         break;
                     }
+
                 case GpuOpCodes.FINISH:
                     {
                         GpuProcessor.GpuBackEnd.Finish(GpuStateStructPointer);
@@ -198,21 +218,27 @@ namespace ScePSP.Core.GpuBackEnd
 
                 // Texture
                 case GpuOpCodes.TFLUSH:
-                    GpuProcessor.GpuBackEnd.TextureFlush(GpuStateStructPointer);
-                    break;
+                    {
+                        GpuProcessor.GpuBackEnd.TextureFlush(GpuStateStructPointer);
+                        break;
+                    }
 
                 case GpuOpCodes.TSYNC:
-                    GpuProcessor.GpuBackEnd.TextureSync(GpuStateStructPointer);
-                    break;
+                    {
+                        GpuProcessor.GpuBackEnd.TextureSync(GpuStateStructPointer);
+                        break;
+                    }
 
                 case GpuOpCodes.SPLINE:
-                    // @TODO
-                    //auto sp_ucount = command.extract!(uint,  0, 8); 
-                    //auto sp_vcount = command.extract!(uint,  8, 8);
-                    //auto sp_utype  = command.extract!(uint, 16, 2);
-                    //auto sp_vtype  = command.extract!(uint, 18, 2);
-                    //gpu.logWarning("OP_SPLINE(%d, %d, %d, %d)", sp_ucount, sp_vcount, sp_utype, sp_vtype);
-                    break;
+                    {
+                        var sp_ucount = (byte)Params24.Extract(0, 8);
+                        var sp_vcount = (byte)Params24.Extract(8, 8);
+                        var sp_utype = (byte)Params24.Extract(16, 2);
+                        var sp_vtype = (byte)Params24.Extract(18, 2);
+                        //Console.WriteLine("OP_SPLINE(%d, %d, %d, %d)", sp_ucount, sp_vcount, sp_utype, sp_vtype);
+                        DrawSpline(sp_ucount, sp_vcount, sp_utype, sp_vtype);
+                        break;
+                    }
 
                 case GpuOpCodes.TRXKICK:
                     {
@@ -227,6 +253,7 @@ namespace ScePSP.Core.GpuBackEnd
                         //gpu.state.patch.type = command.extract!(PatchPrimitiveType, 0);
                         break;
                     }
+
 
                 case GpuOpCodes.PRIM:
                     {
@@ -265,8 +292,8 @@ namespace ScePSP.Core.GpuBackEnd
                     GpuDisplayList.GpuProcessor.GpuImpl.Prim(GlobalGpuState, GpuDisplayList.GpuStateStructPointer, primitiveType, vertexCount);
                     GpuDisplayList.GpuProcessor.GpuImpl.PrimEnd(GlobalGpuState, GpuDisplayList.GpuStateStructPointer);
 #endif
+                        break;
                     }
-                    break;
 
                 case GpuOpCodes.BEZIER:
                     {
@@ -374,20 +401,16 @@ namespace ScePSP.Core.GpuBackEnd
                     //    break;
             }
 
-            if (Debug)
-            {
-                var WritePC = Memory.GetPCWriteAddress(Pc);
-
-                Console.Error.WriteLine(
-                    "CODE(0x{0:X}-0x{1:X}) : PC(0x{2:X}) : {3} : 0x{4:X} : Done:{5}",
-                    InstructionAddressCurrent,
-                    InstructionAddressStall,
-                    WritePC,
-                    Instruction.OpCode,
-                    Instruction.Params,
-                    Done
-                );
-            }
+            //var WritePC = Memory.GetPCWriteAddress(Pc);
+            //Console.Error.WriteLine(
+            //    "CODE(0x{0:X}-0x{1:X}) : PC(0x{2:X}) : {3} : 0x{4:X} : Done:{5}",
+            //    InstructionAddressCurrent,
+            //    InstructionAddressStall,
+            //    WritePC,
+            //    Instruction.OpCode,
+            //    Instruction.Params,
+            //    Done
+            //);
         }
 
         private static float[] BernsteinCoeff(float u)
@@ -454,25 +477,10 @@ namespace ScePSP.Core.GpuBackEnd
                 return;
             }
 
-            //initRendering();
-            //boolean useTexture = context.vinfo.texture != 0 || context.textureFlag.isEnabled();
-            //boolean useNormal = context.lightingFlag.isEnabled();
-
             var anchors = GetControlPoints(uCount, vCount);
 
-            // Don't capture the ram if the vertex list is embedded in the display list. TODO handle stall_addr == 0 better
-            // TODO may need to move inside the loop if indices are used, or find the largest index so we can calculate the size of the vertex list
-            /*
-            if (State.captureGeNextFrame && !isVertexBufferEmbedded()) {
-                Logger.Info("Capture drawBezier");
-                CaptureManager.captureRAM(context.vinfo.ptr_vertex, context.vinfo.vertexSize * ucount * vcount);
-            }
-            */
-
-            // Generate patch VertexState.
             var patch = new VertexInfo[divS + 1, divT + 1];
 
-            // Number of patches in the U and V directions
             var upcount = uCount / 3;
             var vpcount = vCount / 3;
 
@@ -482,7 +490,7 @@ namespace ScePSP.Core.GpuBackEnd
             {
                 var vglobal = (float)j * vpcount / divT;
 
-                var vpatch = (int)vglobal; // Patch number
+                var vpatch = (int)vglobal;
                 var v = vglobal - vpatch;
                 if (j == divT)
                 {
@@ -511,14 +519,6 @@ namespace ScePSP.Core.GpuBackEnd
                     {
                         for (var jj = 0; jj < 4; ++jj)
                         {
-                            /*
-                            Console.WriteLine(
-                                "({0}, {1}) : {2} : {3} : {4}",
-                                ii, jj,
-                                p.Position, anchors[3 * upatch + ii, 3 * vpatch + jj].Position,
-                                ucoeff[i][ii] * vcoeff[jj]
-                            );
-                            */
                             PointMultAdd(
                                 ref p,
                                 ref anchors[3 * upatch + ii, 3 * vpatch + jj],
@@ -531,27 +531,148 @@ namespace ScePSP.Core.GpuBackEnd
                     p.Texture.Y = vglobal;
 
                     patch[i, j] = p;
-
-                    /*
-                    Console.WriteLine(
-                        "W: ({0}, {1}) : {2}",
-                        i, j,
-                        patch[i, j] 
-                    );
-                    */
-
-                    /*
-                    if (useTexture && context.vinfo.texture == 0)
-                    {
-                        p.t[0] = uglobal;
-                        p.t[1] = vglobal;
-                    }
-                    */
                 }
             }
 
             GpuProcessor.GpuBackEnd.BeforeDraw(GpuStateStructPointer);
             GpuProcessor.GpuBackEnd.DrawCurvedSurface(GlobalGpuState, GpuStateStructPointer, patch, uCount, vCount);
+        }
+
+        private static float[] LinearCoeff(float t)
+        {
+            return new[]
+            {
+                1 - t, // 第一个控制点权重
+                t      // 第二个控制点权重
+            };
+        }
+
+        internal void DrawSpline(int sp_ucount, int sp_vcount, int sp_utype, int sp_vtype)
+        {
+            var divS = GpuStateStructPointer.PatchState.DivS;
+            var divT = GpuStateStructPointer.PatchState.DivT;
+
+            if (sp_ucount <= 0 || sp_vcount <= 0)
+            {
+                Logger.Warning($"Unsupported spline parameters ucount={sp_ucount} vcount={sp_vcount} (count must be >0)");
+                return;
+            }
+            if (divS <= 0 || divT <= 0)
+            {
+                Logger.Warning($"Unsupported spline patches patch_div_s={divS} patch_div_t={divT} (div must be >0)");
+                return;
+            }
+
+            // 假设 3 是三次样条的兼容值，映射为 1
+            // 准化类型：0=线性，1/3=三次，其他=不支持
+            int normalizedUType = sp_utype switch
+            {
+                0 => 0,    // 线性
+                1 or 3 => 1,// 三次（兼容 3 型）
+                _ => 1      // 未知类型默认三次
+            };
+            int normalizedVType = sp_vtype switch
+            {
+                0 => 0,
+                1 or 3 => 1,
+                _ => 1
+            };
+
+            if (normalizedUType == -1 || normalizedVType == -1)
+            {
+                Logger.Warning($"Unsupported spline type utype={sp_utype} vtype={sp_vtype} (supported: 0=线性, 1/3=三次)");
+                return;
+            }
+
+            var controlPoints = GetControlPoints(sp_ucount, sp_vcount);
+
+            var splinePatch = new VertexInfo[divS + 1, divT + 1];
+
+            bool isUCubic = normalizedUType == 1;
+            bool isVCubic = normalizedVType == 1;
+
+            for (int j = 0; j <= divT; j++)
+            {
+                int vControlStep = isVCubic ? 3 : 1;
+                float vGlobal = (float)j * (sp_vcount - vControlStep) / divT;
+                int vPatch = (int)vGlobal;
+                float v = vGlobal - vPatch;
+
+                // 边界处理：最后一个分段强制取1.0
+                if (j == divT)
+                {
+                    vPatch = Math.Max(0, (sp_vcount - vControlStep) - 1);
+                    v = 1.0f;
+                }
+
+                float[] vCoeff = isVCubic ? BernsteinCoeff(v) : LinearCoeff(v);
+
+                for (int i = 0; i <= divS; i++)
+                {
+                    int uControlStep = isUCubic ? 3 : 1;
+                    float uGlobal = (float)i * (sp_ucount - uControlStep) / divS;
+                    int uPatch = (int)uGlobal;
+                    float u = uGlobal - uPatch;
+
+                    // 最后一个分段强制取1.0
+                    if (i == divS)
+                    {
+                        uPatch = Math.Max(0, (sp_ucount - uControlStep) - 1);
+                        u = 1.0f;
+                    }
+
+                    float[] uCoeff = isUCubic ? BernsteinCoeff(u) : LinearCoeff(u);
+
+                    // 双线性/双三次插值计算当前顶点
+                    var currentVertex = default(VertexInfo);
+                    currentVertex.Position = Vector4.Zero;
+                    currentVertex.Normal = Vector4.Zero;
+                    currentVertex.Texture = Vector4.Zero;
+                    currentVertex.Color = Vector4.Zero;
+
+                    // 插值维度：线性=2个控制点，三次=4个控制点
+                    int uDim = isUCubic ? 4 : 2;
+                    int vDim = isVCubic ? 4 : 2;
+
+                    for (int ui = 0; ui < uDim; ui++)
+                    {
+                        for (int vi = 0; vi < vDim; vi++)
+                        {
+                            int uIndex = uPatch + ui;
+                            int vIndex = vPatch + vi;
+                            if (uIndex >= sp_ucount || vIndex >= sp_vcount)
+                            {
+                                Logger.Warning($"Spline index out of range: uIndex={uIndex} (max={sp_ucount - 1}), vIndex={vIndex} (max={sp_vcount - 1})");
+                                continue;
+                            }
+
+                            PointMultAdd(
+                                ref currentVertex,
+                                ref controlPoints[uIndex, vIndex],
+                                uCoeff[ui] * vCoeff[vi]
+                            );
+                        }
+                    }
+
+                    currentVertex.Texture.X = uGlobal;
+                    currentVertex.Texture.Y = vGlobal;
+
+                    splinePatch[i, j] = currentVertex;
+                }
+            }
+
+            GpuProcessor.GpuBackEnd.BeforeDraw(GpuStateStructPointer);
+            GpuProcessor.GpuBackEnd.DrawSpline(
+                GlobalGpuState,
+                GpuStateStructPointer,
+                splinePatch,
+                sp_ucount,
+                sp_vcount,
+                sp_utype,
+                sp_vtype,
+                normalizedUType,
+                normalizedVType
+            );
         }
 
 
@@ -562,6 +683,7 @@ namespace ScePSP.Core.GpuBackEnd
 
         internal void JumpAbsolute(uint Address)
         {
+            Console.WriteLine($"Process({Id}) op: RET , JumpAbsolute 0x{Address:X}");
             InstructionAddressCurrent = Address;
         }
 
@@ -596,7 +718,7 @@ namespace ScePSP.Core.GpuBackEnd
 
         public void DoFinish(uint PC, uint Arg, bool ExecuteNow)
         {
-            if (Debug) Console.WriteLine("FINISH: Arg:{0}", Arg);
+            //Console.WriteLine("FINISH: Arg:{0}", Arg);
 
             if (Callbacks.FinishFunction != 0)
             {
@@ -606,7 +728,7 @@ namespace ScePSP.Core.GpuBackEnd
 
         public void DoSignal(uint PC, uint Signal, SignalBehavior Behavior, bool ExecuteNow)
         {
-            if (Debug) Console.WriteLine("SIGNAL : {0}: Behavior:{1}", Signal, Behavior);
+            //Console.WriteLine("SIGNAL : {0}: Behavior:{1}", Signal, Behavior);
 
             Status.SetValue(GEProcesStatusEnum.Paused);
 

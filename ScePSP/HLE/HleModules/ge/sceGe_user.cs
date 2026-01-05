@@ -273,6 +273,8 @@ namespace ScePSP.Hle.Modules.ge
         private GEProcess _sceGeListEnQueue(uint InstructionAddressStart, uint InstructionAddressStall, int CallbackId, PspGeListArgs* Args)
         {
             var GE = GpuProcessor.DequeueFreeGEProcess();
+            
+            //Console.WriteLine($"_sceGeListEnQueue Start 0x{InstructionAddressStart & PspMemory.MemoryMask:X} Stall 0x{InstructionAddressStall & PspMemory.MemoryMask:X} ");
 
             GE.SetInstructionAddressStartAndCurrent(InstructionAddressStart);
             GE.SetInstructionAddressStall(InstructionAddressStall);
@@ -361,6 +363,8 @@ namespace ScePSP.Hle.Modules.ge
             {
                 throw new SceKernelException(SceKernelErrors.ERROR_ALREADY);
             }
+
+            //Console.WriteLine($"sceGeListUpdateStallAddr Stall 0x{InstructionAddressStall & PspMemory.MemoryMask:X} ");
 
             GE.SetInstructionAddressStall(InstructionAddressStall);
 

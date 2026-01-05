@@ -510,6 +510,89 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             ResetVertex();
         }
 
+        public override void DrawSpline(GlobalGpuState GlobalGpuState, GpuStateStruct GpuStateStruct, VertexInfo[,] Patch,
+            int sp_ucount, int sp_vcount, int sp_utype, int sp_vtype, int normalizedUType, int normalizedVType)
+        {
+            if (Patch == null || Patch.Length == 0)
+            {
+                //Logger.Warning("DrawSpline: Patch is null or empty");
+                return;
+            }
+            if (sp_ucount <= 1 || sp_vcount <= 1)
+            {
+                //Logger.Warning($"DrawSpline: Invalid count u={sp_ucount} v={sp_vcount} (must be >1)");
+                return;
+            }
+
+            GpuState = GpuStateStruct;
+            VertexType = GpuState.VertexState.Type;
+
+            PrepareStateCommon(GpuState, ScaleViewport);
+            PrepareStateDraw(GpuState);
+            PrepareStateMatrix(GpuState, out _worldViewProjectionMatrix);
+
+#if ENABLE_TEXTURES
+            PrepareState_Texture_Common(GpuState);
+            PrepareState_Texture_3D(GpuState);
+#endif
+
+            PrepareDrawStateFirst();
+
+            var mipmap0 = GpuState.TextureMappingState.TextureState.Mipmap0;
+            float mipmapWidth = mipmap0.TextureWidth > 0 ? mipmap0.TextureWidth : 1.0f;
+            float mipmapHeight = mipmap0.TextureHeight > 0 ? mipmap0.TextureHeight : 1.0f;
+
+            ResetVertex();
+
+            int uStep = normalizedUType == 1 ? 3 : 1; // 三次样条分段步长3，线性1
+            int vStep = normalizedVType == 1 ? 3 : 1;
+            int uSegments = (sp_ucount - uStep);
+            int vSegments = (sp_vcount - vStep);
+
+            uSegments = Math.Max(1, uSegments);
+            vSegments = Math.Max(1, vSegments);
+
+            for (int v = 0; v < vSegments; v++)
+            {
+                for (int u = 0; u < uSegments; u++)
+                {
+                    if (u + 1 >= Patch.GetLength(0) || v + 1 >= Patch.GetLength(1))
+                        continue;
+
+                    var v1 = Patch[u, v];
+                    var v2 = Patch[u, v + 1];
+                    var v3 = Patch[u + 1, v + 1];
+                    var v4 = Patch[u + 1, v];
+
+                    if (VertexType.HasTexture)
+                    {
+                        v1.Texture.X = (float)u / uSegments * mipmapWidth;
+                        v1.Texture.Y = (float)v / vSegments * mipmapHeight;
+
+                        v2.Texture.X = (float)u / uSegments * mipmapWidth;
+                        v2.Texture.Y = (float)(v + 1) / vSegments * mipmapHeight;
+
+                        v3.Texture.X = (float)(u + 1) / uSegments * mipmapWidth;
+                        v3.Texture.Y = (float)(v + 1) / vSegments * mipmapHeight;
+
+                        v4.Texture.X = (float)(u + 1) / uSegments * mipmapWidth;
+                        v4.Texture.Y = (float)v / vSegments * mipmapHeight;
+                    }
+
+                    PutVertex(v1);
+                    PutVertex(v2);
+                    PutVertex(v3);
+
+                    PutVertex(v1);
+                    PutVertex(v3);
+                    PutVertex(v4);
+                }
+            }
+
+            DrawVertices(GLGeometry.GL_TRIANGLES);
+            ResetVertex();
+        }
+
         bool _doPrimStart;
         VertexTypeStruct _cachedVertexType;
         GuPrimitiveType _primitiveType;

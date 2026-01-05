@@ -312,6 +312,11 @@ namespace ScePSP.Core.GpuBackEnd
         {
         }
 
+        public virtual void DrawSpline(GlobalGpuState GlobalGpuState, GpuStateStruct GpuStateStruct, VertexInfo[,] Patch, 
+            int sp_ucount, int sp_vcount, int sp_utype, int sp_vtype, int normalizedUType, int normalizedVType)
+        {
+        }
+
         public virtual void DrawVideo(uint FrameBufferAddress, OutputPixel* OutputPixel, int Width, int Height)
         {
         }

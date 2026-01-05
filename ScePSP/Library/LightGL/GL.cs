@@ -274,6 +274,34 @@ namespace LightGL
         Texture = 0x1702
     }
 
+    public enum LightParameter
+    {
+        Ambient = 0x1200,
+        Diffuse = 0x1201,
+        Specular = 0x1202,
+        Position = 0x1203,
+        SpotDirection = 0x1204,
+        SpotExponent = 0x1205,
+        SpotCutoff = 0x1206,
+        ConstantAttenuation = 0x1207,
+        LinearAttenuation = 0x1208,
+        QuadraticAttenuation = 0x1209
+    }
+
+    public enum LightModelParameter
+    {
+        LightModelAmbient = 0x0C02,
+        LightModelLocalViewer = 0x0B51,
+        LightModelColorControl = 0x81F8,
+        LightModelTwoSide = 0x0B52
+    }
+
+    public enum LightModelColorControl
+    {
+        SingleColor = 0x81F9,
+        SeparateSpecularColor = 0x81FA
+    }
+
     public unsafe class GL
     {
         internal static readonly object Lock = new object();
@@ -638,6 +666,8 @@ namespace LightGL
         public const int GL_SRC1_ALPHA = 0x8589;
         public const int GL_ONE_MINUS_SRC1_COLOR = 0x88FC;
         public const int GL_ONE_MINUS_SRC1_ALPHA = 0x88FD;
+        public const int GL_LIGHT0 = 0x4000;
+        public const int GL_LIGHT7 = 0x4007;
 
         public static readonly glActiveTexture ActiveTexture;
         public static readonly glAttachShader AttachShader;
@@ -832,6 +862,14 @@ namespace LightGL
         public static readonly glLoadIdentity LoadIdentity;
         public static readonly glMatrixMode MatrixMode;
         public static readonly glOrtho Ortho;
+        public static readonly glLightModelfv LightModelfv;
+        public static readonly glLightModeliv LightModeliv;
+        public static readonly glLightModelf LightModelf;
+        public static readonly glLightModeli LightModeli;
+        public static readonly glLightfv Lightfv;
+        public static readonly glLightiv Lightiv;
+        public static readonly glLightf Lightf;
+        public static readonly glLighti Lighti;
 
         public static void ClearError()
         {
@@ -1363,5 +1401,29 @@ namespace LightGL
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
     public delegate uint glOrtho(double left, double right, double bottom, double top, double zNear, double zFar);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+    public unsafe delegate void glLightModelfv(uint pname, float* value);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+    public unsafe delegate void glLightModeliv(uint pname, uint* value);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+    public delegate void glLightModelf(uint pname, float value);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+    public delegate void glLightModeli(uint pname, uint value);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+    public unsafe delegate void glLightfv(uint light, uint pname, float* value);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+    public unsafe delegate void glLightiv(uint light, uint pname, uint* value);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+    public delegate void glLightf(uint light, uint pname, float value);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+    public delegate void glLighti(uint light, uint pname, uint value);
 
 }

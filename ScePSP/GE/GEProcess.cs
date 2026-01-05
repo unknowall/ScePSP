@@ -1,5 +1,6 @@
 ﻿#define PRIM_BATCH
 
+using LightGL;
 using ScePSP.Core.Cpu;
 using ScePSP.Core.GpuBackEnd.State;
 using ScePSP.Core.GpuBackEnd.VertexReading;
@@ -11,7 +12,9 @@ using System.Collections.Generic;
 using System.Drawing.Design;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.Xml;
 using System.Threading;
+using System.Windows.Forms.Design.Behavior;
 using static ScePSP.Core.GpuBackEnd.GpuBackEnd;
 
 namespace ScePSP.Core.GpuBackEnd
@@ -112,11 +115,10 @@ namespace ScePSP.Core.GpuBackEnd
             Done = false;
             while (!Done)
             {
-                //Console.WriteLine($"Process({Id}) Current 0x{InstructionAddressCurrent:X} Stall 0x{InstructionAddressStall:X} ");
+                //Console.WriteLine($"Process({Id}) Current 0x{InstructionAddressCurrent:X} Start 0x{InstructionAddressStart:X} Stall 0x{InstructionAddressStall:X} ");
                 if (InstructionAddressStall != 0 && InstructionAddressCurrent >= InstructionAddressStall)
                 {
                     Status.SetValue(GEProcesStatusEnum.Stalling);
-
                     do
                     {
                         if (!StallAddressUpdated.WaitOne(1000))
@@ -135,7 +137,6 @@ namespace ScePSP.Core.GpuBackEnd
                         }
                     } while (InstructionAddressStall != 0 && InstructionAddressCurrent >= InstructionAddressStall);
 
-                    Status.SetValue(GEProcesStatusEnum.Drawing);
                 }
 
                 ProcessInstruction();
@@ -219,13 +220,26 @@ namespace ScePSP.Core.GpuBackEnd
                 // Texture
                 case GpuOpCodes.TFLUSH:
                     {
+                        //Console.Out.WriteLineColored(ConsoleColor.Green, $"GpuOpCodes.TFLUSH");
                         GpuProcessor.GpuBackEnd.TextureFlush(GpuStateStructPointer);
                         break;
                     }
 
                 case GpuOpCodes.TSYNC:
                     {
+                        //Console.Out.WriteLineColored(ConsoleColor.Green, $"GpuOpCodes.TSYNC");
                         GpuProcessor.GpuBackEnd.TextureSync(GpuStateStructPointer);
+                        break;
+                    }
+
+                case GpuOpCodes.TRXKICK:
+                    {
+                        var transfer = GpuStateStructPointer.TextureTransferState;
+                        transfer.TexelSize = (TextureTransferStateStruct.TexelSizeEnum)Params24.Extract(0, 1);
+
+                        Console.Out.WriteLineColored(ConsoleColor.Green, $"TRXKICK: TexelSize {transfer.TexelSize}");
+
+                        GpuProcessor.GpuBackEnd.Transfer(GpuStateStructPointer);
                         break;
                     }
 
@@ -240,13 +254,6 @@ namespace ScePSP.Core.GpuBackEnd
                         break;
                     }
 
-                case GpuOpCodes.TRXKICK:
-                    {
-                        var transfer = GpuStateStructPointer.TextureTransferState;
-                        transfer.TexelSize = (TextureTransferStateStruct.TexelSizeEnum)Params24.Extract(0, 1);
-                        GpuProcessor.GpuBackEnd.Transfer(GpuStateStructPointer);
-                        break;
-                    }
 
                 case GpuOpCodes.PPRIM:
                     {
@@ -265,24 +272,28 @@ namespace ScePSP.Core.GpuBackEnd
 
                         if (_primCount == 0)
                         {
+                            //Console.Out.WriteLineColored(ConsoleColor.Green, $"PRIM: START BeforeDraw {primitiveType}");
+
                             GpuProcessor.GpuBackEnd.BeforeDraw(GpuStateStructPointer);
                             GpuProcessor.GpuBackEnd.PrimStart(GlobalGpuState, GpuStateStructPointer, primitiveType);
                         }
 
                         if (vertexCount > 0)
                         {
+                            //Console.Out.WriteLineColored(ConsoleColor.Green, $"PRIM: DRAW vertexCount {vertexCount}");
+
                             GpuProcessor.GpuBackEnd.Prim(vertexCount);
                         }
 
                         if (nextInstruction.OpCode == GpuOpCodes.PRIM &&
                             (GuPrimitiveType)nextInstruction.Params.Extract(16, 3) == primitiveType)
                         {
-                            //Console.WriteLine();
                             _primCount++;
                         }
                         else
                         {
-                            //Console.WriteLine("{0:X8}", PC);
+                            //Console.Out.WriteLineColored(ConsoleColor.Green, $"PRIM: END PrimCount {_primCount}");
+
                             _primCount = 0;
                             GpuProcessor.GpuBackEnd.PrimEnd();
                         }
@@ -675,15 +686,20 @@ namespace ScePSP.Core.GpuBackEnd
             );
         }
 
-
         internal void JumpRelativeOffset(uint Address)
         {
-            InstructionAddressCurrent = GpuStateStructPointer.GetAddressRelativeToBaseOffset(Address);
+            uint newAddress = GpuStateStructPointer.GetAddressRelativeToBaseOffset(Address);
+
+            if (InstructionAddressStall != 0 && newAddress >= InstructionAddressStall)
+            {
+                //Logger.Warning($"Process {Id} 0x{InstructionAddressCurrent:X} -> 0x{newAddress:X} | Stall 0x{InstructionAddressStall:X}");
+                SetInstructionAddressStall(0);
+            }
+            InstructionAddressCurrent = newAddress;
         }
 
         internal void JumpAbsolute(uint Address)
         {
-            Console.WriteLine($"Process({Id}) op: RET , JumpAbsolute 0x{Address:X}");
             InstructionAddressCurrent = Address;
         }
 
@@ -691,9 +707,7 @@ namespace ScePSP.Core.GpuBackEnd
         {
             CallStack.Push(InstructionAddressCurrent);
             CallStack.Push((uint)GpuStateStructPointer.BaseOffset);
-            //CallStack.Push(InstructionAddressCurrent);
             JumpRelativeOffset(Address);
-            //throw new NotImplementedException();
         }
 
         internal void Ret()

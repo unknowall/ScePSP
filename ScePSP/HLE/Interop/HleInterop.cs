@@ -38,10 +38,9 @@ namespace ScePSP.Hle.Interop
             var currentFakeHleThread = HleThreadManager.CurrentOrAny;
             currentFakeHleThread.CpuThreadState.CopyRegistersFrom(HleThreadManager.CurrentOrAny.CpuThreadState);
             SetArgumentsToCpuThreadState(currentFakeHleThread.CpuThreadState, function, arguments);
-            Console.Out.WriteLineColored(ConsoleColor.Magenta, "ExecuteFunctionNow: 0x{0:X8}", function);
+            //Console.Out.WriteLineColored(ConsoleColor.Magenta, "ExecuteFunctionNow: 0x{0:X8}", function);
             currentFakeHleThread.CpuThreadState.ExecuteFunctionAndReturn(currentFakeHleThread.CpuThreadState.Pc);
-            Console.Out.WriteLineColored(ConsoleColor.Magenta, "... {0}",
-                currentFakeHleThread.CpuThreadState.Gpr2);
+            //Console.Out.WriteLineColored(ConsoleColor.Magenta, "... {0}", currentFakeHleThread.CpuThreadState.Gpr2);
             return currentFakeHleThread.CpuThreadState.Gpr2;
         }
 
@@ -72,8 +71,7 @@ namespace ScePSP.Hle.Interop
             }
         }
 
-        public void ExecuteFunctionLater(uint function, params object[] arguments) =>
-            ExecuteFunctionLater(function, result => { }, arguments);
+        public void ExecuteFunctionLater(uint function, params object[] arguments) => ExecuteFunctionLater(function, result => { }, arguments);
 
         public void ExecuteFunctionLater(uint function, Action<uint> executedCallback, params object[] arguments)
         {

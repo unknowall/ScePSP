@@ -1,6 +1,7 @@
 ﻿using LightGL;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ScePSP.Core.GpuBackEnd.OpenGL
 {
@@ -12,13 +13,13 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
         public TextureCacheKey TextureCacheKey;
     }
 
-    public class TextureOpengl : Texture<OpenglBackEnd>
+    public class TextureOpengl : Texture
     {
         public GLTexture2D Texture;
 
         public int TextureId => (int)Texture.Texture;
 
-        protected override void Init()
+        public override void Init()
         {
             Texture = GLTexture2D.Create();
         }
@@ -27,20 +28,13 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
         {
             Width = textureWidth;
             Height = textureHeight;
+            Data = pixels;
 
             Bind();
             Texture.SetFormat(TextureFormat.RGBA).SetSize(textureWidth, textureHeight).SetData(pixels);
 
             return true;
         }
-
-        //public void SetData(byte[] Data, int Width, int Height)
-        //{
-        //	fixed (byte* DataPtr = Data)
-        //	{
-        //		SetData((OutputPixel*)DataPtr, Width, Height);
-        //	}
-        //}
 
         public override void Bind()
         {
@@ -56,9 +50,9 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
         }
     }
 
-    public class TextureCacheOpengl : TextureCache<OpenglBackEnd, TextureOpengl>
+    public class TextureCacheOpengl : TextureCache<TextureOpengl>
     {
-        public TextureCacheOpengl(PspMemory pspMemory, OpenglBackEnd gpuImpl) : base(pspMemory, gpuImpl)
+        public TextureCacheOpengl(PspMemory pspMemory) : base(pspMemory)
         {
         }
     }

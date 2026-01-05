@@ -385,8 +385,6 @@ namespace ScePSP.Hle
 
                 if (Trace && MethodInfo.DeclaringType.Name == "Kernel_Library") Trace = false;
 
-                //Console.WriteLine("aaaaaaaaaaaaa");
-
                 if (NotImplemented)
                 {
                     Trace = true;
@@ -445,7 +443,6 @@ namespace ScePSP.Hle
                         Count++;
                     }
                     Out.Write(")");
-                    //Console.WriteLine("");
                 }
 
                 try

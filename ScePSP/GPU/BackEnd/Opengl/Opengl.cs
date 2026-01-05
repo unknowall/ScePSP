@@ -129,7 +129,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
         public OpenglBackEnd()
         {
             RenderbufferManager = new RenderbufferManager(this);
-            TextureCache = new TextureCacheOpengl(Memory, this);
+            TextureCache = new TextureCacheOpengl(Memory);
             VertexReader = new VertexReader();
         }
 
@@ -518,9 +518,18 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                 //Logger.Warning("DrawSpline: Patch is null or empty");
                 return;
             }
+
+            int patchUCount = Patch.GetLength(0);
+            int patchVCount = Patch.GetLength(1);
+
+            if (patchUCount <= 1 || patchVCount <= 1)
+            {
+                //Logger.Warning($"DrawSpline: Patch dimension invalid (U={patchUCount}, V={patchVCount})");
+                return;
+            }
             if (sp_ucount <= 1 || sp_vcount <= 1)
             {
-                //Logger.Warning($"DrawSpline: Invalid count u={sp_ucount} v={sp_vcount} (must be >1)");
+                //Logger.Warning($"DrawSpline: Invalid control point count (U={sp_ucount}, V={sp_vcount})");
                 return;
             }
 
@@ -544,21 +553,13 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
             ResetVertex();
 
-            int uStep = normalizedUType == 1 ? 3 : 1; // 三次样条分段步长3，线性1
-            int vStep = normalizedVType == 1 ? 3 : 1;
-            int uSegments = (sp_ucount - uStep);
-            int vSegments = (sp_vcount - vStep);
-
-            uSegments = Math.Max(1, uSegments);
-            vSegments = Math.Max(1, vSegments);
+            int uSegments = patchUCount - 1;  // Patch的U方向分段数 = 顶点数-1
+            int vSegments = patchVCount - 1;  // Patch的V方向分段数 = 顶点数-1
 
             for (int v = 0; v < vSegments; v++)
             {
                 for (int u = 0; u < uSegments; u++)
                 {
-                    if (u + 1 >= Patch.GetLength(0) || v + 1 >= Patch.GetLength(1))
-                        continue;
-
                     var v1 = Patch[u, v];
                     var v2 = Patch[u, v + 1];
                     var v3 = Patch[u + 1, v + 1];
@@ -566,23 +567,30 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
                     if (VertexType.HasTexture)
                     {
-                        v1.Texture.X = (float)u / uSegments * mipmapWidth;
-                        v1.Texture.Y = (float)v / vSegments * mipmapHeight;
+                        float uvU = (float)u / uSegments;
+                        float uvV = (float)v / vSegments;
+                        float uvU1 = (float)(u + 1) / uSegments;
+                        float uvV1 = (float)(v + 1) / vSegments;
 
-                        v2.Texture.X = (float)u / uSegments * mipmapWidth;
-                        v2.Texture.Y = (float)(v + 1) / vSegments * mipmapHeight;
+                        v1.Texture.X = uvU * mipmapWidth;
+                        v1.Texture.Y = uvV * mipmapHeight;
 
-                        v3.Texture.X = (float)(u + 1) / uSegments * mipmapWidth;
-                        v3.Texture.Y = (float)(v + 1) / vSegments * mipmapHeight;
+                        v2.Texture.X = uvU * mipmapWidth;
+                        v2.Texture.Y = uvV1 * mipmapHeight;
 
-                        v4.Texture.X = (float)(u + 1) / uSegments * mipmapWidth;
-                        v4.Texture.Y = (float)v / vSegments * mipmapHeight;
+                        v3.Texture.X = uvU1 * mipmapWidth;
+                        v3.Texture.Y = uvV1 * mipmapHeight;
+
+                        v4.Texture.X = uvU1 * mipmapWidth;
+                        v4.Texture.Y = uvV * mipmapHeight;
                     }
 
+                    // 第一个三角面：v1 → v2 → v3（顺时针）
                     PutVertex(v1);
                     PutVertex(v2);
                     PutVertex(v3);
 
+                    // 第二个三角面：v1 → v3 → v4（顺时针）
                     PutVertex(v1);
                     PutVertex(v3);
                     PutVertex(v4);
@@ -1033,66 +1041,88 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
             if (!lighting.Enabled)
             {
+                GL.Disable(GL.GL_LIGHTING);
                 // 如果光照被禁用，使用环境色作为基础颜色
                 ShaderInfo.uniformColor.NoWarning().Set(lighting.AmbientModelColor.ToVector4());
                 return;
             }
 
             // 合成一个简单的基色 Ambient + Emissive + Diffuse（相加并 clamp 到 [0,1]）
-            var ambient = lighting.AmbientModelColor.ToVector4();
-            var emissive = lighting.EmissiveModelColor.ToVector4();
-            var diffuse = lighting.DiffuseModelColor.ToVector4();
+            //var ambient = lighting.AmbientModelColor.ToVector4();
+            //var emissive = lighting.EmissiveModelColor.ToVector4();
+            //var diffuse = lighting.DiffuseModelColor.ToVector4();
 
-            var combined = new Vector4(
-                MathF.Min(1f, ambient.X + emissive.X + diffuse.X),
-                MathF.Min(1f, ambient.Y + emissive.Y + diffuse.Y),
-                MathF.Min(1f, ambient.Z + emissive.Z + diffuse.Z),
-                1f
+            //var combined = new Vector4(
+            //    MathF.Min(1f, ambient.X + emissive.X + diffuse.X),
+            //    MathF.Min(1f, ambient.Y + emissive.Y + diffuse.Y),
+            //    MathF.Min(1f, ambient.Z + emissive.Z + diffuse.Z),
+            //    1f
+            //);
+
+            //ShaderInfo.uniformColor.NoWarning().Set(combined);
+
+            //Console.WriteLine($"PrepareState_Lighting {lighting.LightModel}");
+
+            GL.Enable(GL.GL_LIGHTING);
+
+            GL.LightModeli(
+                (uint)LightModelParameter.LightModelColorControl,
+                (uint)((lighting.LightModel == LightModelEnum.SeparateSpecularColor) ? LightModelColorControl.SeparateSpecularColor : LightModelColorControl.SingleColor)
             );
 
-            ShaderInfo.uniformColor.NoWarning().Set(combined);
+            Vector4 color = lighting.AmbientLightColor.ToVector4();
 
-            // TODO: 固定功能的逐光源设置（glLight 等）未统一封装，
+            GL.LightModelfv((uint)LightModelParameter.LightModelAmbient, (float*)&color);
 
-            //GL.LightModel(
-            //	LightModelParameter.LightModelColorControl,
-            //	(int)((LightingState->LightModel == LightModelEnum.SeparateSpecularColor) ? LightModelColorControl.SeparateSpecularColor : LightModelColorControl.SingleColor)
-            //);
-            //GL.LightModel(LightModelParameter.LightModelAmbient, &LightingState->AmbientLightColor.Red);
-            //
-            //for (int n = 0; n < 4; n++)
-            //{
-            //	var LightState = &(&LightingState->Light0)[n];
-            //	LightName LightName = (LightName)(LightName.Light0 + n);
-            //
-            //	if (!GL.EnableDisable((EnableCap)(EnableCap.Light0 + n), LightState->Enabled))
-            //	{
-            //		continue;
-            //	}
-            //
-            //	GL.Light(LightName, LightParameter.Specular, &LightState->SpecularColor.Red);
-            //	GL.Light(LightName, LightParameter.Ambient, &LightState->AmbientColor.Red);
-            //	GL.Light(LightName, LightParameter.Diffuse, &LightState->DiffuseColor.Red);
-            //
-            //	LightState->Position.W = 1.0f;
-            //	GL.Light(LightName, LightParameter.Position, &LightState->Position.X);
-            //
-            //	GL.Light(LightName, LightParameter.ConstantAttenuation, &LightState->Attenuation.Constant);
-            //	GL.Light(LightName, LightParameter.LinearAttenuation, &LightState->Attenuation.Linear);
-            //	GL.Light(LightName, LightParameter.QuadraticAttenuation, &LightState->Attenuation.Quadratic);
-            //
-            //	if (LightState->Type == LightTypeEnum.SpotLight)
-            //	{
-            //		GL.Light(LightName, LightParameter.SpotDirection, &LightState->SpotDirection.X);
-            //		GL.Light(LightName, LightParameter.SpotExponent, &LightState->SpotExponent);
-            //		GL.Light(LightName, LightParameter.SpotCutoff, &LightState->SpotCutoff);
-            //	}
-            //	else
-            //	{
-            //		GL.Light(LightName, LightParameter.SpotExponent, 0);
-            //		GL.Light(LightName, LightParameter.SpotCutoff, 180);
-            //	}
-            //}
+            for (byte n = 0; n < 4; n++)
+            {
+                var LightState = lighting.Light(n);
+
+                uint LightName = GL.GL_LIGHT0 + (uint)n;
+
+                if (LightState.Enabled)
+                {
+                    GL.Enable((int)LightName);
+                }
+                else
+                {
+                    GL.Disable((int)LightName);
+
+                    continue;
+                }
+
+                color = LightState.SpecularColor.ToVector4();
+                GL.Lightfv(LightName, (uint)LightParameter.Specular, (float*)&color);
+
+                color = LightState.AmbientColor.ToVector4();
+                GL.Lightfv(LightName, (uint)LightParameter.Ambient, (float*)&color);
+
+                color = LightState.DiffuseColor.ToVector4();
+                GL.Lightfv(LightName, (uint)LightParameter.Diffuse, (float*)&color);
+
+                Vector4 Position = LightState.Position.ToVector4();
+                Position.W = 1.0f;
+                GL.Lightfv(LightName, (uint)LightParameter.Position, (float*)&Position);
+
+                GL.Lightf(LightName, (uint)LightParameter.ConstantAttenuation, LightState.Attenuation.Constant);
+                GL.Lightf(LightName, (uint)LightParameter.LinearAttenuation, LightState.Attenuation.Linear);
+                GL.Lightf(LightName, (uint)LightParameter.QuadraticAttenuation, LightState.Attenuation.Quadratic);
+
+                if (LightState.Type == LightTypeEnum.SpotLight)
+                {
+                    Position = LightState.SpotDirection.ToVector4();
+                    Position.W = 0.0f;
+                    GL.Lightfv(LightName, (uint)LightParameter.SpotDirection, (float*)&Position);
+
+                    GL.Lightf(LightName, (uint)LightParameter.SpotExponent, LightState.SpotExponent);
+                    GL.Lightf(LightName, (uint)LightParameter.SpotCutoff, LightState.SpotCutoff);
+                }
+                else
+                {
+                    GL.Lightf(LightName, (uint)LightParameter.SpotExponent, 0f);
+                    GL.Lightf(LightName, (uint)LightParameter.SpotCutoff, 180f);
+                }
+            }
         }
 
         private void PrepareState_Blend(GpuStateStruct gpuState)
@@ -1221,7 +1251,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             //var ClutState = TextureMappingState.ClutState;
             var textureState = textureMappingState.TextureState;
 
-            if (!GL.EnableDisable(GL.GL_TEXTURE_2D, textureMappingState.Enabled)) return;
+            //if (!GL.EnableDisable(GL.GL_TEXTURE_2D, textureMappingState.Enabled)) return;
 
             if (VertexType.Transform2D)
             {

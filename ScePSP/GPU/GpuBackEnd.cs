@@ -89,7 +89,6 @@ namespace ScePSP.Core.GpuBackEnd
 
         public virtual void Prim(ushort vertexCount)
         {
-            //Console.WriteLine($"Prim({vertexCount})");
             uint morpingVertexCount, totalVerticesWithoutMorphing;
             PreparePrim(GpuState, out totalVerticesWithoutMorphing, vertexCount, out morpingVertexCount);
             var vertices = stackalloc Vector4[vertexCount];
@@ -106,9 +105,12 @@ namespace ScePSP.Core.GpuBackEnd
                     var tvertex = VertexType.Transform2D ? vector : Vector4.Transform(vector, rtransform);
 
                     //Console.WriteLine($"VertexType.Transform2D: {VertexType.Transform2D} : {PrimitiveType} : {vinfo}");
+
                     vertices[n] = tvertex;
                     var color = VertexType.HasColor ? vinfo.Color : GpuState.LightingState.AmbientModelColor.ToVector4();
-                    //Console.WriteLine(GpuState->LightingState.AmbientLightColor);
+
+                    //Console.WriteLine($"AmbientLightColor: ", GpuState.LightingState.AmbientLightColor);
+
                     vP[n] = Vector4ToPoint(tvertex, vinfo.Normal, vinfo.Texture, color);
                 }
             }

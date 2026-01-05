@@ -154,7 +154,7 @@ namespace ScePSP.Hle.Modules.mpeg
 
         public void WriteData(void* DataPointer, int DataLength)
         {
-            Console.Out.WriteLineColored(ConsoleColor.Cyan, "{0}: {1}", new IntPtr(DataPointer), DataLength);
+            //Console.Out.WriteLineColored(ConsoleColor.Cyan, "MPEG WriteData {0}: {1}", new IntPtr(DataPointer), DataLength);
             try
             {
                 var Data = PointerUtils.PointerToByteArray((byte*)DataPointer, DataLength);

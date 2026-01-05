@@ -13,6 +13,7 @@ namespace ScePSP.Core.GpuBackEnd.State
     {
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public unsafe class GpuStateData
     {
         public Memory<uint> Data;
@@ -64,7 +65,7 @@ namespace ScePSP.Core.GpuBackEnd.State
 
     }
 
-    //[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 2048)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 2048)]
     public class GpuStateStruct
     {
         public GpuStateData data;
@@ -150,6 +151,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         }
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct PatchStateStruct
     {
         private GpuStateData data;
@@ -160,6 +162,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public byte DivT => (byte)data.Param8(GpuOpCodes.PSUB, 8);
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct AlphaTestStateStruct
     {
         private GpuStateData data;
@@ -172,6 +175,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public byte Mask => (byte)data.Param8(GpuOpCodes.ATST, 16);
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct BackfaceCullingStateStruct
     {
         private readonly GpuStateData data;
@@ -182,6 +186,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public FrontFaceDirectionEnum FrontFaceDirection => (FrontFaceDirectionEnum)data.Int(GpuOpCodes.FFACE);
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct BlendingStateStruct
     {
         private readonly GpuStateData data;
@@ -207,6 +212,7 @@ namespace ScePSP.Core.GpuBackEnd.State
             );
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct ClipPlaneStateStruct
     {
         private GpuStateData data;
@@ -223,6 +229,7 @@ namespace ScePSP.Core.GpuBackEnd.State
             );
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     unsafe public ref struct ClutStateStruct
     {
         private GpuStateData data;
@@ -243,6 +250,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public byte* Data => throw new NotImplementedException();
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct ColorTestStateStruct
     {
         private GpuStateData data;
@@ -265,6 +273,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public ColorTestFunctionEnum Function => (ColorTestFunctionEnum)data.Extract(GpuOpCodes.CTST, 0, 2);
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct DepthTestStateStruct
     {
         private GpuStateData data;
@@ -278,6 +287,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public ushort Mask => (ushort)data.Param16(GpuOpCodes.ZMSK, 0);
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct DitheringStateStruct
     {
         private GpuStateData data;
@@ -285,6 +295,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public bool Enabled => data.Bool(GpuOpCodes.DTE);
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct FogState
     {
         private GpuStateData data;
@@ -298,6 +309,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public int Hint => 0;
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct LightingStateStruct
     {
         private GpuStateData data;
@@ -321,6 +333,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public LightModelEnum LightModel => (LightModelEnum)data.Param8(GpuOpCodes.LMODE, 0);
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct AttenuationStruct
     {
         private GpuStateData data;
@@ -332,12 +345,12 @@ namespace ScePSP.Core.GpuBackEnd.State
             this.index = index;
         }
 
-
         public float Constant => data.Float1(GpuOpCodes.LCA0 + index);
         public float Linear => data.Float1(GpuOpCodes.LLA0 + index);
         public float Quadratic => data.Float1(GpuOpCodes.LQA0 + index);
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct LightStateStruct
     {
         private readonly GpuStateData data;
@@ -373,6 +386,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public ColorfStruct SpecularColor => new ColorfStruct().SetRGB_A1(data.Int(GpuOpCodes.SLC0 + index));
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct LineSmoothStateStruct
     {
         private GpuStateData data;
@@ -382,6 +396,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public bool Enabled => data.Bool(GpuOpCodes.AAE);
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct LogicalOperationStateStruct
     {
         private GpuStateData data;
@@ -392,6 +407,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public LogicalOperationEnum Operation => (LogicalOperationEnum)data.Param8(GpuOpCodes.LOP, 0);
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct MorphingStateStruct
     {
         private GpuStateData data;
@@ -401,6 +417,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public float MorphWeight(int index) => data.Float1(GpuOpCodes.MW0 + (byte)index);
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct PatchCullingStateStruct
     {
         private GpuStateData data;
@@ -411,6 +428,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public bool FaceFlag => data.Param24(GpuOpCodes.PFACE) != 0;
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct ScreenBufferStateStruct
     {
         private GpuStateData data;
@@ -437,6 +455,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public int BytesPerPixel => Format.BytesPerPixel();
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct SkinningStateStruct
     {
         private readonly GpuStateData data;
@@ -454,6 +473,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public Matrix4x4 BoneMatrix7 => BoneMatrix(7);
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct StencilStateStruct
     {
         private GpuStateData data;
@@ -469,6 +489,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public StencilOperationEnum OperationZPass => (StencilOperationEnum)data.Param8(GpuOpCodes.SOP, 16);
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct TextureMappingStateStruct
     {
         private readonly GpuStateData data;
@@ -506,6 +527,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         }
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct TextureStateStruct
     {
         private GpuStateData data;
@@ -548,15 +570,13 @@ namespace ScePSP.Core.GpuBackEnd.State
             /// <summary>
             /// Texture Width
             /// </summary>
-            public ushort TextureWidth =>
-                (ushort)(1 << Math.Min((int)data.Extract(GpuOpCodes.TSIZE0 + index, 0, 4), 9));
+            public ushort TextureWidth => (ushort)(1 << Math.Min((int)data.Extract(GpuOpCodes.TSIZE0 + index, 0, 4), 9));
 
 
             /// <summary>
             /// Texture Height
             /// </summary>
-            public ushort TextureHeight =>
-                (ushort)(1 << Math.Min((int)data.Extract(GpuOpCodes.TSIZE0 + index, 8, 4), 9));
+            public ushort TextureHeight => (ushort)(1 << Math.Min((int)data.Extract(GpuOpCodes.TSIZE0 + index, 8, 4), 9));
         }
 
         /// <summary>
@@ -589,6 +609,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public TextureColorComponent ColorComponent => (TextureColorComponent)data.Param8(GpuOpCodes.TFUNC, 8);
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct TextureTransferStateStruct
     {
         private GpuStateData data;
@@ -623,6 +644,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         }
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class VertexTypeStruct
     {
         private GpuStateData data;
@@ -799,6 +821,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public override string ToString() => this.ToStringDefault();
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct VertexStateStruct
     {
         private GpuStateData data;
@@ -826,6 +849,7 @@ namespace ScePSP.Core.GpuBackEnd.State
         public override string ToString() => this.ToStringDefault();
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public ref struct ViewportStruct
     {
         private GpuStateData data;

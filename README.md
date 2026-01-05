@@ -5,13 +5,16 @@
 _(Figure 1: runing Castlevania - The Dracula X Chronicles (USA) on title )_  
 <img width="962" height="576" alt="捕获2" src="https://github.com/user-attachments/assets/143741c0-047f-4091-b18a-813487b9c8d8" />
 
-_(Figure 2: CoreTest.Opengl runing PSPDemo/morphskin.elf)_  
+_(Figure 2: runing Valhalla Knights in game (many graphics issues))_  
+<img width="962" height="576" alt="捕获5" src="https://github.com/user-attachments/assets/52b2d082-e34b-400b-879a-cd79e5142ce0" />
+
+_(Figure 3: runing PSPDemo/morphskin.elf)_  
 <img width="962" height="576" alt="PSP2" src="https://github.com/user-attachments/assets/355a362a-350e-4d66-b6ac-dc8bd4e6cc81" />
 
-_(Figure 3: CoreTest.Opengl runing PSPDemo/zbufferfog.elf)_  
+_(Figure 4: runing PSPDemo/zbufferfog.elf)_  
 <img width="962" height="576" alt="PSP3" src="https://github.com/user-attachments/assets/73c29348-f7ba-47a4-86d0-47c0cc1ff248" />
 
-_(Figure 4: CoreTest.Opengl runing PSPDemo/cubevfpu.prx)_  
+_(Figure 5: runing PSPDemo/cubevfpu.prx)_  
 <img width="962" height="576" alt="PSP4" src="https://github.com/user-attachments/assets/bb01b8b8-229e-480e-bcea-acc89fd90dd4" />
 
 #### Compilation 

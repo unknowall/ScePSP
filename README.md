@@ -11,7 +11,7 @@
 - cspspemu on https://github.com/soywiz-archive/cspspemu
 
 _(Figure 1: runing Castlevania - The Dracula X Chronicles (USA) on title )_  
-<img width="987" height="850" alt="捕获2" src="https://github.com/user-attachments/assets/0e28910c-9c30-45a9-9daf-a93943f4e946" />
+<img width="962" height="576" alt="捕获2" src="https://github.com/user-attachments/assets/143741c0-047f-4091-b18a-813487b9c8d8" />
 
 _(Figure 2: CoreTest.Opengl runing PSPDemo/morphskin.elf)_  
 <img width="962" height="576" alt="PSP2" src="https://github.com/user-attachments/assets/355a362a-350e-4d66-b6ac-dc8bd4e6cc81" />

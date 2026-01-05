@@ -2,14 +2,6 @@
 
 #### At present, the core can only run a small number of games, and there is still a considerable distance to go before releasing a version available for end users. 
 
-#### Compilation 
-- Environment: .NET 8.0
-- Dependencies: None
-
-#### This project is based on the following projects. Special thanks to the pioneers for their contributions.
-- pspplayer on Http://code.google.com/p/pspplayer
-- cspspemu on https://github.com/soywiz-archive/cspspemu
-
 _(Figure 1: runing Castlevania - The Dracula X Chronicles (USA) on title )_  
 <img width="962" height="576" alt="捕获2" src="https://github.com/user-attachments/assets/143741c0-047f-4091-b18a-813487b9c8d8" />
 
@@ -21,3 +13,11 @@ _(Figure 3: CoreTest.Opengl runing PSPDemo/zbufferfog.elf)_
 
 _(Figure 4: CoreTest.Opengl runing PSPDemo/cubevfpu.prx)_  
 <img width="962" height="576" alt="PSP4" src="https://github.com/user-attachments/assets/bb01b8b8-229e-480e-bcea-acc89fd90dd4" />
+
+#### Compilation 
+- Environment: .NET 8.0
+- Dependencies: None
+
+#### This project is based on the following projects. Special thanks to the pioneers for their contributions.
+- pspplayer on Http://code.google.com/p/pspplayer
+- cspspemu on https://github.com/soywiz-archive/cspspemu

@@ -263,16 +263,16 @@ class Program
                         PspCtrlButtons buttonMask;
                         switch (e.key.keysym.sym)
                         {
-                            case SDL.SDL_Keycode.SDLK_a:
+                            case SDL.SDL_Keycode.SDLK_u:
                                 buttonMask = PspCtrlButtons.Square;
                                 break;
-                            case SDL.SDL_Keycode.SDLK_w:
+                            case SDL.SDL_Keycode.SDLK_i:
                                 buttonMask = PspCtrlButtons.Triangle;
                                 break;
-                            case SDL.SDL_Keycode.SDLK_d:
+                            case SDL.SDL_Keycode.SDLK_j:
                                 buttonMask = PspCtrlButtons.Circle;
                                 break;
-                            case SDL.SDL_Keycode.SDLK_s:
+                            case SDL.SDL_Keycode.SDLK_k:
                                 buttonMask = PspCtrlButtons.Cross;
                                 break;
                             case SDL.SDL_Keycode.SDLK_SPACE:
@@ -281,28 +281,28 @@ class Program
                             case SDL.SDL_Keycode.SDLK_RETURN:
                                 buttonMask = PspCtrlButtons.Start;
                                 break;
-                            case SDL.SDL_Keycode.SDLK_UP:
+                            case SDL.SDL_Keycode.SDLK_w:
                                 buttonMask = PspCtrlButtons.Up;
                                 break;
-                            case SDL.SDL_Keycode.SDLK_DOWN:
+                            case SDL.SDL_Keycode.SDLK_s:
                                 buttonMask = PspCtrlButtons.Down;
                                 break;
-                            case SDL.SDL_Keycode.SDLK_LEFT:
+                            case SDL.SDL_Keycode.SDLK_a:
                                 buttonMask = PspCtrlButtons.Left;
                                 break;
-                            case SDL.SDL_Keycode.SDLK_RIGHT:
+                            case SDL.SDL_Keycode.SDLK_d:
                                 buttonMask = PspCtrlButtons.Right;
                                 break;
-                            case SDL.SDL_Keycode.SDLK_i:
+                            case SDL.SDL_Keycode.SDLK_UP:
                                 buttonMask = UpdatePressing(ref pressingAnalogUp, pressed);
                                 break;
-                            case SDL.SDL_Keycode.SDLK_k:
+                            case SDL.SDL_Keycode.SDLK_DOWN:
                                 buttonMask = UpdatePressing(ref pressingAnalogDown, pressed);
                                 break;
-                            case SDL.SDL_Keycode.SDLK_j:
+                            case SDL.SDL_Keycode.SDLK_LEFT:
                                 buttonMask = UpdatePressing(ref pressingAnalogLeft, pressed);
                                 break;
-                            case SDL.SDL_Keycode.SDLK_l:
+                            case SDL.SDL_Keycode.SDLK_RIGHT:
                                 buttonMask = UpdatePressing(ref pressingAnalogRight, pressed);
                                 break;
                             default:

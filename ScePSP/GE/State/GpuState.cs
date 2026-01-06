@@ -236,7 +236,7 @@ namespace ScePSP.Core.GpuBackEnd.State
 
         public ClutStateStruct(GpuStateData data) => this.data = data;
 
-        public uint Address => data.Int(GpuOpCodes.CBP) | (data.Int(GpuOpCodes.CBPH) << 24);
+        public uint Address => data.Int(GpuOpCodes.CBP) | (data.Int(GpuOpCodes.CBPH) << 8);
         public int NumberOfColors
         {
             get { return (int)(data.Param8(GpuOpCodes.CLOAD, 0) * 8); }
@@ -440,7 +440,6 @@ namespace ScePSP.Core.GpuBackEnd.State
             this.depth = depth;
         }
 
-
         public uint Width => data.Param16(depth ? GpuOpCodes.ZBW : GpuOpCodes.FBW, 0);
         public GuPixelFormats Format => (GuPixelFormats)data.Param8(GpuOpCodes.PSM, 0);
 
@@ -534,13 +533,9 @@ namespace ScePSP.Core.GpuBackEnd.State
 
         public TextureStateStruct(GpuStateData data) => this.data = data;
 
-        /// <summary>
-        /// MipmapState list
-        /// </summary>
         public MipmapState Mipmap(byte index) => new MipmapState(data, (byte)index);
 
         public MipmapState Mipmap0 => Mipmap(0);
-
 
         public class MipmapState
         {
@@ -553,9 +548,6 @@ namespace ScePSP.Core.GpuBackEnd.State
                 this.index = index;
             }
 
-            /// <summary>
-            /// Pointer 
-            /// </summary>
             public uint Address => (data.Int(GpuOpCodes.TBP0 + index) & 0xFFFFFF) |
                                    (data.Param8(GpuOpCodes.TBW0 + index, 16) << 24);
 
@@ -567,31 +559,15 @@ namespace ScePSP.Core.GpuBackEnd.State
             /// </summary>
             public ushort BufferWidth => (ushort)data.Param16(GpuOpCodes.TBW0 + index, 0);
 
-            /// <summary>
-            /// Texture Width
-            /// </summary>
             public ushort TextureWidth => (ushort)(1 << Math.Min((int)data.Extract(GpuOpCodes.TSIZE0 + index, 0, 4), 9));
 
-
-            /// <summary>
-            /// Texture Height
-            /// </summary>
             public ushort TextureHeight => (ushort)(1 << Math.Min((int)data.Extract(GpuOpCodes.TSIZE0 + index, 8, 4), 9));
         }
 
-        /// <summary>
-        /// Is texture swizzled?
-        /// </summary>
         public bool Swizzled => data.Param8(GpuOpCodes.TMODE, 0) != 0;
 
-        /// <summary>
-        /// Mipmaps share clut?
-        /// </summary>
         public bool MipmapShareClut => data.Param8(GpuOpCodes.TMODE, 8) != 0;
 
-        /// <summary>
-        /// Levels of mipmaps
-        /// </summary>
         public int MipmapMaxLevel => (int)data.Param8(GpuOpCodes.TMODE, 16);
         public GuPixelFormats PixelFormat => (GuPixelFormats)data.Extract(GpuOpCodes.TPSM, 0, 4);
         public TextureFilter FilterMinification => (TextureFilter)data.Param8(GpuOpCodes.TFLT, 0);

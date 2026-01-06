@@ -80,8 +80,8 @@
         VOFFSET = 0x4B,     // 0x4B - 75 - Texture Offset V
         OFFSETX = 0x4C,     // 0x4C - 76 - Viewport Offset (X)
         OFFSETY = 0x4D,     // 0x4D - 77 - Viewport Offset (Y)
-        OFFSETZ = 0x4E,     // 0x4E - 78 - Viewport Offset (Z)
-        FOG_MODE = 0x4F,    // 0x4F - 79 - Fog Mode (Linear/Exponential)
+        Reserved4E = 0x4E,  // 0x4E - 78 - Viewport Offset (Z) OFFSETZ <- Reserved 
+        Reserved4F = 0x4F,  // 0x4F - 79 - Fog Mode (Linear/Exponential) FOG_MODE <- Reserved
         SHADE = 0x50,       // 0x50 - 80 - Shade Model
         RNORM = 0x51,       // 0x51 - 81 - Reverse Face Normals Enable
         NORMALIZE = 0x52,   // 0x52 - 82 - Normal Vector Normalization Enable
@@ -210,7 +210,7 @@
         FFAR = 0xCD,        // 0xCD - 205 - Fog Far Distance
         FDIST = 0xCE,       // 0xCE - 206 - Fog Range
         FCOL = 0xCF,        // 0xCF - 207 - Fog Color
-        DEPTH_OFFSET = 0xD0,// 0xD0 - 208 - Depth Offset (Polygon Offset)
+        //DEPTH_OFFSET = 0xD0,// 0xD0 - 208 - Depth Offset (Polygon Offset)
         TSLOPE = 0xD0,      // 0xD0 - 208 - Alias: Texture Slope
         TEXTURE_LOD = 0xD1, // 0xD1 - 209 - Texture LOD Threshold
         PSM = 0xD2,         // 0xD2 - 210 - Frame Buffer Pixel Storage Mode

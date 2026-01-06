@@ -664,10 +664,15 @@ namespace LightGL
         public const int GL_SHADER_STORAGE_BARRIER_BIT = 0x2000;
         public const int GL_SRC1_COLOR = 0x88F9;
         public const int GL_SRC1_ALPHA = 0x8589;
-        public const int GL_ONE_MINUS_SRC1_COLOR = 0x88FC;
-        public const int GL_ONE_MINUS_SRC1_ALPHA = 0x88FD;
+        public const int GL_ONE_MINUS_SRC1_COLOR = 0x88FA;
+        public const int GL_ONE_MINUS_SRC1_ALPHA = 0x88FB;
         public const int GL_LIGHT0 = 0x4000;
         public const int GL_LIGHT7 = 0x4007;
+        public const int GL_EMISSION = 0x1600;
+        public const int GL_AMBIENT = 0x1200;
+        public const int GL_DIFFUSE = 0x1201;
+        public const int GL_SPECULAR = 0x1202;
+        public const int GL_SHININESS = 0x1203;
 
         public static readonly glActiveTexture ActiveTexture;
         public static readonly glAttachShader AttachShader;
@@ -1357,7 +1362,7 @@ namespace LightGL
     public delegate void glViewport(int x, int y, int width, int height);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
-    public delegate void glMaterialfv(int face, int pname, float[] @params);
+    public unsafe delegate void glMaterialfv(int face, int pname, float* value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
     public delegate void glMaterialf(int face, int pname, float param);

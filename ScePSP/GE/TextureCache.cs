@@ -116,7 +116,7 @@ namespace ScePSP.Core.GpuBackEnd
         public TTexture Get(GpuStateStruct GpuState)
         {
             var TextureMappingState = GpuState.TextureMappingState;
-            var ClutState = TextureMappingState.ClutState; //ClutState UploadedClutState
+            var ClutState = TextureMappingState.ClutState;
             var TextureState = TextureMappingState.TextureState;
 
             TTexture Texture;
@@ -205,7 +205,7 @@ namespace ScePSP.Core.GpuBackEnd
                 byte* TexturePointer = null;
                 byte* ClutPointer = null;
                 //HardCode need fix it!
-                ClutAddress = ClutAddress + 0x09000000;
+                //ClutAddress = ClutAddress + 0x09000000;
                 try
                 {
                     TexturePointer = (byte*)PspMemory.PspAddressToPointerSafe(TextureAddress);

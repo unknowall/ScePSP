@@ -7,9 +7,49 @@ using System.Numerics;
 
 namespace ScePSP.Core.GpuBackEnd.OpenGL
 {
-
     public unsafe partial class OpenglBackEnd : GpuBackEnd
     {
+        public class FastList<T>
+        {
+            public int Length = 0;
+
+            public T[] Buffer = new T[1024];
+
+            public void Reset() => Length = 0;
+
+            public void Add(T item)
+            {
+                if (Length >= Buffer.Length) Buffer = Buffer.ResizedCopy(Buffer.Length * 2);
+                Buffer[Length++] = item;
+            }
+        }
+
+        private readonly FastList<Vector3> _verticesPosition = new FastList<Vector3>();
+        private readonly FastList<Vector3> _verticesNormal = new FastList<Vector3>();
+        private readonly FastList<Vector3> _verticesTexcoords = new FastList<Vector3>();
+        private readonly FastList<RgbaFloat> _verticesColors = new FastList<RgbaFloat>();
+        private readonly FastList<VertexInfoWeights> _verticesWeights = new FastList<VertexInfoWeights>();
+
+        private GLBuffer _verticesPositionBuffer;
+        private GLBuffer _verticesNormalBuffer;
+        private GLBuffer _verticesTexcoordsBuffer;
+        private GLBuffer _verticesColorsBuffer;
+        private GLBuffer _verticesWeightsBuffer;
+
+        private FastList<uint> _indicesList = new FastList<uint>();
+
+        private static GLGeometry ConvertGLGeometry(GuPrimitiveType primitiveType) => primitiveType switch
+        {
+            GuPrimitiveType.Lines => GLGeometry.GL_LINES,
+            GuPrimitiveType.LineStrip => GLGeometry.GL_LINE_STRIP,
+            GuPrimitiveType.Triangles => GLGeometry.GL_TRIANGLES,
+            GuPrimitiveType.Points => GLGeometry.GL_POINTS,
+            GuPrimitiveType.TriangleFan => GLGeometry.GL_TRIANGLE_FAN,
+            GuPrimitiveType.TriangleStrip => GLGeometry.GL_TRIANGLE_STRIP,
+            GuPrimitiveType.Sprites => GLGeometry.GL_TRIANGLE_STRIP,
+            _ => throw new NotImplementedException("Not implemented PrimitiveType:'" + primitiveType + "'")
+        };
+
         private void DrawInitVertices()
         {
             //Console.WriteLine(WGL.wglGetCurrentContext());

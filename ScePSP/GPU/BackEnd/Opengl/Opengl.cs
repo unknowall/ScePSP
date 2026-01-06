@@ -5,7 +5,6 @@ using ScePSP.Core.GpuBackEnd.VertexReading;
 using ScePSP.Core.Types;
 using ScePSP.Utils;
 using ScePSPUtils;
-using ScePSPUtils.Drawing;
 using System;
 using System.Numerics;
 using System.Threading;
@@ -31,35 +30,6 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
         private PspWavefrontObjWriter _pspWavefrontObjWriter = null;
 
         //public static object GpuLock = new object();
-
-        public class FastList<T>
-        {
-            public int Length = 0;
-
-            public T[] Buffer = new T[1024];
-
-            public void Reset() => Length = 0;
-
-            public void Add(T item)
-            {
-                if (Length >= Buffer.Length) Buffer = Buffer.ResizedCopy(Buffer.Length * 2);
-                Buffer[Length++] = item;
-            }
-        }
-
-        private readonly FastList<Vector3> _verticesPosition = new FastList<Vector3>();
-        private readonly FastList<Vector3> _verticesNormal = new FastList<Vector3>();
-        private readonly FastList<Vector3> _verticesTexcoords = new FastList<Vector3>();
-        private readonly FastList<RgbaFloat> _verticesColors = new FastList<RgbaFloat>();
-        private readonly FastList<VertexInfoWeights> _verticesWeights = new FastList<VertexInfoWeights>();
-
-        private GLBuffer _verticesPositionBuffer;
-        private GLBuffer _verticesNormalBuffer;
-        private GLBuffer _verticesTexcoordsBuffer;
-        private GLBuffer _verticesColorsBuffer;
-        private GLBuffer _verticesWeightsBuffer;
-
-        private FastList<uint> _indicesList = new FastList<uint>();
 
         private Matrix4x4 _worldViewProjectionMatrix = Matrix4x4.Identity;
         private Matrix4x4 _textureMatrix = Matrix4x4.Identity;
@@ -111,6 +81,30 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             public GlAttribute vertexWeight5;
             public GlAttribute vertexWeight6;
             public GlAttribute vertexWeight7;
+
+            public GlUniform lightenable;
+            public GlUniform materialEmission;    // 发射光
+            public GlUniform materialAmbient;     // 环境光
+            public GlUniform materialDiffuse;     // 漫反射
+            public GlUniform materialSpecular;    // 镜面反射
+            public GlUniform materialShininess;  // 镜面高光指数
+            public GlUniform lightModelAmbient;
+            public GlUniform lightModelColorControl;
+
+            public GlUniform matrixWorld;
+            public GlUniform matrixView;
+
+            public GlUniform lightEnableds;
+            public GlUniform lightAmbient;    // 光源环境光
+            public GlUniform lightDiffuse;    // 光源漫反射
+            public GlUniform lightSpecular;   // 光源镜面反射
+            public GlUniform lightPosition;   // 光源位置 (w=1:点光源, w=0:方向光)
+            public GlUniform lightSpotDirection; // 聚光灯方向
+            public GlUniform lightSpotExponent; // 聚光灯指数
+            public GlUniform lightSpotCutoff;   // 聚光灯截止角 (0-90, 180=无聚光)
+            public GlUniform lightConstantAttenuation;  // 常数衰减
+            public GlUniform lightLinearAttenuation;    // 线性衰减
+            public GlUniform lightQuadraticAttenuation; // 二次衰减
         }
 
         ShaderInfoClass ShaderInfo = new ShaderInfoClass();
@@ -121,18 +115,6 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             TextureCache = new TextureCacheOpengl(Memory);
             VertexReader = new VertexReader();
         }
-
-        private static GLGeometry ConvertGLGeometry(GuPrimitiveType primitiveType) => primitiveType switch
-        {
-            GuPrimitiveType.Lines => GLGeometry.GL_LINES,
-            GuPrimitiveType.LineStrip => GLGeometry.GL_LINE_STRIP,
-            GuPrimitiveType.Triangles => GLGeometry.GL_TRIANGLES,
-            GuPrimitiveType.Points => GLGeometry.GL_POINTS,
-            GuPrimitiveType.TriangleFan => GLGeometry.GL_TRIANGLE_FAN,
-            GuPrimitiveType.TriangleStrip => GLGeometry.GL_TRIANGLE_STRIP,
-            GuPrimitiveType.Sprites => GLGeometry.GL_TRIANGLE_STRIP,
-            _ => throw new NotImplementedException("Not implemented PrimitiveType:'" + primitiveType + "'")
-        };
 
         public static string GlGetString(int name) => GL.GetStringStr(name);
 

@@ -8,7 +8,6 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 {
     public unsafe partial class OpenglBackEnd : GpuBackEnd
     {
-
         private DepthFunction DepthFunctionTranslate(int pspFunc)
         {
             return pspFunc switch
@@ -231,8 +230,8 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
         private void PrepareState_Colors_3D(GpuStateStruct gpuState)
         {
-            //if (ShaderInfo.uniformColor != null)
-            //    ShaderInfo.uniformColor.Set(gpuState.LightingState.AmbientModelColor.ToVector4());
+            if (ShaderInfo.uniformColor != null)
+                ShaderInfo.uniformColor.Set(gpuState.LightingState.AmbientModelColor.ToVector4());
 
             GL.EnableDisable(GL.GL_COLOR_MATERIAL, VertexType.HasColor);
         }
@@ -243,105 +242,99 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
             if (!lighting.Enabled)
             {
-                GL.Disable(GL.GL_LIGHTING);
-                // 如果光照被禁用，使用环境色作为基础颜色
-                ShaderInfo.uniformColor.NoWarning().Set(lighting.AmbientModelColor.ToVector4());
+                ShaderInfo.lightenable.Set(false);
+                //如果光照被禁用，使用环境色作为基础颜色
+                ShaderInfo.uniformColor.Set(lighting.AmbientModelColor.ToVector4());
                 return;
             }
 
-            // 合成一个简单的基色 Ambient + Emissive + Diffuse（相加并 clamp 到 [0,1]）
-            //var ambient = lighting.AmbientModelColor.ToVector4();
-            //var emissive = lighting.EmissiveModelColor.ToVector4();
-            //var diffuse = lighting.DiffuseModelColor.ToVector4();
+            ShaderInfo.lightenable.Set(true);
 
-            //var combined = new Vector4(
-            //    MathF.Min(1f, ambient.X + emissive.X + diffuse.X),
-            //    MathF.Min(1f, ambient.Y + emissive.Y + diffuse.Y),
-            //    MathF.Min(1f, ambient.Z + emissive.Z + diffuse.Z),
-            //    1f
-            //);
+            ShaderInfo.matrixWorld.Set(gpuState.VertexState.WorldMatrix);
+            ShaderInfo.matrixView.Set(gpuState.VertexState.ViewMatrix);
 
-            //ShaderInfo.uniformColor.NoWarning().Set(combined);
+            ShaderInfo.materialEmission.Set(lighting.EmissiveModelColor.ToVector4());
+            ShaderInfo.materialAmbient.Set(lighting.AmbientModelColor.ToVector4());
 
-            //Console.WriteLine($"PrepareState_Lighting {lighting.LightModel}");
+            var DiffuseModelColor = lighting.DiffuseModelColor.ToVector4();
 
-            GL.Enable(GL.GL_LIGHTING);
+            if (DiffuseModelColor.X == 0 && DiffuseModelColor.Y == 0 && DiffuseModelColor.Z == 0 && DiffuseModelColor.W == 0)
+            {
+                ShaderInfo.materialDiffuse.Set(DiffuseModelColor);
+            }
+            else
+            {
+                ShaderInfo.materialDiffuse.Set(new Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+            }
 
-            Vector4 color = gpuState.LightingState.EmissiveModelColor.ToVector4();
-            GL.Materialfv(GL.GL_FRONT, GL.GL_EMISSION, (float*)&color);
+            ShaderInfo.materialSpecular.Set(lighting.SpecularModelColor.ToVector4());
+            ShaderInfo.materialShininess.Set(Math.Clamp(lighting.SpecularPower, 0f, 128f));
 
-            color = gpuState.LightingState.AmbientModelColor.ToVector4();
-            GL.Materialfv(GL.GL_FRONT, GL.GL_AMBIENT, (float*)&color);
+            const int LIGHT_MODEL_COLOR_CONTROL_SEPARATE_SPECULAR_COLOR = 1;
+            const int LIGHT_MODEL_COLOR_CONTROL_SINGLE_COLOR = 0;
 
-            color = gpuState.LightingState.DiffuseModelColor.ToVector4();
-            GL.Materialfv(GL.GL_FRONT, GL.GL_DIFFUSE, (float*)&color);
+            ShaderInfo.lightModelAmbient.Set(lighting.AmbientLightColor.ToVector4());
+            ShaderInfo.lightModelColorControl.Set((int)(lighting.LightModel == LightModelEnum.SeparateSpecularColor
+                ? LIGHT_MODEL_COLOR_CONTROL_SEPARATE_SPECULAR_COLOR
+                : LIGHT_MODEL_COLOR_CONTROL_SINGLE_COLOR));
 
-            color = gpuState.LightingState.SpecularModelColor.ToVector4();
-            GL.Materialfv(GL.GL_FRONT, GL.GL_SPECULAR, (float*)&color);
-
-            color = gpuState.LightingState.EmissiveModelColor.ToVector4();
-            GL.Materialf(GL.GL_FRONT, GL.GL_SHININESS, gpuState.LightingState.SpecularPower);
-
-            GL.LightModeli(
-                (uint)LightModelParameter.LightModelColorControl,
-                (uint)((lighting.LightModel == LightModelEnum.SeparateSpecularColor) ? LightModelColorControl.SeparateSpecularColor : LightModelColorControl.SingleColor)
-            );
-
-            color = lighting.AmbientLightColor.ToVector4();
-
-            GL.LightModelfv((uint)LightModelParameter.LightModelAmbient, (float*)&color);
+            var lightenables = new int[4];
+            var lightAmbient = new Vector4[4];
+            var lightDiffuse = new Vector4[4];
+            var lightPosition = new Vector4[4];
+            var lightSpecular = new Vector4[4];
+            var lightSpotDirection = new Vector3[4];
+            var lightSpotExponent = new float[4];
+            var lightSpotCutoff = new float[4];
+            var lightConstantAttenuation = new float[4];
+            var lightLinearAttenuation = new float[4];
+            var lightQuadraticAttenuation = new float[4];
 
             for (byte n = 0; n < 4; n++)
             {
-                var LightState = lighting.Light(n);
+                var light = lighting.Light(n);
 
-                uint LightName = GL.GL_LIGHT0 + (uint)n;
+                lightenables[n] = light.Enabled ? 1 : 0;
 
-                //Console.WriteLine($"LightState {n} {LightState.Enabled}");
+                if (!light.Enabled) continue;
 
-                if (LightState.Enabled)
-                {
-                    GL.Enable((int)LightName);
-                }
-                else
-                {
-                    GL.Disable((int)LightName);
+                lightAmbient[n] = light.AmbientColor.ToVector4();
 
-                    continue;
-                }
+                lightDiffuse[n] = light.DiffuseColor.ToVector4();
 
-                color = LightState.SpecularColor.ToVector4();
-                GL.Lightfv(LightName, (uint)LightParameter.Specular, (float*)&color);
+                lightPosition[n] = light.Position.ToVector4();
 
-                color = LightState.AmbientColor.ToVector4();
-                GL.Lightfv(LightName, (uint)LightParameter.Ambient, (float*)&color);
+                lightSpecular[n] = light.SpecularColor.ToVector4();
 
-                color = LightState.DiffuseColor.ToVector4();
-                GL.Lightfv(LightName, (uint)LightParameter.Diffuse, (float*)&color);
+                //if (light.SpotDirection.X == 0 && light.SpotDirection.Y == 0 && light.SpotDirection.Z == 0)
+                //{
+                //    lightSpotDirection[n] = new Vector3(0, 0, -1); // 默认指向-Z轴
+                //}
 
-                Vector4 Position = LightState.Position.ToVector4();
-                Position.W = 1.0f;
-                GL.Lightfv(LightName, (uint)LightParameter.Position, (float*)&Position);
+                lightSpotDirection[n] = light.SpotDirection.ToRVector3();
 
-                GL.Lightf(LightName, (uint)LightParameter.ConstantAttenuation, LightState.Attenuation.Constant);
-                GL.Lightf(LightName, (uint)LightParameter.LinearAttenuation, LightState.Attenuation.Linear);
-                GL.Lightf(LightName, (uint)LightParameter.QuadraticAttenuation, LightState.Attenuation.Quadratic);
+                lightSpotExponent[n] = light.SpotExponent;
 
-                if (LightState.Type == LightTypeEnum.SpotLight)
-                {
-                    Position = LightState.SpotDirection.ToVector4();
-                    Position.W = 0.0f;
-                    GL.Lightfv(LightName, (uint)LightParameter.SpotDirection, (float*)&Position);
+                lightSpotCutoff[n] = light.SpotCutoff;
 
-                    GL.Lightf(LightName, (uint)LightParameter.SpotExponent, LightState.SpotExponent);
-                    GL.Lightf(LightName, (uint)LightParameter.SpotCutoff, LightState.SpotCutoff);
-                }
-                else
-                {
-                    GL.Lightf(LightName, (uint)LightParameter.SpotExponent, 0f);
-                    GL.Lightf(LightName, (uint)LightParameter.SpotCutoff, 180f);
-                }
+                lightConstantAttenuation[n] = light.Attenuation.Constant;
+
+                lightLinearAttenuation[n] = light.Attenuation.Linear;
+
+                lightQuadraticAttenuation[n] = light.Attenuation.Quadratic;
             }
+
+            ShaderInfo.lightEnableds.Set(lightenables);
+            ShaderInfo.lightAmbient.Set(lightAmbient);
+            ShaderInfo.lightDiffuse.Set(lightDiffuse);
+            ShaderInfo.lightSpecular.Set(lightSpecular);
+            ShaderInfo.lightPosition.Set(lightPosition);
+            ShaderInfo.lightSpotDirection.Set(lightSpotDirection);
+            ShaderInfo.lightSpotExponent.Set(lightSpotExponent);
+            ShaderInfo.lightSpotCutoff.Set(lightSpotCutoff);
+            ShaderInfo.lightConstantAttenuation.Set(lightConstantAttenuation);
+            ShaderInfo.lightLinearAttenuation.Set(lightLinearAttenuation);
+            ShaderInfo.lightQuadraticAttenuation.Set(lightQuadraticAttenuation);
         }
 
         private void PrepareState_Blend(GpuStateStruct gpuState)
@@ -396,6 +389,24 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                 blendingState.FixColorDestination.Blue,
                 blendingState.FixColorDestination.Alpha
             );
+        }
+
+        private void PrepareState_Texture_Common(GpuStateStruct gpuState)
+        {
+            //Console.WriteLine($"PrepareState_Texture_Common {VertexType}");
+
+            if (VertexType.Transform2D)
+            {
+                PrepareState_Texture_2D(gpuState);
+            }
+            else
+            {
+                PrepareState_Texture_3D(gpuState);
+            }
+
+            RenderbufferManager.TextureCacheGetAndBind(gpuState);
+
+            //GL.TexEnvi(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvModeTranslate[(int)TextureState.Effect]);
         }
 
         private void PrepareState_Texture_2D(GpuStateStruct gpuState)
@@ -458,34 +469,6 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             }
         }
 
-        private void PrepareState_Texture_Common(GpuStateStruct gpuState)
-        {
-            //var textureMappingState = gpuState.TextureMappingState;
-            //var ClutState = TextureMappingState.ClutState;
-            //var textureState = textureMappingState.TextureState;
-
-            //if (!GL.EnableDisable(GL.GL_TEXTURE_2D, textureMappingState.Enabled)) return;
-
-            if (VertexType.Transform2D)
-            {
-                PrepareState_Texture_2D(gpuState);
-            }
-            else
-            {
-                PrepareState_Texture_3D(gpuState);
-            }
-
-            //GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
-
-            //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-            RenderbufferManager.TextureCacheGetAndBind(gpuState);
-
-            //CurrentTexture.Save("test.png");
-
-            //GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvModeTranslate[(int)TextureState.Effect]);
-        }
-
         public static void PrepareStateCommon(GpuStateStruct gpuState, int scaleViewport)
         {
             var viewport = gpuState.Viewport;
@@ -499,7 +482,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
             GL.Viewport(left, top, width, height);
 
-            //GL.Disable(GL.GL_LIGHTING);
+            GL.Disable(GL.GL_LIGHTING);
             GL.Disable(GL.GL_POLYGON_OFFSET_FILL);
 
             GL.EnableDisable(GL.GL_DITHER, true);

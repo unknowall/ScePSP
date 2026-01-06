@@ -274,7 +274,7 @@ namespace LightGL
         Texture = 0x1702
     }
 
-    public enum LightParameter
+    public enum LightParameter : uint
     {
         Ambient = 0x1200,
         Diffuse = 0x1201,
@@ -288,18 +288,18 @@ namespace LightGL
         QuadraticAttenuation = 0x1209
     }
 
-    public enum LightModelParameter
+    public enum LightModelParameter : uint
     {
-        LightModelAmbient = 0x0C02,
-        LightModelLocalViewer = 0x0B51,
-        LightModelColorControl = 0x81F8,
-        LightModelTwoSide = 0x0B52
+        LightModelAmbient = 0x0B51,
+        LightModelLocalViewer = 0x0B53,
+        LightModelColorControl = 0x0B52,
+        LightModelTwoSide = 0x0B54
     }
 
-    public enum LightModelColorControl
+    public enum LightModelColorControl : uint
     {
-        SingleColor = 0x81F9,
-        SeparateSpecularColor = 0x81FA
+        SingleColor = 0x0B55,
+        SeparateSpecularColor = 0x81F9
     }
 
     public unsafe class GL
@@ -672,7 +672,7 @@ namespace LightGL
         public const int GL_AMBIENT = 0x1200;
         public const int GL_DIFFUSE = 0x1201;
         public const int GL_SPECULAR = 0x1202;
-        public const int GL_SHININESS = 0x1203;
+        public const int GL_SHININESS = 0x1601;
 
         public static readonly glActiveTexture ActiveTexture;
         public static readonly glAttachShader AttachShader;

@@ -143,6 +143,54 @@ namespace LightGL
         }
 
         [DebuggerHidden]
+        public void Set(int[] vectors)
+        {
+            if (!CheckValid())
+                return;
+            if (ValueType != GLValueType.GL_BOOL && ValueType != GLValueType.GL_INT)
+                throw new InvalidOperationException($"this.ValueType {ValueType}!= GLValueType.GL_INT");
+            if (ArrayLength != vectors.Length)
+                throw new InvalidOperationException("this.ArrayLength != Vectors.Length");
+            PrepareUsing();
+            fixed (int* ptr = &vectors[0])
+            {
+                GL.Uniform1iv(Location, vectors.Length, (int*)ptr);
+            }
+        }
+
+        [DebuggerHidden]
+        public void Set(float[] vectors)
+        {
+            if (!CheckValid())
+                return;
+            if (ValueType != GLValueType.GL_FLOAT)
+                throw new InvalidOperationException("this.ValueType != GLValueType.GL_FLOAT");
+            if (ArrayLength != vectors.Length)
+                throw new InvalidOperationException("this.ArrayLength != Vectors.Length");
+            PrepareUsing();
+            fixed (float* ptr = &vectors[0])
+            {
+                GL.Uniform1fv(Location, vectors.Length, (float*)ptr);
+            }
+        }
+
+        [DebuggerHidden]
+        public void Set(Vector3[] vectors)
+        {
+            if (!CheckValid())
+                return;
+            if (ValueType != GLValueType.GL_FLOAT_VEC3)
+                throw new InvalidOperationException("this.ValueType != GLValueType.GL_FLOAT_VEC3");
+            if (ArrayLength != vectors.Length)
+                throw new InvalidOperationException("this.ArrayLength != Vectors.Length");
+            PrepareUsing();
+            fixed (Vector3* ptr = &vectors[0])
+            {
+                GL.Uniform3fv(Location, vectors.Length, (float*)ptr);
+            }
+        }
+
+        [DebuggerHidden]
         public void Set(Vector4[] vectors)
         {
             if (!CheckValid())

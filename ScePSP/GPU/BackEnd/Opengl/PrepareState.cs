@@ -111,7 +111,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                 GL.Disable(GL.GL_CULL_FACE);
                 GL.DepthRange(0, 1);
                 GL.Disable(GL.GL_DEPTH_TEST);
-                //GL.Disable(EnableCap.Lighting);
+                GL.Disable(GL.GL_LIGHTING);
             }
             else
             {
@@ -122,7 +122,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                 PrepareState_DepthTest(gpuState);
                 PrepareState_Stencil(gpuState);
             }
-            //GL.ShadeModel((GpuState->ShadeModel == ShadingModelEnum.Flat) ? ShadingModel.Flat : ShadingModel.Smooth);
+            //GL.ShadeModel((GpuState.ShadeModel == ShadingModelEnum.Flat) ? ShadingModel.Flat : ShadingModel.Smooth);
             PrepareState_AlphaTest(gpuState);
         }
 
@@ -256,15 +256,17 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             ShaderInfo.materialEmission.Set(lighting.EmissiveModelColor.ToVector4());
             ShaderInfo.materialAmbient.Set(lighting.AmbientModelColor.ToVector4());
 
+            var DefWhiteColor = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+
             var DiffuseModelColor = lighting.DiffuseModelColor.ToVector4();
 
-            if (DiffuseModelColor.X == 0 && DiffuseModelColor.Y == 0 && DiffuseModelColor.Z == 0 && DiffuseModelColor.W == 0)
+            if (DiffuseModelColor.X == 0 && DiffuseModelColor.Y == 0 && DiffuseModelColor.Z == 0)
             {
-                ShaderInfo.materialDiffuse.Set(DiffuseModelColor);
+                ShaderInfo.materialDiffuse.Set(DefWhiteColor);
             }
             else
             {
-                ShaderInfo.materialDiffuse.Set(new Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+                ShaderInfo.materialDiffuse.Set(DiffuseModelColor);
             }
 
             ShaderInfo.materialSpecular.Set(lighting.SpecularModelColor.ToVector4());
@@ -274,6 +276,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             const int LIGHT_MODEL_COLOR_CONTROL_SINGLE_COLOR = 0;
 
             ShaderInfo.lightModelAmbient.Set(lighting.AmbientLightColor.ToVector4());
+
             ShaderInfo.lightModelColorControl.Set((int)(lighting.LightModel == LightModelEnum.SeparateSpecularColor
                 ? LIGHT_MODEL_COLOR_CONTROL_SEPARATE_SPECULAR_COLOR
                 : LIGHT_MODEL_COLOR_CONTROL_SINGLE_COLOR));
@@ -302,18 +305,32 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
                 lightDiffuse[n] = light.DiffuseColor.ToVector4();
 
+                if (lightDiffuse[n].X == 0 && lightDiffuse[n].Y == 0 && lightDiffuse[n].Z == 0)
+                {
+                    lightDiffuse[n] = DefWhiteColor;
+                }
+
                 lightPosition[n] = light.Position.ToVector4();
 
                 lightSpecular[n] = light.SpecularColor.ToVector4();
 
-                //if (light.SpotDirection.X == 0 && light.SpotDirection.Y == 0 && light.SpotDirection.Z == 0)
-                //{
-                //    lightSpotDirection[n] = new Vector3(0, 0, -1); // 默认指向-Z轴
-                //}
+                if (light.SpotDirection.X == 0 && light.SpotDirection.Y == 0 && light.SpotDirection.Z == 0)
+                {
+                    lightSpotDirection[n] = new Vector3(0, 0, -1); // 指向-Z轴
+                }
+                else
+                {
+                    lightSpotDirection[n] = light.SpotDirection.ToRVector3();
+                }
 
-                lightSpotDirection[n] = light.SpotDirection.ToRVector3();
-
-                lightSpotExponent[n] = light.SpotExponent;
+                if (light.SpotExponent == 0)
+                {
+                    lightSpotExponent[n] = 180f;
+                }
+                else
+                {
+                    lightSpotExponent[n] = light.SpotExponent;
+                }
 
                 lightSpotCutoff[n] = light.SpotCutoff;
 
@@ -503,8 +520,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             else
             {
                 worldViewProjectionMatrix =
-                    gpuState.VertexState.WorldMatrix * gpuState.VertexState.ViewMatrix *
-                    gpuState.VertexState.ProjectionMatrix;
+                    gpuState.VertexState.WorldMatrix * gpuState.VertexState.ViewMatrix * gpuState.VertexState.ProjectionMatrix;
             }
         }
 

@@ -9,14 +9,12 @@ namespace ScePSP.Runner.Tasks.Display
 {
     public sealed class DisplayTask : PspMainTask
     {
-        private HleInterruptManager _hleInterruptManager;
+        private HleInterruptManager _hleInterruptManager => PSPDrivers.HLE.HleInterruptManager;
 
-        private PspDisplay _pspDisplay;
+        private PspDisplay _pspDisplay => PSPDrivers.PspDisplay;
 
-        public DisplayTask(HleInterruptManager hleInterruptManager, PspDisplay pspDisplay)
+        public DisplayTask()
         {
-            _hleInterruptManager = hleInterruptManager;
-            _pspDisplay = pspDisplay;
         }
 
         protected override string ThreadName => "DisplayTask";

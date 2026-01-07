@@ -14,7 +14,6 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.Xml;
 using System.Threading;
-using System.Windows.Forms.Design.Behavior;
 using static ScePSP.Core.GpuBackEnd.GpuBackEnd;
 
 namespace ScePSP.Core.GpuBackEnd
@@ -243,17 +242,24 @@ namespace ScePSP.Core.GpuBackEnd
                         break;
                     }
 
+                case GpuOpCodes.BEZIER:
+                    {
+                        var uCount = (byte)Params24.Extract(0, 8);
+                        var vCount = (byte)Params24.Extract(8, 8);
+                        DrawBezier(uCount, vCount);
+                        break;
+                    }
+
                 case GpuOpCodes.SPLINE:
                     {
-                        var sp_ucount = (byte)Params24.Extract(0, 8);
-                        var sp_vcount = (byte)Params24.Extract(8, 8);
-                        var sp_utype = (byte)Params24.Extract(16, 2);
-                        var sp_vtype = (byte)Params24.Extract(18, 2);
+                        var sp_ucount = (int)Params24.Extract(0, 8);
+                        var sp_vcount = (int)Params24.Extract(8, 8);
+                        var sp_utype = (int)Params24.Extract(16, 2);
+                        var sp_vtype = (int)Params24.Extract(18, 2);
                         //Console.WriteLine("OP_SPLINE(%d, %d, %d, %d)", sp_ucount, sp_vcount, sp_utype, sp_vtype);
                         DrawSpline(sp_ucount, sp_vcount, sp_utype, sp_vtype);
                         break;
                     }
-
 
                 case GpuOpCodes.PPRIM:
                     {
@@ -261,12 +267,10 @@ namespace ScePSP.Core.GpuBackEnd
                         break;
                     }
 
-
                 case GpuOpCodes.PRIM:
                     {
                         var primitiveType = (GuPrimitiveType)Params24.Extract(16, 3);
                         var vertexCount = (ushort)Params24.Extract(0, 16);
-
 #if PRIM_BATCH
                         var nextInstruction = *(GpuInstruction*)Memory.PspAddressToPointerUnsafe(Pc + 4);
 
@@ -303,14 +307,6 @@ namespace ScePSP.Core.GpuBackEnd
                     GpuDisplayList.GpuProcessor.GpuImpl.Prim(GlobalGpuState, GpuDisplayList.GpuStateStructPointer, primitiveType, vertexCount);
                     GpuDisplayList.GpuProcessor.GpuImpl.PrimEnd(GlobalGpuState, GpuDisplayList.GpuStateStructPointer);
 #endif
-                        break;
-                    }
-
-                case GpuOpCodes.BEZIER:
-                    {
-                        var uCount = (byte)Params24.Extract(0, 8);
-                        var vCount = (byte)Params24.Extract(8, 8);
-                        DrawBezier(uCount, vCount);
                         break;
                     }
 
@@ -563,85 +559,35 @@ namespace ScePSP.Core.GpuBackEnd
             var divS = GpuStateStructPointer.PatchState.DivS;
             var divT = GpuStateStructPointer.PatchState.DivT;
 
-            if (sp_ucount <= 0 || sp_vcount <= 0)
-            {
-                Logger.Warning($"Unsupported spline parameters ucount={sp_ucount} vcount={sp_vcount} (count must be >0)");
+            if (sp_ucount <= 0 || sp_vcount <= 0 || divS <= 0 || divT <= 0)
                 return;
-            }
-            if (divS <= 0 || divT <= 0)
-            {
-                Logger.Warning($"Unsupported spline patches patch_div_s={divS} patch_div_t={divT} (div must be >0)");
-                return;
-            }
 
-            // 假设 3 是三次样条的兼容值，映射为 1
-            // 准化类型：0=线性，1/3=三次，其他=不支持
-            int normalizedUType = sp_utype switch
-            {
-                0 => 0,    // 线性
-                1 or 3 => 1,// 三次（兼容 3 型）
-                _ => 1      // 未知类型默认三次
-            };
-            int normalizedVType = sp_vtype switch
-            {
-                0 => 0,
-                1 or 3 => 1,
-                _ => 1
-            };
-
-            if (normalizedUType == -1 || normalizedVType == -1)
-            {
-                Logger.Warning($"Unsupported spline type utype={sp_utype} vtype={sp_vtype} (supported: 0=线性, 1/3=三次)");
-                return;
-            }
-
-            var controlPoints = GetControlPoints(sp_ucount, sp_vcount);
-
-            var splinePatch = new VertexInfo[divS + 1, divT + 1];
-
+            int normalizedUType = sp_utype == 0 ? 0 : 1;
+            int normalizedVType = sp_vtype == 0 ? 0 : 1;
             bool isUCubic = normalizedUType == 1;
             bool isVCubic = normalizedVType == 1;
 
-            for (int j = 0; j <= divT; j++)
+            var controlPoints = GetControlPoints(sp_ucount, sp_vcount);
+            var splinePatch = new VertexInfo[divS + 2, divT + 2];
+
+            int uControlStep = isUCubic ? 3 : 1;
+            int vControlStep = isVCubic ? 3 : 1;
+
+            for (int j = 0; j <= divT + 1; j++)
             {
-                int vControlStep = isVCubic ? 3 : 1;
-                float vGlobal = (float)j * (sp_vcount - vControlStep) / divT;
+                float vGlobal = (float)j * (divT) / divT;
                 int vPatch = (int)vGlobal;
                 float v = vGlobal - vPatch;
-
-                // 边界处理：最后一个分段强制取1.0
-                if (j == divT)
-                {
-                    vPatch = Math.Max(0, (sp_vcount - vControlStep) - 1);
-                    v = 1.0f;
-                }
-
                 float[] vCoeff = isVCubic ? BernsteinCoeff(v) : LinearCoeff(v);
 
-                for (int i = 0; i <= divS; i++)
+                for (int i = 0; i <= divS + 1; i++)
                 {
-                    int uControlStep = isUCubic ? 3 : 1;
-                    float uGlobal = (float)i * (sp_ucount - uControlStep) / divS;
+                    float uGlobal = (float)i * (divS) / divS;
                     int uPatch = (int)uGlobal;
                     float u = uGlobal - uPatch;
-
-                    // 最后一个分段强制取1.0
-                    if (i == divS)
-                    {
-                        uPatch = Math.Max(0, (sp_ucount - uControlStep) - 1);
-                        u = 1.0f;
-                    }
-
                     float[] uCoeff = isUCubic ? BernsteinCoeff(u) : LinearCoeff(u);
 
-                    // 双线性/双三次插值计算当前顶点
                     var currentVertex = default(VertexInfo);
-                    currentVertex.Position = Vector4.Zero;
-                    currentVertex.Normal = Vector4.Zero;
-                    currentVertex.Texture = Vector4.Zero;
-                    currentVertex.Color = Vector4.Zero;
-
-                    // 插值维度：线性=2个控制点，三次=4个控制点
                     int uDim = isUCubic ? 4 : 2;
                     int vDim = isVCubic ? 4 : 2;
 
@@ -652,38 +598,20 @@ namespace ScePSP.Core.GpuBackEnd
                             int uIndex = uPatch + ui;
                             int vIndex = vPatch + vi;
                             if (uIndex >= sp_ucount || vIndex >= sp_vcount)
-                            {
-                                Logger.Warning($"Spline index out of range: uIndex={uIndex} (max={sp_ucount - 1}), vIndex={vIndex} (max={sp_vcount - 1})");
                                 continue;
-                            }
 
-                            PointMultAdd(
-                                ref currentVertex,
-                                ref controlPoints[uIndex, vIndex],
-                                uCoeff[ui] * vCoeff[vi]
-                            );
+                            PointMultAdd(ref currentVertex, ref controlPoints[uIndex, vIndex], uCoeff[ui] * vCoeff[vi]);
                         }
                     }
 
                     currentVertex.Texture.X = uGlobal;
                     currentVertex.Texture.Y = vGlobal;
-
                     splinePatch[i, j] = currentVertex;
                 }
             }
 
             GpuProcessor.GpuBackEnd.BeforeDraw(GpuStateStructPointer);
-            GpuProcessor.GpuBackEnd.DrawSpline(
-                GlobalGpuState,
-                GpuStateStructPointer,
-                splinePatch,
-                sp_ucount,
-                sp_vcount,
-                sp_utype,
-                sp_vtype,
-                normalizedUType,
-                normalizedVType
-            );
+            GpuProcessor.GpuBackEnd.DrawSpline(GlobalGpuState, GpuStateStructPointer, splinePatch, sp_ucount, sp_vcount, sp_utype, sp_vtype, normalizedUType, normalizedVType);
         }
 
         internal void JumpRelativeOffset(uint Address)
@@ -693,7 +621,7 @@ namespace ScePSP.Core.GpuBackEnd
             if (InstructionAddressStall != 0 && newAddress >= InstructionAddressStall)
             {
                 //Logger.Warning($"Process {Id} 0x{InstructionAddressCurrent:X} -> 0x{newAddress:X} | Stall 0x{InstructionAddressStall:X}");
-                SetInstructionAddressStall(0);
+                if (PSPDrivers.GameInfo.IsIso) SetInstructionAddressStall(0);
             }
             InstructionAddressCurrent = newAddress;
         }

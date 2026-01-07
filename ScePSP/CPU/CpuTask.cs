@@ -21,6 +21,7 @@ using ScePSP.Hle.Vfs.Local;
 using ScePSP.Hle.Vfs.MemoryStick;
 using ScePSP.Hle.Vfs.Zip;
 using ScePSPUtils;
+using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -198,6 +199,8 @@ namespace ScePSP.Runner.Tasks.Cpu
         {
             SetVirtualFolder(Path.GetDirectoryName(fileName));
 
+            PSPDrivers.GameInfo.FileName = fileName;
+
             var memoryStream = new PspMemoryStream(PspMemory);
 
             var arguments = new[]
@@ -211,7 +214,8 @@ namespace ScePSP.Runner.Tasks.Cpu
             //Stream ElfLoadStream = null;
 
             var format = new FormatDetector().DetectSubType(loadStream);
-            string title = null;
+            string title = "";
+            string id = "";
             switch (format)
             {
                 case FormatDetector.SubType.Pbp:
@@ -244,12 +248,16 @@ namespace ScePSP.Runner.Tasks.Cpu
                         arguments[0] = "disc0:/PSP/GAME/SYSDIR/EBOOT.BIN";
 
                         var iso = SetIso(fileName);
+                        PSPDrivers.GameInfo.IsIso = true;
+
                         Logger.TryCatch(() =>
                         {
                             var paramSfo = new Psf().Load(iso.Root.Locate("/PSP_GAME/PARAM.SFO").Open());
                             title = (string)paramSfo.EntryDictionary["TITLE"];
+                            id = (string)paramSfo.EntryDictionary.GetOrDefault("DISC_ID", ""); //GAMEDATA_ID
+                            PSPDrivers.GameInfo.Psf = paramSfo;
+                            PSPDrivers.GameInfo.ID = id;
                         });
-
                         string[] filesToTry = {
                             "/PSP_GAME/SYSDIR/BOOT.BIN",
                             "/PSP_GAME/SYSDIR/EBOOT.BIN",
@@ -311,6 +319,9 @@ namespace ScePSP.Runner.Tasks.Cpu
                     loadException = e;
                 }
             }
+
+            //Console.WriteLine($"Title {title}");
+            if (title != "") PSPDrivers.GameInfo.Title = title;
 
             if (loadException != null) throw loadException;
 
@@ -381,7 +392,7 @@ namespace ScePSP.Runner.Tasks.Cpu
                     // threads has secondary effects that I have to consideer first.
                     var tickAlternate = false;
 
-                    PspRtc.Update();
+                    //PspRtc.Update();
                     while (true)
                     {
                         ThreadTaskQueue.HandleEnqueued();
@@ -391,7 +402,7 @@ namespace ScePSP.Runner.Tasks.Cpu
 
                         HleThreadManager.StepNext(DoBeforeSelectingNext: () =>
                         {
-                            //PspRtc.Update();
+                            PspRtc.Update();
                         });
                     }
                 }

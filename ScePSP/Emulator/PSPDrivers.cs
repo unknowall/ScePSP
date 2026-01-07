@@ -17,6 +17,7 @@ using ScePSP.Core.GpuBackEnd.OpenGL;
 using ScePSP.Core.GpuBackEnd.Soft;
 using ScePSP.Core.Memory;
 using ScePSP.Hle;
+using ScePSP.Hle.Formats;
 using ScePSP.Hle.Interop;
 using ScePSP.Hle.Loader;
 using ScePSP.Hle.Managers;
@@ -93,6 +94,10 @@ namespace ScePSP
             public static string Title;
 
             public static string ID;
+
+            public static bool IsIso;
+
+            public static Psf Psf;
         }
 
         public static class Tasks
@@ -302,7 +307,7 @@ namespace ScePSP
 
             Tasks.GpuTask = new GpuTask();
             Tasks.AudioTask = new AudioTask();
-            Tasks.DisplayTask = new DisplayTask(HLE.HleInterruptManager, Devices.Display);
+            Tasks.DisplayTask = new DisplayTask();
             Tasks.CpuTask = new CpuTask();
 
             Runner = new PspRunner();

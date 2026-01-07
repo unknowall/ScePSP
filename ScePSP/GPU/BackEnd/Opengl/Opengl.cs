@@ -197,11 +197,17 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             VertexType = GpuState.VertexState.Type;
 
             PrepareStateCommon(GpuState, ScaleViewport);
-            PrepareStateDraw(GpuState);
-            PrepareStateMatrix(GpuState, out _worldViewProjectionMatrix);
 
-            PrepareState_Texture_Common(GpuState);
-            PrepareState_Texture_3D(GpuState);
+            if (GpuState.ClearingMode)
+            {
+                PrepareStateClear(GpuState);
+            }
+            else
+            {
+                PrepareStateDraw(GpuState);
+            }
+
+            PrepareStateMatrix(GpuState, out _worldViewProjectionMatrix);
 
             PrepareDrawStateFirst();
 
@@ -273,26 +279,21 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             int patchUCount = Patch.GetLength(0);
             int patchVCount = Patch.GetLength(1);
 
-            if (patchUCount <= 1 || patchVCount <= 1)
-            {
-                //Logger.Warning($"DrawSpline: Patch dimension invalid (U={patchUCount}, V={patchVCount})");
-                return;
-            }
-            if (sp_ucount <= 1 || sp_vcount <= 1)
-            {
-                //Logger.Warning($"DrawSpline: Invalid control point count (U={sp_ucount}, V={sp_vcount})");
-                return;
-            }
-
             GpuState = GpuStateStruct;
             VertexType = GpuState.VertexState.Type;
 
             PrepareStateCommon(GpuState, ScaleViewport);
-            PrepareStateDraw(GpuState);
-            PrepareStateMatrix(GpuState, out _worldViewProjectionMatrix);
 
-            PrepareState_Texture_Common(GpuState);
-            PrepareState_Texture_3D(GpuState);
+            if (GpuState.ClearingMode)
+            {
+                PrepareStateClear(GpuState);
+            }
+            else
+            {
+                PrepareStateDraw(GpuState);
+            }
+
+            PrepareStateMatrix(GpuState, out _worldViewProjectionMatrix);
 
             PrepareDrawStateFirst();
 
@@ -587,14 +588,12 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
             var drawBuffer = gpuState.DrawBufferState;
 
-            // 如果目的 DrawBuffer 的行宽或每像素大小和传输描述不一致，退回到通用实现以保证正确性
             if (bytesPerPixel != drawBuffer.BytesPerPixel || textureTransferState.DestinationLineWidth != drawBuffer.Width)
             {
                 TransferGeneric(gpuState);
                 return;
             }
 
-            // 计算缓冲区总大小以供安全访问（以行宽计算）
             var sourceLineWidth = textureTransferState.SourceLineWidth;
             var destLineWidth = textureTransferState.DestinationLineWidth; // 应当等于 drawBuffer.Width
 
@@ -610,7 +609,6 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                 return;
             }
 
-            // 逐行拷贝，注意源/目的可能有不同的行首偏移
             for (uint y = 0; y < textureTransferState.Height; y++)
             {
                 var rowSourceOffset = (uint)(sourceLineWidth * (y + sourceY) + sourceX);
@@ -622,7 +620,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                     textureTransferState.Width * bytesPerPixel
                 );
             }
-            // 完成后，不在此强制刷新 GPU 纹理缓存；上层或 RenderbufferManager 会在需要时使用 DrawBuffer 数据。
+            // 不在此强制刷新 GPU 纹理缓存；上层或 RenderbufferManager 会在需要时使用 DrawBuffer 数据。
         }
 
         private void TransferGeneric(GpuStateStruct gpuState)

@@ -190,7 +190,7 @@ namespace LightGL.Windows
 
             if (!SetPixelFormat(_dc, pf, &pfd))
             {
-                throw new Exception("Error SetPixelFormat failed.");
+                Console.WriteLine("Error SetPixelFormat failed.");
             }
 
             _context = Wgl.wglCreateContext(_dc);

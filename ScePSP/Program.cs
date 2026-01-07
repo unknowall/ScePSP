@@ -1,4 +1,5 @@
-﻿using ScePSP;
+﻿using LightGL;
+using ScePSP;
 using ScePSP.Core;
 using ScePSP.Core.Components.Controller;
 using ScePSP.Core.Components.Display;
@@ -13,12 +14,10 @@ using ScePSPUtils;
 using SDL2;
 using System;
 using System.Diagnostics;
-using System.Windows.Forms;
-
-using static ScePSPUtils.Logger;
-
-using LightGL;
+using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows.Forms;
+using static ScePSPUtils.Logger;
 
 #pragma warning disable CS0436
 #pragma warning disable CS8602
@@ -64,7 +63,7 @@ class Program
             "ScePSP",
             SDL.SDL_WINDOWPOS_CENTERED, SDL.SDL_WINDOWPOS_CENTERED,
             PspDisplay.MaxVisibleWidth * 2, PspDisplay.MaxVisibleHeight * 2,
-            SDL.SDL_WindowFlags.SDL_WINDOW_SHOWN | SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE
+            SDL.SDL_WindowFlags.SDL_WINDOW_SHOWN | SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE | SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL
         );
 
         SDL.SDL_SysWMinfo wmInfo = new SDL.SDL_SysWMinfo();
@@ -104,6 +103,17 @@ class Program
         pspEmulator = new PspEmulator();
 
         pspEmulator.Start(ofn.FileName, false, false);
+
+        var title = "ScePSP";
+        if (PSPDrivers.GameInfo.ID != null)
+        {
+            title += " - " + PSPDrivers.GameInfo.ID;
+        }
+        if (PSPDrivers.GameInfo.Title != "")
+        {
+            title += " - " + PSPDrivers.GameInfo.Title;
+        }
+        SDL.SDL_SetWindowTitle(window, title);
 
         RunMainLoop();
     }

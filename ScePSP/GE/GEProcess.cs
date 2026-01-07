@@ -74,6 +74,8 @@ namespace ScePSP.Core.GpuBackEnd
 
         public SignalBehavior Signal;
 
+        int _primCount;
+
         //Action[] InstructionSwitch = new Action[256];
 
         internal GEProcess(PspMemory Memory, GpuProcessor GpuProcessor, int Id)
@@ -465,8 +467,6 @@ namespace ScePSP.Core.GpuBackEnd
             }
             return controlPoints;
         }
-
-        int _primCount;
 
         private void DrawBezier(int uCount, int vCount)
         {

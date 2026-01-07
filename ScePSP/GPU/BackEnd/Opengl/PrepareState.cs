@@ -8,6 +8,16 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 {
     public unsafe partial class OpenglBackEnd : GpuBackEnd
     {
+        public enum TexCoordMode
+        {
+            Default = 0,
+            GU_ENV_MAP = 1,
+            GU_POSITION = 2,
+            GU_NORMAL = 3,
+            GU_NORMALIZED_NORMAL = 4,
+            GU_UV = 5,
+        }
+
         private DepthFunction DepthFunctionTranslate(int pspFunc)
         {
             return pspFunc switch
@@ -24,10 +34,28 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             };
         }
 
-        private void PrepareDrawStateFirst()
+        public void PrepareStateCommon(GpuStateStruct gpuState, int scaleViewport)
         {
             if (_shader == null) DrawInitVertices();
 
+            var viewport = gpuState.Viewport;
+
+            // PSP 中 viewport 坐标通常以左上为原点，OpenGL 以左下为原点
+            var left = (int)viewport.RegionTopLeft.X * scaleViewport;
+            var top = (int)viewport.RegionTopLeft.Y * scaleViewport;
+            var width = Math.Max(1, (int)viewport.RegionSize.X * scaleViewport);
+            var height = Math.Max(1, (int)viewport.RegionSize.Y * scaleViewport);
+
+            GL.Viewport(left, top, width, height);
+
+            //GL.Disable(GL.GL_LIGHTING);
+            //GL.Disable(GL.GL_POLYGON_OFFSET_FILL);
+            //GL.EnableDisable(GL.GL_DITHER, true);
+
+        }
+
+        private void PrepareShaderTexSet()
+        {
             var vertexType = GpuState.VertexState.Type;
 
             ShaderInfo.matrixWorldViewProjection.Set(_worldViewProjectionMatrix);
@@ -112,6 +140,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                 GL.DepthRange(0, 1);
                 GL.Disable(GL.GL_DEPTH_TEST);
                 GL.Disable(GL.GL_LIGHTING);
+                //PrepareState_Lighting(gpuState);
             }
             else
             {
@@ -197,11 +226,20 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                 return;
             }
 
-            //GL.EnableDisable(EnableCap.CullFace, false);
-
-            GL.CullFace(gpuState.BackfaceCullingState.FrontFaceDirection == FrontFaceDirectionEnum.ClockWise
+            var face = gpuState.BackfaceCullingState.FrontFaceDirection == FrontFaceDirectionEnum.ClockWise
                 ? GL.GL_FRONT
-                : GL.GL_BACK);
+                : GL.GL_BACK;
+
+            //if(face == GL.GL_FRONT)
+            //{
+            //    ShaderInfo.hasReversedNormal.Set(true);
+            //}
+            //else
+            //{
+            //    ShaderInfo.hasReversedNormal.Set(false);
+            //}
+
+            GL.CullFace(face);
         }
 
         private void PrepareState_Depth(GpuStateStruct gpuState)
@@ -230,9 +268,6 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
         private void PrepareState_Colors_3D(GpuStateStruct gpuState)
         {
-            if (ShaderInfo.uniformColor != null)
-                ShaderInfo.uniformColor.Set(gpuState.LightingState.AmbientModelColor.ToVector4());
-
             GL.EnableDisable(GL.GL_COLOR_MATERIAL, VertexType.HasColor);
         }
 
@@ -270,7 +305,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             }
 
             ShaderInfo.materialSpecular.Set(lighting.SpecularModelColor.ToVector4());
-            ShaderInfo.materialShininess.Set(Math.Clamp(lighting.SpecularPower, 0f, 128f));
+            ShaderInfo.materialShininess.Set(Math.Clamp(lighting.SpecularPower, 10f, 128f));
 
             const int LIGHT_MODEL_COLOR_CONTROL_SEPARATE_SPECULAR_COLOR = 1;
             const int LIGHT_MODEL_COLOR_CONTROL_SINGLE_COLOR = 0;
@@ -303,31 +338,41 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
                 lightAmbient[n] = light.AmbientColor.ToVector4();
 
+                //if (lightAmbient[n].X == 0 && lightAmbient[n].Y == 0 && lightAmbient[n].Z == 0)
+                //{
+                //    lightAmbient[n] = DefWhiteColor;
+                //}
+
                 lightDiffuse[n] = light.DiffuseColor.ToVector4();
 
-                if (lightDiffuse[n].X == 0 && lightDiffuse[n].Y == 0 && lightDiffuse[n].Z == 0)
-                {
-                    lightDiffuse[n] = DefWhiteColor;
-                }
+                //if (lightDiffuse[n].X == 0 && lightDiffuse[n].Y == 0 && lightDiffuse[n].Z == 0)
+                //{
+                //    lightDiffuse[n] = DefWhiteColor;
+                //}
 
                 lightPosition[n] = light.Position.ToVector4();
 
                 lightSpecular[n] = light.SpecularColor.ToVector4();
 
-                if (light.SpotDirection.X == 0 && light.SpotDirection.Y == 0 && light.SpotDirection.Z == 0)
-                {
-                    lightSpotDirection[n] = new Vector3(0, 0, -1); // 指向-Z轴
-                }
-                else
+                //if (lightSpecular[n].X == 0 && lightSpecular[n].Y == 0 && lightSpecular[n].Z == 0)
+                //{
+                //    lightSpecular[n] = DefWhiteColor;
+                //}
+
+                //if (light.SpotDirection.X == 0 && light.SpotDirection.Y == 0 && light.SpotDirection.Z == 0)
+                //{
+                //    lightSpotDirection[n] = new Vector3(0, 0, -1); // 指向-Z轴
+                //}
+                //else
                 {
                     lightSpotDirection[n] = light.SpotDirection.ToRVector3();
                 }
 
-                if (light.SpotExponent == 0)
-                {
-                    lightSpotExponent[n] = 180f;
-                }
-                else
+                //if (light.SpotExponent == 0)
+                //{
+                //    lightSpotExponent[n] = 180f;
+                //}
+                //else
                 {
                     lightSpotExponent[n] = light.SpotExponent;
                 }
@@ -439,15 +484,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                         1.0f
                 );
 
-                //GL.ActiveTexture(TextureUnit.Texture0);
-                //GL.MatrixMode(MatrixMode.Texture);
-                //GL.LoadIdentity();
-                //
-                //GL.Scale(
-                //	1.0f / Mipmap0->BufferWidth,
-                //	1.0f / Mipmap0->TextureHeight,
-                //	1.0f
-                //);
+                ShaderInfo.matrixTexture.Set(_textureMatrix);
             }
         }
 
@@ -463,47 +500,48 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                 switch (textureMappingState.TextureMapMode)
                 {
                     case TextureMapMode.GuTextureCoords:
-
                         _textureMatrix = _textureMatrix *
                                          Matrix4x4.CreateTranslation(textureState.OffsetU, textureState.OffsetV, 0) *
                                          Matrix4x4.CreateScale(textureState.ScaleU, textureState.ScaleV, 1);
+
+                        ShaderInfo.TextureMode.Set((int)TexCoordMode.Default);
                         break;
+
                     case TextureMapMode.GuTextureMatrix:
                         switch (gpuState.TextureMappingState.TextureProjectionMapMode)
                         {
+                            case TextureProjectionMapMode.GuPosition:
+                                ShaderInfo.TextureMode.Set((int)TexCoordMode.GU_POSITION);
+                                break;
+                            case TextureProjectionMapMode.GuNormal:
+                                ShaderInfo.TextureMode.Set((int)TexCoordMode.GU_NORMAL);
+                                break;
+                            case TextureProjectionMapMode.GuNormalizedNormal:
+                                ShaderInfo.TextureMode.Set((int)TexCoordMode.GU_NORMALIZED_NORMAL);
+                                break;
+                            case TextureProjectionMapMode.GuUv:
+                                ShaderInfo.TextureMode.Set((int)TexCoordMode.GU_UV);
+                                break;
                             default:
                                 Console.Error.WriteLine("NotImplemented: GU_TEXTURE_MATRIX: {0}", gpuState.TextureMappingState.TextureProjectionMapMode);
                                 break;
                         }
+                        //Console.WriteLine($"GuTextureMatrix tfx {textureState.Effect} tcc {textureState.ColorComponent}");
                         break;
+
                     case TextureMapMode.GuEnvironmentMap:
-                        Console.Error.WriteLine("NotImplemented: GU_ENVIRONMENT_MAP");
+                        {
+                            ShaderInfo.TextureMode.Set((int)TexCoordMode.GU_ENV_MAP);
+                        }
                         break;
+
                     default:
-                        Console.Error.WriteLine("NotImplemented TextureMappingState->TextureMapMode: " + textureMappingState.TextureMapMode);
+                        Console.Error.WriteLine("NotImplemented TextureMappingState.TextureMapMode: " + textureMappingState.TextureMapMode);
                         break;
                 }
+
+                ShaderInfo.matrixTexture.Set(_textureMatrix);
             }
-        }
-
-        public static void PrepareStateCommon(GpuStateStruct gpuState, int scaleViewport)
-        {
-            var viewport = gpuState.Viewport;
-
-            // PSP 中 viewport 坐标通常以左上为原点，OpenGL 以左下为原点
-            // 简单映射
-            var left = (int)viewport.RegionTopLeft.X * scaleViewport;
-            var top = (int)viewport.RegionTopLeft.Y * scaleViewport;
-            var width = Math.Max(1, (int)viewport.RegionSize.X * scaleViewport);
-            var height = Math.Max(1, (int)viewport.RegionSize.Y * scaleViewport);
-
-            GL.Viewport(left, top, width, height);
-
-            GL.Disable(GL.GL_LIGHTING);
-            GL.Disable(GL.GL_POLYGON_OFFSET_FILL);
-
-            GL.EnableDisable(GL.GL_DITHER, true);
-
         }
 
         public static void PrepareStateMatrix(GpuStateStruct gpuState, out Matrix4x4 worldViewProjectionMatrix)

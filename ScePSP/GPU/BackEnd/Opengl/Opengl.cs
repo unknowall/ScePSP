@@ -1,4 +1,5 @@
-﻿using LightGL;
+﻿using cscodec.h264.decoder;
+using LightGL;
 using ScePSP.Core.GpuBackEnd.Formats;
 using ScePSP.Core.GpuBackEnd.State;
 using ScePSP.Core.GpuBackEnd.VertexReading;
@@ -55,6 +56,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
             public GlUniform texture0;
             public GlUniform uniformColor;
+            public GlUniform TextureMode;
 
             public GlUniform colorTest;
 
@@ -193,6 +195,11 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             if (Patch == null) return;
             if (Patch.Length == 0) return;
 
+            int s_len = Patch.GetLength(0);
+            int t_len = Patch.GetLength(1);
+
+            if (s_len <= 1 || t_len <= 1)  return;
+
             GpuState = GpuStateStruct;
             VertexType = GpuState.VertexState.Type;
 
@@ -209,16 +216,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
             PrepareStateMatrix(GpuState, out _worldViewProjectionMatrix);
 
-            PrepareDrawStateFirst();
-
-            int s_len = Patch.GetLength(0);
-            int t_len = Patch.GetLength(1);
-
-            if (s_len <= 1 || t_len <= 1)
-            {
-                // 无法构造三角形
-                return;
-            }
+            PrepareShaderTexSet();
 
             float s_len_float = s_len;
             float t_len_float = t_len;
@@ -270,14 +268,12 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
         public override void DrawSpline(GlobalGpuState GlobalGpuState, GpuStateStruct GpuStateStruct, VertexInfo[,] Patch,
             int sp_ucount, int sp_vcount, int sp_utype, int sp_vtype, int normalizedUType, int normalizedVType)
         {
-            if (Patch == null || Patch.Length == 0)
-            {
-                //Logger.Warning("DrawSpline: Patch is null or empty");
-                return;
-            }
+            if (Patch == null || Patch.Length == 0) return;
 
             int patchUCount = Patch.GetLength(0);
             int patchVCount = Patch.GetLength(1);
+
+            if (patchUCount <= 1 || patchVCount <= 1) return;
 
             GpuState = GpuStateStruct;
             VertexType = GpuState.VertexState.Type;
@@ -295,7 +291,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
             PrepareStateMatrix(GpuState, out _worldViewProjectionMatrix);
 
-            PrepareDrawStateFirst();
+            PrepareShaderTexSet();
 
             var mipmap0 = GpuState.TextureMappingState.TextureState.Mipmap0;
             float mipmapWidth = mipmap0.TextureWidth > 0 ? mipmap0.TextureWidth : 1.0f;
@@ -437,7 +433,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
                 PrepareStateMatrix(GpuState, out _worldViewProjectionMatrix);
 
-                PrepareDrawStateFirst();
+                PrepareShaderTexSet();
             }
 
             uint morpingVertexCount, totalVerticesWithoutMorphing;

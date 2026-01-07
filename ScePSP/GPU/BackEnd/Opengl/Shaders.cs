@@ -2,7 +2,6 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 {
     public class Shaders
     {
-        //language=c++
         static public string ShaderFrag = @"
 			#extension GL_EXT_gpu_shader4 : enable
 
@@ -249,26 +248,23 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 					}
 
 					if (tfx == GU_TFX_MODULATE) {
-						if (lightenable) {
-							gl_FragColor.rgb = texColor.rgb * gl_FragColor.rgb * litColor.rgb;
-						} else {
-							gl_FragColor.rgb = texColor.rgb * gl_FragColor.rgb;
-						}
+						gl_FragColor.rgb = texColor.rgb * gl_FragColor.rgb;
 						gl_FragColor.a = (tcc == GU_TCC_RGBA) ? (gl_FragColor.a * texColor.a) : texColor.a;
-					} 
+						if (lightenable) {
+							gl_FragColor.rgb = gl_FragColor.rgb * litColor.rgb;
+						}
+					}
 					else if (tfx == GU_TFX_DECAL) {
 						if (tcc == GU_TCC_RGB) {
+							gl_FragColor.rgb = texColor.rgb;
 							if (lightenable) {
-								gl_FragColor.rgb = texColor.rgb * litColor.rgb;
-							} else {
-								gl_FragColor.rgb = texColor.rgb;
+								gl_FragColor.rgb = gl_FragColor.rgb * litColor.rgb;
 							}
 							gl_FragColor.a = texColor.a;
 						} else {
+							gl_FragColor.rgb = texColor.rgb * gl_FragColor.rgb;
 							if (lightenable) {
-								gl_FragColor.rgb = texColor.rgb * gl_FragColor.rgb * litColor.rgb;
-							} else {
-								gl_FragColor.rgb = texColor.rgb * gl_FragColor.rgb;
+								gl_FragColor.rgb = gl_FragColor.rgb * litColor.rgb;
 							}
 							gl_FragColor.a = texColor.a;
 						}
@@ -329,6 +325,10 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 					gl_FragColor = gl_FragColor * litColor;
 				}
 
+				if (!clearingMode && lightenable) {
+					gl_FragColor = litColor;
+				}
+
 				//if (colorTest) {
 				//	discard; return;
 				//}
@@ -343,6 +343,8 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 			uniform mat4 matrixView;
 			uniform int weightCount;
 			uniform bool hasReversedNormal;
+			
+			uniform int TextureMode;
 
 			attribute vec4 vertexTexCoords;
 			attribute vec4 vertexColor;
@@ -404,6 +406,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 			void main() {
 
 				vec4 skinnedPos = performSkinning(vertexPosition);
+
 				vec4 skinnedNormal = performSkinning(prepareNormal(vertexNormal));
 
 				gl_Position = matrixWorldViewProjection * skinnedPos;
@@ -413,11 +416,37 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 				v_normal = matrixWorld * skinnedNormal;
 
 				vec3 cameraPos = inverse(matrixView)[3].xyz;
+
 				v_viewDir = normalize(cameraPos - v_worldPos);
 
 				v_backtexCoords = (gl_Position.xy + vec2(1.0, 1.0)) / 2.0;
+
 				v_color = vertexColor;
-				v_texCoords = (matrixTexture * vertexTexCoords).xy;
+
+				if(TextureMode == 0){
+					v_texCoords = (matrixTexture * vertexTexCoords).xy;
+
+				} else if(TextureMode == 1){
+					vec3 worldPos = v_worldPos;
+					vec3 viewDir = normalize(cameraPos - worldPos);
+					vec3 normal = normalize(v_normal.xyz);
+					vec3 reflectVec = reflect(-viewDir, normal);
+					v_texCoords = (reflectVec.xy * 0.5 + 0.5);
+
+				} else if(TextureMode == 2){ //GU_POSITION
+					v_texCoords = (matrixTexture * vertexPosition).xy;
+
+				} else if(TextureMode == 3){ //GU_NORMAL
+					v_texCoords = (matrixTexture * vertexNormal).xy;
+
+				} else if(TextureMode == 4){ //GU_NORMALIZED_NORMAL
+					vec4 normalizedNormal = normalize(vertexNormal);
+					v_texCoords = (matrixTexture * normalizedNormal).xy;
+
+				} else if(TextureMode == 5){ //GU_UV
+					v_texCoords = (matrixTexture * vertexTexCoords).xy;
+				}
+
 			}
 		";
     }

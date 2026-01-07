@@ -14,8 +14,8 @@ _(Figure 3: runing PSPDemo/morphskin.elf)_
 _(Figure 4: runing PSPDemo/zbufferfog.elf)_  
 <img width="962" height="576" alt="PSP3" src="https://github.com/user-attachments/assets/73c29348-f7ba-47a4-86d0-47c0cc1ff248" />
 
-_(Figure 5: runing PSPDemo/cubevfpu.prx)_  
-<img width="962" height="576" alt="PSP4" src="https://github.com/user-attachments/assets/bb01b8b8-229e-480e-bcea-acc89fd90dd4" />
+_(Figure 5: runing PSPDemo/lights.prx)_  
+<img width="962" height="576" alt="捕获" src="https://github.com/user-attachments/assets/b80b1d4d-26ed-4664-8abb-0bf42749d7f8" />
 
 #### Compilation 
 - Environment: .NET 8.0

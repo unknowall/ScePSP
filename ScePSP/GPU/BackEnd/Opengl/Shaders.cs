@@ -40,29 +40,36 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 			#define GU_NAND          14
 			#define GU_SET           15
 
-			uniform vec4 materialEmission;    // 发射光
-			uniform vec4 materialAmbient;     // 环境光
-			uniform vec4 materialDiffuse;     // 漫反射
-			uniform vec4 materialSpecular;    // 镜面反射
-			uniform float materialShininess;  // 镜面高光指数
-			uniform vec4 lightModelAmbient;
-			uniform int lightModelColorControl;
-
 			#define LIGHT_MODEL_COLOR_CONTROL_SEPARATE_SPECULAR_COLOR 1
 			#define LIGHT_MODEL_COLOR_CONTROL_SINGLE_COLOR 0
 			#define MAX_LIGHTS 4
 
-			uniform bool lightEnableds[MAX_LIGHTS];
-			uniform vec4 lightAmbient[MAX_LIGHTS];    // 光源环境光
-			uniform vec4 lightDiffuse[MAX_LIGHTS];    // 光源漫反射
-			uniform vec4 lightSpecular[MAX_LIGHTS];   // 光源镜面反射
-			uniform vec4 lightPosition[MAX_LIGHTS];   // 光源位置 (w=1:点光源, w=0:方向光)
-			uniform vec3 lightSpotDirection[MAX_LIGHTS]; // 聚光灯方向
-			uniform float lightSpotExponent[MAX_LIGHTS]; // 聚光灯指数
-			uniform float lightSpotCutoff[MAX_LIGHTS];   // 聚光灯截止角 (0-90, 180=无聚光)
-			uniform float lightConstantAttenuation[MAX_LIGHTS];  // 常数衰减
-			uniform float lightLinearAttenuation[MAX_LIGHTS];    // 线性衰减
-			uniform float lightQuadraticAttenuation[MAX_LIGHTS]; // 二次衰减
+			struct Light {
+				vec4 ambient;
+				vec4 diffuse;
+				vec4 specular;
+				vec4 position;       // w=0: 方向光, w=1: 点光源/聚光灯
+				vec3 spotDirection;
+				float spotExponent;
+				float spotCutoff;
+				float constantAttenuation;
+				float linearAttenuation;
+				float quadraticAttenuation;
+				bool enabled;
+				int type; // Directional = 0, PointLight = 1, SpotLight = 2
+			};
+
+			layout(std140) uniform LightBlock {
+				vec4 materialEmission;
+				vec4 materialAmbient;
+				vec4 materialDiffuse;
+				vec4 materialSpecular;
+				float materialShininess;
+				vec4 lightModelAmbient;
+				int lightModelColorControl;
+				int MaterialColorComponents; // Ambient = 1, Diffuse = 2, Specular = 4
+				Light lights[MAX_LIGHTS];
+			};
 
 			uniform bool lightenable;
 			uniform vec4 uniformColor;
@@ -105,113 +112,140 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 			}
 
 			vec4 calculateSingleLight(int lightIdx, vec3 normal, vec3 viewDir, vec3 worldPos) {
-				if (!lightEnableds[lightIdx]) return vec4(0.0);
+				Light l = lights[lightIdx];
+				if (!l.enabled) return vec4(0.0);
 
 				vec4 result = vec4(0.0);
 				vec3 L = vec3(0.0);
 				float attenuation = 1.0;
 
-				if (lightPosition[lightIdx].w == 0.0) {
-					// 方向光 (w=0)
-					L = normalize(lightPosition[lightIdx].xyz);
+				// 根据类型计算光向量 L 和衰减
+				if (l.type == 0) {
+					// 方向光 (Directional)
+					L = normalize(l.position.xyz);
 				} else {
-					// 点光源/聚光灯 (w=1)
-					L = lightPosition[lightIdx].xyz - worldPos;
+					// 点光源 (Point) 或 聚光灯 (Spot)
+					L = l.position.xyz - worldPos;
 					float distance = length(L);
 					L = normalize(L);
 
-					attenuation = 1.0 / (lightConstantAttenuation[lightIdx] + 
-					                     lightLinearAttenuation[lightIdx] * distance + 
-					                     lightQuadraticAttenuation[lightIdx] * distance * distance);
+					attenuation = 1.0 / (l.constantAttenuation + 
+					                     l.linearAttenuation * distance + 
+					                     l.quadraticAttenuation * distance * distance);
 
-					if (lightSpotCutoff[lightIdx] < 180.0) {
-						vec3 spotDir = normalize(lightSpotDirection[lightIdx]);
-						float spotFactor = dot(-L, spotDir);
-						if (spotFactor < cos(radians(lightSpotCutoff[lightIdx]))) {
-							attenuation = 0.0;
-						} else {
-							spotFactor = pow(spotFactor, lightSpotExponent[lightIdx]);
-							attenuation *= spotFactor;
+					if (l.type == 2) {
+						// 聚光灯 (SpotLight)
+						if (l.spotCutoff < 180.0) {
+							vec3 spotDir = normalize(l.spotDirection);
+							float spotFactor = dot(-L, spotDir);
+							if (spotFactor < cos(radians(l.spotCutoff))) {
+								attenuation = 0.0;
+							} else {
+								spotFactor = pow(spotFactor, l.spotExponent);
+								attenuation *= spotFactor;
+							}
 						}
 					}
 				}
 
 				if (attenuation <= 0.0) return vec4(0.0);
 
-				result += lightAmbient[lightIdx] * materialAmbient;
+				// Ambient = 1, Diffuse = 2, Specular = 4
+				int comps = MaterialColorComponents;
 
-				float NdotL = max(dot(normal, L), 0.0);
-				result += lightDiffuse[lightIdx] * materialDiffuse * NdotL;
+				// 环境光分量
+				if ((comps & 1) != 0) {
+					result += l.ambient * materialAmbient;
+				}
 
-				if (NdotL > 0.0 && materialShininess > 0.0) {
-					vec3 R = reflect(-L, normal);
-					float RdotV = max(dot(R, viewDir), 0.0);
-					float specularFactor = pow(RdotV, materialShininess);
-					result += lightSpecular[lightIdx] * materialSpecular * specularFactor;
+				// 漫反射分量
+				if ((comps & 2) != 0) {
+					float NdotL = max(dot(normal, L), 0.0);
+					result += l.diffuse * materialDiffuse * NdotL;
+				}
+
+				// 镜面反射分量
+				if ((comps & 4) != 0 && materialShininess > 0.0) {
+					float NdotL = max(dot(normal, L), 0.0);
+					if (NdotL > 0.0) {
+						vec3 R = reflect(-L, normal);
+						float RdotV = max(dot(R, viewDir), 0.0);
+						float specularFactor = pow(RdotV, materialShininess);
+						result += l.specular * materialSpecular * specularFactor;
+					}
 				}
 
 				return result * attenuation;
 			}
 
-			// 计算总光照
 			vec4 calculateLighting(vec3 normal, vec3 worldPos, vec3 viewDir) {
+				vec4 finalColor = vec4(0.0);
 
-				vec4 ambientGlobal = lightModelAmbient * materialAmbient;
-				vec4 totalLight = ambientGlobal + materialEmission;
+				// 发射光
+				finalColor += materialEmission;
 
-				for (int i = 0; i < MAX_LIGHTS; i++) {
-					totalLight += calculateSingleLight(i, normal, viewDir, worldPos);
+				// 全局环境光
+				if ((MaterialColorComponents & 1) != 0) {
+					finalColor += materialAmbient * lightModelAmbient;
 				}
 
+				// 累加光源
+				for (int i = 0; i < MAX_LIGHTS; i++) {
+					finalColor += calculateSingleLight(i, normal, viewDir, worldPos);
+				}
+
+				// 分离模式单独计算并叠加镜面光
 				vec4 specularSeparate = vec4(0.0);
 				if (lightModelColorControl == LIGHT_MODEL_COLOR_CONTROL_SEPARATE_SPECULAR_COLOR) {
-					// 重新计算镜面反射分量（单独分离）
-					for (int i = 0; i < MAX_LIGHTS; i++) {
-						if (!lightEnableds[i]) continue;
+					// 只有当材质组件包含镜面反射时才计算
+					if ((MaterialColorComponents & 4) != 0) {
+						for (int i = 0; i < MAX_LIGHTS; i++) {
+							Light l = lights[i];
+							if (!l.enabled) continue;
 
-						vec3 L = vec3(0.0);
-						float attenuation = 1.0;
+							vec3 L = vec3(0.0);
+							float attenuation = 1.0;
 
-						if (lightPosition[i].w == 0.0) {
-							L = normalize(lightPosition[i].xyz);
-						} else {
-							L = lightPosition[i].xyz - worldPos;
-							float distance = length(L);
-							L = normalize(L);
-							attenuation = 1.0 / (lightConstantAttenuation[i] + 
-							                     lightLinearAttenuation[i] * distance + 
-							                     lightQuadraticAttenuation[i] * distance * distance);
+							// 复制光照逻辑用于计算纯镜面分量
+							if (l.type == 0) {
+								L = normalize(l.position.xyz);
+							} else {
+								L = l.position.xyz - worldPos;
+								float distance = length(L);
+								L = normalize(L);
+								attenuation = 1.0 / (l.constantAttenuation + 
+								                     l.linearAttenuation * distance + 
+								                     l.quadraticAttenuation * distance * distance);
 
-							if (lightSpotCutoff[i] < 180.0) {
-								vec3 spotDir = normalize(lightSpotDirection[i]);
-								float spotFactor = dot(-L, spotDir);
-								if (spotFactor < cos(radians(lightSpotCutoff[i]))) {
-									attenuation = 0.0;
-								} else {
-									spotFactor = pow(spotFactor, lightSpotExponent[i]);
-									attenuation *= spotFactor;
+								if (l.type == 2 && l.spotCutoff < 180.0) {
+									vec3 spotDir = normalize(l.spotDirection);
+									float spotFactor = dot(-L, spotDir);
+									if (spotFactor < cos(radians(l.spotCutoff))) {
+										attenuation = 0.0;
+									} else {
+										spotFactor = pow(spotFactor, l.spotExponent);
+										attenuation *= spotFactor;
+									}
+								}
+							}
+
+							if (attenuation > 0.0 && materialShininess > 0.0) {
+								float NdotL = max(dot(normal, L), 0.0);
+								if (NdotL > 0.0) {
+									vec3 R = reflect(-L, normal);
+									float RdotV = max(dot(R, viewDir), 0.0);
+									float specularFactor = pow(RdotV, materialShininess);
+									specularSeparate += l.specular * materialSpecular * specularFactor * attenuation;
 								}
 							}
 						}
-
-						float NdotL = max(dot(normal, L), 0.0);
-						if (NdotL > 0.0 && materialShininess > 0.0) {
-							vec3 R = reflect(-L, normal);
-							float RdotV = max(dot(R, viewDir), 0.0);
-							float specularFactor = pow(RdotV, materialShininess);
-							specularSeparate += lightSpecular[i] * materialSpecular * specularFactor * attenuation;
-						}
 					}
-				}
-
-				// 合并颜色（分离镜面反射时，镜面光不参与主颜色计算，最后叠加）
-				vec4 finalColor = totalLight;
-				if (lightModelColorControl == LIGHT_MODEL_COLOR_CONTROL_SEPARATE_SPECULAR_COLOR) {
+					
+					// 镜面分量叠加到最终颜色
 					finalColor.rgb += specularSeparate.rgb;
 				}
 
 				finalColor = clamp(finalColor, 0.0, 1.0);
-
 				finalColor.a = materialDiffuse.a;
 
 				return finalColor;
@@ -325,9 +359,9 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 					gl_FragColor = gl_FragColor * litColor;
 				}
 
-				if (!clearingMode && lightenable) {
-					gl_FragColor = litColor;
-				}
+				//if (!clearingMode && lightenable) {
+				//	gl_FragColor = litColor;
+				//}
 
 				//if (colorTest) {
 				//	discard; return;

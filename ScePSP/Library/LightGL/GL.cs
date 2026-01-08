@@ -41,6 +41,7 @@ namespace LightGL
     public enum BufferTarget
     {
         ArrayBuffer = 0x8892,
+        UniformBuffer = 0x8A11,
         ElementArrayBuffer = 0x8893,
         ArrayBufferBinding = 0x8894,
         ElementArrayBufferBinding = 0x8895
@@ -388,6 +389,7 @@ namespace LightGL
         public const int GL_ONE_MINUS_CONSTANT_ALPHA = 0x8004;
         public const int GL_BLEND_COLOR = 0x8005;
         public const int GL_ARRAY_BUFFER = 0x8892;
+        public const int GL_UNIFORM_BUFFER = 0x8A11;
         public const int GL_ELEMENT_ARRAY_BUFFER = 0x8893;
         public const int GL_ARRAY_BUFFER_BINDING = 0x8894;
         public const int GL_ELEMENT_ARRAY_BUFFER_BINDING = 0x8895;
@@ -678,6 +680,7 @@ namespace LightGL
         public static readonly glAttachShader AttachShader;
         public static readonly glBindAttribLocation BindAttribLocation;
         public static readonly glBindBuffer BindBuffer;
+        public static readonly glBindBufferBase BindBufferBase;
         public static readonly glBindFramebuffer BindFramebuffer;
         public static readonly glBindRenderbuffer BindRenderbuffer;
         public static readonly glBindTexture BindTexture;
@@ -930,6 +933,9 @@ namespace LightGL
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
     public delegate void glBindBuffer(int target, uint buffer);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+    public delegate void glBindBufferBase(int target, uint slot, uint buffer);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
     public delegate void glBindFramebuffer(int target, uint framebuffer);

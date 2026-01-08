@@ -2,7 +2,10 @@ using LightGL;
 using ScePSP.Core.GpuBackEnd.State;
 using ScePSP.Utils;
 using System;
+using System.IO;
 using System.Numerics;
+using System.Runtime.InteropServices;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ScePSP.Core.GpuBackEnd.OpenGL
 {
@@ -17,6 +20,67 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             GU_NORMALIZED_NORMAL = 4,
             GU_UV = 5,
         }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        private struct LightSubSet
+        {
+            public Vector4 ambient;       // Offset: 0, Size: 16
+            public Vector4 diffuse;       // Offset: 16, Size: 16
+            public Vector4 specular;      // Offset: 32, Size: 16
+            public Vector4 position;      // Offset: 48, Size: 16 (w=0: Dir, w=1: Point/Spot)
+
+            public Vector3 spotDirection; // Offset: 64, Size: 12
+            public float spotExponent;    // Offset: 76, Size: 4  (Total 16 bytes aligned)
+
+            public float spotCutoff;      // Offset: 80, Size: 4
+            public float constantAttenuation; // Offset: 84, Size: 4
+            public float linearAttenuation;    // Offset: 88, Size: 4
+            public float quadraticAttenuation; // Offset: 92, Size: 4 (Total 16 bytes aligned)
+
+            public int enabled;           // Offset: 96, Size: 4 (GLSL bool is 4 bytes in UBO)
+            public int type;              // Offset: 100, Size: 4
+
+            // Padding to align struct size to multiple of 16 (std140 rule)
+            // Current size: 104 bytes. Next 16-byte boundary: 112 bytes.
+            private int _padding1;        // Offset: 104, Size: 4
+            private int _padding2;        // Offset: 108, Size: 4
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        private struct LightSet
+        {
+            public Vector4 materialEmission;    // Offset: 0, Size: 16
+            public Vector4 materialAmbient;     // Offset: 16, Size: 16
+            public Vector4 materialDiffuse;     // Offset: 32, Size: 16
+            public Vector4 materialSpecular;    // Offset: 48, Size: 16
+            public float materialShininess;     // Offset: 64, Size: 4
+
+            // Padding to align lightModelAmbient (vec4) to 16 bytes
+            // Current Offset: 68. Target: 80.
+            private int _pad1;                  // Offset: 68, Size: 4
+            private int _pad2;                  // Offset: 72, Size: 4
+            private int _pad3;                  // Offset: 76, Size: 4
+
+            public Vector4 lightModelAmbient;   // Offset: 80, Size: 16
+            public int lightModelColorControl;  // Offset: 96, Size: 4
+            public int MaterialColorComponents; // Offset: 100, Size: 4
+
+            // Padding to align Lights array start to 16 bytes
+            // Current Offset: 104. Target: 112.
+            private int _pad4;                  // Offset: 104, Size: 4
+            private int _pad5;                  // Offset: 108, Size: 4
+
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public LightSubSet[] Lights;        // Offset: 112, Size: 112 * 4 = 448
+
+            public LightSet()
+            {
+                // Initialize array to avoid null reference
+                Lights = new LightSubSet[4];
+            }
+        }
+
+        LightSet LightData = new LightSet();
 
         private DepthFunction DepthFunctionTranslate(int pspFunc)
         {
@@ -59,8 +123,13 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             var vertexType = GpuState.VertexState.Type;
 
             ShaderInfo.matrixWorldViewProjection.Set(_worldViewProjectionMatrix);
+            ShaderInfo.matrixWorld.Set(GpuState.VertexState.WorldMatrix);
+            ShaderInfo.matrixView.Set(GpuState.VertexState.ViewMatrix);
+
             ShaderInfo.matrixTexture.Set(_textureMatrix);
+
             ShaderInfo.uniformColor.NoWarning().Set(GpuState.LightingState.AmbientModelColor.ToVector4());
+
             ShaderInfo.hasPerVertexColor.Set(vertexType.HasColor);
             ShaderInfo.clearingMode.Set(GpuState.ClearingMode);
             ShaderInfo.hasTexture.Set(GpuState.TextureMappingState.Enabled);
@@ -151,7 +220,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                 PrepareState_DepthTest(gpuState);
                 PrepareState_Stencil(gpuState);
             }
-            //GL.ShadeModel((GpuState.ShadeModel == ShadingModelEnum.Flat) ? ShadingModel.Flat : ShadingModel.Smooth);
+            //GL.ShadeMode1((GpuState.ShadeModel == ShadingModelEnum.Flat) ? ShadingModel.Flat : ShadingModel.Smooth);
             PrepareState_AlphaTest(gpuState);
         }
 
@@ -285,118 +354,62 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
             ShaderInfo.lightenable.Set(true);
 
-            ShaderInfo.matrixWorld.Set(gpuState.VertexState.WorldMatrix);
-            ShaderInfo.matrixView.Set(gpuState.VertexState.ViewMatrix);
-
-            ShaderInfo.materialEmission.Set(lighting.EmissiveModelColor.ToVector4());
-            ShaderInfo.materialAmbient.Set(lighting.AmbientModelColor.ToVector4());
-
-            var DefWhiteColor = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-
-            var DiffuseModelColor = lighting.DiffuseModelColor.ToVector4();
-
-            if (DiffuseModelColor.X == 0 && DiffuseModelColor.Y == 0 && DiffuseModelColor.Z == 0)
-            {
-                ShaderInfo.materialDiffuse.Set(DefWhiteColor);
-            }
-            else
-            {
-                ShaderInfo.materialDiffuse.Set(DiffuseModelColor);
-            }
-
-            ShaderInfo.materialSpecular.Set(lighting.SpecularModelColor.ToVector4());
-            ShaderInfo.materialShininess.Set(Math.Clamp(lighting.SpecularPower, 10f, 128f));
-
             const int LIGHT_MODEL_COLOR_CONTROL_SEPARATE_SPECULAR_COLOR = 1;
             const int LIGHT_MODEL_COLOR_CONTROL_SINGLE_COLOR = 0;
 
-            ShaderInfo.lightModelAmbient.Set(lighting.AmbientLightColor.ToVector4());
-
-            ShaderInfo.lightModelColorControl.Set((int)(lighting.LightModel == LightModelEnum.SeparateSpecularColor
+            LightData.lightModelColorControl = lighting.LightModel == LightModelEnum.SeparateSpecularColor
                 ? LIGHT_MODEL_COLOR_CONTROL_SEPARATE_SPECULAR_COLOR
-                : LIGHT_MODEL_COLOR_CONTROL_SINGLE_COLOR));
+                : LIGHT_MODEL_COLOR_CONTROL_SINGLE_COLOR;
 
-            var lightenables = new int[4];
-            var lightAmbient = new Vector4[4];
-            var lightDiffuse = new Vector4[4];
-            var lightPosition = new Vector4[4];
-            var lightSpecular = new Vector4[4];
-            var lightSpotDirection = new Vector3[4];
-            var lightSpotExponent = new float[4];
-            var lightSpotCutoff = new float[4];
-            var lightConstantAttenuation = new float[4];
-            var lightLinearAttenuation = new float[4];
-            var lightQuadraticAttenuation = new float[4];
+            LightData.lightModelAmbient = lighting.AmbientLightColor.ToVector4();
+
+            LightData.materialAmbient = lighting.AmbientModelColor.ToVector4();
+            LightData.materialEmission = lighting.EmissiveModelColor.ToVector4();
+            LightData.materialDiffuse = lighting.DiffuseModelColor.ToVector4();
+            if (LightData.materialDiffuse.X == 0 && LightData.materialDiffuse.Y == 0 && LightData.materialDiffuse.Z == 0){
+                LightData.materialDiffuse = new Vector4(1, 1, 1, 1);
+            }
+            LightData.materialSpecular = lighting.SpecularModelColor.ToVector4();
+            LightData.materialShininess = Math.Clamp(lighting.SpecularPower, 1f, 128f);
+
+            //Ambient = 1, Diffuse = 2, Specular = 4,
+            //mbientAndDiffuse = Ambient | Diffuse,
+            //DiffuseAndSpecular = Diffuse | Specular,
+            //All = Ambient | DiffuseAndSpecular,
+            LightData.MaterialColorComponents = (int)lighting.MaterialColorComponents;
 
             for (byte n = 0; n < 4; n++)
             {
                 var light = lighting.Light(n);
 
-                lightenables[n] = light.Enabled ? 1 : 0;
+                LightData.Lights[n].enabled = light.Enabled ? 1 : 0;
 
                 if (!light.Enabled) continue;
 
-                lightAmbient[n] = light.AmbientColor.ToVector4();
+                LightData.Lights[n].type = (int)light.Type; //Directional = 0, PointLight = 1, SpotLight = 2,
 
-                //if (lightAmbient[n].X == 0 && lightAmbient[n].Y == 0 && lightAmbient[n].Z == 0)
-                //{
-                //    lightAmbient[n] = DefWhiteColor;
-                //}
+                LightData.Lights[n].ambient = light.AmbientColor.ToVector4();
 
-                lightDiffuse[n] = light.DiffuseColor.ToVector4();
+                LightData.Lights[n].diffuse = light.DiffuseColor.ToVector4();
 
-                //if (lightDiffuse[n].X == 0 && lightDiffuse[n].Y == 0 && lightDiffuse[n].Z == 0)
-                //{
-                //    lightDiffuse[n] = DefWhiteColor;
-                //}
+                LightData.Lights[n].position = light.Position.ToVector4();
 
-                lightPosition[n] = light.Position.ToVector4();
+                LightData.Lights[n].specular = light.SpecularColor.ToVector4();
 
-                lightSpecular[n] = light.SpecularColor.ToVector4();
+                LightData.Lights[n].spotDirection = light.SpotDirection.ToRVector3();
 
-                //if (lightSpecular[n].X == 0 && lightSpecular[n].Y == 0 && lightSpecular[n].Z == 0)
-                //{
-                //    lightSpecular[n] = DefWhiteColor;
-                //}
+                LightData.Lights[n].spotExponent = light.SpotExponent;
 
-                //if (light.SpotDirection.X == 0 && light.SpotDirection.Y == 0 && light.SpotDirection.Z == 0)
-                //{
-                //    lightSpotDirection[n] = new Vector3(0, 0, -1); // Ö¸Ïò-ZÖá
-                //}
-                //else
-                {
-                    lightSpotDirection[n] = light.SpotDirection.ToRVector3();
-                }
+                LightData.Lights[n].spotCutoff = light.SpotCutoff;
 
-                //if (light.SpotExponent == 0)
-                //{
-                //    lightSpotExponent[n] = 180f;
-                //}
-                //else
-                {
-                    lightSpotExponent[n] = light.SpotExponent;
-                }
+                LightData.Lights[n].constantAttenuation = light.Attenuation.Constant;
 
-                lightSpotCutoff[n] = light.SpotCutoff;
+                LightData.Lights[n].linearAttenuation = light.Attenuation.Linear;
 
-                lightConstantAttenuation[n] = light.Attenuation.Constant;
-
-                lightLinearAttenuation[n] = light.Attenuation.Linear;
-
-                lightQuadraticAttenuation[n] = light.Attenuation.Quadratic;
+                LightData.Lights[n].quadraticAttenuation = light.Attenuation.Quadratic;
             }
 
-            ShaderInfo.lightEnableds.Set(lightenables);
-            ShaderInfo.lightAmbient.Set(lightAmbient);
-            ShaderInfo.lightDiffuse.Set(lightDiffuse);
-            ShaderInfo.lightSpecular.Set(lightSpecular);
-            ShaderInfo.lightPosition.Set(lightPosition);
-            ShaderInfo.lightSpotDirection.Set(lightSpotDirection);
-            ShaderInfo.lightSpotExponent.Set(lightSpotExponent);
-            ShaderInfo.lightSpotCutoff.Set(lightSpotCutoff);
-            ShaderInfo.lightConstantAttenuation.Set(lightConstantAttenuation);
-            ShaderInfo.lightLinearAttenuation.Set(lightLinearAttenuation);
-            ShaderInfo.lightQuadraticAttenuation.Set(lightQuadraticAttenuation);
+            _lightBuf.SetStructData<LightSet>(LightData);
         }
 
         private void PrepareState_Blend(GpuStateStruct gpuState)
@@ -483,6 +496,8 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                         1.0f / mipmap0.TextureHeight,
                         1.0f
                 );
+
+                ShaderInfo.TextureMode.Set((int)TexCoordMode.Default);
 
                 ShaderInfo.matrixTexture.Set(_textureMatrix);
             }

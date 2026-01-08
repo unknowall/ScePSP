@@ -1012,7 +1012,8 @@ namespace ScePSP.Core.GpuBackEnd.State
         Ambient = 1, Diffuse = 2, Specular = 4,
         AmbientAndDiffuse = Ambient | Diffuse,
         DiffuseAndSpecular = Diffuse | Specular,
-        UnknownLightComponent = 8,
+        All = Ambient | DiffuseAndSpecular,
+        //UnknownLightComponent = 8,
     }
 
     public enum LightTypeEnum : byte

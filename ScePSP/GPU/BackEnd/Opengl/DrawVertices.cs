@@ -52,21 +52,6 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
         private void DrawInitVertices()
         {
-            //Console.WriteLine(WGL.wglGetCurrentContext());
-            _verticesPositionBuffer = GLBuffer.Create();
-            _verticesNormalBuffer = GLBuffer.Create();
-            _verticesTexcoordsBuffer = GLBuffer.Create();
-            _verticesColorsBuffer = GLBuffer.Create();
-            _verticesWeightsBuffer = GLBuffer.Create();
-
-            _shader = new GLShader(Shaders.ShaderVert, Shaders.ShaderFrag);
-
-            //Console.WriteLine("###################################");
-            //foreach (var uniform in _shader.Uniforms) Console.WriteLine(uniform);
-            //foreach (var attribute in _shader.Attributes) Console.WriteLine(attribute);
-            //Console.WriteLine("###################################");
-
-            _shader.BindUniformsAndAttributes(ShaderInfo);
         }
 
         private void DrawVertices(GLGeometry type)

@@ -37,6 +37,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
         public RenderbufferManager RenderbufferManager { get; private set; }
         private GLShader _shader;
+        private GLBuffer _lightBuf;
 
         bool _doPrimStart;
         VertexTypeStruct _cachedVertexType;
@@ -92,11 +93,13 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             public GlUniform materialShininess;  // 镜面高光指数
             public GlUniform lightModelAmbient;
             public GlUniform lightModelColorControl;
+            public GlUniform MaterialColorComponents;
 
             public GlUniform matrixWorld;
             public GlUniform matrixView;
 
             public GlUniform lightEnableds;
+            public GlUniform lightTypes;
             public GlUniform lightAmbient;    // 光源环境光
             public GlUniform lightDiffuse;    // 光源漫反射
             public GlUniform lightSpecular;   // 光源镜面反射
@@ -154,6 +157,25 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                     //throw new Exception("Couldn't initialize opengl");
                 }
 
+                _verticesPositionBuffer = GLBuffer.Create();
+                _verticesNormalBuffer = GLBuffer.Create();
+                _verticesTexcoordsBuffer = GLBuffer.Create();
+                _verticesColorsBuffer = GLBuffer.Create();
+                _verticesWeightsBuffer = GLBuffer.Create();
+
+                _shader = new GLShader(Shaders.ShaderVert, Shaders.ShaderFrag);
+
+                //Console.WriteLine("###################################");
+                //foreach (var uniform in _shader.Uniforms) Console.WriteLine(uniform);
+                //foreach (var attribute in _shader.Attributes) Console.WriteLine(attribute);
+                //Console.WriteLine("###################################");
+
+                _shader.BindUniformsAndAttributes(ShaderInfo);
+
+                _shader.BindUniformBlock("LightBlock", 0);
+
+                _lightBuf = GLBuffer.Create(BufferTarget.UniformBuffer, BufferUsage.DynamicDraw);
+
                 OpenglContext.ReleaseCurrent();
 
                 AlreadyInitialized = true;
@@ -167,6 +189,15 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
             if (AlreadyInitialized)
             {
+                _verticesPositionBuffer.Dispose();
+                _verticesNormalBuffer.Dispose();
+                _verticesTexcoordsBuffer.Dispose();
+                _verticesColorsBuffer.Dispose();
+                _verticesWeightsBuffer.Dispose();
+
+                _shader.Dispose();
+                _lightBuf.Dispose();
+
                 OpenglContext.Dispose();
             }
         }

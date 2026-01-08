@@ -323,7 +323,7 @@ namespace ScePSP.Core.GpuBackEnd
                         var signal = Params24.Extract(0, 16);
                         var behaviour = (SignalBehavior)Params24.Extract(16, 8);
 
-                        Console.Out.WriteLineColored(ConsoleColor.Green, "OP_SIGNAL: {0}, {1}", signal, behaviour);
+                        //Console.Out.WriteLineColored(ConsoleColor.Green, "OP_SIGNAL: {0}, {1}", signal, behaviour);
 
                         switch (behaviour)
                         {

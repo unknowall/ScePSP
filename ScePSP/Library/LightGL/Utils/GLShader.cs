@@ -110,9 +110,9 @@ namespace LightGL
             var FragmentShaderInfo = GetShaderInfoLog(FragmentShader);
 
             if (!string.IsNullOrEmpty(VertexShaderInfo))
-                Console.WriteLine("{0}", VertexShaderInfo);
+                Console.WriteLine("VertexShader:\n {0}", VertexShaderInfo);
             if (!string.IsNullOrEmpty(FragmentShaderInfo))
-                Console.WriteLine("{0}", FragmentShaderInfo);
+                Console.WriteLine("FragmentShader:\n {0}", FragmentShaderInfo);
 
             if (VertexShaderCompileStatus == 0 || FragmentShaderCompileStatus == 0)
             {
@@ -316,6 +316,15 @@ namespace LightGL
                     Field.SetValue(Object, GetUniform(Field.Name));
                 }
             }
+        }
+
+        public void BindUniformBlock(string Name, uint BindSlot)
+        {
+            Use();
+
+            uint blockIndex = GL.GetUniformBlockIndex((uint)Program, Name);
+
+            GL.UniformBlockBinding(Program, blockIndex, BindSlot);
         }
     }
 }

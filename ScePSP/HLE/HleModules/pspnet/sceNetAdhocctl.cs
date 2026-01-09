@@ -1,12 +1,11 @@
 ﻿using ScePSP.Hle.Interop;
-using ScePSP.Hle.Managers;
 using System;
 
 namespace ScePSP.Hle.Modules.pspnet
 {
     public unsafe partial class sceNetAdhocctl : HleModuleHost
     {
-         HleInterop HleInterop => PSPDrivers.HLE.HleInterop;
+        HleInterop HleInterop => PSPDrivers.HLE.HleInterop;
 
         /// <summary>
         /// Initialise the Adhoc control library
@@ -96,7 +95,7 @@ namespace ScePSP.Hle.Modules.pspnet
         private void _notifyAdhocctlHandler(Event @event, Errors Error = Errors.SUCCESS)
         {
             Console.Error.WriteLine("_notifyAdhocctlHandler:");
-            foreach (var Handler in  PSPDrivers.HLE.HleUidPoolManager.List<AdhocctlHandler>())
+            foreach (var Handler in PSPDrivers.HLE.HleUidPoolManager.List<AdhocctlHandler>())
             {
                 Console.Error.WriteLine("_notifyAdhocctlHandler: {0:X8}: {1}: {2}, {3}", Handler.callback, @event,
                     Error, Handler.parameter);

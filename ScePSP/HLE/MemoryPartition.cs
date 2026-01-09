@@ -282,7 +282,7 @@ namespace ScePSP.Hle
                         _ChildPartitions.Add(NewPartiton = new MemoryPartition(Position,
                             (uint)(Position + Size), true, ParentPartition: this, Name: Name));
 
-                        _ChildPartitions.Add(new MemoryPartition( (uint)(Position + Size),
+                        _ChildPartitions.Add(new MemoryPartition((uint)(Position + Size),
                             OldFreePartition.High, false, ParentPartition: this, Name: "<Free>"));
 
                         break;

@@ -3,7 +3,6 @@ using ScePSP.Core.Components.Rtc;
 using ScePSP.Core.Cpu;
 using ScePSP.Core.Types;
 using ScePSP.Hle.Attributes;
-using ScePSP.Hle.Managers;
 using System;
 
 namespace ScePSP.Hle.Modules.display

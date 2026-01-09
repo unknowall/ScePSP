@@ -310,18 +310,16 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 						}
 					} 
 					else if (tfx == GU_TFX_REPLACE) {
+						gl_FragColor.rgb = texColor.rgb;
 						if (lightenable) {
-							gl_FragColor.rgb = texColor.rgb * litColor.rgb;
-						} else {
-							gl_FragColor.rgb = texColor.rgb;
+							gl_FragColor.rgb = gl_FragColor.rgb * litColor.rgb;
 						}
 						gl_FragColor.a = (tcc == GU_TCC_RGB) ? gl_FragColor.a : texColor.a;
 					} 
 					else if (tfx == GU_TFX_ADD) {
+						gl_FragColor.rgb += texColor.rgb;
 						if (lightenable) {
 							gl_FragColor.rgb += texColor.rgb * litColor.rgb;
-						} else {
-							gl_FragColor.rgb += texColor.rgb;
 						}
 						gl_FragColor.a = (tcc == GU_TCC_RGB) ? gl_FragColor.a : (texColor.a * gl_FragColor.a);
 					} 
@@ -359,9 +357,9 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 					gl_FragColor = gl_FragColor * litColor;
 				}
 
-				//if (!clearingMode && lightenable) {
-				//	gl_FragColor = litColor;
-				//}
+				if (!clearingMode && lightenable) {
+					//gl_FragColor = litColor;
+				}
 
 				//if (colorTest) {
 				//	discard; return;

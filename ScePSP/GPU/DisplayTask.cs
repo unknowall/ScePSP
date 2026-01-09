@@ -1,6 +1,5 @@
 ﻿using LightGL;
 using ScePSP.Core.Components.Display;
-using ScePSP.Core.GpuBackEnd;
 using ScePSP.Core.GpuBackEnd.OpenGL;
 using ScePSP.Hle.Managers;
 using ScePSP.Utils;
@@ -75,7 +74,7 @@ namespace ScePSP.Runner.Tasks.Display
 
                 Shader.Use();
 
-                //GL.BindFramebuffer(GL.GL_FRAMEBUFFER, 0);
+                GL.BindFramebuffer(GL.GL_FRAMEBUFFER, 0);
 
                 Context.ReleaseCurrent();
 
@@ -113,17 +112,18 @@ namespace ScePSP.Runner.Tasks.Display
         {
             var GLE = PSPDrivers.GpuBackEnd as OpenglBackEnd;
 
-            if (Context == null) return;
+            if (Context == null || GLE.GpuState == null) return;
 
             Context.MakeCurrent();
 
-            GL.Viewport(0, 0, PSPDrivers.Config.DisplayConfig.Width, PSPDrivers.Config.DisplayConfig.Height);
-            GL.ClearColor(0, 0, 0, 1);
-            GL.Clear(GL.GL_COLOR_BUFFER_BIT);
-
             if (!PSPDrivers.Devices.Display.CurrentInfo.PlayingVideo && PSPDrivers.GE.UsingGe)
             {
-                GLE.FrameTex2D.Bind();
+                GLE.FrameFB.TextureColor.Bind();
+
+                //if (GLE.GeTexture.TryGetValue(GLE.GpuState.DrawBufferState.Address, out var Texture))
+                //{
+                //    Texture.Bind();
+                //}
 
                 if (Vflip)
                 {
@@ -142,11 +142,17 @@ namespace ScePSP.Runner.Tasks.Display
                 }
             }
 
+            GL.Viewport(0, 0, PSPDrivers.Config.DisplayConfig.Width, PSPDrivers.Config.DisplayConfig.Height);
+            GL.ClearColor(0, 0, 0, 1);
+            GL.Clear(GL.GL_COLOR_BUFFER_BIT);
+
             GL.DrawArrays(GL.GL_TRIANGLE_STRIP, 0, 4);
 
             Context.SwapBuffers();
 
-            GLE.FrameFB.Clear(true);
+            //Console.WriteLine($" Current GETexture: {GLE.GeTexture.Count}");
+
+            //GLE.FrameFB.Clear();
         }
 
         public void Step(Action DrawStart, Action VBlankStart, Action VBlankEnd)

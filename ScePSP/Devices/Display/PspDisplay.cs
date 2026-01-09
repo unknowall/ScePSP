@@ -5,7 +5,6 @@ using ScePSP.GE;
 using ScePSP.Utils;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 
 using Bitmap = System.Drawing.Bitmap;
 

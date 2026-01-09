@@ -1,7 +1,7 @@
-﻿using System;
-using System.Diagnostics;
-using LightGL.DynamicLibrary;
+﻿using LightGL.DynamicLibrary;
 using ScePSP.Utils;
+using System;
+using System.Diagnostics;
 
 namespace ScePSP.Core.Memory
 {

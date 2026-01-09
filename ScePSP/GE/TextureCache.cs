@@ -1,6 +1,5 @@
 ﻿//#define DEBUG_TEXTURE_CACHE
 
-using ScePSP.Core.GpuBackEnd.OpenGL;
 using ScePSP.Core.GpuBackEnd.State;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
@@ -12,13 +11,11 @@ using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Runtime.CompilerServices;
-using System.Security.Policy;
 using Hashing = ScePSP.Utils.Hashing;
 
 namespace ScePSP.Core.GpuBackEnd
 {
-    public abstract unsafe class Texture : IDisposable
+    public abstract unsafe class PspTexture : IDisposable
     {
         //public int TextureId { get; private set; }
         public ulong TextureHash => TextureCacheKey.TextureHash;
@@ -29,7 +26,7 @@ namespace ScePSP.Core.GpuBackEnd
         public int Height;
         protected OutputPixel[] Data;
 
-        protected Texture()
+        protected PspTexture()
         {
         }
 
@@ -57,12 +54,12 @@ namespace ScePSP.Core.GpuBackEnd
             Bitmap.Save(File);
         }
 
-        public Texture Load(string FileName)
+        public PspTexture Load(string FileName)
         {
             var Bitmap = new Bitmap(Image.FromFile(FileName));
             SetData(
                 Bitmap.GetChannelsDataInterleaved(BitmapChannelList.Argb).
-                CastToStructArray<OutputPixel>(), 
+                CastToStructArray<OutputPixel>(),
                 Bitmap.Width, Bitmap.Height
                 );
             return this;
@@ -102,7 +99,7 @@ namespace ScePSP.Core.GpuBackEnd
         }
     }
 
-    public unsafe class TextureCache<TTexture> where TTexture : Texture, new()
+    public unsafe class TextureCache<TTexture> where TTexture : PspTexture, new()
     {
         private PspMemory PspMemory;
         public readonly Dictionary<ulong, TTexture> Cache = new Dictionary<ulong, TTexture>();
@@ -111,6 +108,8 @@ namespace ScePSP.Core.GpuBackEnd
         private OutputPixel[] DecodedTextureBuffer = new OutputPixel[1024 * 1024];
 
         TTexture InvalidTexture;
+
+        public Action<OutputPixel[], int, int, TextureCacheKey> OnTextureReady;
 
         public TextureCache(PspMemory PspMemory)
         {
@@ -131,8 +130,6 @@ namespace ScePSP.Core.GpuBackEnd
             var ClutFormat = ClutState.PixelFormat;
             var ClutStart = ClutState.Start;
             var ClutDataStart = PixelFormatDecoder.GetPixelsSize(ClutFormat, ClutStart);
-
-            //if (TextureAddress > 0xA0000000) TextureAddress = TextureAddress - 0x10000000;
 
             ulong Hash1 = TextureAddress | (ulong)((ClutAddress + ClutDataStart) << 32);
             bool Recheck = false;
@@ -268,7 +265,7 @@ namespace ScePSP.Core.GpuBackEnd
                             if (Swizzled)
                             {
                                 fixed (byte* SwizzlingBufferPointer = SwizzlingBuffer)
-                                { 
+                                {
                                     new Span<byte>(TexturePointer, TextureDataSize).CopyTo(new Span<byte>(SwizzlingBufferPointer, TextureDataSize));
 
                                     //byte[] buf = new byte[TextureDataSize];
@@ -323,7 +320,7 @@ namespace ScePSP.Core.GpuBackEnd
                                 {
                                     Console.BackgroundColor = ConsoleColor.Red;
                                     Console.ForegroundColor = ConsoleColor.Yellow;
-                                    Console.Error.WriteLine("{0} : {1}, {2} : ref:{3} : mask:{4}",
+                                    Console.Error.WriteLine("ColorTest {0} : {1}, {2} : ref:{3} : mask:{4}",
                                         TextureCacheKey.ColorTestFunction, EqualValue, NotEqualValue,
                                         TextureCacheKey.ColorTestRef, TextureCacheKey.ColorTestMask);
                                 });
@@ -346,16 +343,11 @@ namespace ScePSP.Core.GpuBackEnd
                                 }
                             }
 
-                            var TextureInfo = new TextureHookInfo()
-                            {
-                                TextureCacheKey = TextureCacheKey,
-                                Data = DecodedTextureBuffer,
-                                Width = TextureWidth,
-                                Height = TextureHeight
-                            };
-                            //MessageBus.Dispatch(TextureInfo);
+                            //TextureCacheKey
 
-                            var Result = Texture.SetData(TextureInfo.Data, TextureInfo.Width, TextureInfo.Height);
+                            OnTextureReady?.Invoke(DecodedTextureBuffer, TextureWidth, TextureHeight, TextureCacheKey);
+
+                            var Result = Texture.SetData(DecodedTextureBuffer, TextureWidth, TextureHeight);
 #if DEBUG_TEXTURE_CACHE
                             Texture.Save(ApplicationPaths.AssertPath+"/"+ TextureName + ".bmp");
 #endif

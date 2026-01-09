@@ -24,7 +24,6 @@ using ScePSP.Hle.Managers;
 using ScePSP.Hle.Modules;
 using ScePSP.Hle.Modules.audio;
 using ScePSP.Hle.Modules.display;
-using ScePSP.Hle.Modules.interruptman;
 using ScePSP.Hle.Modules.iofilemgr;
 using ScePSP.Hle.Modules.modulemgr;
 using ScePSP.Hle.Modules.pspnet;
@@ -37,13 +36,8 @@ using ScePSP.Runner.Tasks.Audio;
 using ScePSP.Runner.Tasks.Cpu;
 using ScePSP.Runner.Tasks.Display;
 using ScePSP.Runner.Tasks.Gpu;
-using ScePSP.TextureHook;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using static ScePSP.Hle.Modules.iofilemgr.IoFileMgrForUser;
 using static ScePSP.Hle.Modules.pspnet.sceNetAdhocMatching;
 
@@ -81,9 +75,7 @@ namespace ScePSP
 
         public static PspDisplay PspDisplay;
 
-        public static CWCheatPlugin CWCheatPlugin;
-
-        public static TextureHookPlugin TextureHookPlugin;
+        public static CWCheatList CWCheatList;
 
         public static ElfPspLoader Loader;
 
@@ -230,10 +222,11 @@ namespace ScePSP
 
             if (Config.StoredConfig.UseFastMemory)
             {
-                PspMemory = new FastPspMemory(); 
-            }else
+                PspMemory = new FastPspMemory();
+            }
+            else
             {
-                PspMemory = new NormalPspMemory(); 
+                PspMemory = new NormalPspMemory();
             }
 
             CPU = new CpuProcessor();
@@ -246,8 +239,7 @@ namespace ScePSP
             PspAudio = new PspAudio();
             PspDisplay = new PspDisplay();
 
-            CWCheatPlugin = new CWCheatPlugin();
-            TextureHookPlugin = new TextureHookPlugin();
+            CWCheatList = new CWCheatList();
 
             Loader = new ElfPspLoader();
 
@@ -322,7 +314,6 @@ namespace ScePSP
             if (!Inited) return;
 
             PspMemory.Dispose();
-            TextureHookPlugin.Dispose();
 
             HLE.ModuleMgrForUser.Dispose();
             HLE.HleModuleManager.Dispose();

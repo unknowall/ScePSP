@@ -54,7 +54,7 @@ namespace ScePSP.Hle
 
         CpuProcessor CpuProcessor => PSPDrivers.CPU;
 
-         HleThreadManager HleThreadManager => PSPDrivers.HLE.HleThreadManager;
+        HleThreadManager HleThreadManager => PSPDrivers.HLE.HleThreadManager;
 
         public HleModuleGuest()
         {

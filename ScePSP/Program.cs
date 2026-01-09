@@ -1,21 +1,10 @@
-﻿using LightGL;
-using ScePSP;
-using ScePSP.Core;
-using ScePSP.Core.Components.Controller;
+﻿using ScePSP;
 using ScePSP.Core.Components.Display;
-using ScePSP.Core.Components.Rtc;
-using ScePSP.Core.GpuBackEnd;
-using ScePSP.Core.GpuBackEnd.OpenGL;
-using ScePSP.Core.Memory;
 using ScePSP.Core.Types.Controller;
-using ScePSP.Runner;
-using ScePSP.Runner.Tasks.Display;
 using ScePSPUtils;
 using SDL2;
 using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Threading;
 using System.Windows.Forms;
 using static ScePSPUtils.Logger;
 

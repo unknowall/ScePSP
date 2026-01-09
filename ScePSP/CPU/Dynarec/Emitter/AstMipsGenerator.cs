@@ -90,8 +90,7 @@ namespace ScePSP.Core.Cpu.Emitter
             return Ast.FieldAccess(Reg(nameof(CpuThreadState.Fcr31)), nameof(CpuThreadState.Fcr31Struct.Cc));
         }
 
-        private static readonly Dictionary<string, AstNodeExprFieldAccess> RegCache =
-            new Dictionary<string, AstNodeExprFieldAccess>(1024);
+        private static readonly Dictionary<string, AstNodeExprFieldAccess> RegCache = new Dictionary<string, AstNodeExprFieldAccess>(1024);
 
         public AstNodeExprLValue BranchFlag() => Reg(nameof(CpuThreadState.BranchFlag));
 
@@ -125,11 +124,9 @@ namespace ScePSP.Core.Cpu.Emitter
 
         public AstNodeExprLValue HI_LO() => Ast.PropertyAccess(Ast.CpuThreadStateExpr, nameof(CpuThreadState.HiLo));
 
-        public AstNodeExprLValue FPR_I(int index) =>
-            Ast.Indirect(Ast.Cast(typeof(int*), Ast.GetAddress(Reg(CpuThreadState.FprNames[index])), Explicit: false));
+        public AstNodeExprLValue FPR_I(int index) => Ast.Indirect(Ast.Cast(typeof(int*), Ast.GetAddress(Reg(CpuThreadState.FprNames[index])), Explicit: false));
 
-        public AstNodeExprLValue GPR_F(int index) =>
-            Ast.Indirect(Ast.Cast(typeof(float*), Ast.GetAddress(RefGprIndex(index)), Explicit: false));
+        public AstNodeExprLValue GPR_F(int index) => Ast.Indirect(Ast.Cast(typeof(float*), Ast.GetAddress(RefGprIndex(index)), Explicit: false));
 
         public AstNodeStm AssignFPR_F(int index, AstNodeExpr expr) => Ast.Assign(Ast.Fpr(index), expr);
 
@@ -166,17 +163,13 @@ namespace ScePSP.Core.Cpu.Emitter
         private static readonly CpuThreadState CpuThreadStateMethods = CpuThreadState.Methods;
         private static readonly Type CpuThreadStateType = typeof(CpuThreadState);
 
-        public AstNodeExprLValue PrefixSource() => Ast.FieldAccess(Ast.CpuThreadStateExpr,
-            IlFieldInfo.GetFieldInfo(() => CpuThreadStateMethods.PrefixSource));
+        public AstNodeExprLValue PrefixSource() => Ast.FieldAccess(Ast.CpuThreadStateExpr, IlFieldInfo.GetFieldInfo(() => CpuThreadStateMethods.PrefixSource));
 
-        public AstNodeExprLValue PrefixSourceEnabled() => Ast.FieldAccess(PrefixSource(),
-            IlFieldInfo.GetFieldInfo(() => CpuThreadStateMethods.PrefixSource.Enabled));
+        public AstNodeExprLValue PrefixSourceEnabled() => Ast.FieldAccess(PrefixSource(), IlFieldInfo.GetFieldInfo(() => CpuThreadStateMethods.PrefixSource.Enabled));
 
-        public AstNodeExprLValue PrefixDestination() => Ast.FieldAccess(Ast.CpuThreadStateExpr,
-            IlFieldInfo.GetFieldInfo(() => CpuThreadStateMethods.PrefixSource));
+        public AstNodeExprLValue PrefixDestination() => Ast.FieldAccess(Ast.CpuThreadStateExpr, IlFieldInfo.GetFieldInfo(() => CpuThreadStateMethods.PrefixSource));
 
-        public AstNodeExprLValue PrefixDestinationEnabled() => Ast.FieldAccess(PrefixDestination(),
-            IlFieldInfo.GetFieldInfo(() => CpuThreadStateMethods.PrefixDestination.Enabled));
+        public AstNodeExprLValue PrefixDestinationEnabled() => Ast.FieldAccess(PrefixDestination(), IlFieldInfo.GetFieldInfo(() => CpuThreadStateMethods.PrefixDestination.Enabled));
 
         public AstNodeExprLValue Vcc(int index) => Reg(CpuThreadState.VfrCcNames[index]);
 
@@ -268,7 +261,7 @@ namespace ScePSP.Core.Cpu.Emitter
             }
         }
 
-        public AstNodeExpr MemoryGetPointer(PspMemory memory, AstNodeExpr address) =>  MemoryGetPointer(memory, address, false);
+        public AstNodeExpr MemoryGetPointer(PspMemory memory, AstNodeExpr address) => MemoryGetPointer(memory, address, false);
 
         public AstNodeExprLValue MemoryGetPointerRef(Type type, PspMemory memory, AstNodeExpr address) =>
             Ast.Indirect(Ast.Cast(type.MakePointerType(), MemoryGetPointer(memory, address), false));
@@ -276,19 +269,13 @@ namespace ScePSP.Core.Cpu.Emitter
         public AstNodeExprLValue MemoryGetPointerRef<TType>(PspMemory memory, AstNodeExpr address) => MemoryGetPointerRef(typeof(TType), memory, address);
 
         public AstNodeStm MemorySetValue(Type type, PspMemory memory, AstNodeExpr address, AstNodeExpr value) =>
-            Ast.Assign(
-                MemoryGetPointerRef(type, memory, address),
-                Ast.Cast(type, value, false)
-            );
+            Ast.Assign(MemoryGetPointerRef(type, memory, address), Ast.Cast(type, value, false));
 
-        public AstNodeStm MemorySetValue<T>(PspMemory memory, AstNodeExpr address, AstNodeExpr value) =>
-            MemorySetValue(typeof(T), memory, address, value);
+        public AstNodeStm MemorySetValue<T>(PspMemory memory, AstNodeExpr address, AstNodeExpr value) => MemorySetValue(typeof(T), memory, address, value);
 
-        public AstNodeExpr MemoryGetValue(Type type, PspMemory memory, AstNodeExpr address) =>
-            MemoryGetPointerRef(type, memory, address);
+        public AstNodeExpr MemoryGetValue(Type type, PspMemory memory, AstNodeExpr address) => MemoryGetPointerRef(type, memory, address);
 
-        public AstNodeExpr MemoryGetValue<T>(PspMemory memory, AstNodeExpr address) =>
-            MemoryGetValue(typeof(T), memory, address);
+        public AstNodeExpr MemoryGetValue<T>(PspMemory memory, AstNodeExpr address) => MemoryGetValue(typeof(T), memory, address);
 
         public AstNodeStm GetTickCall(bool mandatory)
         {

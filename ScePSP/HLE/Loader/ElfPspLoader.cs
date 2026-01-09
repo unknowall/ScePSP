@@ -66,7 +66,7 @@ namespace ScePSP.Hle.Loader
             HleModuleManager moduleManager, string gameTitle, string moduleName, bool isMainModule)
         {
             HleModuleGuest = new HleModuleGuest();
-            
+
             PSPDrivers.HleModuleGuestList.Add(HleModuleGuest);
 
             ElfLoader = new ElfLoader();
@@ -82,7 +82,7 @@ namespace ScePSP.Hle.Loader
                 try
                 {
                     var decryptedData = new EncryptedPrx().Decrypt(fileStream.ReadAll(), true);
-                    File.WriteAllBytes(ApplicationPaths.AssertPath+ "/decoded.prx", decryptedData);
+                    File.WriteAllBytes(ApplicationPaths.AssertPath + "/decoded.prx", decryptedData);
                     fileStream = new MemoryStream(decryptedData);
                 }
                 catch (Exception exception)

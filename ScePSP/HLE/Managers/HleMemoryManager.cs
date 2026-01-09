@@ -1,5 +1,4 @@
 ﻿using ScePSP.Core.Memory;
-using System;
 
 namespace ScePSP.Hle.Managers
 {

@@ -8,9 +8,11 @@ using ScePSP.Core.Types;
 using ScePSP.Utils;
 using ScePSPUtils;
 using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Numerics;
 using System.Threading;
-using System.Windows.Forms;
+using ScePSPUtils.Extensions;
 
 namespace ScePSP.Core.GpuBackEnd.OpenGL
 {
@@ -20,7 +22,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
         AutoResetEvent StopEvent = new AutoResetEvent(false);
 
-        public static IGlContext OpenglContext;
+        public static IGlContext Context;
 
         public static bool AlreadyInitialized;
 
@@ -42,12 +44,15 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
         int _Scale = 0;
         VertexTypeStruct _cachedVertexType;
         GuPrimitiveType _primitiveType;
-        
+
+        //public GLRenderTarget FrameTarget;
         public GLFrameBuffer FrameFB;
-        public GLTexture2D FrameTex2D, FrameTexDEPTH, LogicTex2D;
-        public TextureCacheOpengl TextureCache;
-        public TextureOpengl CurrentTextureCache;
+        public GLTexture2D FrameTex2D, FrameTexDEPTH;
+        public GLTexture2D LogicTex2D;
+        public TextureCacheGL TextureCache;
+        public TextureGL CurrentTextureCache;
         public GLTextureUnit TexUnit;
+        public int _Width, _Height;
 
         public class ShaderInfoClass
         {
@@ -101,9 +106,14 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
         ShaderInfoClass ShaderInfo = new ShaderInfoClass();
 
+        //GE RenderTarget
+        //Bind to gpuState.TextureMappingState.TextureState.Mipmap0.Address
+        //Bind to gpuState.DrawBufferState.Address
+        public readonly Dictionary<uint, GLTexture2D> GeTexture = new Dictionary<uint, GLTexture2D>();
+
         public OpenglBackEnd()
         {
-            TextureCache = new TextureCacheOpengl(Memory);
+            TextureCache = new TextureCacheGL(Memory);
             VertexReader = new VertexReader();
         }
 
@@ -114,28 +124,24 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             if (_Scale == scaleViewport) return;
             _Scale = scaleViewport;
 
-            FrameFB?.Dispose();
+            _Width = 480 * scaleViewport;
+            _Height = 272 * scaleViewport;
 
-            LogicTex2D?.Dispose();
+            FrameFB?.Dispose();
+            FrameTex2D?.Dispose();
+            FrameTexDEPTH?.Dispose();
 
             FrameFB = GLFrameBuffer.Create();
-
-            FrameTex2D = GLTexture2D.Create().SetSize(480 * scaleViewport, 272 * scaleViewport);
-
-            FrameTexDEPTH = GLTexture2D.Create().SetFormat(TextureFormat.DEPTH).SetSize(480 * scaleViewport, 272 * scaleViewport);
-
-            FrameFB.AttachTexture(FramebufferAttachment.ColorAttachment0, FrameTex2D);
-
+            FrameTexDEPTH = GLTexture2D.Create().SetFormat(TextureFormat.DEPTH).SetSize(_Width, _Height);
             FrameFB.AttachTexture(FramebufferAttachment.DepthAttachment, FrameTexDEPTH);
-
-            LogicTex2D = GLTexture2D.Create().SetSize(480 * scaleViewport, 272 * scaleViewport);
-
             FrameFB.Bind();
+
+            LogicTex2D?.Dispose();
+            LogicTex2D = GLTexture2D.Create().SetSize(_Width, _Height);
         }
 
         public override void InitSynchronizedOnce(IntPtr TargetHwnd)
         {
-            //Memory.WriteBytesHook += OnMemoryWrite;
             ScaleViewport = PspStoredConfig.RenderScale;
 
             if (!AlreadyInitialized)
@@ -143,15 +149,15 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                 if (TargetHwnd == IntPtr.Zero)
                 {
                     Console.Out.WriteLineColored(ConsoleColor.White, $"   -> OpenGL Windowless Mode");
-                    OpenglContext = GlContextFactory.CreateWindowless();
+                    Context = GlContextFactory.CreateWindowless();
                 }
                 else
                 {
                     Console.Out.WriteLineColored(ConsoleColor.White, $"   -> OpenGL Window HWND: {TargetHwnd}");
-                    OpenglContext = GlContextFactory.CreateFromWindowHandle(TargetHwnd);
+                    Context = GlContextFactory.CreateFromWindowHandle(TargetHwnd);
                 }
 
-                OpenglContext.MakeCurrent();
+                Context.MakeCurrent();
 
 
                 Console.Out.WriteLineColored(ConsoleColor.White, "   -> OpenGL Context Version: {0}", GlGetString(GL.GL_VERSION));
@@ -190,7 +196,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
                 TexUnit = GLTextureUnit.CreateAtIndex(0);
 
-                OpenglContext.ReleaseCurrent();
+                Context.ReleaseCurrent();
 
                 AlreadyInitialized = true;
             }
@@ -213,14 +219,19 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                 _lightBuf.Dispose();
 
                 FrameFB?.Dispose();
-
-                FrameTex2D?.Dispose();
                 FrameTexDEPTH?.Dispose();
+
                 LogicTex2D?.Dispose();
+
+                foreach (var item in GeTexture)
+                {
+                    item.Value?.Dispose();
+                }
+                GeTexture.Clear();
 
                 CurrentTextureCache?.Dispose();
 
-                OpenglContext.Dispose();
+                Context.Dispose();
             }
         }
 
@@ -232,14 +243,14 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
         {
             if (!IsCurrentWindow)
             {
-                OpenglContext.MakeCurrent();
+                Context.MakeCurrent();
                 IsCurrentWindow = true;
             }
         }
 
         public override void UnsetCurrent()
         {
-            OpenglContext.ReleaseCurrent();
+            Context.ReleaseCurrent();
             IsCurrentWindow = false;
         }
 
@@ -251,7 +262,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             int s_len = Patch.GetLength(0);
             int t_len = Patch.GetLength(1);
 
-            if (s_len <= 1 || t_len <= 1)  return;
+            if (s_len <= 1 || t_len <= 1) return;
 
             GpuState = GpuStateStruct;
             VertexType = GpuState.VertexState.Type;
@@ -452,11 +463,11 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
                     LogicTex2D.Bind();
 
-                    GL.CopyTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA4, 0, 0, FrameTex2D.Width, FrameTex2D.Height, 0);
+                    GL.CopyTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, 0, 0, FrameFB.TextureColor.Width, FrameFB.TextureColor.Height, 0);
 
-                    FrameFB.Bind(FramebufferTarget.DrawFramebuffer);
+                    FrameFB.Bind(FramebufferTarget.Framebuffer);
 
-                    FrameTex2D.Bind();
+                    FrameFB.TextureColor.Bind();
 
                     ShaderInfo.backtex.Set(
                         GLTextureUnit.CreateAtIndex(1)
@@ -466,7 +477,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
                     ShaderInfo.lop.Set((int)gpuState.LogicalOperationState.Operation);
 
-                    //new Bitmap(480, 272).SetChannelsDataInterleaved(LogicOpsRenderTarget.ReadPixels(), BitmapChannelList.RGBA).Save("test.png");
+                    //new Bitmap(480, 272).SetChannelsDataInterleaved(LogicTex2D.ReadPixels(), BitmapChannelList.RGBA).Save("test.png");
                 }
             }
         }
@@ -608,7 +619,20 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
         public override void BeforeDraw(GpuStateStruct gpuState)
         {
-            FrameFB.Bind(FramebufferTarget.DrawFramebuffer);
+            var Address = gpuState.DrawBufferState.Address;
+
+            GLTexture2D Texture;
+
+            if (!GeTexture.TryGetValue(Address, out Texture))
+            {
+                Texture = GLTexture2D.Create().SetSize(_Width, _Height);
+
+                GeTexture.Add(Address, Texture);
+            }
+
+            FrameFB.AttachTexture(FramebufferAttachment.ColorAttachment0, Texture);
+
+            FrameFB.Bind(FramebufferTarget.Framebuffer);
         }
 
         public override void Finish(GpuStateStruct gpuState)

@@ -1,23 +1,7 @@
-﻿using ScePSP.cheats;
-using ScePSP.Core;
-using ScePSP.Core.AudioBackEnd;
-using ScePSP.Core.Components.Display;
-using ScePSP.Core.Components.Rtc;
-using ScePSP.Core.Cpu;
-using ScePSP.Core.GpuBackEnd;
-using ScePSP.Core.Memory;
-using ScePSP.Hle;
-using ScePSP.Hle.Loader;
-using ScePSP.Hle.Managers;
-using ScePSP.Hle.Modules.threadman;
-using ScePSP.Hle.Vfs;
-using ScePSP.Hle.Vfs.Emulator;
-using ScePSP.Runner;
-using ScePSP.TextureHook;
+﻿using ScePSP.Core;
 using System;
 using System.IO;
 using System.Linq;
-using System.Threading;
 
 namespace ScePSP
 {

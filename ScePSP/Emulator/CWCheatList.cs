@@ -7,7 +7,7 @@ using System.IO;
 
 namespace ScePSP.cheats
 {
-    public class CWCheatPlugin
+    public class CWCheatList
     {
         PspDisplay PspDisplay => PSPDrivers.PspDisplay;
 
@@ -46,7 +46,7 @@ namespace ScePSP.cheats
             }
         }
 
-        public CWCheatPlugin()
+        public CWCheatList()
         {
             PspDisplay.VBlankEventCall += new Action(PspEmulator_VBlankEventCall);
 

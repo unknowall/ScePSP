@@ -2,7 +2,6 @@
 using ScePSP.Hle.Managers;
 using ScePSP.Hle.Vfs;
 using ScePSPUtils;
-using ScePSPUtils.Extensions;
 using System;
 using System.Diagnostics;
 using System.IO;

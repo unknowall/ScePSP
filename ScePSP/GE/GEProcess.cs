@@ -1,7 +1,5 @@
 ﻿#define PRIM_BATCH
 
-using LightGL;
-using ScePSP.Core.Cpu;
 using ScePSP.Core.GpuBackEnd.State;
 using ScePSP.Core.GpuBackEnd.VertexReading;
 using ScePSP.Core.Memory;
@@ -9,12 +7,9 @@ using ScePSPUtils;
 using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Design;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography.Xml;
 using System.Threading;
-using static ScePSP.Core.GpuBackEnd.GpuBackEnd;
 
 namespace ScePSP.Core.GpuBackEnd
 {
@@ -205,7 +200,7 @@ namespace ScePSP.Core.GpuBackEnd
                         //Console.Out.WriteLineColored(ConsoleColor.Red, $"BJUMP to {(Params24 & ~3)}");
                         //if (_bjumpCount++ < 5)
                         //{
-                            //JumpRelativeOffset((uint)(Params24 & ~3));
+                        //JumpRelativeOffset((uint)(Params24 & ~3));
                         //}
                         //else
                         //{

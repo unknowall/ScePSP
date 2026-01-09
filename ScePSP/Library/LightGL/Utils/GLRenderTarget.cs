@@ -17,6 +17,7 @@ namespace LightGL
         [ThreadStatic] public static GLRenderTarget Current = GLRenderTargetScreen.Default;
 
         protected uint FrameBufferId;
+
         public GLTexture2D TextureColor
         {
             get; private set;
@@ -136,7 +137,8 @@ namespace LightGL
             try
             {
                 Action();
-            } finally
+            }
+            finally
             {
                 GL.BindFramebuffer(GL.GL_FRAMEBUFFER, (uint)OldFrameBuffer);
             }
@@ -177,12 +179,14 @@ namespace LightGL
             }
         }
 
-        public void Clear()
+        public GLRenderTarget Clear()
         {
             GL.Viewport(0, 0, Width, Height);
             GL.ClearColor(0, 0, 0, 1);
             GL.Clear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
             GL.Flush();
+
+            return this;
         }
 
         public bool IsComplete()
@@ -205,9 +209,11 @@ namespace LightGL
             return this;
         }
 
-        public void Bind(FramebufferTarget binding)
+        public GLRenderTarget Bind(FramebufferTarget binding)
         {
             GL.BindFramebuffer((int)binding, FrameBufferId);
+
+            return this;
         }
 
         public byte[] ReadPixels()

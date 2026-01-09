@@ -65,8 +65,6 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             //    if (i >= _indicesList.Length) break;
             //}
 
-            ShaderInfo.hasReversedNormal.NoWarning().Set(VertexType.ReversedNormal);
-
             _shader.Draw(type, _indicesList.Buffer, _indicesList.Length, () =>
             {
                 // Œª÷√

@@ -4,7 +4,7 @@ using ScePSP.Core.Types;
 
 namespace ScePSP.Core.GpuBackEnd.OpenGL
 {
-    public class TextureHookInfo
+    public class TextureInfo
     {
         public int Width;
         public int Height;
@@ -12,7 +12,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
         public TextureCacheKey TextureCacheKey;
     }
 
-    public class TextureOpengl : Texture
+    public class TextureGL : PspTexture
     {
         public GLTexture2D Texture;
 
@@ -30,6 +30,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             Data = pixels;
 
             Bind();
+
             Texture.SetFormat(TextureFormat.RGBA).SetSize(textureWidth, textureHeight).SetData(pixels);
 
             return true;
@@ -49,9 +50,9 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
         }
     }
 
-    public class TextureCacheOpengl : TextureCache<TextureOpengl>
+    public class TextureCacheGL : TextureCache<TextureGL>
     {
-        public TextureCacheOpengl(PspMemory pspMemory) : base(pspMemory)
+        public TextureCacheGL(PspMemory pspMemory) : base(pspMemory)
         {
         }
     }

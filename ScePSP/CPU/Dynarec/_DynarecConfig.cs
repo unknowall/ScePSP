@@ -4,7 +4,7 @@
     {
         public static bool UpdatePCEveryInstruction = false;
 
-        public static bool FunctionCallWithStaticReferences = false;
+        public static bool FunctionCallWithStaticReferences = true;
 
         public static bool EnableFastPspMemoryUtilsGetFastMemoryReader = false;
 
@@ -18,7 +18,7 @@
 
         public static bool DebugFunctionCreation = false;
 
-        public static bool EnableGpuSignalsCallback = true;
+        public static bool EnableGpuSignalsCallback = false;
 
         public static bool EnableGpuFinishCallback = false;
 

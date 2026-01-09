@@ -22,20 +22,15 @@ namespace ScePSP.Core.Cpu.Dynarec
         /// <summary>A list of Calling PCs</summary>
         public List<uint> CallingPCs = new List<uint>();
 
-        /// <summary />
         public uint EntryPc;
 
-        /// <summary />
         public uint MinPc;
 
-        /// <summary />
         public uint MaxPc;
 
         public bool DisableOptimizations;
 
-        /// <summary />
         public TimeSpan TimeAnalyzeBranches;
-
         public TimeSpan TimeGenerateAst;
         public TimeSpan TimeOptimize;
         public TimeSpan TimeGenerateIl;

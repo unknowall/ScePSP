@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Drawing;
-using System.Runtime.InteropServices;
 using static SDL2.SDL;
 
 namespace ScePSP.Core.AudioBackEnd.SDL

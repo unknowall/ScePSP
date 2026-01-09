@@ -46,7 +46,8 @@ namespace LightGL
                 {
                     GL.BufferData((int)target, (uint)(size * sizeof(T)), ptr, (int)usage);
                 }
-            } else
+            }
+            else
             {
                 GL.BufferData((int)target, (uint)(size * sizeof(T)), null, (int)usage);
             }
@@ -63,7 +64,8 @@ namespace LightGL
                     Length * Marshal.SizeOf(typeof(T)),
                     (byte*)Handle.AddrOfPinnedObject().ToPointer() + Offset * Marshal.SizeOf(typeof(T))
                 );
-            } finally
+            }
+            finally
             {
                 Handle.Free();
             }
@@ -104,7 +106,7 @@ namespace LightGL
         {
             GL.BindBuffer((int)target, Buffer);
 
-            if(target == BufferTarget.UniformBuffer)
+            if (target == BufferTarget.UniformBuffer)
                 GL.BindBufferBase((int)target, Slot, Buffer);
         }
 

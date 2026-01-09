@@ -57,7 +57,7 @@ namespace LightGL.DynamicLibrary
                     "arm" or "armv7l" => Architecture.arm,
                     "aarch64" or "arm64" => Architecture.arm64,
                     "mips" => Architecture.mips,
-                    _ => Architecture.arm, 
+                    _ => Architecture.arm,
                 };
             }
         }

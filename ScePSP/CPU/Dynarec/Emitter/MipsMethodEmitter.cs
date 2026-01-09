@@ -3,13 +3,12 @@
 
 #define USE_DYNAMIC_METHOD
 
+using LightGL.DynamicLibrary;
 using SafeILGenerator.Ast.Nodes;
 using SafeILGenerator.Utils;
 using ScePSP.Core.Cpu.Dynarec.Ast;
 using System;
 using System.Reflection;
-
-using LightGL.DynamicLibrary;
 
 namespace ScePSP.Core.Cpu.Emitter
 {

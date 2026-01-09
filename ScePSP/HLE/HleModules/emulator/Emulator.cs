@@ -1,6 +1,5 @@
 ﻿using ScePSP.Core.Cpu;
 using ScePSP.Hle.Attributes;
-using ScePSP.Hle.Managers;
 using System;
 
 namespace ScePSP.Hle.Modules.emulator

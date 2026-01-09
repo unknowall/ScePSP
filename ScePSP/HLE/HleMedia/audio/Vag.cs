@@ -1,5 +1,4 @@
-﻿using ScePSP.Core.Types;
-using ScePSPUtils;
+﻿using ScePSPUtils;
 using ScePSPUtils.Endian;
 using System;
 using System.Collections.Generic;

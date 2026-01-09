@@ -46,7 +46,7 @@ namespace ScePSP.Core.Cpu.Dynarec
                     };
                 default:
                     var mipsMethodEmiter = new MipsMethodEmitter(CpuProcessor, pc, doDebug, doLog);
-                    var internalFunctionCompiler = new InternalFunctionCompiler( mipsMethodEmiter, this,
+                    var internalFunctionCompiler = new InternalFunctionCompiler(mipsMethodEmiter, this,
                         instructionReader, exploreNewPcCallback, pc, doLog, checkValidAddress: checkValidAddress);
                     return internalFunctionCompiler.CreateFunction();
             }
@@ -128,10 +128,6 @@ namespace ScePSP.Core.Cpu.Dynarec
                 }
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <returns></returns>
             internal DynarecFunction CreateFunction()
             {
                 _cpuEmitter.SpecialName = "";
@@ -216,9 +212,7 @@ namespace ScePSP.Core.Cpu.Dynarec
                 _maxPc = Math.Max(_maxPc, pc);
             }
 
-            /// <summary>
-            /// PASS 1: Analyze Branches
-            /// </summary>
+            // PASS 1: Analyze Branches
             private void AnalyzeBranches()
             {
                 _skipPc = new HashSet<uint>();
@@ -292,8 +286,7 @@ namespace ScePSP.Core.Cpu.Dynarec
                                         if (AddressInsideFunction(jumpAddress))
                                         {
                                             //Console.WriteLine("JumpAddress: {0:X8}", JumpAddress);
-                                            _labelsJump[jumpAddress] =
-                                                AstLabel.CreateLabel($"Jump_0x{jumpAddress:X8}");
+                                            _labelsJump[jumpAddress] = AstLabel.CreateLabel($"Jump_0x{jumpAddress:X8}");
                                             branchesToAnalyze.Enqueue(jumpAddress);
                                         }
                                     }
@@ -310,8 +303,7 @@ namespace ScePSP.Core.Cpu.Dynarec
                             {
                                 //Console.WriteLine("BranchAddress: {0:X8}", BranchAddress);
                                 UpdateMinMax(branchAddress);
-                                _labels[branchAddress] =
-                                    AstLabel.CreateLabel($"Label_0x{branchAddress:X8}");
+                                _labels[branchAddress] = AstLabel.CreateLabel($"Label_0x{branchAddress:X8}");
                                 branchesToAnalyze.Enqueue(branchAddress);
                             }
                         }
@@ -487,9 +479,7 @@ namespace ScePSP.Core.Cpu.Dynarec
 
             //static int DummyTempCounter = 0;
 
-            /// <summary>
-            /// PASS 2: Generate code and put labels;
-            /// </summary>
+            // PASS 2: Generate code and put labels;
             private AstNodeStmContainer GenerateCode()
             {
                 foreach (var label in _labels.ToArray())
@@ -541,7 +531,6 @@ namespace ScePSP.Core.Cpu.Dynarec
 
                             var delayedBranchInstruction = _GetAstCpuInstructionAT(_pc + 4); // Delayed
                             var jumpInstruction = _GetAstCpuInstructionAT(_pc + 0); // Jump
-
 #if !DISABLE_JUMP_GOTO
                             var jumpInstruction2 = _cpuEmitter.LoadAt(_pc + 0);
                             var jumpDisasm = _mipsDisassembler.Disassemble(_pc + 0, jumpInstruction2);
@@ -553,8 +542,7 @@ namespace ScePSP.Core.Cpu.Dynarec
                                 && _labelsJump.ContainsKey(jumpJumpPc)
                             )
                             {
-                                jumpInstruction = new AstNodeStmPspInstruction(jumpDisasm,
-                                    _ast.GotoAlways(_labelsJump[jumpJumpPc]));
+                                jumpInstruction = new AstNodeStmPspInstruction(jumpDisasm, _ast.GotoAlways(_labelsJump[jumpJumpPc]));
 
                                 //Console.WriteLine(
                                 //	"{0}: {1} : Function({2:X8}-{3:X8})",
@@ -570,7 +558,6 @@ namespace ScePSP.Core.Cpu.Dynarec
                                 CallingPCs.Add(jumpJumpPc);
                             }
 #endif
-
                             // Put delayed instruction first.
                             nodes.AddStatement(delayedBranchInstruction);
                             // A jump outside the current function.

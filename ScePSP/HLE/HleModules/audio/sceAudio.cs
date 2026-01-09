@@ -1,7 +1,6 @@
 ﻿using ScePSP.Core.AudioBackEnd;
 using ScePSP.Core.Cpu;
 using ScePSP.Hle.Attributes;
-using ScePSP.Hle.Managers;
 using System;
 using System.Linq;
 

@@ -1,5 +1,5 @@
-﻿using ScePSP.Hle.Formats.audio;
-using ScePSP.Hle.Attributes;
+﻿using ScePSP.Hle.Attributes;
+using ScePSP.Hle.Formats.audio;
 using ScePSPUtils;
 using System;
 using System.Linq;

@@ -11,7 +11,7 @@ namespace ScePSP.Hle.Modules.audio
 
         public PspAudio PspAudio => PSPDrivers.PspAudio;
 
-        public HleThreadManager HleThreadManager =>PSPDrivers.HLE.HleThreadManager;
+        public HleThreadManager HleThreadManager => PSPDrivers.HLE.HleThreadManager;
 
         PspAudioChannel PspVaudioChannel => PspAudio.SrcOutput2Channel;
 

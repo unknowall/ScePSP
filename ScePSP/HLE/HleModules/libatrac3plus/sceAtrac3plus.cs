@@ -1,7 +1,6 @@
 ﻿using ScePSP.Core.AudioBackEnd;
 using ScePSP.Core.Cpu;
 using ScePSP.Core.Memory;
-using ScePSP.Core.Types;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Formats.audio;
 using ScePSP.Hle.Managers;
@@ -711,7 +710,7 @@ new ArrayWrapper<StereoShortSoundSample>(PointerUtils.ByteArrayToArray<StereoSho
                 throw new SceKernelException(SceKernelErrors.ATRAC_ERROR_INVALID_CODECTYPE);
             }
 
-            return TryToAlloc(new Atrac( CodecType));
+            return TryToAlloc(new Atrac(CodecType));
         }
 
         private Atrac TryToAlloc(Atrac Atrac)

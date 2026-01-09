@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ScePSP.Hle.Formats.audio;
+using System;
 using System.Linq;
-using ScePSP.Hle.Formats.audio;
 
 namespace ScePSP.Core.AudioBackEnd
 {

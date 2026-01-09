@@ -15,14 +15,13 @@
  * 
  */
 
+using LightGL.DynamicLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
-
-using LightGL.DynamicLibrary;
 
 namespace LightGL
 {
@@ -894,7 +893,8 @@ namespace LightGL
                 var Error = GetError();
                 if (Error != GL_NO_ERROR)
                     throw new Exception($"{prefix} glError: 0x{Error:X4}");
-            } finally
+            }
+            finally
             {
                 ClearError();
             }
@@ -905,7 +905,8 @@ namespace LightGL
             if (EnableDisable)
             {
                 Enable(EnableCap);
-            } else
+            }
+            else
             {
                 Disable(EnableCap);
             }

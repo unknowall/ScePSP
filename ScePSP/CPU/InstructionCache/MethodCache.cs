@@ -1,4 +1,5 @@
-﻿using SafeILGenerator.Ast.Generators;
+﻿using LightGL.DynamicLibrary;
+using SafeILGenerator.Ast.Generators;
 using ScePSP.Core.Cpu.Dynarec;
 using ScePSP.Core.Cpu.Dynarec.Ast;
 using ScePSP.Core.Cpu.Emitter;
@@ -10,8 +11,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-
-using LightGL.DynamicLibrary;
 
 namespace ScePSP.Core.Cpu.InstructionCache
 {
@@ -201,8 +200,8 @@ namespace ScePSP.Core.Cpu.InstructionCache
             var time0 = DateTime.UtcNow;
 
             var dynarecFunction =
-                _cpuProcessor.DynarecFunctionCompiler.CreateFunction(
-                    new InstructionStreamReader(new PspMemoryStream(memory)), pc);
+                _cpuProcessor.DynarecFunctionCompiler.CreateFunction( new InstructionStreamReader(new PspMemoryStream(memory)), pc);
+
             if (dynarecFunction.EntryPc != pc) throw new Exception("Unexpected error");
 
             if (DynarecConfig.AllowCreatingUsedFunctionsInBackground)

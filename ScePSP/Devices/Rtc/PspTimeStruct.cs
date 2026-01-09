@@ -1,7 +1,6 @@
-﻿using ScePSPUtils;
+﻿using LightGL.DynamicLibrary;
+using ScePSPUtils;
 using System;
-
-using LightGL.DynamicLibrary;
 
 namespace ScePSP.Core.Components.Rtc
 {

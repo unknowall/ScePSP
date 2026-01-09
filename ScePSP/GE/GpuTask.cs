@@ -1,6 +1,5 @@
 ﻿using ScePSP.Core.Components.Display;
 using ScePSP.Core.GpuBackEnd;
-using ScePSP.Runner.Tasks.Display;
 using ScePSP.Utils;
 using System;
 using System.Threading;

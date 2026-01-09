@@ -2,7 +2,7 @@
 
 namespace ScePSP.Core.GpuBackEnd.OpenGL
 {
-    internal static class OpenglGpuImplConversionTables
+    internal static class ConversionTables
     {
         internal static readonly int[] StencilOperationTranslate =
         {

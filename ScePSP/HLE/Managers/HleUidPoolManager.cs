@@ -1,5 +1,4 @@
-﻿using ScePSP.Hle.Managers;
-using ScePSPUtils.Extensions;
+﻿using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

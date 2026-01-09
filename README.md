@@ -3,10 +3,10 @@
 #### At present, the core can only run a small number of games, and there is still a considerable distance to go before releasing a version available for end users. 
 
 _(Figure 1: runing Castlevania - The Dracula X Chronicles (USA) on title )_  
-<img width="962" height="576" alt="捕获2" src="https://github.com/user-attachments/assets/143741c0-047f-4091-b18a-813487b9c8d8" />
+<img width="962" height="576" alt="捕获" src="https://github.com/user-attachments/assets/94a3ca0a-70a3-4d5c-878a-98cc3a42e87c" />
 
 _(Figure 2: runing Valhalla Knights in game (many graphics issues))_  
-<img width="962" height="576" alt="捕获5" src="https://github.com/user-attachments/assets/52b2d082-e34b-400b-879a-cd79e5142ce0" />
+<img width="962" height="576" alt="捕获2" src="https://github.com/user-attachments/assets/9d87dba3-9242-4beb-a152-2156bee726e4" />
 
 _(Figure 3: runing PSPDemo/morphskin.elf)_  
 <img width="962" height="576" alt="PSP2" src="https://github.com/user-attachments/assets/355a362a-350e-4d66-b6ac-dc8bd4e6cc81" />

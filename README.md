@@ -5,8 +5,8 @@
 _(Figure 1: runing Castlevania - The Dracula X Chronicles (USA) on title )_  
 <img width="962" height="576" alt="捕获" src="https://github.com/user-attachments/assets/94a3ca0a-70a3-4d5c-878a-98cc3a42e87c" />
 
-_(Figure 2: runing Castlevania - The Dracula X Chronicles (USA) in game (many graphics issues) )_  
-<img width="962" height="576" alt="捕获" src="https://github.com/user-attachments/assets/abb1eea7-8df0-45a8-8dce-b6c5f3c89918" />
+_(Figure 2: runing Castlevania - The Dracula X Chronicles (USA) in game )_  
+<img width="962" height="576" alt="捕获" src="https://github.com/user-attachments/assets/2f82abf5-81fa-4dc3-8abe-71c080ff5f83" />
 
 _(Figure 3: runing Valhalla Knights in game (many graphics issues))_  
 <img width="962" height="576" alt="捕获2" src="https://github.com/user-attachments/assets/9d87dba3-9242-4beb-a152-2156bee726e4" />

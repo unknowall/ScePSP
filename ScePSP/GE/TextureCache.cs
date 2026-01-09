@@ -60,7 +60,11 @@ namespace ScePSP.Core.GpuBackEnd
         public Texture Load(string FileName)
         {
             var Bitmap = new Bitmap(Image.FromFile(FileName));
-            SetData(Bitmap.GetChannelsDataInterleaved(BitmapChannelList.Argb).CastToStructArray<OutputPixel>(), Bitmap.Width, Bitmap.Height);
+            SetData(
+                Bitmap.GetChannelsDataInterleaved(BitmapChannelList.Argb).
+                CastToStructArray<OutputPixel>(), 
+                Bitmap.Width, Bitmap.Height
+                );
             return this;
         }
 
@@ -106,12 +110,12 @@ namespace ScePSP.Core.GpuBackEnd
         private byte[] SwizzlingBuffer = new byte[4 * 1024 * 1024];
         private OutputPixel[] DecodedTextureBuffer = new OutputPixel[1024 * 1024];
 
+        TTexture InvalidTexture;
+
         public TextureCache(PspMemory PspMemory)
         {
             this.PspMemory = PspMemory;
         }
-
-        TTexture InvalidTexture;
 
         public TTexture Get(GpuStateStruct GpuState)
         {
@@ -127,6 +131,8 @@ namespace ScePSP.Core.GpuBackEnd
             var ClutFormat = ClutState.PixelFormat;
             var ClutStart = ClutState.Start;
             var ClutDataStart = PixelFormatDecoder.GetPixelsSize(ClutFormat, ClutStart);
+
+            //if (TextureAddress > 0xA0000000) TextureAddress = TextureAddress - 0x10000000;
 
             ulong Hash1 = TextureAddress | (ulong)((ClutAddress + ClutDataStart) << 32);
             bool Recheck = false;
@@ -145,17 +151,16 @@ namespace ScePSP.Core.GpuBackEnd
 
             if (Recheck)
             {
-                //Console.WriteLine("{0:X}", ClutAddress);
-
                 var TextureFormat = TextureState.PixelFormat;
-                //var Width = TextureState->Mipmap0.TextureWidth;
 
                 int BufferWidth = TextureState.Mipmap0.BufferWidth;
 
-                // FAKE!
-                //BufferWidth = TextureState->Mipmap0.TextureWidth;
-
+                var Width = TextureState.Mipmap0.TextureWidth;
                 var Height = TextureState.Mipmap0.TextureHeight;
+
+                if (BufferWidth > 512)
+                    BufferWidth = Width;
+
                 var TextureDataSize = PixelFormatDecoder.GetPixelsSize(TextureFormat, BufferWidth * Height);
                 if (ClutState.NumberOfColors > 256)
                 {
@@ -166,18 +171,18 @@ namespace ScePSP.Core.GpuBackEnd
                 var ClutShift = ClutState.Shift;
                 var ClutMask = ClutState.Mask;
 
-                //Console.WriteLine(TextureFormat);
-
                 // INVALID TEXTURE
-                if (!PspMemory.IsRangeValid(TextureAddress, TextureDataSize) || TextureDataSize > 2048 * 2048 * 4)
+                bool isVaild = PspMemory.IsRangeValid(TextureAddress, TextureDataSize);
+                if (!isVaild || TextureDataSize > 2048 * 2048 * 4 || TextureDataSize < 1)
                 {
                     Console.Error.WriteLineColored(ConsoleColor.DarkRed,
                         "UPDATE_TEXTURE(TEX={0},CLUT={1}:{2}:{3}:{4}:0x{5:X},SIZE={6}x{7},{8},Swizzled={9})",
-                        TextureFormat, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask, BufferWidth, Height,
+                        TextureFormat, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask, Width, Height,
                         BufferWidth, Swizzled);
+
                     Console.Error.WriteLineColored(ConsoleColor.DarkRed,
-                        "Invalid TEXTURE! TextureAddress=0x{0:X}, TextureDataSize={1}", TextureAddress,
-                        TextureDataSize);
+                        $"Invalid TEXTURE! isVaild={isVaild} Address=0x{TextureAddress:X8}, Clut=0x{ClutAddress:X8}, DataSize={TextureDataSize}");
+
                     if (InvalidTexture == null)
                     {
                         InvalidTexture = new TTexture();
@@ -204,8 +209,6 @@ namespace ScePSP.Core.GpuBackEnd
 
                 byte* TexturePointer = null;
                 byte* ClutPointer = null;
-                //HardCode need fix it!
-                //ClutAddress = ClutAddress + 0x09000000;
                 try
                 {
                     TexturePointer = (byte*)PspMemory.PspAddressToPointerSafe(TextureAddress);
@@ -243,7 +246,7 @@ namespace ScePSP.Core.GpuBackEnd
                                          "_" + TextureFormat + "_" + ClutFormat + "_" + BufferWidth + "x" + Height +
                                          "_" + Swizzled;
 #if DEBUG_TEXTURE_CACHE
-                    Console.Error.WriteLine($"UPDATE_TEXTURE TextureAddress 0x{TextureAddress:X} ClutAddress 0x{ClutAddress:X})");
+                    Console.Error.WriteLine($"UPDATE_TEXTURE TextureAddress 0x{TextureAddress:X8} ClutAddress 0x{ClutAddress:X8})");
 
                     Console.Error.WriteLine("UPDATE_TEXTURE(TEX={0},CLUT={1}:{2}:{3}:{4}:0x{5:X},SIZE={6}x{7},{8},Swizzled={9})",
                         TextureFormat, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask, BufferWidth, Height, BufferWidth, Swizzled);

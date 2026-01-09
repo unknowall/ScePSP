@@ -41,11 +41,11 @@ namespace ScePSP.Core.Cpu.Emitter
 
         public AstNodeStm MethodCacheInfoCallDynamicPc(AstNodeExpr pc, bool tailCall)
         {
-            //if (_DynarecConfig.FunctionCallWithStaticReferences)
+            //if (DynarecConfig.FunctionCallWithStaticReferences)
             //{
-            //	var Call = (AstNodeExpr)ast.CallInstance(GetMethodCacheInfoAtPC(PC), (Action<CpuThreadState>)MethodCacheInfo.Methods.CallDelegate, ast.CpuThreadState);
-            //	if (TailCall) Call = ast.TailCall(Call as AstNodeExprCall);
-            //	return ast.Statement(Call);
+            //    var Call = (AstNodeExpr)Ast.CallInstance(GetMethodCacheInfoAtPC(PC), (Action<CpuThreadState>)MethodCacheInfo.Methods.CallDelegate, Ast.CpuThreadStateExpr);
+            //    if (tailCall) Call = Ast.TailCall(Call as AstNodeExprCall);
+            //    return Ast.Statement(Call);
             //}
             //else
             {
@@ -249,8 +249,7 @@ namespace ScePSP.Core.Cpu.Emitter
                 {
                     if (DynarecConfig.EnableFastPspMemoryUtilsGetFastMemoryReader)
                     {
-                        return Ast.CallStatic(FastPspMemoryUtils.GetFastMemoryReader(memory.FixedGlobalAddress),
-                            address);
+                        return Ast.CallStatic(FastPspMemoryUtils.GetFastMemoryReader(memory.FixedGlobalAddress), address);
                     }
                     else
                     {
@@ -296,8 +295,7 @@ namespace ScePSP.Core.Cpu.Emitter
             //mandatory = true;
             if (mandatory || DynarecConfig.EmitCallTick)
             {
-                return Ast.Statement(Ast.CallInstance(Ast.CpuThreadStateExpr,
-                    (Action)CpuThreadState.Methods.Tick));
+                return Ast.Statement(Ast.CallInstance(Ast.CpuThreadStateExpr, (Action)CpuThreadState.Methods.Tick));
             }
             else
             {

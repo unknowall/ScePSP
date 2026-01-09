@@ -384,9 +384,6 @@ namespace ScePSP.Hle.Vfs
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public unsafe interface IHleIoDriver
     {
         int IoInit(); // Initializes the Driver

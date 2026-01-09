@@ -118,10 +118,10 @@ namespace LightGL
             {
                 Console.WriteLine("Shader ERROR: {0}, {1}", VertexShaderInfo, FragmentShaderInfo);
             }
-            else
-            {
-                Console.WriteLine("OpenGL Shader Compiled.");
-            }
+            //else
+            //{
+            //    Console.WriteLine("OpenGL Shader Compiled.");
+            //}
 
             //Console.WriteLine(
             //    "Compiled Shader! : {0}, {1}",

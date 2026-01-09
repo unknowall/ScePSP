@@ -157,6 +157,10 @@ namespace ScePSP.Core.GpuBackEnd
 
         uint Pc => InstructionAddressCurrent;
 
+        //uint _bjumpCount = 0;
+
+        private GuPrimitiveType _lastPrimType, _lastPPrimType;
+
         private void ProcessInstruction()
         {
             var Instruction = ReadInstructionAndMoveNext();
@@ -183,10 +187,30 @@ namespace ScePSP.Core.GpuBackEnd
                         break;
                     }
 
+                case GpuOpCodes.BBOX:
+                    {
+                        Console.Out.WriteLineColored(ConsoleColor.Red, $" GpuOpCodes BBOX ");
+                        break;
+                    }
+
                 // Flow
                 case GpuOpCodes.JUMP:
                     {
                         JumpRelativeOffset((uint)(Params24 & ~3));
+                        break;
+                    }
+
+                case GpuOpCodes.BJUMP:
+                    {
+                        //Console.Out.WriteLineColored(ConsoleColor.Red, $"BJUMP to {(Params24 & ~3)}");
+                        //if (_bjumpCount++ < 5)
+                        //{
+                            //JumpRelativeOffset((uint)(Params24 & ~3));
+                        //}
+                        //else
+                        //{
+                        //    Console.Out.WriteLineColored(ConsoleColor.Red, "GE - BJUMP Loop > 5");
+                        //}
                         break;
                     }
 
@@ -204,7 +228,6 @@ namespace ScePSP.Core.GpuBackEnd
 
                 // Finishing
                 case GpuOpCodes.END:
-
                     {
                         Done = true;
                         GpuProcessor.GpuBackEnd.End(GpuStateStructPointer);
@@ -265,41 +288,73 @@ namespace ScePSP.Core.GpuBackEnd
 
                 case GpuOpCodes.PPRIM:
                     {
-                        //gpu.state.patch.type = command.extract!(PatchPrimitiveType, 0);
+                        var PrimitiveType = (GuPrimitiveType)Params24.Extract(16, 3);
+                        var vertexCount = (ushort)Params24.Extract(0, 16);
+
+                        if (vertexCount == 0) return;
+
+                        if (PrimitiveType != GuPrimitiveType.ContinuePreviousPrim)
+                            _lastPPrimType = PrimitiveType;
+
+                        //Console.Out.WriteLineColored(ConsoleColor.Cyan, $"PPRIM: Type {PrimitiveType} VertexCount {vertexCount}");
+
+                        //if (_primCount == 0)
+                        //{
+                        //    GpuProcessor.GpuBackEnd.BeforeDraw(GpuStateStructPointer);
+                        //    GpuProcessor.GpuBackEnd.PrimStart(GlobalGpuState, GpuStateStructPointer, _lastPPrimType);
+                        //}
+
+                        //if (vertexCount > 0)
+                        //{
+                        //    GpuProcessor.GpuBackEnd.Prim(vertexCount, true);
+                        //}
+
+                        //var nextInstruction = *(GpuInstruction*)Memory.PspAddressToPointerUnsafe(Pc + 4);
+                        //if (nextInstruction.OpCode == GpuOpCodes.PPRIM &&
+                        //    (GuPrimitiveType)nextInstruction.Params.Extract(16, 3) == PrimitiveType)
+                        //{
+                        //    _primCount++;
+                        //}
+                        //else
+                        //{
+                        //    _primCount = 0;
+                        //    GpuProcessor.GpuBackEnd.PrimEnd();
+                        //}
                         break;
                     }
 
                 case GpuOpCodes.PRIM:
                     {
-                        var primitiveType = (GuPrimitiveType)Params24.Extract(16, 3);
+                        var PrimitiveType = (GuPrimitiveType)Params24.Extract(16, 3);
                         var vertexCount = (ushort)Params24.Extract(0, 16);
+
+                        if (vertexCount == 0) return;
+
+                        if (PrimitiveType != GuPrimitiveType.ContinuePreviousPrim)
+                            _lastPPrimType = PrimitiveType;
+
+                        //Console.Out.WriteLineColored(ConsoleColor.Cyan, $"PRIM: Type {PrimitiveType} VertexCount {vertexCount}");
 #if PRIM_BATCH
                         var nextInstruction = *(GpuInstruction*)Memory.PspAddressToPointerUnsafe(Pc + 4);
 
                         if (_primCount == 0)
                         {
-                            //Console.Out.WriteLineColored(ConsoleColor.Green, $"PRIM: START BeforeDraw {primitiveType}");
-
                             GpuProcessor.GpuBackEnd.BeforeDraw(GpuStateStructPointer);
-                            GpuProcessor.GpuBackEnd.PrimStart(GlobalGpuState, GpuStateStructPointer, primitiveType);
+                            GpuProcessor.GpuBackEnd.PrimStart(GlobalGpuState, GpuStateStructPointer, _lastPPrimType);
                         }
 
                         if (vertexCount > 0)
                         {
-                            //Console.Out.WriteLineColored(ConsoleColor.Green, $"PRIM: DRAW vertexCount {vertexCount}");
-
                             GpuProcessor.GpuBackEnd.Prim(vertexCount);
                         }
 
                         if (nextInstruction.OpCode == GpuOpCodes.PRIM &&
-                            (GuPrimitiveType)nextInstruction.Params.Extract(16, 3) == primitiveType)
+                            (GuPrimitiveType)nextInstruction.Params.Extract(16, 3) == PrimitiveType)
                         {
                             _primCount++;
                         }
                         else
                         {
-                            //Console.Out.WriteLineColored(ConsoleColor.Green, $"PRIM: END PrimCount {_primCount}");
-
                             _primCount = 0;
                             GpuProcessor.GpuBackEnd.PrimEnd();
                         }

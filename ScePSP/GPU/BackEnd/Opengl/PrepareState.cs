@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ScePSP.Core.GpuBackEnd.OpenGL
 {
@@ -115,7 +114,6 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             //GL.Disable(GL.GL_LIGHTING);
             //GL.Disable(GL.GL_POLYGON_OFFSET_FILL);
             //GL.EnableDisable(GL.GL_DITHER, true);
-
         }
 
         private void PrepareShaderTexSet()
@@ -175,7 +173,10 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                 ShaderInfo.alphaMask.NoWarning().Set(GpuState.AlphaTestState.Mask);
                 ShaderInfo.alphaValue.Set(GpuState.AlphaTestState.Value);
 
-                ShaderInfo.texture0.Set(GLTextureUnit.CreateAtIndex(0)
+                CurrentTextureCache = TextureCache.Get(GpuState);
+                CurrentTextureCache.Texture.Bind();
+
+                ShaderInfo.texture0.Set(TexUnit
                     .SetWrap(
                         (GLWrap)(textureState.WrapU == WrapMode.Repeat ? GL.GL_REPEAT : GL.GL_CLAMP_TO_EDGE),
                         (GLWrap)(textureState.WrapV == WrapMode.Repeat ? GL.GL_REPEAT : GL.GL_CLAMP_TO_EDGE)
@@ -188,7 +189,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                             ? GL.GL_LINEAR
                             : GL.GL_NEAREST)
                     )
-                    .SetTexture(RenderbufferManager.TextureCacheGetAndBind(GpuState))
+                    .SetTexture(CurrentTextureCache.Texture)
                 );
             }
         }
@@ -247,13 +248,13 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                 return;
             }
 
-            GL.Enable(GL.GL_ALPHA_TEST);
+            //GL.Enable(GL.GL_ALPHA_TEST);
 
-            var glCompareFunc = DepthFunctionTranslate((int)gpuState.AlphaTestState.Function);
+            //var glCompareFunc = DepthFunctionTranslate((int)gpuState.AlphaTestState.Function);
 
-            float alphaThreshold = gpuState.AlphaTestState.Value / 255.0f;
+            //float alphaThreshold = gpuState.AlphaTestState.Value / 255.0f;
 
-            GL.AlphaFunc((int)glCompareFunc, alphaThreshold);
+            //GL.AlphaFunc((int)glCompareFunc, alphaThreshold);
         }
 
         private void PrepareState_Stencil(GpuStateStruct gpuState)
@@ -479,23 +480,18 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                 PrepareState_Texture_3D(gpuState);
             }
 
-            RenderbufferManager.TextureCacheGetAndBind(gpuState);
-
             //GL.TexEnvi(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvModeTranslate[(int)TextureState.Effect]);
         }
 
         private void PrepareState_Texture_2D(GpuStateStruct gpuState)
         {
             var textureMappingState = gpuState.TextureMappingState;
-            var mipmap0 = textureMappingState.TextureState.Mipmap0;
+            var textureState = textureMappingState.TextureState;
+            var mipmap0 = textureState.Mipmap0;
 
             if (textureMappingState.Enabled)
             {
-                _textureMatrix = Matrix4x4.CreateScale(
-                        1.0f / mipmap0.BufferWidth,
-                        1.0f / mipmap0.TextureHeight,
-                        1.0f
-                );
+                _textureMatrix = Matrix4x4.CreateScale( 1.0f / mipmap0.BufferWidth, 1.0f / mipmap0.TextureHeight, 1.0f );
 
                 ShaderInfo.TextureMode.Set((int)TexCoordMode.Default);
 

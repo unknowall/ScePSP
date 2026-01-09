@@ -44,8 +44,7 @@ namespace ScePSP.Hle.Managers
             {
                 foreach (var handler in SubinterruptHandlers.Where(handler => handler.Enabled))
                 {
-                    _hleInterruptManager.Queue(HleCallback.Create("InterruptTrigger", handler.Address, handler.Index,
-                        handler.Argument));
+                    _hleInterruptManager.Queue(HleCallback.Create("InterruptTrigger", handler.Address, handler.Index, handler.Argument));
                 }
             }
             //Console.Error.WriteLine("Trigger: " + PspInterrupt);

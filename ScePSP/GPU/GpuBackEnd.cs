@@ -61,7 +61,7 @@ namespace ScePSP.Core.GpuBackEnd
         {
         }
 
-        public virtual void Prim(ushort vertexCount)
+        public virtual void Prim(ushort vertexCount, bool isPPrim = false)
         {
         }
 

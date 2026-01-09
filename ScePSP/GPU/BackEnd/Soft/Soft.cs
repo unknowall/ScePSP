@@ -159,7 +159,7 @@ namespace ScePSP.Core.GpuBackEnd.Soft
             //}
         }
 
-        public override void Prim(ushort vertexCount)
+        public override void Prim(ushort vertexCount, bool isPPrim)
         {
             uint morpingVertexCount, totalVerticesWithoutMorphing;
             PrepareVertexs(GpuState, out totalVerticesWithoutMorphing, vertexCount, out morpingVertexCount);

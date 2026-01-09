@@ -4,13 +4,13 @@
     {
         public static bool UpdatePCEveryInstruction = false;
 
-        public static bool FunctionCallWithStaticReferences = true;
+        public static bool FunctionCallWithStaticReferences = false;
 
         public static bool EnableFastPspMemoryUtilsGetFastMemoryReader = false;
 
         public static bool AllowFastMemory = true;
 
-        public static bool EmitCallTick = false;
+        public static bool EmitCallTick = true;
 
         public static bool EnableTailCalling = true;
 
@@ -18,17 +18,14 @@
 
         public static bool DebugFunctionCreation = false;
 
-        public static bool EnableGpuSignalsCallback = false;
+        public static bool EnableGpuSignalsCallback = true;
 
         public static bool EnableGpuFinishCallback = false;
-
-        public static bool EnableRenderTarget = true;
 
         public static bool ImmediateLinking = true;
 
         //Cause sometimes "System.InvalidProgramException: Common Language Runtime detect."
-        //public static bool AllowCreatingUsedFunctionsInBackground = true;
-        public static bool AllowCreatingUsedFunctionsInBackground = false;
+        public static bool AllowCreatingUsedFunctionsInBackground = true;
 
         public static bool DisableDotNetJitOptimizations = false;
 

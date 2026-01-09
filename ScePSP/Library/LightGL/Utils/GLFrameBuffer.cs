@@ -65,11 +65,11 @@ namespace LightGL
             return this;
         }
 
-        public GLFrameBuffer Clear()
+        public GLFrameBuffer Clear(bool isBind = false)
         {
             Bind();
             GL.Clear((int)ClearBufferMask.ColorBufferBit | (int)ClearBufferMask.DepthBufferBit);
-            Unbind();
+            if (!isBind) Unbind();
             return this;
         }
 

@@ -163,10 +163,8 @@ namespace LightGL
             CheckComplete();
 
             //Console.WriteLine($"Bound FrameBuffer {FrameBufferId} : {TargetLayers}, {Width}x{Height}");
-            GL.Viewport(0, 0, Width, Height);
-            GL.ClearColor(0, 0, 0, 1);
-            GL.Clear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-            GL.Flush();
+
+            Clear();
         }
 
         private void CheckComplete()
@@ -177,6 +175,14 @@ namespace LightGL
                 throw new Exception($"Failed to bind FrameBuffer 0x{Status:X4} GlError 0x{GL.GetError():X4}" +
                     $" {GL.GetConstantString(Status)}, {TargetLayers}, {Width}x{Height}");
             }
+        }
+
+        public void Clear()
+        {
+            GL.Viewport(0, 0, Width, Height);
+            GL.ClearColor(0, 0, 0, 1);
+            GL.Clear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+            GL.Flush();
         }
 
         public bool IsComplete()

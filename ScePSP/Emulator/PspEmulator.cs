@@ -50,11 +50,10 @@ namespace ScePSP
             PSPDrivers.Config.StoredConfig = PspStoredConfig.Load();
         }
 
-        public void Start(string File, bool TraceSyscalls = false, bool TrackCallStack = true, IntPtr GpuWindowHandle = default)
+        public void Start(string File, bool TraceSyscalls = false, bool TrackCallStack = true, IntPtr WindowHandle = default)
         {
-            PSPDrivers.initialize(PSPDrivers.PspGpuType.OpenGL, PSPDrivers.PspAudioType.SDL);
+            PSPDrivers.initialize(PSPDrivers.PspGpuType.OpenGL, PSPDrivers.PspAudioType.SDL, WindowHandle);
 
-            PSPDrivers.Config.DisplayConfig.WindowHandle = GpuWindowHandle;
             PSPDrivers.Config.CpuConfig.DebugSyscalls = TraceSyscalls;
             PSPDrivers.Config.CpuConfig.TrackCallStack = TrackCallStack;
 

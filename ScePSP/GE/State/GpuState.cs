@@ -551,6 +551,9 @@ namespace ScePSP.Core.GpuBackEnd.State
             public uint Address => (data.Int(GpuOpCodes.TBP0 + index) & 0xFFFFFF) |
                                    (data.Param8(GpuOpCodes.TBW0 + index, 16) << 24);
 
+            //public uint Address => ((data.Param24(GpuOpCodes.BASE) << 8) & 0xFF000000) |
+            //                        (data.Int(GpuOpCodes.TBP0 + index) & 0xFFFFFF);
+
             /// <summary>
             /// Data width of the image.
             /// With will be bigger. For example:

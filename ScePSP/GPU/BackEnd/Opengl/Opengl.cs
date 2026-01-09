@@ -1,4 +1,5 @@
 ﻿using cscodec.h264.decoder;
+using cscodec.util;
 using LightGL;
 using ScePSP.Core.GpuBackEnd.Formats;
 using ScePSP.Core.GpuBackEnd.State;
@@ -9,13 +10,12 @@ using ScePSPUtils;
 using System;
 using System.Numerics;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace ScePSP.Core.GpuBackEnd.OpenGL
 {
     public unsafe partial class OpenglBackEnd : GpuBackEnd
     {
-        public TextureCacheOpengl TextureCache;
-
         //private GpuStateStruct GpuState;
 
         AutoResetEvent StopEvent = new AutoResetEvent(false);
@@ -35,14 +35,19 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
         private Matrix4x4 _worldViewProjectionMatrix = Matrix4x4.Identity;
         private Matrix4x4 _textureMatrix = Matrix4x4.Identity;
 
-        public RenderbufferManager RenderbufferManager { get; private set; }
         private GLShader _shader;
         private GLBuffer _lightBuf;
 
         bool _doPrimStart;
+        int _Scale = 0;
         VertexTypeStruct _cachedVertexType;
         GuPrimitiveType _primitiveType;
-        GLRenderTarget _logicOpsRenderTarget;
+        
+        public GLFrameBuffer FrameFB;
+        public GLTexture2D FrameTex2D, FrameTexDEPTH, LogicTex2D;
+        public TextureCacheOpengl TextureCache;
+        public TextureOpengl CurrentTextureCache;
+        public GLTextureUnit TexUnit;
 
         public class ShaderInfoClass
         {
@@ -86,42 +91,47 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             public GlAttribute vertexWeight7;
 
             public GlUniform lightenable;
-            public GlUniform materialEmission;    // 发射光
-            public GlUniform materialAmbient;     // 环境光
-            public GlUniform materialDiffuse;     // 漫反射
-            public GlUniform materialSpecular;    // 镜面反射
-            public GlUniform materialShininess;  // 镜面高光指数
-            public GlUniform lightModelAmbient;
-            public GlUniform lightModelColorControl;
-            public GlUniform MaterialColorComponents;
-
             public GlUniform matrixWorld;
             public GlUniform matrixView;
 
-            public GlUniform lightEnableds;
-            public GlUniform lightTypes;
-            public GlUniform lightAmbient;    // 光源环境光
-            public GlUniform lightDiffuse;    // 光源漫反射
-            public GlUniform lightSpecular;   // 光源镜面反射
-            public GlUniform lightPosition;   // 光源位置 (w=1:点光源, w=0:方向光)
-            public GlUniform lightSpotDirection; // 聚光灯方向
-            public GlUniform lightSpotExponent; // 聚光灯指数
-            public GlUniform lightSpotCutoff;   // 聚光灯截止角 (0-90, 180=无聚光)
-            public GlUniform lightConstantAttenuation;  // 常数衰减
-            public GlUniform lightLinearAttenuation;    // 线性衰减
-            public GlUniform lightQuadraticAttenuation; // 二次衰减
+            public GlUniform lopEnabled;
+            public GlUniform backtex;
+            public GlUniform lop;
         }
 
         ShaderInfoClass ShaderInfo = new ShaderInfoClass();
 
         public OpenglBackEnd()
         {
-            RenderbufferManager = new RenderbufferManager(this);
             TextureCache = new TextureCacheOpengl(Memory);
             VertexReader = new VertexReader();
         }
 
         public static string GlGetString(int name) => GL.GetStringStr(name);
+
+        private void UpdateScale(int scaleViewport)
+        {
+            if (_Scale == scaleViewport) return;
+            _Scale = scaleViewport;
+
+            FrameFB?.Dispose();
+
+            LogicTex2D?.Dispose();
+
+            FrameFB = GLFrameBuffer.Create();
+
+            FrameTex2D = GLTexture2D.Create().SetSize(480 * scaleViewport, 272 * scaleViewport);
+
+            FrameTexDEPTH = GLTexture2D.Create().SetFormat(TextureFormat.DEPTH).SetSize(480 * scaleViewport, 272 * scaleViewport);
+
+            FrameFB.AttachTexture(FramebufferAttachment.ColorAttachment0, FrameTex2D);
+
+            FrameFB.AttachTexture(FramebufferAttachment.DepthAttachment, FrameTexDEPTH);
+
+            LogicTex2D = GLTexture2D.Create().SetSize(480 * scaleViewport, 272 * scaleViewport);
+
+            FrameFB.Bind();
+        }
 
         public override void InitSynchronizedOnce(IntPtr TargetHwnd)
         {
@@ -157,6 +167,8 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                     //throw new Exception("Couldn't initialize opengl");
                 }
 
+                UpdateScale(PSPDrivers.Config.StoredConfig.RenderScale);
+
                 _verticesPositionBuffer = GLBuffer.Create();
                 _verticesNormalBuffer = GLBuffer.Create();
                 _verticesTexcoordsBuffer = GLBuffer.Create();
@@ -175,6 +187,8 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                 _shader.BindUniformBlock("LightBlock", 0);
 
                 _lightBuf = GLBuffer.Create(BufferTarget.UniformBuffer, BufferUsage.DynamicDraw);
+
+                TexUnit = GLTextureUnit.CreateAtIndex(0);
 
                 OpenglContext.ReleaseCurrent();
 
@@ -197,6 +211,14 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
                 _shader.Dispose();
                 _lightBuf.Dispose();
+
+                FrameFB?.Dispose();
+
+                FrameTex2D?.Dispose();
+                FrameTexDEPTH?.Dispose();
+                LogicTex2D?.Dispose();
+
+                CurrentTextureCache?.Dispose();
 
                 OpenglContext.Dispose();
             }
@@ -380,7 +402,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
         public override void DrawVideo(uint frameBufferAddress, OutputPixel* outputPixel, int width, int height)
         {
-            RenderbufferManager.DrawVideo(frameBufferAddress, outputPixel, width, height);
+
         }
 
         public override void InvalidateCache(uint address, int size)
@@ -420,29 +442,36 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             _doPrimStart = true;
             ResetVertex();
 
-            if (_shader != null)
+            if (ShaderInfo != null)
             {
-                _shader.GetUniform("lopEnabled").Set(gpuState.LogicalOperationState.Enabled);
+                ShaderInfo.lopEnabled.Set(gpuState.LogicalOperationState.Enabled);
 
                 if (gpuState.LogicalOperationState.Enabled)
                 {
-                    if (_logicOpsRenderTarget == null)
-                    {
-                        _logicOpsRenderTarget = GLRenderTarget.Create(512, 272, TargetLayers.Color);
-                    }
-                    GLRenderTarget.CopyFromTo(GLRenderTarget.Current, _logicOpsRenderTarget);
+                    FrameFB.Bind(FramebufferTarget.ReadFramebuffer);
 
-                    _shader.GetUniform("backtex").Set(GLTextureUnit.CreateAtIndex(1).SetFiltering(GLScaleFilter.Linear)
-                        .SetWrap(GLWrap.ClampToEdge).SetTexture(_logicOpsRenderTarget.TextureColor));
+                    LogicTex2D.Bind();
 
-                    _shader.GetUniform("lop").Set((int)gpuState.LogicalOperationState.Operation);
+                    GL.CopyTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA4, 0, 0, FrameTex2D.Width, FrameTex2D.Height, 0);
 
-                    //new Bitmap(512, 272).SetChannelsDataInterleaved(LogicOpsRenderTarget.ReadPixels(), BitmapChannelList.RGBA).Save(@"c:\temp\test.png");
+                    FrameFB.Bind(FramebufferTarget.DrawFramebuffer);
+
+                    FrameTex2D.Bind();
+
+                    ShaderInfo.backtex.Set(
+                        GLTextureUnit.CreateAtIndex(1)
+                        .SetFiltering(GLScaleFilter.Linear)
+                        .SetWrap(GLWrap.ClampToEdge)
+                        .SetTexture(LogicTex2D));
+
+                    ShaderInfo.lop.Set((int)gpuState.LogicalOperationState.Operation);
+
+                    //new Bitmap(480, 272).SetChannelsDataInterleaved(LogicOpsRenderTarget.ReadPixels(), BitmapChannelList.RGBA).Save("test.png");
                 }
             }
         }
 
-        public override void Prim(ushort vertexCount)
+        public override void Prim(ushort vertexCount, bool IsPatchPrim = false)
         {
             VertexType = GpuState.VertexState.Type;
 
@@ -501,56 +530,75 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
             _CapturePrimitive(_primitiveType, GpuState.GetAddressRelativeToBaseOffset(GpuState.VertexAddress), vertexCount, ref VertexType, () =>
             {
-                if (_indicesList.Length > 0)
+                if (IsPatchPrim)
                 {
-                    switch (_primitiveType)
-                    {
-                        case GuPrimitiveType.TriangleStrip:
-                        case GuPrimitiveType.Sprites:
-                            if (vertexCount > 0)
-                            {
-                                PutVertexIndexRelative(-1);
-                                PutVertexIndexRelative(0);
-                            }
-                            break;
-                        // Can't degenerate, flush.
-                        default:
-                            EndVertex();
-                            break;
-                    }
+                    PPrim(vertexCount);
                 }
-
-                if (_primitiveType == GuPrimitiveType.Sprites)
+                else if (_primitiveType == GuPrimitiveType.Sprites)
                 {
-                    GL.Disable(GL.GL_CULL_FACE);
-                    for (var n = 0; n < vertexCount; n += 2)
-                    {
-                        VertexInfo v0, v1, v2, v3;
-
-                        readVertex(n + 0, out v0);
-                        readVertex(n + 1, out v3);
-
-                        VertexUtils.GenerateTriangleStripFromSpriteVertices(ref v0, out v1, out v2, ref v3);
-
-                        if (n > 0)
-                        {
-                            PutVertexIndexRelative(-1);
-                            PutVertexIndexRelative(0);
-                        }
-
-                        PutVertices(v0, v1, v2, v3);
-                    }
+                    HandleSprites(vertexCount);
                 }
                 else
                 {
-                    VertexInfo VertexInfo;
-                    for (var n = 0; n < vertexCount; n++)
-                    {
-                        readVertex(n, out VertexInfo);
-                        PutVertex(VertexInfo);
-                    }
+                    HandleStandardVertices(vertexCount);
                 }
             });
+        }
+
+        private void PPrim(ushort vertexCount)
+        {
+            GL.Disable(GL.GL_CULL_FACE);
+
+            var mipmap0 = GpuState.TextureMappingState.TextureState.Mipmap0;
+            float mipmapWidth = mipmap0.TextureWidth > 0 ? mipmap0.TextureWidth : 1.0f;
+            float mipmapHeight = mipmap0.TextureHeight > 0 ? mipmap0.TextureHeight : 1.0f;
+
+            VertexInfo v;
+            for (var n = 0; n < vertexCount; n++)
+            {
+                readVertex(n, out v);
+
+                // Patch 需要归一化?
+                if (VertexType.HasTexture)
+                {
+                    v.Texture.X = v.Texture.X / mipmapWidth;
+                    v.Texture.Y = v.Texture.Y / mipmapHeight;
+                }
+
+                PutVertex(v);
+            }
+        }
+
+        private void HandleSprites(ushort vertexCount)
+        {
+            GL.Disable(GL.GL_CULL_FACE);
+            for (var n = 0; n < vertexCount; n += 2)
+            {
+                VertexInfo v0, v1, v2, v3;
+
+                readVertex(n + 0, out v0);
+                readVertex(n + 1, out v3);
+
+                VertexUtils.GenerateTriangleStripFromSpriteVertices(ref v0, out v1, out v2, ref v3);
+
+                if (n > 0)
+                {
+                    // 连接上一批次的顶点
+                    PutVertexIndexRelative(-1);
+                    PutVertexIndexRelative(0);
+                }
+
+                PutVertices(v0, v1, v2, v3);
+            }
+        }
+        private void HandleStandardVertices(ushort vertexCount)
+        {
+            VertexInfo vertexInfo;
+            for (var n = 0; n < vertexCount; n++)
+            {
+                readVertex(n, out vertexInfo);
+                PutVertex(vertexInfo);
+            }
         }
 
         public override void PrimEnd()
@@ -560,7 +608,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
 
         public override void BeforeDraw(GpuStateStruct gpuState)
         {
-            RenderbufferManager.BindCurrentDrawBufferTexture(gpuState);
+            FrameFB.Bind(FramebufferTarget.DrawFramebuffer);
         }
 
         public override void Finish(GpuStateStruct gpuState)

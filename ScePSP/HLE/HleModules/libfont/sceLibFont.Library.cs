@@ -26,10 +26,10 @@ namespace ScePSP.Hle.Modules.libfont
         public Font sceFontOpen(FontLibrary FontLibrary, int Index, int Mode, uint* ErrorCode)
         {
             var FontRegistry = FontLibrary.FontRegistryList[Index];
+            //Console.WriteLine($"sceFontOpen Index {Index} Font {FontRegistry.FontStyle.FileName}");
             try
             {
-                var FontFileStream = HleIoManager.HleIoWrapper.Open("flash0:/font/" + FontRegistry.FontStyle.FileName,
-                    Vfs.HleIoFlags.Read, Vfs.SceMode.All);
+                var FontFileStream = HleIoManager.HleIoWrapper.Open("flash0:/font/" + FontRegistry.FontStyle.FileName, Vfs.HleIoFlags.Read, Vfs.SceMode.All);
                 var PGF = new Pgf().Load(FontFileStream);
                 var Font = new Font(FontLibrary, PGF);
                 *ErrorCode = 0;

@@ -214,7 +214,7 @@ namespace ScePSP
             Null
         }
 
-        public static void initialize(PspGpuType gpu, PspAudioType audio)
+        public static void initialize(PspGpuType gpu, PspAudioType audio, IntPtr WindowHandle = default)
         {
             Config.StoredConfig = new PspStoredConfig();
             Config.CpuConfig = new CpuConfig();
@@ -223,6 +223,8 @@ namespace ScePSP
             Config.HleConfig = new HleConfig();
             Config.DisplayConfig = new DisplayConfig();
             Config.PspHleRunningConfig = new PspHleRunningConfig();
+
+            Config.DisplayConfig.WindowHandle = WindowHandle;
 
             Config.HleConfig.HleModulesDll = typeof(HleModulesRoot).Assembly;
 
@@ -305,10 +307,10 @@ namespace ScePSP
             GpuConnector = HLE.HleThreadManager;
             InterruptManager = HLE.HleInterruptManager;
 
+            Tasks.CpuTask = new CpuTask();
             Tasks.GpuTask = new GpuTask();
             Tasks.AudioTask = new AudioTask();
             Tasks.DisplayTask = new DisplayTask();
-            Tasks.CpuTask = new CpuTask();
 
             Runner = new PspRunner();
 

@@ -1,7 +1,6 @@
 ﻿using LightGL;
 using ScePSP.Core.Memory;
 using ScePSP.Core.Types;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ScePSP.Core.GpuBackEnd.OpenGL
 {

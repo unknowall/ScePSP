@@ -1,4 +1,4 @@
-﻿using ScePSP.Hle.Media.audio.At3;
+﻿using LightCodec;
 using System;
 using System.IO;
 
@@ -6,10 +6,9 @@ namespace cscodec.h264.player
 {
     public sealed unsafe class At3pFrameDecoder : FrameDecoder<short[]>
     {
-        private MaiAt3PlusFrameDecoder MaiAT3PlusFrameDecoder;
+        private ILightCodec FrameDecoder;
 
-        public At3pFrameDecoder(Stream stream)
-            : base(stream)
+        public At3pFrameDecoder(Stream stream) : base(stream)
         {
         }
 
@@ -19,22 +18,26 @@ namespace cscodec.h264.player
 
         protected override void InitProtected()
         {
-            this.MaiAT3PlusFrameDecoder = new MaiAt3PlusFrameDecoder();
+            FrameDecoder = CodecFactory.Get(AudioCodec.AT3plus);
         }
 
         protected override short[] DecodeFrameFromPacket(av.AVPacket avpkt, out int len)
         {
-            Console.WriteLine("{0}", avpkt.data_offset);
-            File.WriteAllBytes(@"c:\isos\psp\samples.raw2", avpkt.data_base);
+            Console.WriteLine("cscodec.h264.player {0}", avpkt.data_offset);
+            //File.WriteAllBytes(@"samples.raw2", avpkt.data_base);
+
+            len = 0;
+            short[] samples = new short[8192];
+
             fixed (byte* data = &avpkt.data_base[avpkt.data_offset])
             {
-                short[] samples;
-                int channels = 0;
-                int ret = this.MaiAT3PlusFrameDecoder.DecodeFrame(data, avpkt.size, out channels, out samples);
-                len = ret;
-                Console.WriteLine("{0}, {1}, {2}", channels, ret, samples.Length);
-                return samples;
+                fixed(short* outptr = samples)
+                    FrameDecoder.decode(data, avpkt.size, outptr, out len);
+
+                Console.WriteLine("cscodec.h264.player AT3+ {0}, {1}", len, samples.Length);
             }
+
+            return samples;
         }
     }
 }

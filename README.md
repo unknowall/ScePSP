@@ -22,7 +22,7 @@
 | :--- | :---: | :---: | :--- |
 | CPU | ✅ Completed | 100% | Dynamic recompiler using AST optimization, approx 12x faster than original CPU |
 | GE | ⏳ In Progress | 90% | BBOX, BJUMP, SIGNAL instructions not yet implemented |
-| ME | ⏳ In Progress | 70% | VAG,AT3,AT3+,AAC completed; implemented using LightCodec |
+| ME | ⏳ In Progress | 70% | VAG, ATRAC3, ATRAC3+, and AAC decoding completed; implemented via LightCodec |
 | AUDIO | ✅ Completed | 100% | Audio output via SDL2 |
 | Devices | ⏳ In Progress | 95% | Kirk supports commercial game decoding |
 | Graphics Backend | ⏳ In Progress | 90% | Supports all GE rendering modes, 130+ FPS, implemented using LightGL |

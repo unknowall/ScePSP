@@ -8,7 +8,7 @@
 | :--- | :---: | :---: | :--- |
 | CPU | ✅ 已完成 | 100% | 使用AST优化的动态重编译，速度约为原CPU的12倍 |
 | GE | ⏳ 开发中 | 90% | BBOX, BJUMP,SIGNAL 指令未完成 |
-| ME | ⏳ 开发中 | 40% | Vag 完成，其他部分使用 LightCodec 实现 |
+| ME | ⏳ 开发中 | 70% | Vag,AT3,AT3+,AAC 完成，使用 LightCodec 实现 |
 | AUDIO | ✅ 已完成 | 100% | 使用SDL2作为音频输出 |
 | Devices | ⏳ 开发中 | 95% | Kirk 已支持商业游戏解码|
 | 图形后端 | ⏳ 开发中 | 90% | 支持所有GE渲染模式 130+ FPS，使用 LightGL 实现 |
@@ -22,7 +22,7 @@
 | :--- | :---: | :---: | :--- |
 | CPU | ✅ Completed | 100% | Dynamic recompiler using AST optimization, approx 12x faster than original CPU |
 | GE | ⏳ In Progress | 90% | BBOX, BJUMP, SIGNAL instructions not yet implemented |
-| ME | ⏳ In Progress | 40% | VAG completed; other parts implemented using LightCodec |
+| ME | ⏳ In Progress | 70% | VAG,AT3,AT3+,AAC completed; implemented using LightCodec |
 | AUDIO | ✅ Completed | 100% | Audio output via SDL2 |
 | Devices | ⏳ In Progress | 95% | Kirk supports commercial game decoding |
 | Graphics Backend | ⏳ In Progress | 90% | Supports all GE rendering modes, 130+ FPS, implemented using LightGL |

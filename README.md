@@ -12,7 +12,7 @@
 | AUDIO | ✅ 已完成 | 100% | 使用SDL2作为音频输出 |
 | Devices | ⏳ 开发中 | 95% | Kirk 已支持商业游戏解码|
 | 图形后端 | ⏳ 开发中 | 90% | 支持所有GE渲染模式 130+ FPS，使用 LightGL 实现 |
-| HLE模块 | ⏳ 开发中 | 42% | 已能支持商业游戏运行 |
+| HLE模块 | ⏳ 开发中 | 48% | 已能支持商业游戏运行 |
 | 跨平台 | ⏳ 开发中 | ?% | 核心已可编译为Win,Linux,Mac |
 | UI 界面 | 🚫 计划中 | 0% | 核心功能稳定后开始编写 |
 
@@ -25,19 +25,19 @@
 | ME | ⏳ In Progress | 70% | VAG, ATRAC3, ATRAC3+, and AAC decoding completed; implemented via LightCodec |
 | AUDIO | ✅ Completed | 100% | Audio output via SDL2 |
 | Devices | ⏳ In Progress | 95% | Kirk supports commercial game decoding |
-| Graphics Backend | ⏳ In Progress | 90% | Supports all GE rendering modes, 130+ FPS, implemented using LightGL |
-| HLE Modules | ⏳ In Progress | 42% | Capable of running commercial games |
+| Graphics Backend | ⏳ In Progress | 90% | Supports all GE rendering modes, 130+ FPS, implemented via LightGL |
+| HLE Modules | ⏳ In Progress | 48% | Capable of running commercial games |
 | Cross-Platform | ⏳ In Progress | ?% | Core compiles on Windows, Linux, and Mac |
 | UI | 🚫 Planned | 0% | Development to begin after core features are stable |
 
 _(Figure 1: runing Castlevania - The Dracula X Chronicles (USA) on title )_  
-<img width="962" height="576" alt="捕获" src="https://github.com/user-attachments/assets/94a3ca0a-70a3-4d5c-878a-98cc3a42e87c" />
+<img width="962" height="576" alt="捕获" src="https://github.com/user-attachments/assets/0d707833-22e3-480f-8fe7-1751e12d330a" />
 
 _(Figure 2: runing Castlevania - The Dracula X Chronicles (USA) in game )_  
-<img width="962" height="576" alt="捕获" src="https://github.com/user-attachments/assets/2f82abf5-81fa-4dc3-8abe-71c080ff5f83" />
+<img width="962" height="576" alt="捕获1" src="https://github.com/user-attachments/assets/ed22a0c8-2d8d-4698-8c1f-543399c8c323" />
 
 _(Figure 3: runing Valhalla Knights in game (many graphics issues))_  
-<img width="962" height="576" alt="捕获2" src="https://github.com/user-attachments/assets/9d87dba3-9242-4beb-a152-2156bee726e4" />
+<img width="962" height="576" alt="捕获3" src="https://github.com/user-attachments/assets/505cf60a-aa29-436b-8ffc-4867aea3a19a" />
 
 _(Figure 4: runing PSPDemo/morphskin.elf)_  
 <img width="962" height="576" alt="PSP2" src="https://github.com/user-attachments/assets/355a362a-350e-4d66-b6ac-dc8bd4e6cc81" />

@@ -125,7 +125,7 @@ namespace ScePSP.Hle.Formats
             }
 
             // Read the block list
-            Blocks = Stream.ReadStructVector<BlockInfo>((uint)(NumberOfBlocks + 1));
+            Blocks = Stream.ReadStructVectorEx<BlockInfo>((uint)(NumberOfBlocks + 1));
         }
 
         /// <summary>

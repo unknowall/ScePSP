@@ -1,7 +1,9 @@
-﻿using SafeILGenerator.Ast;
+﻿using Microsoft.VisualBasic;
+using SafeILGenerator.Ast;
 using SafeILGenerator.Ast.Nodes;
 using SafeILGenerator.Utils;
 using ScePSP.Core.Cpu.InstructionCache;
+using ScePSP.Core.GpuBackEnd;
 using ScePSP.Core.Memory;
 using System;
 using System.Collections.Generic;
@@ -21,6 +23,7 @@ namespace ScePSP.Core.Cpu.Emitter
     public unsafe class AstMipsGenerator : AstGenerator
     {
         public new static readonly AstMipsGenerator Instance = new AstMipsGenerator();
+
         private static readonly AstMipsGenerator Ast = Instance;
 
         public AstNodeExprCallDelegate MethodCacheInfoCallStaticPc(CpuProcessor cpuProcessor, uint pc)

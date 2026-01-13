@@ -2,12 +2,17 @@
 using ScePSPUtils.Streams;
 using System;
 using System.IO;
+using static System.Windows.Forms.DataFormats;
 
 namespace ScePSP.Hle.Formats.audio
 {
     public class RiffWaveReader
     {
-        public event Action<string, SliceStream> HandleChunk;
+        public event Action<string, uint, SliceStream> HandleChunk;
+
+        public int HeadSize = 0;
+
+        public bool HasData = false;
 
         public RiffWaveReader()
         {
@@ -18,29 +23,40 @@ namespace ScePSP.Hle.Formats.audio
             ParseFile(Stream);
         }
 
-        private void ParseFile(Stream Stream)
+        public void ParseFile(Stream Stream)
         {
             if (Stream.ReadString(4) != "RIFF") throw new InvalidDataException("Not a RIFF File");
             var RiffSize = new BinaryReader(Stream).ReadUInt32();
+            HeadSize += 8;
             var RiffStream = Stream.ReadStream(RiffSize);
             ParseRiff(RiffStream);
         }
 
-        private void ParseRiff(Stream Stream)
+        public void ParseRiff(Stream Stream)
         {
             if (Stream.ReadString(4) != "WAVE") throw new InvalidDataException("Not a RIFF.WAVE File");
-            while (!Stream.Eof())
+            HeadSize += 4;
+            while (!Stream.Eof() && !HasData)
             {
                 var ChunkType = Stream.ReadString(4);
-                var ChunkSize = new BinaryReader(Stream).ReadUInt32();
+                uint ChunkSize = new BinaryReader(Stream).ReadUInt32();
+                HeadSize += 8;
+                if (ChunkType == "data")
+                {
+                    HasData = true;
+                }
+                else
+                {
+                    HeadSize += (int)ChunkSize;
+                }
                 var ChunkStream = Stream.ReadStream(ChunkSize);
-                HandleChunkInternal(ChunkType, ChunkStream);
+                HandleChunkInternal(ChunkType, ChunkSize, ChunkStream);
             }
         }
 
-        private void HandleChunkInternal(string ChunkType, SliceStream ChunkStream)
+        public void HandleChunkInternal(string ChunkType, uint ChunkSize, SliceStream ChunkStream)
         {
-            if (HandleChunk != null) HandleChunk(ChunkType, ChunkStream);
+            if (HandleChunk != null) HandleChunk(ChunkType, ChunkSize, ChunkStream);
         }
     }
 }

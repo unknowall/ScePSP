@@ -476,8 +476,6 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
                         .SetTexture(LogicTex2D));
 
                     ShaderInfo.lop.Set((int)gpuState.LogicalOperationState.Operation);
-
-                    //new Bitmap(480, 272).SetChannelsDataInterleaved(LogicTex2D.ReadPixels(), BitmapChannelList.RGBA).Save("test.png");
                 }
             }
         }

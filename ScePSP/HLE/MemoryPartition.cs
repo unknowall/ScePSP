@@ -192,8 +192,7 @@ namespace ScePSP.Hle
             return Partition;
         }
 
-        public MemoryPartition Allocate(int Size, Anchor AllocateAnchor = Anchor.Low, uint Position = 0,
-            int Alignment = 1, string Name = "<Unknown>")
+        public MemoryPartition Allocate(int Size, Anchor AllocateAnchor = Anchor.Low, uint Position = 0, int Alignment = 1, string Name = "<Unknown>")
         {
             try
             {
@@ -209,8 +208,7 @@ namespace ScePSP.Hle
                 // As much we will need those space.
                 SizeCheck += Alignment - 1;
 
-                var AcceptablePartitions =
-                    _ChildPartitions.Where(Partition => !Partition.Allocated && Partition.Size >= SizeCheck);
+                var AcceptablePartitions = _ChildPartitions.Where(Partition => !Partition.Allocated && Partition.Size >= SizeCheck);
 
                 //Console.Error.WriteLine("{0}, {1}", AcceptablePartitions.Count(), AcceptablePartitions.First().Size);
 

@@ -28,14 +28,11 @@ namespace ScePSP.Core.Cpu.InstructionCache
 
         public MethodCache MethodCache;
 
-        /// <summary>
-        /// Functions that are calling to this one.
-        /// And that should be uncached when this function
-        /// </summary>
+        // Functions that are calling to this one.
+        // And that should be uncached when this function
         //public List<MethodCacheInfo> FunctionsUsingThis = new List<MethodCacheInfo>();
-        /// <summary>
-        /// Static Field that will hold the Delegate
-        /// </summary>
+
+        // Static Field that will hold the Delegate
         public IlInstanceHolderPoolItem<Action<CpuThreadState>> StaticField;
 
         public bool FollowPspCallingConventions;

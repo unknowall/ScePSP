@@ -6,13 +6,8 @@ using ScePSP.Hle.Formats.audio;
 using ScePSP.Hle.Managers;
 using ScePSP.Hle.Modules.audio;
 using ScePSPUtils;
-using ScePSPUtils.Endian;
-using ScePSPUtils.Streams;
 using System;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using LightCodec;
 
 namespace ScePSP.Hle.Modules.libatrac3plus
 {
@@ -25,435 +20,26 @@ namespace ScePSP.Hle.Modules.libatrac3plus
 
         public HleMemoryManager HleMemoryManager => PSPDrivers.HLE.MemoryManager;
 
-        public enum CodecType
+        private Atrac TryToAlloc(Atrac Atrac)
         {
-            PSP_MODE_AT_3_PLUS = 0x00001000,
-            PSP_MODE_AT_3 = 0x00001001,
-        }
-
-        public struct OMAHeader
-        {
-            public UintBe Magic;
-            public UshortBe StructSize;
-            public UshortBe Unknown0;
-            public UintBe Unknown1;
-            public UintBe Unknown2;
-            public UintBe Unknown3;
-            public UintBe Unknown4;
-            public UintBe Unknown5;
-            public UintBe Unknown6;
-
-            // Must set from AT3.
-            public uint OmaInfo;
-
-            private fixed byte Pad[60];
-
-            public OMAHeader(uint omaInfo)
+            var CodecType = Atrac.CodecType;
+            var Count = PSPDrivers.HLE.HleUidPoolManager.List<Atrac>().Count(_Atrac => _Atrac.CodecType == CodecType);
+            if (CodecType == CodecType.PSP_MODE_AT_3_PLUS)
             {
-                this.Magic = 0x45413301;
-                this.StructSize = (ushort)sizeof(OMAHeader);
-                this.Unknown0 = unchecked((ushort)-1);
-                this.Unknown1 = 0x00000000;
-                this.Unknown2 = 0x010f5000;
-                this.Unknown3 = 0x00040000;
-                this.Unknown4 = 0x0000f5ce;
-                this.Unknown5 = 0xd2929132;
-                this.Unknown6 = 0x2480451c;
-                this.OmaInfo = omaInfo;
-            }
-
-            public static void WriteOma(string FileName, ScePSP.Hle.Modules.libatrac3plus.sceAtrac3plus.Atrac.At3FormatStruct Format, Stream DataStream)
-            {
-                using (var Stream = File.Open(FileName, FileMode.Create, FileAccess.Write))
+                if (Count >= MaxAtrac3Plus)
                 {
-                    Stream.WriteStruct(new OMAHeader(Format.OmaInfo));
-                    Stream.WriteStream(DataStream);
+                    throw new SceKernelException(SceKernelErrors.ATRAC_ERROR_NO_ATRACID);
                 }
             }
-        }
-
-        [HleUidPoolClass(NotFoundError = SceKernelErrors.ERROR_ATRAC_BAD_ID, FirstItem = 0, ReuseIds = true)]
-        public class Atrac : IHleUidPoolClass
-        {
-            protected HleMemoryManager HleMemoryManager => PSPDrivers.HLE.MemoryManager;
-
-            public At3FormatStruct Format;
-            public FactStruct Fact;
-            public SmplStruct Smpl;
-            public LoopInfoStruct[] LoopInfoList;
-
-            public int MaximumSamples
+            else if (CodecType == CodecType.PSP_MODE_AT_3)
             {
-                get
+                if (Count >= MaxAtrac3)
                 {
-                    switch (CodecType)
-                    {
-                        case sceAtrac3plus.CodecType.PSP_MODE_AT_3_PLUS: return 0x800;
-                        case sceAtrac3plus.CodecType.PSP_MODE_AT_3: return 0x400;
-                        default: throw new NotImplementedException();
-                    }
+                    throw new SceKernelException(SceKernelErrors.ATRAC_ERROR_NO_ATRACID);
                 }
             }
 
-            public int BlockSize => this.Format.BlockSize;
-
-            public CodecType CodecType;
-            public int NumberOfLoops;
-            private int _DecodingOffset;
-
-            public int DecodingOffset
-            {
-                get => _DecodingOffset;
-                set
-                {
-                    _DecodingOffset = value & ~0x7FF;
-                    if (this.MaximumSamples == 0)
-                    {
-                        DataStream.Position = 0;
-                    }
-                    else
-                    {
-                        DataStream.Position = _DecodingOffset * this.BlockSize / this.MaximumSamples;
-                    }
-                }
-            }
-
-            public ScePSPUtils.Streams.SliceStream DataStream;
-
-            protected ILightCodec AT3FrameDecoder;
-
-            public MemoryPartition PrimaryBuffer;
-
-            public int PrimaryBufferReaded;
-
-            public enum CompressionCode : ushort
-            {
-                Unknown = 0x0000,
-                PcmUncompressed = 0x0001,
-                MicrosoftAdpcm = 0x0002,
-                ItuG711ALaw = 0x0006,
-                ItuG711AmLaw = 0x0007,
-                ImaAdpcm = 0x0011,
-                ItuG723AdpcmYamaha = 0x0016,
-                Gsm610 = 0x0031,
-                ItuG721Adpcm = 0x0040,
-                Mpeg = 0x0050,
-                Atrac3 = 0x0270,
-                Atrac3Plus = 0xFFFE,
-                Experimental = 0xFFFF,
-            }
-
-            public struct WavFormatStruct
-            {
-                /// <summary>
-                /// 01 00       - For Uncompressed PCM (linear quntization)
-                /// </summary>
-                public CompressionCode CompressionCode;
-
-                /// <summary>
-                /// 02 00       - Stereo
-                /// </summary>
-                public ushort AtracChannels;
-
-                /// <summary>
-                /// 44 AC 00 00 - 44100
-                /// </summary>
-                public int Bitrate;
-
-                /// <summary>
-                /// Should be on uncompressed PCM : sampleRate * short.sizeof * numberOfChannels
-                /// </summary>
-                public uint BytesPerSecond;
-
-                /// <summary>
-                /// short.sizeof * numberOfChannels
-                /// </summary>
-                public ushort BlockAlignment;
-
-                public static StreamStructCachedArrayWrapper<StereoShortSoundSample> ParseWavData(Stream Stream)
-                {
-                    StreamStructCachedArrayWrapper<StereoShortSoundSample> DecodedSamples = null;
-                    var RiffWaveReader = new RiffWaveReader();
-                    WavFormatStruct WavFormat;
-                    RiffWaveReader.HandleChunk += (ChunkType, ChunkStream) =>
-                    {
-                        switch (ChunkType)
-                        {
-                            case "fmt ":
-                                WavFormat = ChunkStream.ReadStruct<WavFormatStruct>();
-                                break;
-                            case "data":
-#if false
-								DecodedSamples =new ArrayWrapper<StereoShortSoundSample>(PointerUtils.ByteArrayToArray<StereoShortSoundSample>(ChunkStream.ReadAll()));
-#else
-                                DecodedSamples = ChunkStream.ConvertToStreamStructCachedArrayWrapper<StereoShortSoundSample>(16 * 1024);
-#endif
-                                break;
-                            default:
-                                throw new NotImplementedException($"Can't handle chunk '{ChunkType}'");
-                        }
-                    };
-                    RiffWaveReader.Parse(Stream);
-
-                    return DecodedSamples;
-                }
-            }
-
-            [StructLayout(LayoutKind.Explicit)]
-            public struct At3FormatStruct
-            {
-                /// <summary>
-                /// 01 00 - For Uncompressed PCM (linear quntization)
-                /// FE FF - For AT3+
-                /// </summary>
-                [FieldOffset(0x0000)] public CompressionCode CompressionCode;
-
-                /// <summary>
-                /// 02 00       - Stereo
-                /// </summary>
-                [FieldOffset(0x0002)] public ushort AtracChannels;
-
-                /// <summary>
-                /// 44 AC 00 00 - 44100
-                /// </summary>
-                [FieldOffset(0x0004)] public uint Bitrate;
-
-                /// <summary>
-                /// Should be on uncompressed PCM : sampleRate * short.sizeof * numberOfChannels
-                /// </summary>
-                [FieldOffset(0x0008)] public uint AverageBytesPerSecond;
-
-                /// <summary>
-                /// short.sizeof * numberOfChannels
-                /// </summary>
-                [FieldOffset(0x000A)] public ushort BlockAlignment;
-
-                [FieldOffset(0x000C)] public ushort BytesPerFrame;
-
-                [FieldOffset(0x0010)] private fixed uint Unknown[6];
-
-                [FieldOffset(0x0028)] public uint OmaInfo;
-
-                [FieldOffset(0x0028)] private UshortBe _Unk2;
-
-                [FieldOffset(0x002A)] private UshortBe _BlockSize;
-
-                public int BlockSize => (_BlockSize & 0x3FF) * 8 + 8;
-            }
-
-            public struct FactStruct
-            {
-                public int EndSample;
-
-                public int SampleOffset;
-            }
-
-            /// <summary>
-            /// Loop Info
-            /// </summary>
-            public struct SmplStruct
-            {
-                /// <summary>
-                /// 0000 -
-                /// </summary>
-                private fixed uint Unknown[7];
-
-                /// <summary>
-                /// 001C -
-                /// </summary>
-                public uint LoopCount;
-
-                /// <summary>
-                /// 0020 - 
-                /// </summary>
-                private fixed uint Unknown2[1];
-            }
-
-            public struct LoopInfoStruct
-            {
-                /// <summary>
-                /// 0000 -
-                /// </summary>
-                public uint CuePointID;
-
-                /// <summary>
-                /// 0004 -
-                /// </summary>
-                public uint Type;
-
-                /// <summary>
-                /// 0008 -
-                /// </summary>
-                public int StartSample;
-
-                /// <summary>
-                /// 000C -
-                /// </summary>
-                public int EndSample;
-
-                /// <summary>
-                /// 0010 -
-                /// </summary>
-                public uint Fraction;
-
-                /// <summary>
-                /// 0014 -
-                /// </summary>
-                public int PlayCount;
-            }
-
-            public Atrac(CodecType CodecType)
-            {
-                PrimaryBuffer = HleMemoryManager.GetPartition(MemoryPartitions.User).Allocate(1024);
-
-                this.CodecType = CodecType;
-            }
-
-            public Atrac(byte* Data, int DataLength)
-            {
-                PrimaryBuffer = HleMemoryManager.GetPartition(MemoryPartitions.User).Allocate(1024);
-
-                CodecType = CodecType.PSP_MODE_AT_3_PLUS;
-
-                SetData(Data, DataLength);
-            }
-
-            public void SetData(byte* Data, int DataLength)
-            {
-                ParseAtracData(new UnmanagedMemoryStream(Data, DataLength));
-            }
-
-            private void ParseAtracData(Stream Stream)
-            {
-                var RiffWaveReader = new RiffWaveReader();
-                RiffWaveReader.HandleChunk += (ChunkType, ChunkStream) =>
-                {
-                    switch (ChunkType)
-                    {
-                        case "fmt ":
-                            Format = ChunkStream.ReadStructPartially<At3FormatStruct>();
-                            break;
-                        case "fact":
-                            Fact = ChunkStream.ReadStructPartially<FactStruct>();
-                            break;
-                        case "smpl":
-                            Smpl = ChunkStream.ReadStructPartially<SmplStruct>();
-                            LoopInfoList = ChunkStream.ReadStructVector<LoopInfoStruct>(Smpl.LoopCount);
-
-                            Console.WriteLine("AT3 smpl: {0}", Smpl.ToString());
-                            foreach (var LoopInfo in LoopInfoList)
-                                Console.WriteLine("Loop: {0}", LoopInfo.ToString());
-
-                            break;
-                        case "data":
-                            this.DataStream = ChunkStream;
-                            break;
-                        default:
-                            throw new NotImplementedException($"Can't handle chunk '{ChunkType}'");
-                    }
-                };
-                RiffWaveReader.Parse(Stream);
-
-                switch (Format.CompressionCode)
-                {
-                    case CompressionCode.Atrac3:
-                        AT3FrameDecoder = CodecFactory.Get(AudioCodec.AT3);
-                        break;
-                    case CompressionCode.Atrac3Plus:
-                        AT3FrameDecoder = CodecFactory.Get(AudioCodec.AT3plus);
-                        break;
-                    default:
-                        AT3FrameDecoder = CodecFactory.Get(AudioCodec.NULL);
-                        Console.WriteLine($"sceAtrac3Plus no sopport codec: {Format.CompressionCode}");
-                        return;
-                }
-
-                AT3FrameDecoder.init(Format.BytesPerFrame,Format.AtracChannels,Format.AtracChannels,0);
-            }
-
-            void IDisposable.Dispose()
-            {
-                Console.WriteLine("Atrac3+ Dispose");
-            }
-
-            public int EndSample => Fact.EndSample;
-
-            public bool DecodingReachedEnd => RemainingFrames <= 0;
-
-            public int GetNumberOfSamplesInNextFrame()
-            {
-                //Console.Error.WriteLine("*************** {0}, {1}, {2}", EndSample, DecodingOffset, EndSample - DecodingOffset);
-                return Math.Min(this.MaximumSamples, EndSample - DecodingOffset);
-            }
-
-            public int RemainingFrames
-            {
-                get
-                {
-                    if (this.BlockSize == 0) return -1;
-                    return (int)(this.DataStream.Available() / this.BlockSize);
-                }
-            }
-
-            public int Decode(StereoShortSoundSample* SamplesOut)
-            {
-                if (SamplesOut == null) return 0;
-
-                try
-                {
-                    var BlockSize = this.Format.BlockSize;
-
-                    if (BlockSize <= 0)
-                    {
-                        Console.WriteLine("BlockSize <= 0");
-                        return -1;
-                    }
-
-                    if (this.DataStream.Available() < BlockSize)
-                    {
-                        Console.WriteLine("EndOfData {0} < {1} : {2}, {3}", this.DataStream.Available(), BlockSize,  DecodingOffset, EndSample);
-                        return 0;
-                    }
-
-                    var Data = new byte[BlockSize];
-                    short[] buf;
-                    int channels = 2;
-                    int rc, len = 0;
-
-                    this.DataStream.Read(Data, 0, Data.Length);
-
-                    fixed (byte* DataPtr = Data)
-                    {
-                        fixed (short* bufptr = buf)
-                            if ((rc = this.AT3FrameDecoder.decode(DataPtr, BlockSize, bufptr, out len)) < 0)
-                            {
-                                Console.WriteLine("LightCodec.decode: {0}", rc);
-                                return 0;
-                            }
-
-                        int DecodedSamples = this.MaximumSamples;
-                        int DecodedSamplesChannels = DecodedSamples * channels;
-                        _DecodingOffset += DecodedSamples;
-
-                        fixed (short* buf_ptr = buf)
-                        {
-                            for (int n = 0; n < DecodedSamplesChannels; n += channels)
-                            {
-                                SamplesOut->Left = buf_ptr[n + 0];
-                                SamplesOut->Right = buf_ptr[n + 1];
-                                SamplesOut++;
-                            }
-                        }
-
-                        return DecodedSamples;
-                    }
-                }
-                catch
-                {
-                    Console.Error.WriteLine("Error Atrac3.Decode");
-                    return 0;
-                }
-            }
+            return Atrac;
         }
 
         /// <summary>
@@ -463,19 +49,17 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// <param name="DataLength">The size of the buffer pointed by buf</param>
         /// <returns>The new atrac ID, or less than 0 on error </returns>
         [HlePspFunction(NID = 0x7A20E7AF, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public Atrac sceAtracSetDataAndGetID(byte* DataPointer, int DataLength)
         {
-            //var Data = ArrayUtils.CreateArray<byte>(DataPointer, DataLength);
             return TryToAlloc(new Atrac(DataPointer, DataLength));
         }
 
         [HlePspFunction(NID = 0xB3B5D042, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceAtracGetOutputChannel(CpuThreadState CpuThreadState, Atrac Atrac, out int OutputChannel)
         {
             OutputChannel = sceAudio.sceAudioChReserve(CpuThreadState, -1, Atrac.MaximumSamples, PspAudio.FormatEnum.Stereo);
-            //Console.WriteLine("{0}", *OutputChannelPointer); Console.ReadKey();
             return 0;
         }
 
@@ -504,10 +88,10 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         }
 
         [HlePspFunction(NID = 0x0E2A73AB, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
         public int sceAtracSetData(Atrac Atrac, byte* BufferPointer, int BufferSizeInBytes)
         {
             Atrac.SetData(BufferPointer, BufferSizeInBytes);
+
             return 0;
         }
 
@@ -518,7 +102,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// <param name="MaxNumberOfSamples">Pointer to a integer that receives the maximum number of samples.</param>
         /// <returns>Less than 0 on error, otherwise 0</returns>
         [HlePspFunction(NID = 0xD6A5F2F7, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceAtracGetMaxSample(Atrac Atrac, out int MaxNumberOfSamples)
         {
             MaxNumberOfSamples = Atrac.MaximumSamples;
@@ -526,11 +110,12 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         }
 
         [HlePspFunction(NID = 0xFAA4F89B, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
-        public int sceAtracGetLoopStatus(Atrac Atrac, out int piLoopNum, out uint puiLoopStatus)
+        //[HlePspNotImplemented]
+        public int sceAtracGetLoopStatus(Atrac Atrac, out int piLoopNum, out int puiLoopStatus)
         {
-            piLoopNum = 0;
-            puiLoopStatus = 0;
+            piLoopNum = Atrac.NumberOfLoops;
+            puiLoopStatus = Atrac.LoopStatus;
+
             return 0;
         }
 
@@ -544,11 +129,13 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// </param>
         /// <returns>Less than 0 on error, otherwise 0</returns>
         [HlePspFunction(NID = 0x868120B5, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceAtracSetLoopNum(Atrac Atrac, int NumberOfLoops)
         {
             if (Atrac.Smpl.LoopCount == 0) throw new SceKernelException(SceKernelErrors.ATRAC_ERROR_UNSET_PARAM);
+
             Atrac.NumberOfLoops = NumberOfLoops;
+
             return 0;
         }
 
@@ -562,7 +149,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// </param>
         /// <returns>Less than 0 on error, otherwise 0</returns>
         [HlePspFunction(NID = 0x9AE849A7, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceAtracGetRemainFrame(Atrac Atrac, out int RemainFramePointer)
         {
             RemainFramePointer = Atrac.RemainingFrames;
@@ -574,7 +161,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// </summary>
         /// <param name="AtracId">The atrac ID</param>
         /// <param name="SamplesOut">pointer to a buffer that receives the decoded data of the current frame</param>
-        /// <param name="DecodedSamples">pointer to a integer that receives the number of audio samples of the decoded frame</param>
+        /// <param name="NumberOfSamples">pointer to a integer that receives the number of audio samples of the decoded frame</param>
         /// <param name="ReachedEnd">pointer to a integer that receives a boolean value indicating if the decoded frame is the last one</param>
         /// <param name="RemainingFramesToDecode">
         ///		pointer to a integer that receives either -1 if all at3 data is already on memory, 
@@ -584,39 +171,65 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         [HlePspFunction(NID = 0x6A8C3CD5, FirmwareVersion = 150)]
         //[HlePspNotImplemented]
         public int sceAtracDecodeData(Atrac Atrac, StereoShortSoundSample* SamplesOut,
-            [HleInvalidAsInvalidPointer] out int DecodedSamples, [HleInvalidAsInvalidPointer] out int ReachedEnd,
+            [HleInvalidAsInvalidPointer] out int NumberOfSamples, [HleInvalidAsInvalidPointer] out int ReachedEnd,
             [HleInvalidAsInvalidPointer] out int RemainingFramesToDecode)
         {
-            return _sceAtracDecodeData(Atrac, SamplesOut, out DecodedSamples, out ReachedEnd, out RemainingFramesToDecode);
+            return _sceAtracDecodeData(Atrac, SamplesOut, out NumberOfSamples, out ReachedEnd, out RemainingFramesToDecode);
         }
 
-        private int _sceAtracDecodeData(Atrac Atrac, StereoShortSoundSample* SamplesOut, out int DecodedSamples, out int ReachedEnd, out int RemainingFramesToDecode)
+        private int _sceAtracDecodeData(Atrac Atrac, StereoShortSoundSample* SamplesOut, out int NumberOfSamples, out int ReachedEnd, out int RemainingFramesToDecode)
         {
-            DecodedSamples = 0;
             ReachedEnd = 0;
-            RemainingFramesToDecode = 0;
-
-            //return 0;
-
-            DecodedSamples = Atrac.Decode(SamplesOut);
-            ReachedEnd = 0;
+            NumberOfSamples = 0;
             RemainingFramesToDecode = Atrac.RemainingFrames;
 
-            //Console.WriteLine("{0}/{1} -> {2} : {3}", Atrac.DecodingOffsetInSamples, Atrac.TotalSamples, DecodedSamples, Atrac.DecodingReachedEnd);
+            if (Atrac.SecondBufferNeeded && !Atrac.SecondBufferSet)
+            {
+                Console.WriteLine($"sceAtracDecodeData {Atrac} needs second buffer!");
+                return (int)SceKernelErrors.ERROR_ATRAC_SECOND_BUFFER_NEEDED;
+            }
+
+            int Ret = Atrac.Decode(SamplesOut);
+            if (Ret == -1)
+            {
+                NumberOfSamples = 0;
+                return 0;
+            }
+            if (Ret == -2)
+            {
+                return (int)SceKernelErrors.ERROR_ATRAC_BUFFER_IS_EMPTY;
+            }
+
+            NumberOfSamples = Atrac.Decoder.NumberOfSamples;
+            RemainingFramesToDecode = Atrac.RemainingFrames;
+
+            //Console.WriteLine("{0}/{1} -> {2} : {3}", Atrac.DecodingOffset, Atrac.DataStream.Length, NumberOfSamples, Atrac.DecodingReachedEnd);
 
             if (Atrac.DecodingReachedEnd)
             {
                 if (Atrac.NumberOfLoops == 0)
                 {
-                    DecodedSamples = 0;
+                    NumberOfSamples = 0;
                     ReachedEnd = 1;
                     RemainingFramesToDecode = 0;
-                    Console.WriteLine("SceKernelErrors.ERROR_ATRAC_ALL_DATA_DECODED)");
-                    throw new SceKernelException(SceKernelErrors.ERROR_ATRAC_ALL_DATA_DECODED);
+                    Console.WriteLine("SceKernelErrors.ERROR_ATRAC_ALL_DATA_DECODED");
+                    return (int)(SceKernelErrors.ERROR_ATRAC_ALL_DATA_DECODED);
                 }
                 if (Atrac.NumberOfLoops > 0) Atrac.NumberOfLoops--;
 
-                Atrac.DecodingOffset = Atrac.LoopInfoList.Length > 0 ? Atrac.LoopInfoList[0].StartSample : 0;
+                Atrac.SetPlayPosition(Atrac.LoopInfoList.Length > 0 ? Atrac.LoopInfoList[0].StartSample : 0, Atrac.InputBuffer.CurrentSize, 0);
+
+                if (Atrac.InputBuffer.Position == Atrac.InputBuffer.CurrentSize)
+                    Atrac.SetPlayPosition(0, Atrac.InputBuffer.CurrentSize, 0);
+
+                Console.WriteLine($"LoopInfoList {Atrac.NumberOfLoops} Start {Atrac.LoopInfoList[0].StartSample} Set 0x{Atrac.InputBuffer.Available():X}");
+            }
+
+            // Delay the thread decoding the Atrac data,
+            // the thread is also blocking using semaphores/event flags on a real PSP.
+            if (Ret > 0)
+            {
+                PSPDrivers.HLE.ThreadManForUser.sceKernelDelayThread(2300); // Microseconds, based on PSP tests
             }
 
             return 0;
@@ -628,7 +241,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// <param name="AtracId">The atrac ID to release</param>
         /// <returns>Less than 0 on error</returns>
         [HlePspFunction(NID = 0x61EB33F5, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceAtracReleaseAtracID(Atrac Atrac)
         {
             Atrac.RemoveUid();
@@ -636,7 +249,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         }
 
         [HlePspFunction(NID = 0x780F88D1, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public Atrac sceAtracGetAtracID(CodecType CodecType)
         {
             if (CodecType != CodecType.PSP_MODE_AT_3 && CodecType != CodecType.PSP_MODE_AT_3_PLUS)
@@ -645,27 +258,6 @@ namespace ScePSP.Hle.Modules.libatrac3plus
             }
 
             return TryToAlloc(new Atrac(CodecType));
-        }
-
-        private Atrac TryToAlloc(Atrac Atrac)
-        {
-            var CodecType = Atrac.CodecType;
-            var Count = PSPDrivers.HLE.HleUidPoolManager.List<Atrac>().Count(_Atrac => _Atrac.CodecType == CodecType);
-            if (CodecType == CodecType.PSP_MODE_AT_3_PLUS)
-            {
-                if (Count >= MaxAtrac3Plus)
-                {
-                    throw new SceKernelException(SceKernelErrors.ATRAC_ERROR_NO_ATRACID);
-                }
-            }
-            else if (CodecType == CodecType.PSP_MODE_AT_3)
-            {
-                if (Count >= MaxAtrac3)
-                {
-                    throw new SceKernelException(SceKernelErrors.ATRAC_ERROR_NO_ATRACID);
-                }
-            }
-            return Atrac;
         }
 
         /// <summary>
@@ -681,8 +273,8 @@ namespace ScePSP.Hle.Modules.libatrac3plus
             NumberOfSamplesInNextFrame = 0;
             try
             {
-                //Console.Error.WriteLine(Atrac.Format.ToStringDefault());
-                NumberOfSamplesInNextFrame = Atrac.GetNumberOfSamplesInNextFrame();
+                NumberOfSamplesInNextFrame = Atrac.CurrentFrame + 1;
+
                 return 0;
             }
             catch (Exception Exception)
@@ -707,13 +299,14 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// <param name="ReadOffset">Offset where to seek into the atrac file before reading</param>
         /// <returns>Less than 0 on error, otherwise 0</returns>
         [HlePspFunction(NID = 0x5D268707, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceAtracGetStreamDataInfo(Atrac Atrac, out PspPointer WritePointerPointer, out int AvailableBytes, out int ReadOffset)
         {
-            //throw (new NotImplementedException());
-            WritePointerPointer = Atrac.PrimaryBuffer.Low; // @FIXME!!
-            AvailableBytes = Atrac.PrimaryBuffer.Size;
-            ReadOffset = Atrac.PrimaryBufferReaded;
+            //Console.WriteLine($"sceAtracGetStreamDataInfo 0x{Atrac.InputBuffer.CurrentSize:X} 0x{Atrac.InputBuffer.AvailableWriteSize():X}");
+
+            WritePointerPointer = Memory.PointerToPspPointer(Atrac.PrimaryBuffer.LowPointer);
+            AvailableBytes = Atrac.InputBuffer.AvailableWriteSize();
+            ReadOffset = Atrac.InputBuffer.CurrentSize;
 
             return 0;
         }
@@ -722,60 +315,65 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// <param name="bytesToAdd">Number of bytes read into location given by sceAtracGetStreamDataInfo().</param>
         /// <returns>Less than 0 on error, otherwise 0</returns>
         [HlePspFunction(NID = 0x7DB31251, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceAtracAddStreamData(Atrac Atrac, int bytesToAdd)
         {
-            Atrac.PrimaryBufferReaded += bytesToAdd;
-            //throw (new NotImplementedException());
-            /*
-            unimplemented();
+            //Console.WriteLine($"sceAtracAddStreamData 0x{bytesToAdd:X}");
 
-            Atrac3Object atrac3Object = getAtrac3ObjectById(atracID);
+            Atrac.AddStreamData(bytesToAdd);
 
-            logInfo("sceAtracAddStreamData(%d, %d)", atracID, bytesToAdd);
-
-            */
             return 0;
         }
 
         [HlePspFunction(NID = 0x83E85EA0, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int sceAtracGetSecondBufferInfo(Atrac Atrac, out uint puiPosition, out uint puiDataByte)
         {
-            //throw (new NotImplementedException());
-            puiPosition = 0;
-            puiDataByte = 0;
+            //Console.WriteLine("sceAtracGetSecondBufferInfo");
 
-            throw new SceKernelException(SceKernelErrors.ERROR_ATRAC_SECOND_BUFFER_NOT_NEEDED);
+            if (!Atrac.SecondBufferNeeded)
+            {
+                // PSP clears both values when returning this error code.
+                puiPosition = 0;
+                puiDataByte = 0;
+                return (int)SceKernelErrors.ERROR_ATRAC_SECOND_BUFFER_NOT_NEEDED;
+            }
+
+            puiPosition = Atrac.SecondBufferPosition;
+            puiDataByte = Atrac.SecondBufferSize;
+
+            return 0;
         }
 
         /// <returns>0 - not needed ; 1 - needed</returns>
         [HlePspFunction(NID = 0xECA32A99, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
         public int sceAtracIsSecondBufferNeeded(Atrac Atrac)
         {
-            return 0;
+            Console.WriteLine("sceAtracIsSecondBufferNeeded)");
+
+            return Atrac.SecondBufferNeeded ? 1 : 0;
         }
 
         [HlePspFunction(NID = 0x83BF7AFD, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
-        public int sceAtracSetSecondBuffer(Atrac Atrac, out byte pucSecondBufferAddr, uint uiSecondBufferByte)
+        public int sceAtracSetSecondBuffer(Atrac Atrac, byte* SecondBufferAddr, uint uiSecondBufferByte)
         {
-            throw new NotImplementedException();
-            /*
-            unimplemented();
-            //unimplemented();
+            Console.WriteLine($"sceAtracSetSecondBuffer Szie 0x{uiSecondBufferByte:X})");
+
+            Atrac.SetSecondBuffer(SecondBufferAddr, uiSecondBufferByte);
+
             return 0;
-            */
         }
 
         [HlePspFunction(NID = 0xE23E3A35, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
         public int sceAtracGetNextDecodePosition(Atrac Atrac, out int SamplePosition)
         {
-            if (Atrac.DecodingReachedEnd) throw new SceKernelException(SceKernelErrors.ERROR_ATRAC_ALL_DATA_DECODED);
-            SamplePosition = Atrac.DecodingOffset;
-            //Console.WriteLine("  {0}", SamplePosition);
+            SamplePosition = Atrac.CurrentFrame;
+
+            if (Atrac.DecodingReachedEnd)
+            {
+                return (int)SceKernelErrors.ERROR_ATRAC_ALL_DATA_DECODED;
+            }
+
             return 0;
         }
 
@@ -796,18 +394,13 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         public int sceAtracGetBufferInfoForReseting(Atrac Atrac, uint uiSample, PspBufferInfo* pBufferInfo)
         {
             throw new NotImplementedException();
-            /*
-            unimplemented();
-            return 0;
-            */
         }
 
         [HlePspFunction(NID = 0x644E5607, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceAtracResetPlayPosition(Atrac Atrac, uint uiSample, uint uiWriteByteFirstBuf,
-            uint uiWriteByteSecondBuf)
+        public int sceAtracResetPlayPosition(Atrac Atrac, int uiSample, int uiWriteByteFirstBuf, int uiWriteByteSecondBuf)
         {
-            //throw (new NotImplementedException());
+            Atrac.SetPlayPosition(uiSample, uiWriteByteFirstBuf, uiWriteByteSecondBuf);
             return 0;
         }
 
@@ -815,16 +408,9 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         [HlePspNotImplemented]
         public int sceAtracGetBufferInfoForResetting(Atrac Atrac, uint uiSample, void* BufferInfoAddr)
         {
-            //throw (new NotImplementedException());
             return 0;
         }
 
-        /// <summary>
-        /// Get Number of channels of the Atrac3 
-        /// </summary>
-        /// <param name="AtracId"></param>
-        /// <param name="Channels"></param>
-        /// <returns></returns>
         [HlePspFunction(NID = 0x31668baa, FirmwareVersion = 250)]
         //[HlePspNotImplemented]
         public int sceAtracGetChannel(Atrac Atrac, out int Channels)
@@ -841,14 +427,6 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         [HlePspNotImplemented]
         public int sceAtracReinit(int at3Count, int at3plusCount)
         {
-            //int at3CountAlready = InjectContext.GetInstance<HleUidPoolManager>().List<Atrac>().Count(Atrac => Atrac.CodecType == CodecType.PSP_MODE_AT_3);
-            //int at3PlusCountAlready = InjectContext.GetInstance<HleUidPoolManager>().List<Atrac>().Count(Atrac => Atrac.CodecType == CodecType.PSP_MODE_AT_3_PLUS);
-            //
-            //if (at3CountAlready == at3Count && at3PlusCountAlready == at3plusCount)
-            //{
-            //	throw (new SceKernelException(SceKernelErrors.ERROR_BUSY));
-            //}
-
             PSPDrivers.HLE.HleUidPoolManager.RemoveAll<Atrac>();
 
             int Space = MAX_PSP_NUM_ATRAC_IDS;
@@ -881,33 +459,30 @@ namespace ScePSP.Hle.Modules.libatrac3plus
             return 0;
         }
 
+        [HlePspFunction(NID = 0x3F6E26B5, FirmwareVersion = 150)]
+        [HlePspNotImplemented]
+        public int sceAtracSetHalfwayBuffer(Atrac Atrac, byte* halfBuffer, int readSize, int halfBufferSize)
+        {
+            Atrac.SetData(halfBuffer, halfBufferSize, readSize);
+
+            return 0;
+        }
+
         [HlePspFunction(NID = 0x5CF9D852, FirmwareVersion = 250)]
         [HlePspNotImplemented]
-        public int sceAtracSetMOutHalfwayBuffer()
+        public int sceAtracSetMOutHalfwayBuffer(Atrac Atrac, byte* MOutHalfBuffer, int readSize, int MOutHalfBufferSize)
         {
-            throw new NotImplementedException();
+            Atrac.SetData(MOutHalfBuffer, MOutHalfBufferSize, readSize, true);
+
+            return 0;
         }
 
         [HlePspFunction(NID = 0x0FAE370E, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceAtracSetHalfwayBufferAndGetID(uint HalfBufferPointer, uint ReadSize, uint HalfBufferSize)
+        public int sceAtracSetHalfwayBufferAndGetID(uint HalfBufferPointer, uint readSize, uint HalfBufferSize)
         {
             //throw (new NotImplementedException());
             return -1;
-        }
-
-        [HlePspFunction(NID = 0xD5C28CC0, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
-        public int sceAtracEndEntry()
-        {
-            return 0;
-        }
-
-        [HlePspFunction(NID = 0xD1F59FDB, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
-        public int sceAtracStartEntry()
-        {
-            return 0;
         }
 
         [HlePspFunction(NID = 0x9CD7DE03, FirmwareVersion = 250)]
@@ -931,12 +506,19 @@ namespace ScePSP.Hle.Modules.libatrac3plus
             throw new SceKernelException((SceKernelErrors)(-1));
         }
 
-        [HlePspFunction(NID = 0x3F6E26B5, FirmwareVersion = 150)]
+        [HlePspFunction(NID = 0xD5C28CC0, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceAtracSetHalfwayBuffer(Atrac Atrac, void* halfBuffer, uint readSize, uint halfBufferSize)
+        public int sceAtracEndEntry()
         {
-            //throw (new NotImplementedException());
             return 0;
         }
+
+        [HlePspFunction(NID = 0xD1F59FDB, FirmwareVersion = 150)]
+        [HlePspNotImplemented]
+        public int sceAtracStartEntry()
+        {
+            return 0;
+        }
+
     }
 }

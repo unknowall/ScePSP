@@ -476,18 +476,18 @@ namespace ScePSP.Hle.Formats.Font
                 HeaderExtraRevision3 = fileStream.ReadStruct<HeaderRevision3Struct>();
             }
 
-            fileStream.ReadStructVector(out DimensionTable, Header.TableDimLength);
-            fileStream.ReadStructVector(out XAdjustTable, Header.TableXAdjustLength);
-            fileStream.ReadStructVector(out YAdjustTable, Header.TableYAdjustLength);
-            fileStream.ReadStructVector(out AdvanceTable, Header.TableAdvanceLength);
+            fileStream.ReadStructVectorEx(out DimensionTable, Header.TableDimLength);
+            fileStream.ReadStructVectorEx(out XAdjustTable, Header.TableXAdjustLength);
+            fileStream.ReadStructVectorEx(out YAdjustTable, Header.TableYAdjustLength);
+            fileStream.ReadStructVectorEx(out AdvanceTable, Header.TableAdvanceLength);
 
             PackedShadowCharMap =
                 fileStream.ReadBytes(BitsToBytesHighAligned(Header.TableShadowMapLength * Header.TableShadowMapBpe));
 
             if (Header.Revision == 3)
             {
-                fileStream.ReadStructVector(out CharmapCompressionTable1, HeaderExtraRevision3.TableCompCharMapLength1);
-                fileStream.ReadStructVector(out CharmapCompressionTable2, HeaderExtraRevision3.TableCompCharMapLength2);
+                fileStream.ReadStructVectorEx(out CharmapCompressionTable1, HeaderExtraRevision3.TableCompCharMapLength1);
+                fileStream.ReadStructVectorEx(out CharmapCompressionTable2, HeaderExtraRevision3.TableCompCharMapLength2);
             }
 
             PackedCharMap =

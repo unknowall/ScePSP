@@ -199,8 +199,7 @@ namespace ScePSP.Core.Cpu.InstructionCache
             //var Stopwatch = new Logger.Stopwatch();
             var time0 = DateTime.UtcNow;
 
-            var dynarecFunction =
-                _cpuProcessor.DynarecFunctionCompiler.CreateFunction( new InstructionStreamReader(new PspMemoryStream(memory)), pc);
+            var dynarecFunction = _cpuProcessor.DynarecFunctionCompiler.CreateFunction( new InstructionStreamReader(new PspMemoryStream(memory)), pc);
 
             if (dynarecFunction.EntryPc != pc) throw new Exception("Unexpected error");
 

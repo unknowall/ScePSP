@@ -22,6 +22,8 @@ class Program
 
     static PspEmulator pspEmulator;
 
+    static string title;
+
     [STAThreadAttribute]
     private static void Main(string[] args)
     {
@@ -65,7 +67,7 @@ class Program
 
         pspEmulator.Start(ofn.FileName, false, false, windowhwnd);
 
-        var title = "ScePSP";
+        title = "ScePSP";
         if (PSPDrivers.GameInfo.ID != null)
         {
             title += " - " + PSPDrivers.GameInfo.ID;
@@ -107,6 +109,8 @@ class Program
         SDL.SDL_GetWindowSize(window,
            out PSPDrivers.Config.DisplayConfig.Width,
            out PSPDrivers.Config.DisplayConfig.Height);
+
+        SDL.SDL_SetWindowTitle(window, title+$" - [ {PSPDrivers.Tasks.DisplayTask.CurrentFPS:F2} FPS ]");
     }
 
     private static void RunMainLoop()

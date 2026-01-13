@@ -131,13 +131,13 @@ namespace ScePSP.Hle.Formats
             var totalBlocks = Header.TotalBlocks;
 
             //Header.TotalBlocks
-            var offsets = Stream.ReadStructVector<uint>(totalBlocks);
-            var sizes = Stream.ReadStructVector<ushort>(totalBlocks);
+            var offsets = Stream.ReadStructVectorEx<uint>(totalBlocks);
+            var sizes = Stream.ReadStructVectorEx<ushort>(totalBlocks);
             NcArea[] ncAreas = null;
 
             if (Header.Version >= Version.DaxformatVersion1)
             {
-                ncAreas = Stream.ReadStructVector<NcArea>(Header.NcAreas);
+                ncAreas = Stream.ReadStructVectorEx<NcArea>(Header.NcAreas);
             }
 
             Blocks = new BlockInfo[totalBlocks];

@@ -53,7 +53,7 @@ namespace ScePSP.Hle.Formats
         {
             EntryDictionary = new Dictionary<string, object>();
             Header = stream.ReadStruct<HeaderStruct>();
-            Entries = stream.ReadStructVector<EntryStruct>(Header.NumberOfPairs);
+            Entries = stream.ReadStructVectorEx<EntryStruct>(Header.NumberOfPairs);
             KeysStream = stream.SliceWithLength(Header.KeyTable);
             ValuesStream = stream.SliceWithLength(Header.ValueTable);
             foreach (var entry in Entries)

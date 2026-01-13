@@ -23,27 +23,25 @@ namespace SafeILGenerator.Ast
 
         public AstNodeStmComment Comment(string comment) => new AstNodeStmComment(comment);
 
-        public AstNodeExprArgument Argument(Type type, int index, string name = null) =>
-            new AstNodeExprArgument(new AstArgument(index, type, name));
+        public AstNodeExprArgument Argument(Type type, int index, string name = null) => new AstNodeExprArgument(new AstArgument(index, type, name));
 
         public AstNodeExprArgument Argument<T>(int index, string name = null) => Argument(typeof(T), index, name);
+
         public AstNodeExprArgument Argument(AstArgument astArgument) => new AstNodeExprArgument(astArgument);
+
         public AstNodeExprLocal Local(AstLocal astLocal) => new AstNodeExprLocal(astLocal);
+
         public AstNodeStmGoto GotoAlways(AstLabel astLabel) => new AstNodeStmGotoAlways(astLabel);
 
-        public AstNodeStmGotoIfTrue GotoIfTrue(AstLabel astLabel, AstNodeExpr condition) =>
-            new AstNodeStmGotoIfTrue(astLabel, condition);
+        public AstNodeStmGotoIfTrue GotoIfTrue(AstLabel astLabel, AstNodeExpr condition) => new AstNodeStmGotoIfTrue(astLabel, condition);
 
-        public AstNodeStmGotoIfFalse GotoIfFalse(AstLabel astLabel, AstNodeExpr condition) =>
-            new AstNodeStmGotoIfFalse(astLabel, condition);
+        public AstNodeStmGotoIfFalse GotoIfFalse(AstLabel astLabel, AstNodeExpr condition) => new AstNodeStmGotoIfFalse(astLabel, condition);
 
         public AstNodeStmLabel Label(AstLabel astLabel) => new AstNodeStmLabel(astLabel);
 
-        public AstNodeExprFieldAccess FieldAccess(AstNodeExpr instance, FieldInfo fieldInfo, string fieldName = "") =>
-            new AstNodeExprFieldAccess(instance, fieldInfo, fieldName);
+        public AstNodeExprFieldAccess FieldAccess(AstNodeExpr instance, FieldInfo fieldInfo, string fieldName = "") => new AstNodeExprFieldAccess(instance, fieldInfo, fieldName);
 
-        public AstNodeExprFieldAccess FieldAccess(AstNodeExpr instance, string fieldName) =>
-            new AstNodeExprFieldAccess(instance, fieldName);
+        public AstNodeExprFieldAccess FieldAccess(AstNodeExpr instance, string fieldName) => new AstNodeExprFieldAccess(instance, fieldName);
 
         public AstNodeExprLValue FieldPropertyAccess(AstNodeExpr instance, string fieldPropertyName)
         {

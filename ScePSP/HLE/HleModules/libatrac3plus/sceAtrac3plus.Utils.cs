@@ -18,5 +18,10 @@
             public uint uiMinWriteByteSecondBuf;
             public uint uiReadPositionSecondBuf;
         }
+
+        public struct PspPointInfo
+        {
+            public uint Addr;
+        }
     }
 }

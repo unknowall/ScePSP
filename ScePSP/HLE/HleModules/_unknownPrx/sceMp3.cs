@@ -188,8 +188,7 @@ namespace ScePSP.Hle.Modules._unknownPrx
         /// <param name="mp3PosPtr">Position in source stream to start reading from</param>
         /// <returns>0 if success, less than 0 on error.</returns>
         [HlePspFunction(NID = 0xA703FE0F, FirmwareVersion = 150)]
-        public int sceMp3GetInfoToAddStreamData(Mp3Stream Mp3Stream, uint Mp3BufferPointer, uint mp3BufToWritePtr,
-            uint mp3PosPtr)
+        public int sceMp3GetInfoToAddStreamData(Mp3Stream Mp3Stream, uint Mp3BufferPointer, uint mp3BufToWritePtr, uint mp3PosPtr)
         {
             throw new NotImplementedException();
         }

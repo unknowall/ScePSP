@@ -5,6 +5,7 @@ using ScePSP.Hle.Managers;
 using ScePSP.Utils;
 using ScePSPUtils;
 using System;
+using System.Diagnostics;
 using System.Threading;
 
 namespace ScePSP.Runner.Tasks.Display
@@ -34,6 +35,10 @@ namespace ScePSP.Runner.Tasks.Display
         GLShader Shader;
         GLTexture2D TexVram;
         bool Vflip;
+
+        private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
+        private int _frameCount;
+        public float CurrentFPS { get; private set; }
 
         public class ShaderInfoClass
         {
@@ -108,6 +113,18 @@ namespace ScePSP.Runner.Tasks.Display
             }
         }
 
+        public void UpdateFrame()
+        {
+            _frameCount++;
+            double elapsedSeconds = _stopwatch.Elapsed.TotalSeconds;
+            if (elapsedSeconds >= 1.0f)
+            {
+                CurrentFPS = (float)(_frameCount / elapsedSeconds);
+                _frameCount = 0;
+                _stopwatch.Restart();
+            }
+        }
+
         public void RenderToWindow()
         {
             var GLE = PSPDrivers.GpuBackEnd as OpenglBackEnd;
@@ -150,6 +167,8 @@ namespace ScePSP.Runner.Tasks.Display
 
             Context.SwapBuffers();
 
+            UpdateFrame();
+
             //Console.WriteLine($" Current GETexture: {GLE.GeTexture.Count}");
 
             //GLE.FrameFB.Clear();
@@ -167,7 +186,7 @@ namespace ScePSP.Runner.Tasks.Display
 
             // Draw time
             DrawStart();
-            ThreadUtils.SleepUntilUtc(vSyncTime);
+            //ThreadUtils.SleepUntilUtc(vSyncTime);
 
             // VBlank time
             VBlankStart();

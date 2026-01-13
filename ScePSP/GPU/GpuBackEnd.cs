@@ -228,7 +228,6 @@ namespace ScePSP.Core.GpuBackEnd
             if (VertexType.Index == VertexTypeStruct.IndexEnum.Void)
             {
                 GpuState.VertexAddress += (uint)(VertexReader.VertexSize * vertexCount * morpingVertexCount);
-                //GpuState->VertexAddress += (uint)(VertexReader.VertexSize * VertexCount);
             }
 
             if (morpingVertexCount != 1 || VertexType.RealSkinningWeightCount != 0)

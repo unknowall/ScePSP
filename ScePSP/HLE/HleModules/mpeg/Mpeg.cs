@@ -1,7 +1,5 @@
 ﻿#define DUMP_STREAMS
 
-using cscodec;
-using cscodec.h264.player;
 using ScePSP.Core.Components.Display;
 using ScePSP.Core.GpuBackEnd;
 using ScePSP.Core.Memory;
@@ -15,6 +13,9 @@ using System;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
+
+using LightCodec.av;
+using LightCodec.h264;
 
 namespace ScePSP.Hle.Modules.mpeg
 {
@@ -32,6 +33,7 @@ namespace ScePSP.Hle.Modules.mpeg
         public PspDisplay PspDisplay => PSPDrivers.PspDisplay;
 
         public SceMpegPointer* _Mpeg;
+
         public SceMpeg* Data;
 
         public MpegAu AvcAu = new MpegAu();
@@ -39,21 +41,22 @@ namespace ScePSP.Hle.Modules.mpeg
         public MpegAu AtracAu = new MpegAu();
 
         //public ByteRingBufferWrapper RingBuffer;
-        //public readonly ProduceConsumeBuffer<byte> MpegProduceCosumer;
-        private ProduceConsumerBufferStream MpegStream;
 
+        //public readonly ProduceConsumeBuffer<byte> MpegProduceCosumer;
+
+        private ProduceConsumerBufferStream MpegStream;
         private ProduceConsumerBufferStream AudioStream;
         private ProduceConsumerBufferStream VideoStream;
         private MpegPsDemuxer MpegPsDemuxer;
-        public H264FrameDecoder H264FrameDecoder;
+        public H264Decoder Decoder;
 
         public Func<int, int> ReadPackets;
 
         //private const bool SaveBitmapFrame = true;
+
         private const bool SaveBitmapFrame = false;
 
-        int FrameIndex;
-
+        public int FrameIndex;
 
         private const bool DumpStreams = false;
 
@@ -74,11 +77,12 @@ namespace ScePSP.Hle.Modules.mpeg
             AudioStream = new ProduceConsumerBufferStream();
             VideoStream = new ProduceConsumerBufferStream();
             MpegPsDemuxer = new MpegPsDemuxer(MpegStream);
-            H264FrameDecoder = new H264FrameDecoder(VideoStream);
+            Decoder = new H264Decoder(VideoStream);
+
+            Decoder.init(null);
 
             //PspDisplay.CurrentInfo.PlayingVideo = true;
         }
-
 
         public void Delete()
         {
@@ -102,21 +106,19 @@ namespace ScePSP.Hle.Modules.mpeg
         {
             MpegAu.SceMpegAu.DecodeTimestamp = Info.dts.Value;
             MpegAu.SceMpegAu.PresentationTimestamp = Info.pts.Value;
-            //MpegAu.SceMpegAu.DecodeTimestampHigh = (uint)Info.dts.Value;
-            //MpegAu.SceMpegAu.DecodeTimestampLow = MpegPsDemuxer.MpegTimestampPerSecond;
-            //MpegAu.SceMpegAu.PresentationTimestampHigh = (uint)Info.pts.Value;
-            //MpegAu.SceMpegAu.PresentationTimestampLow = MpegPsDemuxer.MpegTimestampPerSecond;
             MpegAu.SceMpegAu.AuSize = (int)Info.Stream.Length;
         }
 
-        private bool DecodePsPacket()
+        private bool PackPsPacket()
         {
             MpegStream.ReadTransactionBegin();
+
             try
             {
                 if (MpegPsDemuxer.HasMorePackets)
                 {
                     var Packet = MpegPsDemuxer.ReadPacketizedElementaryStreamHeader();
+
                     var Info = MpegPsDemuxer.ParsePacketizedStream(Packet.Stream);
 
                     //ConsoleUtils.SaveRestoreConsoleColor(ConsoleColor.Green, () => { Console.WriteLine("DecodePsPacket: {0}:{1:X4}: {2}", Packet.Type, (int)Packet.Type, Info); });
@@ -125,24 +127,20 @@ namespace ScePSP.Hle.Modules.mpeg
                     {
                         case Formats.video.MpegPsDemuxer.ChunkType.ST_Video1:
                             UpdateAuFromPacketInfo(AvcAu, Info);
-                            //if (DumpStreams)
-                            //    FileUtils.CreateAndAppendStream(ApplicationPaths.AssertPath + "/video.stream", Info.Stream.Slice());
                             Info.Stream.Slice().CopyToFast(VideoStream);
                             break;
                         case Formats.video.MpegPsDemuxer.ChunkType.ST_Private1:
-                            //if (DumpStreams)
-                            //    FileUtils.CreateAndAppendStream(ApplicationPaths.AssertPath + "/audio.stream", Info.Stream.Slice());
                             UpdateAuFromPacketInfo(AtracAu, Info);
                             Info.Stream.Slice().CopyToFast(AudioStream);
                             break;
                         default:
-                            ConsoleUtils.SaveRestoreConsoleColor(ConsoleColor.Red,
-                                () => { Console.WriteLine("Unknown PacketType: {0}", Packet.Type); });
+                            ConsoleUtils.SaveRestoreConsoleColor(ConsoleColor.Red, () => { Console.WriteLine("Unknown PacketType: {0}", Packet.Type); });
                             break;
                     }
                 }
 
                 MpegStream.ReadTransactionCommit();
+
                 return true;
             }
             catch //(EndOfStreamException EndOfStreamException)
@@ -158,8 +156,6 @@ namespace ScePSP.Hle.Modules.mpeg
             try
             {
                 var Data = PointerUtils.PointerToByteArray((byte*)DataPointer, DataLength);
-                //if (DumpStreams)
-                //    FileUtils.CreateAndAppendStream(ApplicationPaths.AssertPath + "/mpeg.stream", new MemoryStream(Data));
                 MpegStream.WriteBytes(Data);
             }
             catch (Exception Exception)
@@ -172,13 +168,13 @@ namespace ScePSP.Hle.Modules.mpeg
 
         public SceMpegAu GetAtracAu(StreamId StreamId)
         {
-            while (MpegPsDemuxer.HasMorePackets && AudioStream.Length <= 0) DecodePsPacket();
+            while (MpegPsDemuxer.HasMorePackets && AudioStream.Length <= 0) PackPsPacket();
             return AtracAu.SceMpegAu;
         }
 
         public SceMpegAu GetAvcAu(StreamId StreamId)
         {
-            while (MpegPsDemuxer.HasMorePackets && VideoStream.Length <= 0) DecodePsPacket();
+            while (MpegPsDemuxer.HasMorePackets && VideoStream.Length <= 0) PackPsPacket();
             return AvcAu.SceMpegAu;
         }
 
@@ -186,9 +182,11 @@ namespace ScePSP.Hle.Modules.mpeg
         {
             if (MpegAccessUnit != null) *MpegAccessUnit = GetAvcAu(StreamId.Avc);
 
+            Console.WriteLine("AvcDecode: ");
+
             while (MpegPsDemuxer.HasMorePackets)
             {
-                if (!DecodePsPacket()) return;
+                if (!PackPsPacket()) break;
             }
 
             if (VideoStream.Length <= 0) return;
@@ -198,18 +196,21 @@ namespace ScePSP.Hle.Modules.mpeg
 
             try
             {
-                //if (H264FrameDecoder.HasMorePackets)
+                //while (Decoder.hasMoreNAL)
                 {
-                    //Console.WriteLine("VideoStream.Length: {0}", VideoStream.Length);
-                    var Frame = H264FrameDecoder.DecodeFrame();
+                    Console.WriteLine("VideoStream.Length: {0}", VideoStream.Length);
+
+                    var Frame = Decoder.DecodeFrame();
+
+                    if (Frame == null) return;
 
                     ConsoleUtils.SaveRestoreConsoleColor(ConsoleColor.DarkGreen,
                         () => { Console.WriteLine("DecodedFrame: {0}", FrameIndex); });
 
                     var Bitmap = FrameUtils.imageFromFrameWithoutEdges(Frame, FrameWidth, 272);
 
-                    var TempBuffer =
-                        new byte[PixelFormatDecoder.GetPixelsSize(GuPixelFormat, Bitmap.Width * Bitmap.Height)];
+                    var TempBuffer =  new byte[PixelFormatDecoder.GetPixelsSize(GuPixelFormat, Bitmap.Width * Bitmap.Height)];
+
                     fixed (byte* TempBufferPtr = TempBuffer)
                     {
                         var TempBufferPtr2 = TempBufferPtr;
@@ -227,22 +228,28 @@ namespace ScePSP.Hle.Modules.mpeg
                                 InputBuffer[n].A = 0xFF;
                             }
 
-                            PixelFormatDecoder.Encode(GuPixelFormat, InputBuffer, TempBufferPtr2,
-                                Bitmap.Width * Bitmap.Height);
-                            PixelFormatDecoder.Encode(PspDisplay.CurrentInfo.PixelFormat, InputBuffer,
-                                (byte*)Memory.PspAddressToPointerSafe(PspDisplay.CurrentInfo.FrameAddress), 512,
-                                Bitmap.Width, Bitmap.Height);
+                            PixelFormatDecoder.Encode(GuPixelFormat, InputBuffer, TempBufferPtr2, Bitmap.Width * Bitmap.Height);
+                            PixelFormatDecoder.Encode(
+                                PspDisplay.CurrentInfo.PixelFormat, 
+                                InputBuffer,
+                                (byte*)Memory.PspAddressToPointerSafe(PspDisplay.CurrentInfo.FrameAddress), 
+                                512,
+                                Bitmap.Width, 
+                                Bitmap.Height
+                                );
                             PspDisplay.CurrentInfo.PlayingVideo = true;
                         });
+
                         PspDisplay.CurrentInfo.PlayingVideo = true;
+
                         Memory.WriteBytes(OutputBuffer.Address, TempBufferPtr, TempBuffer.Length);
+
                         Gpubackend.InvalidateCache(OutputBuffer.Address, TempBuffer.Length);
                     }
 
                     //if (SaveBitmapFrame) Bitmap.Save(ApplicationPaths.AssertPath + "/" + FrameIndex + ".png");
                     FrameIndex++;
                 }
-                //PixelFormat
 
                 return;
             }
@@ -483,9 +490,6 @@ namespace ScePSP.Hle.Modules.mpeg
         public uint GP;
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public unsafe struct SceMpegAvcMode
     {
@@ -500,9 +504,6 @@ namespace ScePSP.Hle.Modules.mpeg
         public GuPixelFormats PixelFormat;
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public unsafe struct AvcDecodeDetailStruct
     {

@@ -260,6 +260,15 @@ namespace ScePSP.Hle.Modules.libatrac3plus
                 SetData(Data, DataLength);
             }
 
+            public Atrac(byte* Data, int DataLength, int ReadSize, bool IsMoon = false)
+            {
+                PrimaryBuffer = HleMemoryManager.GetPartition(MemoryPartitions.User).Allocate(1024 * 1024);
+
+                CodecType = CodecType.PSP_MODE_AT_3_PLUS;
+
+                SetData(Data, DataLength, ReadSize, IsMoon);
+            }
+
             public void SetData(byte* Data, int DataLength)
             {
                 ParseAtracData(new UnmanagedMemoryStream(Data, DataLength), Data, DataLength);

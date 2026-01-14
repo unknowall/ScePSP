@@ -1,6 +1,4 @@
-﻿using cscodec.h264.decoder;
-using cscodec.util;
-using LightGL;
+﻿using LightGL;
 using ScePSP.Core.GpuBackEnd.Formats;
 using ScePSP.Core.GpuBackEnd.State;
 using ScePSP.Core.GpuBackEnd.VertexReading;

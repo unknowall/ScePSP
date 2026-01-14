@@ -9,7 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.Xml;
 using System.Threading;
+using static ScePSP.Core.GpuBackEnd.GpuProcessor;
+using static ScePSP.Core.GpuBackEnd.Soft.SoftBackEnd;
 
 namespace ScePSP.Core.GpuBackEnd
 {
@@ -266,6 +269,9 @@ namespace ScePSP.Core.GpuBackEnd
                     {
                         var uCount = (byte)Params24.Extract(0, 8);
                         var vCount = (byte)Params24.Extract(8, 8);
+
+                        //Console.Out.WriteLineColored(ConsoleColor.Green, $"BEZIER uCount {uCount} vCount {vCount}");
+
                         DrawBezier(uCount, vCount);
                         break;
                     }
@@ -276,7 +282,9 @@ namespace ScePSP.Core.GpuBackEnd
                         var sp_vcount = (int)Params24.Extract(8, 8);
                         var sp_utype = (int)Params24.Extract(16, 2);
                         var sp_vtype = (int)Params24.Extract(18, 2);
-                        //Console.WriteLine("OP_SPLINE(%d, %d, %d, %d)", sp_ucount, sp_vcount, sp_utype, sp_vtype);
+
+                        //Console.Out.WriteLineColored(ConsoleColor.Green, "OP_SPLINE %d, %d, %d, %d", sp_ucount, sp_vcount, sp_utype, sp_vtype);
+
                         DrawSpline(sp_ucount, sp_vcount, sp_utype, sp_vtype);
                         break;
                     }
@@ -291,7 +299,7 @@ namespace ScePSP.Core.GpuBackEnd
                         if (PrimitiveType != GuPrimitiveType.ContinuePreviousPrim)
                             _lastPPrimType = PrimitiveType;
 
-                        //Console.Out.WriteLineColored(ConsoleColor.Cyan, $"PPRIM: Type {PrimitiveType} VertexCount {vertexCount}");
+                        Console.Out.WriteLineColored(ConsoleColor.Cyan, $"PPRIM: Type {PrimitiveType} VertexCount {vertexCount}");
 
                         //if (_primCount == 0)
                         //{
@@ -364,7 +372,7 @@ namespace ScePSP.Core.GpuBackEnd
 
                 case GpuOpCodes.ZBW:
                     {
-                        GpuProcessor.MarkDepthBufferLoad(); // @TODO: Is this required?
+                        GpuProcessor.MarkDepthBufferLoad();
                         break;
                     }
 
@@ -373,7 +381,7 @@ namespace ScePSP.Core.GpuBackEnd
                         var signal = Params24.Extract(0, 16);
                         var behaviour = (SignalBehavior)Params24.Extract(16, 8);
 
-                        //Console.Out.WriteLineColored(ConsoleColor.Green, "OP_SIGNAL: {0}, {1}", signal, behaviour);
+                        Console.Out.WriteLineColored(ConsoleColor.Green, "OP_SIGNAL: {0}, {1}", signal, behaviour);
 
                         switch (behaviour)
                         {
@@ -671,7 +679,7 @@ namespace ScePSP.Core.GpuBackEnd
             if (InstructionAddressStall != 0 && newAddress >= InstructionAddressStall)
             {
                 //Logger.Warning($"Process {Id} 0x{InstructionAddressCurrent:X} -> 0x{newAddress:X} | Stall 0x{InstructionAddressStall:X}");
-                if (PSPDrivers.GameInfo.IsIso) SetInstructionAddressStall(0);
+                //if (PSPDrivers.GameInfo.IsIso) SetInstructionAddressStall(0);
             }
             InstructionAddressCurrent = newAddress;
         }
@@ -704,7 +712,7 @@ namespace ScePSP.Core.GpuBackEnd
         public void GeListSync(Action NotifyOnceCallback)
         {
             //Thread.Sleep(200);
-            //Status2.CallbackOnStateOnce(Status2Enum.Free, NotifyOnceCallback);
+            //Status2.SetValue(Status2Enum.Free, NotifyOnceCallback);
             Status.CallbackOnStateOnce(GEProcesStatusEnum.Completed, NotifyOnceCallback);
         }
 

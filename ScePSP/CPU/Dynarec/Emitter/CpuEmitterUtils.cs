@@ -331,15 +331,14 @@ namespace ScePSP.Core.Cpu.Emitter
 
         public static uint _mfvc_impl(CpuThreadState cpuThreadState, VfpuControlRegistersEnum vfpuControlRegister)
         {
-            Console.Error.WriteLine("Warning: _mfvc_impl");
+            Console.Error.WriteLine($"VFPU _mfvc_impl {vfpuControlRegister}");
             switch (vfpuControlRegister)
             {
                 case VfpuControlRegistersEnum.VfpuPfxs: return cpuThreadState.PrefixSource.Value;
                 case VfpuControlRegistersEnum.VfpuPfxt: return cpuThreadState.PrefixTarget.Value;
                 case VfpuControlRegistersEnum.VfpuPfxd: return cpuThreadState.PrefixDestination.Value;
                 case VfpuControlRegistersEnum.VfpuCc: return cpuThreadState.VfrCcValue;
-                case VfpuControlRegistersEnum.VfpuRcx0:
-                    return (uint)MathFloat.ReinterpretFloatAsInt((float)new Random().NextDouble());
+                case VfpuControlRegistersEnum.VfpuRcx0: return (uint)MathFloat.ReinterpretFloatAsInt((float)new Random().NextDouble());
                 case VfpuControlRegistersEnum.VfpuRcx1:
                 case VfpuControlRegistersEnum.VfpuRcx2:
                 case VfpuControlRegistersEnum.VfpuRcx3:
@@ -353,10 +352,9 @@ namespace ScePSP.Core.Cpu.Emitter
             }
         }
 
-        public static void _mtvc_impl(CpuThreadState cpuThreadState, VfpuControlRegistersEnum vfpuControlRegister,
-            uint value)
+        public static void _mtvc_impl(CpuThreadState cpuThreadState, VfpuControlRegistersEnum vfpuControlRegister, uint value)
         {
-            Console.Error.WriteLine("Warning: _mtvc_impl");
+            Console.Error.WriteLine($"VFPU _mtvc_impl {vfpuControlRegister}");
             switch (vfpuControlRegister)
             {
                 case VfpuControlRegistersEnum.VfpuPfxs:
@@ -381,7 +379,7 @@ namespace ScePSP.Core.Cpu.Emitter
                 case VfpuControlRegistersEnum.VfpuRcx5:
                 case VfpuControlRegistersEnum.VfpuRcx6:
                 case VfpuControlRegistersEnum.VfpuRcx7:
-                    //(uint)MathFloat.ReinterpretFloatAsInt(1.0f) = Value;
+                    //(uint)MathFloat.ReinterpretFloatAsInt(1.0f) =  Value;
                     return;
                 default:
                     throw new NotImplementedException("_mtvc_impl: " + vfpuControlRegister);

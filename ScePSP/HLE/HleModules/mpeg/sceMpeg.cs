@@ -14,6 +14,8 @@ namespace ScePSP.Hle.Modules.mpeg
     [HlePspModule(ModuleFlags = ModuleFlags.KernelMode | ModuleFlags.Flags0x00010011)]
     public unsafe partial class sceMpeg : HleModuleHost
     {
+        HleInterop HleInterop => PSPDrivers.HLE.HleInterop;
+
         /// <summary>
         /// MPEG AVC elementary stream.
         /// MPEG packet size.
@@ -29,9 +31,19 @@ namespace ScePSP.Hle.Modules.mpeg
 
         public const int MPEG_ATRAC_ES_OUTPUT_SIZE = 8192;
 
-        HleInterop HleInterop => PSPDrivers.HLE.HleInterop;
-
         private Mpeg __SingleInstance = null;
+
+        public class StreamInfo : IDisposable
+        {
+            public StreamId StreamId;
+            public int StreamIndex;
+
+            void IDisposable.Dispose()
+            {
+            }
+        }
+
+        HleUidPoolSpecial<StreamInfo, int> RegisteredStreams = new HleUidPoolSpecial<StreamInfo, int>(FirstId: 0x17);
 
         /// <param name="mpeg"></param>
         /// <returns></returns>
@@ -95,8 +107,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <returns>0 if successful.</returns>
         [HlePspFunction(NID = 0xD8C5F121, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceMpegCreate(SceMpegPointer* sceMpegPointer, void* mpegData, int mpegSize,
-            SceMpegRingbuffer* sceMpegRingbuffer, int frameWidth, int mode, int ddrTop)
+        public int sceMpegCreate(SceMpegPointer* sceMpegPointer, void* mpegData, int mpegSize, SceMpegRingbuffer* sceMpegRingbuffer, int frameWidth, int mode, int ddrTop)
         {
             //return -1;
 
@@ -114,9 +125,7 @@ namespace ScePSP.Hle.Modules.mpeg
             }
             else
             {
-                sceMpegRingbuffer->PacketsAvailable =
-                    (int)((sceMpegRingbuffer->DataEnd.Address - sceMpegRingbuffer->Data.Address) /
-                           sceMpegRingbuffer->PacketSize);
+                sceMpegRingbuffer->PacketsAvailable = (int)((sceMpegRingbuffer->DataEnd.Address - sceMpegRingbuffer->Data.Address) / sceMpegRingbuffer->PacketSize);
             }
 
             sceMpegRingbuffer->SceMpeg = Memory.PointerToPspPointer(sceMpegPointer);
@@ -171,15 +180,13 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <seealso cref="http://en.wikipedia.org/wiki/Presentation_and_access_units"/>
         [HlePspFunction(NID = 0x167AFD9E, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceMpegInitAu(SceMpegPointer* sceMpegPointer, int elementaryStreamBuffer,
-            out SceMpegAu mpegAccessUnit)
+        public int sceMpegInitAu(SceMpegPointer* sceMpegPointer, int elementaryStreamBuffer, out SceMpegAu mpegAccessUnit)
         {
             var mpeg = GetMpeg(sceMpegPointer);
             mpegAccessUnit = default(SceMpegAu);
             mpegAccessUnit.EsBuffer = elementaryStreamBuffer;
 
-            if (elementaryStreamBuffer >= 1 && elementaryStreamBuffer <= AbvEsBufAllocated.Length &&
-                AbvEsBufAllocated[elementaryStreamBuffer - 1])
+            if (elementaryStreamBuffer >= 1 && elementaryStreamBuffer <= AbvEsBufAllocated.Length && AbvEsBufAllocated[elementaryStreamBuffer - 1])
             {
                 mpegAccessUnit.AuSize = MPEG_AVC_ES_SIZE;
                 mpeg.AvcAu.SceMpegAu = mpegAccessUnit;
@@ -218,8 +225,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <returns>0 if successful.</returns>
         [HlePspFunction(NID = 0x37295ED8, FirmwareVersion = 150)]
         //[HlePspNotImplemented]
-        public int sceMpegRingbufferConstruct(SceMpegRingbuffer* ringbuffer, int packets, PspPointer data, int size,
-            PspPointer callback, PspPointer callbackParam)
+        public int sceMpegRingbufferConstruct(SceMpegRingbuffer* ringbuffer, int packets, PspPointer data, int size, PspPointer callback, PspPointer callbackParam)
         {
             ringbuffer->PacketsTotal = packets;
             ringbuffer->PacketsRead = 0;
@@ -294,6 +300,7 @@ namespace ScePSP.Hle.Modules.mpeg
 
             var packetsAdded = mpeg.ReadPackets(numPackets);
             var dataLength = (int)(packetsAdded * ringbuffer->PacketSize);
+
             mpeg.WriteData(ringbuffer->Data.GetPointer(Memory, dataLength), dataLength);
 
             //
@@ -325,18 +332,6 @@ namespace ScePSP.Hle.Modules.mpeg
 
             return packetsAdded;
         }
-
-        public class StreamInfo : IDisposable
-        {
-            public StreamId StreamId;
-            public int StreamIndex;
-
-            void IDisposable.Dispose()
-            {
-            }
-        }
-
-        HleUidPoolSpecial<StreamInfo, int> RegisteredStreams = new HleUidPoolSpecial<StreamInfo, int>(FirstId: 0x17);
 
         /// <summary>
         /// sceMpegUnRegistStream
@@ -391,12 +386,15 @@ namespace ScePSP.Hle.Modules.mpeg
             var pmf = new Pmf().Load(new MemoryStream(PointerUtils.PointerToByteArray(pmfHeader, 2048)));
 
             var mpeg = GetMpeg(mpegPointer);
+
             var sceMpeg = mpegPointer->GetSceMpeg(Memory);
 
             mpeg.ParsePmfHeader(pmfHeader);
+
             sceMpeg->StreamSize = (int)(uint)pmf.Header.StreamSize;
 
             offset = pmf.Header.StreamOffset;
+
             return 0;
         }
 

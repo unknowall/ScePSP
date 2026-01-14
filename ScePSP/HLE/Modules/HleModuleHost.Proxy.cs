@@ -213,8 +213,7 @@ namespace ScePSP.Hle
 
             var AstNodes = new AstNodeStmContainer();
 
-            AstNodes.AddStatement(ast.Comment("HleModuleHost.CreateDelegateForMethodInfo(" + MethodInfo + ", " +
-                                              HlePspFunctionAttribute + ")"));
+            AstNodes.AddStatement(ast.Comment("HleModuleHost.CreateDelegateForMethodInfo(" + MethodInfo + ", " + HlePspFunctionAttribute + ")"));
 
             AstNodeExprCall AstMethodCall;
             {
@@ -348,8 +347,7 @@ namespace ScePSP.Hle
             return AstNodes;
         }
 
-        private Action<CpuThreadState> CreateDelegateForMethodInfo(MethodInfo MethodInfo,
-            HlePspFunctionAttribute HlePspFunctionAttribute)
+        private Action<CpuThreadState> CreateDelegateForMethodInfo(MethodInfo MethodInfo, HlePspFunctionAttribute HlePspFunctionAttribute)
         {
             if (!MethodInfo.DeclaringType.IsAssignableFrom(this.GetType()))
             {
@@ -372,8 +370,7 @@ namespace ScePSP.Hle
             );
 
             var Delegate = AstNodeExtensions.GeneratorIlPsp.GenerateDelegate<Action<CpuThreadState>>(
-                $"Proxy_{this.GetType().Name}_{MethodInfo.Name}",
-                AstNodes
+                $"Proxy_{this.GetType().Name}_{MethodInfo.Name}", AstNodes
             );
 
             //return Delegate;
@@ -391,9 +388,7 @@ namespace ScePSP.Hle
                     ConsoleUtils.SaveRestoreConsoleState(() =>
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine(
-                            "Not implemented {0}.{1}",
-                            MethodInfo.DeclaringType.Name, MethodInfo.Name
+                        Console.WriteLine( "Modules Call {0}.{1}", MethodInfo.DeclaringType.Name, MethodInfo.Name
                         );
                     });
                 }
@@ -524,8 +519,7 @@ namespace ScePSP.Hle
 
             if (ParameterType.IsPointer)
             {
-                return
-                    $"0x{CpuThreadState.CpuProcessor.Memory.PointerToPspAddressUnsafe((void*)Convert.ToInt64(Value)):X8}";
+                return $"0x{CpuThreadState.CpuProcessor.Memory.PointerToPspAddressUnsafe((void*)Convert.ToInt64(Value)):X8}";
             }
 
             if (ParameterType == typeof(float))

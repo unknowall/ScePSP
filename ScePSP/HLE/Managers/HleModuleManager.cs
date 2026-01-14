@@ -131,6 +131,16 @@ namespace ScePSP.Hle.Managers
             return GetModuleByType(HleModuleTypes[ModuleNameToFind]);
         }
 
+        public HleModuleGuest GetGuestModuleByAddress(int Address)
+        {
+            foreach(var module in LoadedGuestModules)
+            {
+                if (Address >= module.SceModuleStructPartition.Low && Address <= module.SceModuleStructPartition.High)
+                    return module;
+            }
+            return null;
+        }
+
         public TType GetModule<TType>() where TType : HleModuleHost
         {
             return (TType)GetModuleByType(typeof(TType));

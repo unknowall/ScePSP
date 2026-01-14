@@ -122,7 +122,7 @@ namespace ScePSP.Core.GpuBackEnd
             var ClutState = TextureMappingState.ClutState;
             var TextureState = TextureMappingState.TextureState;
 
-            TTexture Texture;
+            TTexture Texture = null;
 
             bool Swizzled = TextureState.Swizzled;
             uint TextureAddress = TextureState.Mipmap0.Address;
@@ -132,6 +132,7 @@ namespace ScePSP.Core.GpuBackEnd
             var ClutDataStart = PixelFormatDecoder.GetPixelsSize(ClutFormat, ClutStart);
 
             ulong Hash1 = TextureAddress | (ulong)((ClutAddress + ClutDataStart) << 32);
+
             bool Recheck = false;
 
             if (Cache.TryGetValue(Hash1, out Texture))

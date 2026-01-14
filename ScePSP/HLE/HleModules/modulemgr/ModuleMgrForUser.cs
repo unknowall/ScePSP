@@ -220,7 +220,7 @@ namespace ScePSP.Hle.Modules.modulemgr
         /// <param name="SceKernelLMOption">Pointer to a mod_param_t structure. Can be NULL.</param>
         /// <returns>The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.</returns>
         [HlePspFunction(NID = 0x977DE386, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HlePspNotImplemented]
         public int sceKernelLoadModule(string Path, uint Flags, SceKernelLMOption* SceKernelLMOption)
         {
             return sceKernelLoadModuleWithStream(
@@ -239,7 +239,7 @@ namespace ScePSP.Hle.Modules.modulemgr
         /// <param name="SceKernelSMOption">Pointer to an optional <see cref="SceKernelSMOption"/> structure.</param>
         /// <returns>??? on success, otherwise one of ::PspKernelErrorCodes.</returns>
         [HlePspFunction(NID = 0x50F0C1EC, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HlePspNotImplemented]
         public int sceKernelStartModule(CpuThreadState CpuThreadState, int ModuleId, int ArgumentsSize,
             uint ArgumentsPointer, int* Status, SceKernelSMOption* SceKernelSMOption)
         {
@@ -277,7 +277,7 @@ namespace ScePSP.Hle.Modules.modulemgr
         ///		??? on success, otherwise one of ::PspKernelErrorCodes.
         /// </returns>
         [HlePspFunction(NID = 0xD1FF982A, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HlePspNotImplemented]
         public int sceKernelStopModule(int ModuleId, int ArgumentsSize, void* ArgumentsPointer, int* Status, void* SceKernelSMOption)
         {
             return 0;
@@ -299,7 +299,7 @@ namespace ScePSP.Hle.Modules.modulemgr
         ///		??? on success, otherwise one of ::PspKernelErrorCodes.
         /// </returns>
         [HlePspFunction(NID = 0x2E0911AA, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HlePspNotImplemented]
         public int sceKernelUnloadModule(int ModuleId)
         {
             //throw(new NotImplementedException());
@@ -324,10 +324,12 @@ namespace ScePSP.Hle.Modules.modulemgr
         /// <returns></returns>
         [HlePspFunction(NID = 0xD8B73127, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceKernelGetModuleIdByAddress(uint Address)
+        public int sceKernelGetModuleIdByAddress(int Address)
         {
-            //throw(new NotImplementedException());
-            //return 0x1234;
+            var module = ModuleManager.GetGuestModuleByAddress(Address);
+
+            if (module != null) return module.ID;
+
             return -1;
         }
 
@@ -338,6 +340,7 @@ namespace ScePSP.Hle.Modules.modulemgr
         /// Greater or equal to zero on success.
         /// </returns>
         [HlePspFunction(NID = 0xF0A26395, FirmwareVersion = 150)]
+        [HlePspNotImplemented]
         public int sceKernelGetModuleId(CpuThreadState CpuThreadState)
         {
             var Module = (HleModuleGuest)CpuThreadState.CallerModule;
@@ -345,6 +348,7 @@ namespace ScePSP.Hle.Modules.modulemgr
         }
 
         [HlePspFunction(NID = 0x8F2DF740, FirmwareVersion = 150)]
+        [HlePspNotImplemented]
         public uint sceKernelStopUnloadSelfModuleWithStatus()
         {
             Console.Error.WriteLine("sceKernelStopUnloadSelfModuleWithStatus");
@@ -359,12 +363,12 @@ namespace ScePSP.Hle.Modules.modulemgr
         /// <param name="SceKernelLMOption">Pointer to an optional <see cref="SceKernelLMOption"/> structure.</param>
         /// <returns>The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.</returns>
         [HlePspFunction(NID = 0xB7F46618, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HlePspNotImplemented]
         public int sceKernelLoadModuleByID(SceUID FileId, uint Flags, SceKernelLMOption* SceKernelLMOption)
         {
             var Args = IoFileMgrForUser.GetFileArgFromHandle(FileId);
-            return sceKernelLoadModuleWithStream(() => { return new FileHandle(Args); }, Args.FullFileName, Flags,
-                SceKernelLMOption);
+
+            return sceKernelLoadModuleWithStream(() => { return new FileHandle(Args); }, Args.FullFileName, Flags, SceKernelLMOption);
         }
 
         /// <summary>
@@ -380,7 +384,7 @@ namespace ScePSP.Hle.Modules.modulemgr
         /// <param name="ModuleInfo">Pointer to a <see cref="SceKernelModuleInfo"/> structure.</param>
         /// <returns>0 on success, otherwise one of ::PspKernelErrorCodes.</returns>
         [HlePspFunction(NID = 0x748CBED9, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HlePspNotImplemented]
         public int sceKernelQueryModuleInfo(int ModuleId, ref SceKernelModuleInfo ModuleInfo)
         {
             var Module = Modules.Get(ModuleId);
@@ -436,7 +440,7 @@ namespace ScePSP.Hle.Modules.modulemgr
         /// <param name="OptionsAddress"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xCC1D3699, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HlePspNotImplemented]
         public int sceKernelStopUnloadSelfModule(int ArgumentSize, void* ArgumentPointer, int* StatusPointer, void* OptionsAddress)
         {
             //throw new NotImplementedException("sceKernelStopUnloadSelfModule");

@@ -320,14 +320,13 @@ namespace ScePSP.Hle.Modules.threadman
                         });
                     }
 
-                    Console.WriteLine("Wait End!");
+                    Console.WriteLine($"sceKernelWaitThreadEnd: {ThreadToWaitEnd.Name} Wait.");
                     Action OnTerminate = null;
 
                     OnTerminate = () =>
                     {
                         ThreadToWaitEnd.OnTerminate -= OnTerminate;
-                        Console.WriteLine("Ended!");
-                        //throw(new Exception("aaaaaaaaaaaa"));
+                        Console.WriteLine($"sceKernelWaitThreadEnd {ThreadToWaitEnd.Name} Ended.");
                         WakeUpCallback();
                     };
 

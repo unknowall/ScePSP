@@ -479,29 +479,28 @@ namespace ScePSP.Hle.Modules.libatrac3plus
 
         [HlePspFunction(NID = 0x0FAE370E, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceAtracSetHalfwayBufferAndGetID(uint HalfBufferPointer, uint readSize, uint HalfBufferSize)
+        public Atrac sceAtracSetHalfwayBufferAndGetID(byte* HalfBufferPointer, int readSize, int HalfBufferSize)
         {
-            //throw (new NotImplementedException());
-            return -1;
+            return TryToAlloc(new Atrac(HalfBufferPointer, HalfBufferSize, readSize));
         }
 
         [HlePspFunction(NID = 0x9CD7DE03, FirmwareVersion = 250)]
         [HlePspNotImplemented]
-        public int sceAtracSetMOutHalfwayBufferAndGetID(void* halfBuffer, uint readSize, uint halfBufferSize)
+        public Atrac sceAtracSetMOutHalfwayBufferAndGetID(byte* halfBuffer, int readSize, int halfBufferSize)
         {
-            throw new SceKernelException((SceKernelErrors)(-1));
+            return TryToAlloc(new Atrac(halfBuffer, halfBufferSize, readSize, true));
         }
 
         [HlePspFunction(NID = 0x5DD66588, FirmwareVersion = 250)]
         [HlePspNotImplemented]
-        public int sceAtracSetAA3HalfwayBufferAndGetID(void* halfBuffer, uint readSize, uint halfBufferSize)
+        public int sceAtracSetAA3HalfwayBufferAndGetID(byte* halfBuffer, uint readSize, uint halfBufferSize)
         {
             throw new SceKernelException((SceKernelErrors)(-1));
         }
 
         [HlePspFunction(NID = 0x5622B7C1, FirmwareVersion = 250)]
         [HlePspNotImplemented]
-        public Atrac sceAtracSetAA3DataAndGetID(void* buffer, int bufferSize, int fileSize, uint metadataSizeAddr)
+        public Atrac sceAtracSetAA3DataAndGetID(byte* buffer, int bufferSize, int fileSize, uint metadataSizeAddr)
         {
             throw new SceKernelException((SceKernelErrors)(-1));
         }

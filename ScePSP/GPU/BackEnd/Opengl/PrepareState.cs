@@ -244,6 +244,7 @@ namespace ScePSP.Core.GpuBackEnd.OpenGL
             );
         }
 
+        //RenderDoc need disable this
         private void PrepareState_AlphaTest(GpuStateStruct gpuState)
         {
             if (!gpuState.AlphaTestState.Enabled)

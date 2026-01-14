@@ -1,13 +1,9 @@
-﻿using cscodec.h264.player;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Core.Memory;
 using System;
 
 namespace ScePSP.Hle.Modules.mpeg
 {
-    /// <summary>
-    /// AVC: Advanced Video Coding
-    /// </summary>
-    /// <see cref="http://en.wikipedia.org/wiki/H.264/MPEG-4_AVC"/>
+
     public unsafe partial class sceMpeg
     {
         protected bool[] AbvEsBufAllocated = new bool[2];
@@ -27,7 +23,7 @@ namespace ScePSP.Hle.Modules.mpeg
 
             //throw(new NotImplementedException());
             AvcDecodeDetail->AvcDecodeResult = 0;
-            AvcDecodeDetail->VideoFrameCount = 0;
+            AvcDecodeDetail->VideoFrameCount = Mpeg.FrameIndex;
             AvcDecodeDetail->AvcDetailFrameWidth = SceMpegData->FrameWidth;
             AvcDecodeDetail->AvcDetailFrameHeight = 272;
             AvcDecodeDetail->FrameCropRectLeft = 0;
@@ -79,8 +75,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <returns>0 if successful.</returns>
         [HlePspFunction(NID = 0xFE246728, FirmwareVersion = 150)]
         //[HlePspNotImplemented]
-        public int sceMpegGetAvcAu(SceMpegPointer* SceMpegPointer, StreamId StreamId, out SceMpegAu MpegAccessUnit,
-            int* DataAttributes)
+        public int sceMpegGetAvcAu(SceMpegPointer* SceMpegPointer, StreamId StreamId, out SceMpegAu MpegAccessUnit, int* DataAttributes)
         {
             if (DataAttributes != null)
             {
@@ -151,8 +146,7 @@ namespace ScePSP.Hle.Modules.mpeg
                         SceMpegData->SceMpegAvcMode = *Mode;
                         break;
                     default:
-                        throw new Exception("Invalid PixelFormat in sceMpegAvcDecodeMode: " + Mode->Mode + ", " +
-                                            Mode->PixelFormat);
+                        throw new Exception("Invalid PixelFormat in sceMpegAvcDecodeMode: " + Mode->Mode + ", " +  Mode->PixelFormat);
                 }
             }
 
@@ -169,41 +163,34 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="Init">Will be set to 0 on first call, then 1</param>
         /// <returns>0 if successful.</returns>
         [HlePspFunction(NID = 0x0E3C2E9D, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
-        public int sceMpegAvcDecode(SceMpegPointer* SceMpegPointer, SceMpegAu* MpegAccessUnit, int FrameWidth,
-            PspPointer* OutputBufferPointer, PspPointer* Init)
+        [HlePspNotImplemented]
+        public int sceMpegAvcDecode(SceMpegPointer* SceMpegPointer, SceMpegAu* MpegAccessUnit, int FrameWidth, PspPointer* OutputBufferPointer, PspPointer* Init)
         {
-            //if (*Init == 1)
-            //{
-            //	throw (new SceKernelException(SceKernelErrors.ERROR_MPEG_NO_DATA));
-            //}
-
             var SceMpegData = GetSceMpegData(SceMpegPointer);
+
             var Mpeg = GetMpeg(SceMpegPointer);
 
             // Dummy
-            var VideoPacket = new VideoPacket();
 
-            //Console.Error.WriteLine("0x{0:X}", PspMemory.PointerToPspAddress(OutputBuffer));
-            //Console.WriteLine("{0:X8}", (*OutputBufferPointer).Address);
+            // 此处应新建线程解码
             Mpeg.AvcDecode(
                 MpegAccessUnit,
                 FrameWidth,
                 SceMpegData->SceMpegAvcMode.PixelFormat,
                 *OutputBufferPointer
             );
+            int threadUid = PSPDrivers.HLE.ModuleMgrForUser.ThreadManager.Current.Id;
+
+            //阻塞当前hle线程直至数据用完
+            //PSPDrivers.HLE.ThreadManForUser.ThreadManager.SuspendThread(PSPDrivers.HLE.ModuleMgrForUser.ThreadManager.Current);
+            //Modules.ThreadManForUserModule.hleBlockCurrentThread(SceKernelThreadInfo. WAIT_VIDEO_DECODER);
 
             SceMpegData->AvcFrameStatus = 1;
-            //Init = SceMpegData->AvcFrameStatus;
 
             //throw (new SceKernelException(SceKernelErrors.ERROR_MPEG_NO_DATA));
             return 0;
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="Mpeg"></param>
         /// <param name="Mode"></param>
         /// <param name="Width">480</param>
@@ -211,8 +198,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="Result">Where to store the result</param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x211A057C, FirmwareVersion = 150)]
-        public int sceMpegAvcQueryYCbCrSize(SceMpegPointer* Mpeg, QueryYCbCrSizeModeEnum Mode, int Width, int Height,
-            int* Result)
+        public int sceMpegAvcQueryYCbCrSize(SceMpegPointer* Mpeg, QueryYCbCrSizeModeEnum Mode, int Width, int Height, int* Result)
         {
             if ((Width & 15) != 0 || (Height & 15) != 0 || Width > 480 || Height > 272)
             {
@@ -299,11 +285,11 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <returns>0 if successful.</returns>
         [HlePspFunction(NID = 0x740FCCD1, FirmwareVersion = 150)]
         [HlePspNotImplemented]
-        public int sceMpegAvcDecodeStop(SceMpegPointer* SceMpegPointer, int FrameWidth, byte* OutputBuffer,
-            out int Status)
+        public int sceMpegAvcDecodeStop(SceMpegPointer* SceMpegPointer, int FrameWidth, byte* OutputBuffer, out int Status)
         {
             //throw(new NotImplementedException());
             var Mpeg = GetMpeg(SceMpegPointer);
+
             var SceMpegData = GetSceMpegData(SceMpegPointer);
 
             Mpeg.Stop();

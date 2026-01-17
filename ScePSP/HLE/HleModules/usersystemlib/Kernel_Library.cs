@@ -62,7 +62,7 @@ namespace ScePSP.Hle.Modules.usersystemlib
 
         private int _sceKernelUnlockLwMutex(SceLwMutexWorkarea* workarea, int count)
         {
-            //return 0;
+            return 0;
 
             if (workarea->uid == -1)
             {
@@ -156,7 +156,7 @@ namespace ScePSP.Hle.Modules.usersystemlib
         /// <param name="Count"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x15B6446B, FirmwareVersion = 380)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelUnlockLwMutex(SceLwMutexWorkarea* WorkAreaPointer, int Count)
         {
             return _sceKernelUnlockLwMutex(WorkAreaPointer, Count);
@@ -170,7 +170,7 @@ namespace ScePSP.Hle.Modules.usersystemlib
         /// <param name="TimeOut"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xBEA46419, FirmwareVersion = 380)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelLockLwMutex(SceLwMutexWorkarea* WorkAreaPointer, int Count, int* TimeOut)
         {
             return _sceKernelLockLwMutexCB(WorkAreaPointer, Count, TimeOut, HandleCallbacks: false);
@@ -183,7 +183,7 @@ namespace ScePSP.Hle.Modules.usersystemlib
         /// <param name="Count"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x37431849, FirmwareVersion = 380)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelTryLockLwMutex_600(SceLwMutexWorkarea* WorkAreaPointer, int Count)
         {
             return _sceKernelTryLockLwMutex(WorkAreaPointer, Count);
@@ -198,7 +198,7 @@ namespace ScePSP.Hle.Modules.usersystemlib
         /// <param name="TimeOut"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x1FC64E09, FirmwareVersion = 380)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelLockLwMutexCB(SceLwMutexWorkarea* WorkAreaPointer, int Count, int* TimeOut)
         {
             return _sceKernelLockLwMutexCB(WorkAreaPointer, Count, TimeOut, HandleCallbacks: true);

@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 
-namespace ScePSP.Core.AudioBackEnd
+namespace ScePSP.BackEnd
 {
     public sealed unsafe class PspAudio : IDisposable
     {

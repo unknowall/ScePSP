@@ -1,6 +1,6 @@
-﻿using ScePSP.Core.Components.Rtc;
-using ScePSP.Core.Memory;
-using ScePSP.Core.Types;
+﻿using ScePSP.Devices.Rtc;
+using ScePSP.Memory;
+using ScePSP.Types;
 using ScePSP.GE;
 using ScePSP.Utils;
 using System;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 using Bitmap = System.Drawing.Bitmap;
 
-namespace ScePSP.Core.Components.Display
+namespace ScePSP.Devices.Display
 {
     public class PspWaitEvent
     {

@@ -35,7 +35,7 @@
         /// <param name="OptionAddress"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x19CFF145, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelCreateLwMutex(SceLwMutexWorkarea* WorkAreaPointer, string Name,
             ThreadManForUser.MutexAttributesEnum Attributes, int InitialCount, int OptionAddress)
         {
@@ -51,7 +51,7 @@
         /// <param name="workAreaAddr"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x60107536, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelDeleteLwMutex(SceLwMutexWorkarea* WorkAreaPointer)
         {
             //throw (new NotImplementedException());

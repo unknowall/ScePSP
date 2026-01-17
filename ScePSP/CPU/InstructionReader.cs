@@ -1,30 +1,39 @@
 ﻿using ScePSPUtils.Arrays;
 using System.IO;
 
-namespace ScePSP.Core.Cpu
+namespace ScePSP.Cpu
 {
     public interface IInstructionReader
     {
-        Instruction this[uint index] { get; set; }
-        uint EndPc { get; }
+        Instruction this[uint Index] { get; set; }
+        uint EndPC { get; }
     }
 
     public class InstructionArrayReader : IInstructionReader
     {
-        private readonly IArray<Instruction> _instructions;
+        private IArray<Instruction> Instructions;
 
-        public InstructionArrayReader(IArray<Instruction> instructions)
+        public InstructionArrayReader(IArray<Instruction> Instructions)
         {
-            _instructions = instructions;
+            this.Instructions = Instructions;
         }
 
-        public Instruction this[uint index]
+        public Instruction this[uint Index]
         {
-            get => _instructions[(int)(index / 4)];
-            set => _instructions[(int)(index / 4)] = value;
+            get
+            {
+                return this.Instructions[(int)(Index / 4)];
+            }
+            set
+            {
+                this.Instructions[(int)(Index / 4)] = value;
+            }
         }
 
-        public uint EndPc => (uint)((_instructions.Length - 1) * 4);
+        public uint EndPC
+        {
+            get { return (uint)((Instructions.Length - 1) * 4); }
+        }
     }
 
     public class InstructionStreamReader : IInstructionReader
@@ -33,30 +42,33 @@ namespace ScePSP.Core.Cpu
         protected BinaryReader BinaryReader;
         protected BinaryWriter BinaryWriter;
 
-        public InstructionStreamReader(Stream stream)
+        public InstructionStreamReader(Stream Stream)
         {
-            Stream = stream;
-            BinaryReader = new BinaryReader(stream);
-            BinaryWriter = new BinaryWriter(stream);
+            this.Stream = Stream;
+            this.BinaryReader = new BinaryReader(Stream);
+            this.BinaryWriter = new BinaryWriter(Stream);
         }
 
-        public Instruction this[uint index]
+        public Instruction this[uint Index]
         {
             get
             {
-                var instruction = default(Instruction);
-                Stream.Position = index;
-                instruction.Value = BinaryReader.ReadUInt32();
-                return instruction;
+                var Instruction = default(Instruction);
+                Stream.Position = Index;
+                Instruction.Value = BinaryReader.ReadUInt32();
+                return Instruction;
             }
             set
             {
-                Stream.Position = index;
+                Stream.Position = Index;
                 BinaryWriter.Write((uint)value.Value);
             }
         }
 
 
-        public uint EndPc => (uint)(Stream.Length - 4);
+        public uint EndPC
+        {
+            get { return (uint)(Stream.Length - 4); }
+        }
     }
 }

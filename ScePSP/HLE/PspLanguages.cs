@@ -1,4 +1,4 @@
-﻿namespace ScePSP.Core.Types
+﻿namespace ScePSP.Types
 {
     public enum PspLanguages
     {

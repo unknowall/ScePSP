@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ScePSP.Core.Types
+namespace ScePSP.Types
 {
     // Format of the texture data. Texture Data mode.
     public enum GuPixelFormats : uint

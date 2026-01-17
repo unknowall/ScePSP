@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Cpu;
+﻿using ScePSP.Cpu;
 using ScePSP.Hle.Formats;
 using ScePSP.Hle.Loader;
 using ScePSP.Hle.Managers;
@@ -65,8 +65,8 @@ namespace ScePSP.Hle
             // J
             //0000 10ii iiii iiii iiii iiii iiii iiii
             var Instruction = default(Instruction);
-            Instruction.Op1 = 2;
-            Instruction.JumpReal = FunctionAddress;
+            Instruction.OP1 = 2;
+            Instruction.JUMP_Real = FunctionAddress;
 
             CpuProcessor.Memory.WriteSafe(CallAddress + 0, Instruction); // J
             CpuProcessor.Memory.WriteSafe(CallAddress + 4, 0x00000000); // NOP
@@ -160,8 +160,8 @@ namespace ScePSP.Hle
                     }
                 }
 
-                Logger.Info("'{0}' - {1}", ModuleImports.Name,
-                    HleModuleHost != null ? HleModuleHost.ModuleLocation : "?");
+                Logger.Info("'{0}' - {1}", ModuleImports.Name, HleModuleHost != null ? HleModuleHost.ModuleLocation : "?");
+
                 foreach (var Function in ModuleImports.Functions)
                 {
                     var NID = Function.Key;

@@ -28,7 +28,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="psmfPlayer"></param>
         /// <param name="psmfPlayerDataAddr"></param>
         [HlePspFunction(NID = 0x235D8787, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerCreate(int psmfPlayer, void* psmfPlayerDataAddr)
         {
             //throw(new NotImplementedException());
@@ -41,7 +41,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="psmfPlayer"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x9B71A274, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerDelete(int psmfPlayer)
         {
             return 0;
@@ -54,7 +54,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="FileName"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x3D6D25A9, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerSetPsmf(int psmfPlayer, string FileName)
         {
             return 0;
@@ -67,7 +67,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="FileName"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x58B83577, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerSetPsmfCB(int psmfPlayer, string FileName)
         {
             return 0;
@@ -79,7 +79,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="psmfPlayer"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xE792CD94, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerReleasePsmf(int psmfPlayer)
         {
             return 0;
@@ -92,7 +92,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="initPlayInfoAddr"></param>
         /// <param name="initPts"></param>
         [HlePspFunction(NID = 0x95A84EE5, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerStart(int psmfPlayer, PlayInfoStruct* initPlayInfoAddr, int initPts)
         {
             return 0;
@@ -103,7 +103,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// </summary>
         /// <param name="psmfPlayer"></param>
         [HlePspFunction(NID = 0x3EA82A4B, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerGetAudioOutSize(int psmfPlayer)
         {
             return 0;
@@ -114,7 +114,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// </summary>
         /// <param name="psmfPlayer"></param>
         [HlePspFunction(NID = 0x1078C008, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerStop(int psmfPlayer)
         {
             PsmfPlayerStatus = PsmfPlayerStatusSet.Standby;
@@ -126,7 +126,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// </summary>
         /// <param name="psmfPlayer"></param>
         [HlePspFunction(NID = 0xA0B8CA55, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerUpdate(int psmfPlayer)
         {
             return 0;
@@ -138,7 +138,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="psmfPlayer"></param>
         /// <param name="VideoData"> </param>
         [HlePspFunction(NID = 0x46F61F8B, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerGetVideoData(int psmfPlayer, void* VideoData)
         {
             return 0;
@@ -150,7 +150,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="psmfPlayer"></param>
         /// <param name="AudioData"></param>
         [HlePspFunction(NID = 0xB9848A74, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerGetAudioData(int psmfPlayer, void* AudioData)
         {
             return 0;
@@ -162,7 +162,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="psmfPlayer"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xF8EF08A6, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public PsmfPlayerStatusSet scePsmfPlayerGetCurrentStatus(int psmfPlayer)
         {
             return PsmfPlayerStatus;
@@ -175,7 +175,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="Info"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xDF089680, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerGetPsmfInfo(int psmfPlayer, ref PmfInfoStruct Info)
         {
             return 0;
@@ -189,7 +189,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="configAttr"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x1E57A8E7, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerConfigPlayer(int psmfPlayer, PSMF_PLAYER_CONFIG_MODE configMode, int configAttr)
         {
             return 0;
@@ -203,7 +203,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="newPlaySpeed"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xA3D81169, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerChangePlayMode(int psmfPlayer, int newPlayMode, int newPlaySpeed)
         {
             return 0;
@@ -217,7 +217,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="audioStreamNumAddr"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x68F07175, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerGetCurrentAudioStream(int psmfPlayer, uint* audioCodecAddr, uint* audioStreamNumAddr)
         {
             return 0;
@@ -231,7 +231,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="playSpeedAddr"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xF3EFAA91, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerGetCurrentPlayMode(int psmfPlayer, uint* playModeAddr, uint* playSpeedAddr)
         {
             return 0;
@@ -244,7 +244,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="currentPtsAddr"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x3ED62233, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerGetCurrentPts(int psmfPlayer, uint* currentPtsAddr)
         {
             return 0;
@@ -258,7 +258,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="videoStreamNumAddr"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x9FF2B2E7, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerGetCurrentVideoStream(int psmfPlayer, uint* videoCodecAddr, uint* videoStreamNumAddr)
         {
             return 0;
@@ -269,7 +269,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// </summary>
         /// <param name="psmfPlayer"></param>
         [HlePspFunction(NID = 0x2BEB1569, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerBreak(int psmfPlayer)
         {
             return 0;
@@ -282,7 +282,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="FileName"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x76C0F4AE, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerSetPsmfOffset(int psmfPlayer, string FileName)
         {
             return 0;
@@ -295,7 +295,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="FileName"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xA72DB4F9, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerSetPsmfOffsetCB(int psmfPlayer, string FileName)
         {
             return 0;
@@ -307,7 +307,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="psmfPlayer"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x2D0E4E0A, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerSetTempBuf(int psmfPlayer)
         {
             return 0;
@@ -321,7 +321,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="newVideoStreamNum"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x75F03FA2, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerSelectSpecificVideo(int psmfPlayer, uint newVideoCodec, uint newVideoStreamNum)
         {
             return 0;
@@ -335,7 +335,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="newAudioStreamNum"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x85461EFF, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerSelectSpecificAudio(int psmfPlayer, uint newAudioCodec, uint newAudioStreamNum)
         {
             return 0;
@@ -346,7 +346,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// </summary>
         /// <param name="psmfPlayer"></param>
         [HlePspFunction(NID = 0x8A9EBDCD, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerSelectVideo(int psmfPlayer)
         {
             return 0;
@@ -358,7 +358,7 @@ namespace ScePSP.Hle.Modules.pmfplayer
         /// <param name="psmfPlayer"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xB8D10C56, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePsmfPlayerSelectAudio(int psmfPlayer)
         {
             return 0;

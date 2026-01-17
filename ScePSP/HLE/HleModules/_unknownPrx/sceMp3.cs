@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Memory;
+﻿using ScePSP.Memory;
 using ScePSP.Hle.Attributes;
 using ScePSPUtils;
 using System;

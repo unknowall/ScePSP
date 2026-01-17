@@ -1,5 +1,5 @@
 ﻿using ScePSP.Core;
-using ScePSP.Core.Cpu;
+using ScePSP.Cpu;
 using ScePSP.Hle.Formats;
 using ScePSP.Hle.Managers;
 using ScePSPUtils;
@@ -313,20 +313,20 @@ namespace ScePSP.Hle.Loader
                         }
                     case Elf.Reloc.TypeEnum.Mips26: // 4
                         {
-                            instruction.JumpReal = instruction.JumpReal + s;
+                            instruction.JUMP_Real = instruction.JUMP_Real + s;
                         }
                         break;
                     case Elf.Reloc.TypeEnum.MipsHi16: // 5
                         {
-                            hiValue = (ushort)instruction.Immu;
+                            hiValue = (ushort)instruction.IMMU;
                             deferredHi16.AddLast(relocatedPointerAddress);
                         }
                         break;
                     case Elf.Reloc.TypeEnum.MipsLo16: // 6
                         {
-                            var a = instruction.Immu;
+                            var a = instruction.IMMU;
 
-                            instruction.Immu = ((uint)(hiValue << 16) | a & 0x0000FFFF) + s;
+                            instruction.IMMU = ((uint)(hiValue << 16) | a & 0x0000FFFF) + s;
 
                             // Process deferred R_MIPS_HI16
                             foreach (var dataAddr2 in deferredHi16)
@@ -347,7 +347,7 @@ namespace ScePSP.Hle.Loader
                                 {
                                     result += 0x10000;
                                 }
-                                data2.Immu = result >> 16;
+                                data2.IMMU = result >> 16;
                                 instructionReader[dataAddr2] = data2;
                             }
                             deferredHi16.Clear();

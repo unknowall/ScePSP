@@ -1,11 +1,9 @@
 ﻿using System;
 
-namespace ScePSP.Core.Cpu
+namespace ScePSP.Cpu
 {
     public class PspBreakException : Exception
     {
-        public PspBreakException(string message) : base(message)
-        {
-        }
+        public PspBreakException(string Message) : base(Message) { }
     }
 }

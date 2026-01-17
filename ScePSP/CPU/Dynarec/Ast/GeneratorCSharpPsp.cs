@@ -1,15 +1,14 @@
 ﻿using SafeILGenerator.Ast.Generators;
+using System;
 
-namespace ScePSP.Core.Cpu.Dynarec.Ast
+namespace ScePSP.Cpu.Dynarec.Ast
 {
     public class GeneratorCSharpPsp : GeneratorCSharp
     {
-        protected void _Generate(AstNodeStmPspInstruction pspInstruction)
+        protected void _Generate(AstNodeStmPspInstruction PspInstruction)
         {
-            Generate(pspInstruction.Statement);
-            Output.Write(
-                $" // 0x{pspInstruction.DisassembledResult.InstructionPc:X8}: {pspInstruction.DisassembledResult.AssemblyLine}"
-            );
+            Generate(PspInstruction.Statement);
+            Output.Write(String.Format(" // 0x{0:X8}: {1}", PspInstruction.DisassembledResult.InstructionPC, PspInstruction.DisassembledResult.AssemblyLine));
         }
     }
 }

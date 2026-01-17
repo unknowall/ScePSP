@@ -1,13 +1,15 @@
-﻿using ScePSP.Core.Cpu;
-using ScePSP.Core.GpuBackEnd;
-using ScePSP.Core.GpuBackEnd.State;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Cpu;
+using ScePSP.GE;
+using ScePSP.GE.State;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
 using ScePSP.Hle.Modules.sysmem;
+using ScePSP.Memory;
 using ScePSPUtils;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace ScePSP.Hle.Modules.ge
 {
@@ -18,16 +20,93 @@ namespace ScePSP.Hle.Modules.ge
 
         HleMemoryManager MemoryManager => PSPDrivers.HLE.MemoryManager;
 
-        public GpuProcessor GpuProcessor => PSPDrivers.GE;
+        public GEList GeList => PSPDrivers.GEList;
 
         public SysMemUserForUser SysMemUserForUser => PSPDrivers.HleModules.SysMemUserForUser;
 
         private MemoryPartition GpuStateStructPartition = null;
+        private GpuStateStruct* GpuStateStructPointer = null;
         private int eDRAMMemoryWidth;
         int CallbackLastId = 1;
+        public Dictionary<int, GeCallbackData> Callbacks = new Dictionary<int, GeCallbackData>();
 
-        public Dictionary<int, PspGeCallbackData> Callbacks = new Dictionary<int, PspGeCallbackData>();
-        //PspGeCallbackData
+        protected override void ModuleInitialize()
+        {
+            GpuStateStructPartition = MemoryManager.GetPartition(MemoryPartitions.Kernel0).Allocate(
+                sizeof(GpuStateStruct),
+                Name: "GpuStateStruct"
+            );
+            GpuStateStructPointer = (GpuStateStruct*)GpuStateStructPartition.GetLowPointerSafe<GpuStateStruct>();
+        }
+
+        private int _sceGeListEnQueue(uint InstructionAddressStart, uint InstructionAddressStall, int CallbackId, PspGeListArgs* Args, bool Head)
+        {
+            var GE = GeList.DequeueFree();
+
+            //Console.WriteLine($"_sceGeListEnQueue Start 0x{InstructionAddressStart & PspMemory.MemoryMask:X} Stall 0x{InstructionAddressStall & PspMemory.MemoryMask:X} ");
+
+            if (SysMemUserForUser.sceKernelGetCompiledSdkVersion() < 0x02000000)
+            {
+                // Old games (i.e. having PSP SDK version < 2.00) are sometimes
+                // reusing the same address for multiple lists, without waiting
+                // TODO 得为老游戏做GE指令缓存
+
+                //Console.WriteLine($"\nsceKernelGetCompiledSdkVersion {SysMemUserForUser.sceKernelGetCompiledSdkVersion()}\n");
+
+                GE.OldSDK = true;
+
+                GE.SyncWaitDone(null);
+            }
+
+            GE.CallbacksId = -1;
+            GE.Callbacks = default(GeCallbackData);
+
+            if (CallbackId != -1)
+            {
+                GE.Callbacks = Callbacks[CallbackId];
+                GE.CallbacksId = CallbackId;
+            }
+
+            if (Args != null && Args->GpuStateStructAddress != 0)
+            {
+                GE.OptParam.ContextAddress = (int)Args->GpuStateStructAddress;
+                GE.OptParam.StackDepth = (int)Args->NumberOfStacks;
+                GE.OptParam.StackAddress = (int)Args->StacksAddress;
+
+                GE.GEStateStruct = (GpuStateStruct*)CpuProcessor.Memory.PspAddressToPointerSafe(Args->GpuStateStructAddress, Marshal.SizeOf(typeof(GpuStateStruct)));
+            }
+
+            if (GE.GEStateStruct == null)
+            {
+                GE.GEStateStruct = GpuStateStructPointer;
+            }
+
+            GE.SetStartAddress(InstructionAddressStart, InstructionAddressStall);
+
+            if (Head)
+            {
+                GeList.EnqueueFirst(GE);
+            }
+            else GeList.Enqueue(GE);
+
+            return GE.Id;
+        }
+
+        public enum PspGeMatrixTypes
+        {
+            Bone0 = 0,
+            Bone1 = 1,
+            Bone2 = 2,
+            Bone3 = 3,
+            Bone4 = 4,
+            Bone5 = 5,
+            Bone6 = 6,
+            Bone7 = 7,
+            World = 8,
+            View = 9,
+            Projection = 10,
+            Texture = 11,
+        }
 
         /// <summary>
         /// Get the address of VRAM.
@@ -55,14 +134,10 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="ContextPtr">Pointer to a <see cref="PspGeContext"/>.</param>
         /// <returns>&lt; 0 on error.</returns>
         [HlePspFunction(NID = 0x438A385A, FirmwareVersion = 150)]
-        public int sceGeSaveContext(uint Address)
+        public int sceGeSaveContext(GpuStateStruct* Context)
         {
-            var pointer = Memory.PspAddressToSpan<uint>(Address, 0x200);
-            var current = GpuProcessor.GpuBackEnd.GpuState.data.Span;
-            current.CopyTo(pointer);
+            *Context = *this.GpuStateStructPointer;
             return 0;
-
-            //throw new NotImplementedException();
         }
 
         /// <summary>
@@ -71,14 +146,10 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="contextAddr">Pointer to a <see cref="PspGeContext"/>.</param>
         /// <returns>&lt; 0 on error.</returns>
         [HlePspFunction(NID = 0x0BF608FB, FirmwareVersion = 150)]
-        public int sceGeRestoreContext(uint Address)
+        public int sceGeRestoreContext(GpuStateStruct* Context)
         {
-            var pointer = Memory.PspAddressToSpan<uint>(Address, 0x200);
-            var current = GpuProcessor.GpuBackEnd.GpuState.data.Span;
-            pointer.CopyTo(current);
+            *GpuStateStructPointer = *Context;
             return 0;
-
-            //throw new NotImplementedException();
         }
 
         /// <summary>
@@ -87,10 +158,12 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="cmd">The GE command register to retrieve.</param>
         /// <returns>The value of the GE command.</returns>
         [HlePspFunction(NID = 0xDC93CFEF, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceGeGetCmd(int cmd)
         {
-            throw new NotImplementedException();
+            var GE = GeList.Current;
+
+            return GE.CMDValues[cmd];
         }
 
         /// <summary>
@@ -100,29 +173,29 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="MatrixAddress">Pointer to a variable to store the matrix.</param>
         /// <returns>&lt; 0 on error.</returns>
         [HlePspFunction(NID = 0x57C8945B, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
-        public int sceGeGetMtx(PspGeMatrixTypes MatrixType, uint* MatrixAddress)
+        [HleTrackCall]
+        public int sceGeGetMtx(PspGeMatrixTypes MatrixType, uint MatrixAddress)
         {
-            throw new NotImplementedException();
-        }
+            if (MatrixType < 0 || MatrixType > PspGeMatrixTypes.Texture)
+            {
+                Console.WriteLine(string.Format("sceGeGetMtx invalid type mtxType={0:D}", MatrixType));
+                return (int)SceKernelErrors.ERROR_INVALID_INDEX;
+            }
 
-        /// <summary>
-        /// Matrix types that can be retrieved.
-        /// </summary>
-        public enum PspGeMatrixTypes
-        {
-            Bone0 = 0,
-            Bone1 = 1,
-            Bone2 = 2,
-            Bone3 = 3,
-            Bone4 = 4,
-            Bone5 = 5,
-            Bone6 = 6,
-            Bone7 = 7,
-            World = 8,
-            View = 9,
-            Projection = 10,
-            Texture = 11,
+            var GE = GeList.Current;
+
+            Matrix4x4 val = GE.GetMtx(MatrixType);
+
+            byte[] MatrixByte = new byte[64];
+
+            fixed (byte* bytePtr = MatrixByte)
+            {
+                Marshal.StructureToPtr(val, (IntPtr)bytePtr, false);
+            }
+
+            Memory.WriteBytes(MatrixAddress, MatrixByte);
+
+            return 0;
         }
 
         [HlePspFunction(NID = 0xB77905EA, FirmwareVersion = 150)]
@@ -145,9 +218,40 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="BreakAddress">Unused (just K1-checked).</param>
         /// <returns>The stopped queue ID if mode isn't set to 0, otherwise 0, and &lt; 0 on error.</returns>
         [HlePspFunction(NID = 0xB448EC0D, FirmwareVersion = 150)]
+        [HleTrackCall]
         public int sceGeBreak(int Mode, void* BreakAddress)
         {
-            throw new NotImplementedException();
+            var GE = GeList.Current;
+
+            if (GE == null)
+            {
+                return 0;
+            }
+
+            int result = 0;
+
+            if (Mode == 0)
+            { // Pause the current list only.
+                if (GE != null)
+                {
+                    GE.Pause = true;
+                    result = GE.Id;
+                }
+            }
+            else if (Mode == 1)
+            { // Pause the current list and cancel the rest of the queue.
+                if (GE != null)
+                {
+                    GE.Pause = true;
+                    for (int i = 0; i < GEList.GECoreCount; i++)
+                    {
+                        GeList.List[i].Status = GEStatusEnum.Cancel;
+                    }
+                    return GE.Id;
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -155,55 +259,25 @@ namespace ScePSP.Hle.Modules.ge
         /// </summary>
         /// <returns>&lt; 0 on error.</returns>
         [HlePspFunction(NID = 0x4C06E472, FirmwareVersion = 150)]
+        [HleTrackCall]
         public int sceGeContinue()
         {
-            var GE = GpuProcessor.GetCurrentGEProcess();
+            var GE = GeList.Current;
+
             if (GE == null)
             {
                 return 0;
             }
 
-            if (GE.Status.Value == GEProcesStatusEnum.Paused)
+            lock (this)
             {
-                if (!GpuProcessor.IsBreak)
+                if (GE.Status == GEStatusEnum.EndReached)
                 {
-                    if (GE.Signal == SignalBehavior.PSP_GE_SIGNAL_HANDLER_PAUSE)
-                    {
-                        return unchecked((int)SceKernelErrors.ERROR_BUSY);
-                    }
-
-                    GE.Status.SetValue(GEProcesStatusEnum.Drawing);
-                    GE.Signal = SignalBehavior.PSP_GE_SIGNAL_NONE;
-
-                    // TODO Restore context of DL is necessary
-                    // TODO Restore BASE
-
-                    // We have a list now, so it's not complete.
-                    //drawCompleteTicks = (u64) - 1;
+                    GE.SkipEnd();
                 }
-                else
-                {
-                    GE.Status.SetValue(GEProcesStatusEnum.Queued);
-                }
-            }
-            else if (GE.Status.Value == GEProcesStatusEnum.Drawing)
-            {
-                if (SysMemUserForUser.sceKernelGetCompiledSdkVersion() >= 0x02000000)
-                {
-                    return unchecked((int)SceKernelErrors.ERROR_ALREADY);
-                }
-                return -1;
-            }
-            else
-            {
-                if (SysMemUserForUser.sceKernelGetCompiledSdkVersion() >= 0x02000000)
-                {
-                    return unchecked((int)0x80000004);
-                }
-                return -1;
+                GE.Sync();
             }
 
-            //ProcessDLQueue();
             return 0;
         }
 
@@ -213,7 +287,8 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="PspGeCallbackData">Configured callback data structure</param>
         /// <returns>The callback ID, less than 0 on error</returns>
         [HlePspFunction(NID = 0xA4FC06A4, FirmwareVersion = 150)]
-        public int sceGeSetCallback(ref PspGeCallbackData PspGeCallbackData)
+        [HleTrackCall]
+        public int sceGeSetCallback(ref GeCallbackData PspGeCallbackData)
         {
             int CallbackId = CallbackLastId++;
 
@@ -232,7 +307,6 @@ namespace ScePSP.Hle.Modules.ge
             Logger.Info("PspGeCallbackData.Finish(0x{0:X}) : (0x{1:X})", PspGeCallbackData.FinishFunction, PspGeCallbackData.FinishArgument);
             Logger.Info("PspGeCallbackData.Signal(0x{0:X}) : (0x{1:X})", PspGeCallbackData.SignalFunction, PspGeCallbackData.SignalArgument);
 
-            //Console.Error.WriteLine("{0}", *PspGeCallbackData);
             return CallbackId;
         }
 
@@ -242,58 +316,11 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="cbid">The ID of the callbacks from sceGeSetCallback</param>
         /// <returns>Less than 0 on error</returns>
         [HlePspFunction(NID = 0x05DB22CE, FirmwareVersion = 150)]
+        [HleTrackCall]
         public int sceGeUnsetCallback(int cbid)
         {
             Callbacks.Remove(cbid);
             return 0;
-        }
-
-        private uint* DefaultGpuStateData = null;
-
-        protected override void ModuleInitialize()
-        {
-            GpuStateStructPartition = MemoryManager.GetPartition(MemoryPartitions.Kernel0).Allocate(
-                GpuStateStruct.StructSizeInBytes,
-                Name: "GpuStateStruct"
-            );
-
-            DefaultGpuStateData = GpuStateStructPartition.GetLowPointerSafe<uint>(GpuStateStruct.StructSizeInWords);
-        }
-
-        private GEProcess GetGEProcessFromId(int GEProcessId)
-        {
-            if (GEProcessId < 0 || GEProcessId >= GpuProcessor.GEProcessCount)
-            {
-                throw new SceKernelException(SceKernelErrors.ERROR_INVALID_ID);
-            }
-
-            return GpuProcessor.GetGEProcess(GEProcessId);
-        }
-
-        private GEProcess _sceGeListEnQueue(uint InstructionAddressStart, uint InstructionAddressStall, int CallbackId, PspGeListArgs* Args)
-        {
-            var GE = GpuProcessor.DequeueFreeGEProcess();
-
-            //Console.WriteLine($"_sceGeListEnQueue Start 0x{InstructionAddressStart & PspMemory.MemoryMask:X} Stall 0x{InstructionAddressStall & PspMemory.MemoryMask:X} ");
-
-            GE.SetInstructionAddressStartAndCurrent(InstructionAddressStart);
-            GE.SetInstructionAddressStall(InstructionAddressStall);
-            GE.CallbacksId = -1;
-            GE.Callbacks = default(PspGeCallbackData);
-
-            if (CallbackId != -1)
-            {
-                GE.Callbacks = Callbacks[CallbackId];
-                GE.CallbacksId = CallbackId;
-            }
-
-            if (Args != null && Args->GpuStateStructAddress != 0)
-            {
-                GE.GpuStateStructPointer.data.Data =
-                    CpuProcessor.Memory.PspAddressToSpan<uint>(Args->GpuStateStructAddress, GpuStateStruct.StructSizeInWords).ToArray();
-            }
-
-            return GE;
         }
 
         /// <summary>
@@ -305,11 +332,10 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="Args">Structure containing GE context buffer address</param>
         /// <returns>The DisplayList ID</returns>
         [HlePspFunction(NID = 0xAB49E76A, FirmwareVersion = 150)]
+        [HleTrackCall]
         public int sceGeListEnQueue(uint InstructionAddressStart, uint InstructionAddressStall, int CallbackId, PspGeListArgs* Args)
         {
-            var GE = _sceGeListEnQueue(InstructionAddressStart, InstructionAddressStall, CallbackId, Args);
-            GpuProcessor.EnqueueGEProcessLast(GE);
-            return GE.Id;
+            return _sceGeListEnQueue(InstructionAddressStart, InstructionAddressStall, CallbackId, Args, false);
         }
 
         /// <summary>
@@ -321,11 +347,10 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="Args">Structure containing GE context buffer address</param>
         /// <returns>The DisplayList ID</returns>
         [HlePspFunction(NID = 0x1C0D95A6, FirmwareVersion = 150)]
+        [HleTrackCall]
         public int sceGeListEnQueueHead(uint InstructionAddressStart, uint InstructionAddressStall, int CallbackId, PspGeListArgs* Args)
         {
-            var GE = _sceGeListEnQueue(InstructionAddressStart, InstructionAddressStall, CallbackId, Args);
-            GpuProcessor.EnqueueGEProcessFirst(GE);
-            return GE.Id;
+            return _sceGeListEnQueue(InstructionAddressStart, InstructionAddressStall, CallbackId, Args, true);
         }
 
         /// <summary>
@@ -334,9 +359,10 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="DisplayListId">A DisplayList ID</param>
         /// <returns>&lt; 0 on error.</returns>
         [HlePspFunction(NID = 0x5FB86AB0, FirmwareVersion = 150)]
+        [HleTrackCall]
         public int sceGeListDeQueue(int GEProcessID)
         {
-            var GE = GetGEProcessFromId(GEProcessID);
+            var GE = GeList.Get(GEProcessID);
             GE.DeQueue();
             return 0;
         }
@@ -348,31 +374,14 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="InstructionAddressStall">The stall address to update</param>
         /// <returns>Unknown. Probably 0 if successful. &lt; 0 on error</returns>
         [HlePspFunction(NID = 0xE0D68148, FirmwareVersion = 150)]
+        //[HleTrackCall]
         public int sceGeListUpdateStallAddr(int GEProcessID, uint InstructionAddressStall)
         {
-            //hleEatCycles(190);
-
-            var GE = GetGEProcessFromId(GEProcessID);
-
-            //if (!PspMemory.IsAddressValid(InstructionAddressStall))
-            //{
-            //	throw (new SceKernelException(SceKernelErrors.ERROR_INVALID_POINTER));
-            //}
-
-            if (GE.Status.Value == GEProcesStatusEnum.Completed)
+            lock (this)
             {
-                throw new SceKernelException(SceKernelErrors.ERROR_ALREADY);
+                var GE = GeList.Get(GEProcessID);
+                GE.SetStallAddress(InstructionAddressStall);
             }
-
-            //Console.WriteLine($"sceGeListUpdateStallAddr Stall 0x{InstructionAddressStall & PspMemory.MemoryMask:X} ");
-
-            GE.SetInstructionAddressStall(InstructionAddressStall);
-
-            if (GE.Signal == SignalBehavior.PSP_GE_SIGNAL_HANDLER_PAUSE)
-            {
-                GE.Signal = SignalBehavior.PSP_GE_SIGNAL_HANDLER_SUSPEND;
-            }
-
             return 0;
         }
 
@@ -383,29 +392,32 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="SyncType">Specifies the condition to wait on.  One of PspGeSyncType.</param>
         /// <returns>???</returns>
         [HlePspFunction(NID = 0x03444EB4, FirmwareVersion = 150)]
-        public GEProcesStatusEnum sceGeListSync(int GEProcessID, SyncTypeEnum SyncType)
+        [HleTrackCall]
+        public int sceGeListSync(int GEProcessID, int Mode)
         {
-            var GE = GetGEProcessFromId(GEProcessID);
+            var GE = GeList.Get(GEProcessID);
 
-            switch (SyncType)
+            int result = 0;
+
+            if (Mode == 0 && !GE.Done)
             {
-                case SyncTypeEnum.WaitForCompletion:
-                    if (ThreadManager.Current == null)
-                    {
-                        //Console.WriteLine("sceGeListSync: ThreadManager.Current is null!");
-                        return 0;
-                    }
-                    ThreadManager.Current.SetWaitAndPrepareWakeUp(
-                        HleThread.WaitType.GraphicEngine, "sceGeListSync",
-                        GE,
-                        (WakeUp) => { GE.GeListSync(WakeUp); }
-                    );
-                    return 0;
-                case SyncTypeEnum.Peek:
-                    return GE.PeekStatus();
-                default:
-                    throw new SceKernelException(SceKernelErrors.ERROR_INVALID_MODE);
+                //if (ThreadManager.Current != null)
+                //    ThreadManager.Current.SetWaitAndPrepareWakeUp(
+                //            HleThread.WaitType.GraphicEngine, "sceGeListSync",
+                //            GE,
+                //            (WakeUp) => { GE.SyncWaitDone(WakeUp); }
+                //    );
+
+                GE.SyncWaitDone(null);
             }
+            else if (Mode == 1)
+            {
+                GE.SyncWaitStall(null);
+
+                result = (int)GE.SyncStatus();
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -414,29 +426,30 @@ namespace ScePSP.Hle.Modules.ge
         /// <param name="SyncType">Specifies the condition to wait on.  One of ::PspGeSyncType.</param>
         /// <returns>???</returns>
         [HlePspFunction(NID = 0xB287BD61, FirmwareVersion = 150, CheckInsideInterrupt = true)]
-        public GEProcesStatusEnum sceGeDrawSync(SyncTypeEnum SyncType)
+        [HleTrackCall]
+        public int sceGeDrawSync(int Mode)
         {
-            //Thread.Sleep(40);
-            //Console.WriteLine($"sceGeDrawSync: {SyncType}");
-            switch (SyncType)
+            int result = 0;
+
+            if (Mode == 0)
             {
-                case SyncTypeEnum.WaitForCompletion:
-                    if (ThreadManager.Current == null)
-                    {
-                        //Console.WriteLine("sceGeDrawSync: ThreadManager.Current is null!");
-                        return 0;
-                    }
-                    ThreadManager.Current.SetWaitAndPrepareWakeUp(
-                            HleThread.WaitType.GraphicEngine, "sceGeDrawSync",
-                            GpuProcessor,
-                            (WakeUp) => { GpuProcessor.GeDrawSync(WakeUp); }
-                    );
-                    return 0;
-                case SyncTypeEnum.Peek:
-                    return GpuProcessor.PeekStatus();
-                default:
-                    throw new SceKernelException(SceKernelErrors.ERROR_INVALID_MODE);
+                //if (ThreadManager.Current != null)
+                //    ThreadManager.Current.SetWaitAndPrepareWakeUp(
+                //            HleThread.WaitType.GraphicEngine, "sceGeDrawSync",
+                //            GeList,
+                //            (WakeUp) => { GeList.WaitSync(GEStatusEnum.Completed, WakeUp); }
+                //    );
+
+                GeList.WaitSync(GEStatusEnum.Completed, null);
             }
+            else if (Mode == 1)
+            {
+                GeList.WaitSync(GEStatusEnum.StallReached, null);
+
+                result = (int)GeList.Last.SyncStatus();
+            }
+
+            return result;
         }
     }
 }

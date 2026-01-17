@@ -1,9 +1,7 @@
-﻿namespace ScePSP.Core.Cpu.VFpu
+﻿namespace ScePSP.Cpu.VFpu
 {
     public enum VfpuRegisterType
     {
-        Cell,
-        Vector,
-        Matrix
+        Cell, Vector, Matrix
     }
 }

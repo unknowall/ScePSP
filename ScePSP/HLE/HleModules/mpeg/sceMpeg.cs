@@ -1,5 +1,5 @@
-﻿using ScePSP.Core.Memory;
-using ScePSP.Core.Types;
+﻿using ScePSP.Memory;
+using ScePSP.Types;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Formats.video;
 using ScePSP.Hle.Interop;
@@ -65,9 +65,9 @@ namespace ScePSP.Hle.Modules.mpeg
         /// </summary>
         /// <returns>0 if success.</returns>
         [HlePspFunction(NID = 0x682A619B, FirmwareVersion = 150)]
+        [HleTrackCall]
         public int sceMpegInit()
         {
-            //throw (new NotImplementedException());
             return 0;
         }
 
@@ -75,9 +75,9 @@ namespace ScePSP.Hle.Modules.mpeg
         /// sceMpegFinish
         /// </summary>
         [HlePspFunction(NID = 0x874624D6, FirmwareVersion = 150)]
+        [HleTrackCall]
         public int sceMpegFinish()
         {
-            //throw (new NotImplementedException());
             return 0;
         }
 
@@ -89,6 +89,7 @@ namespace ScePSP.Hle.Modules.mpeg
         ///		Less than 0 if error else decoder data size.
         /// </returns>
         [HlePspFunction(NID = 0xC132E22F, FirmwareVersion = 150)]
+        [HleTrackCall]
         public int sceMpegQueryMemSize(int mode)
         {
             return sizeof(SceMpeg);
@@ -106,10 +107,10 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="ddrTop">Unknown, set to 0</param>
         /// <returns>0 if successful.</returns>
         [HlePspFunction(NID = 0xD8C5F121, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegCreate(SceMpegPointer* sceMpegPointer, void* mpegData, int mpegSize, SceMpegRingbuffer* sceMpegRingbuffer, int frameWidth, int mode, int ddrTop)
         {
-            //return -1;
+            if (!PSPDrivers.Config.DisplayConfig.H264Enabled) return -1; //skip h264
 
             var mpeg = GetMpeg(sceMpegPointer);
 
@@ -163,6 +164,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// </summary>
         /// <param name="sceMpegPointer">SceMpeg handle</param>
         [HlePspFunction(NID = 0x606A4649, FirmwareVersion = 150)]
+        [HleTrackCall]
         public int sceMpegDelete(SceMpegPointer* sceMpegPointer)
         {
             GetMpeg(sceMpegPointer).Delete();
@@ -179,7 +181,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <returns>0 if successful.</returns>
         /// <seealso cref="http://en.wikipedia.org/wiki/Presentation_and_access_units"/>
         [HlePspFunction(NID = 0x167AFD9E, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegInitAu(SceMpegPointer* sceMpegPointer, int elementaryStreamBuffer, out SceMpegAu mpegAccessUnit)
         {
             var mpeg = GetMpeg(sceMpegPointer);
@@ -207,7 +209,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="numberOfPackets">Number of packets in the ringbuffer</param>
         /// <returns>Less than 0 if error, else ringbuffer data size.</returns>
         [HlePspFunction(NID = 0xD7A29F46, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegRingbufferQueryMemSize(int numberOfPackets)
         {
             return (RingBufferPacketSize + 0x68) * numberOfPackets;
@@ -224,7 +226,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="callbackParam">Param passed to callback</param>
         /// <returns>0 if successful.</returns>
         [HlePspFunction(NID = 0x37295ED8, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegRingbufferConstruct(SceMpegRingbuffer* ringbuffer, int packets, PspPointer data, int size, PspPointer callback, PspPointer callbackParam)
         {
             ringbuffer->PacketsTotal = packets;
@@ -252,7 +254,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// </summary>
         /// <param name="ringbuffer">Pointer to a sceMpegRingbuffer struct</param>
         [HlePspFunction(NID = 0x13407F13, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegRingbufferDestruct(SceMpegRingbuffer* ringbuffer)
         {
             ringbuffer->PacketsAvailable = ringbuffer->PacketsTotal;
@@ -269,7 +271,7 @@ namespace ScePSP.Hle.Modules.mpeg
         ///		Less than 0 if error, else number of free packets in the ringbuffer.
         /// </returns>
         [HlePspFunction(NID = 0xB5F6DC87, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegRingbufferAvailableSize(SceMpegRingbuffer* ringbuffer)
         {
             return ringbuffer->PacketsAvailable;
@@ -285,7 +287,7 @@ namespace ScePSP.Hle.Modules.mpeg
         ///		Less than 0 if error, else number of packets.
         /// </returns>
         [HlePspFunction(NID = 0xB240A59E, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegRingbufferPut(SceMpegRingbuffer* ringbuffer, int numPackets, int available)
         {
             if (numPackets < 0) return 0;
@@ -339,11 +341,10 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="mpeg">SceMpeg handle</param>
         /// <param name="streamInfoId">Pointer to stream</param>
         [HlePspFunction(NID = 0x591A4AA2, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public void sceMpegUnRegistStream(SceMpegPointer* mpeg, int streamInfoId)
         {
             RegisteredStreams.Remove(streamInfoId);
-            //throw(new NotImplementedException());
         }
 
         /// <summary>
@@ -354,7 +355,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="streamIndex">Unknown, set to 0</param>
         /// <returns>The ID, 0 on error.</returns>
         [HlePspFunction(NID = 0x42560F23, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         //public SceMpegStream* sceMpegRegistStream(SceMpeg* Mpeg, int iStreamID, int iUnk)
         public int sceMpegRegistStream(SceMpegPointer* Mpeg, StreamId streamId, int streamIndex)
         {
@@ -368,7 +369,6 @@ namespace ScePSP.Hle.Modules.mpeg
 
             //var SceMpegData = GetSceMpegData(Mpeg);
 
-            //throw(new NotImplementedException());
             return streamInfoId;
         }
 
@@ -380,7 +380,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="offset">Will contain the stream offset in bytes, usually 2048</param>
         /// <returns>0 if successful.</returns>
         [HlePspFunction(NID = 0x21FF80E4, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegQueryStreamOffset(SceMpegPointer* mpegPointer, byte* pmfHeader, out uint offset)
         {
             var pmf = new Pmf().Load(new MemoryStream(PointerUtils.PointerToByteArray(pmfHeader, 2048)));
@@ -405,7 +405,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="size">Will contain stream size in bytes</param>
         /// <returns>0 if successful.</returns>
         [HlePspFunction(NID = 0x611E9E11, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegQueryStreamSize(byte* pmfHeader, out uint size)
         {
             var pmf = new Pmf().Load(new MemoryStream(PointerUtils.PointerToByteArray(pmfHeader, 2048)));
@@ -421,12 +421,11 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="sceMpegPointer"></param>
         /// <returns>0 if successful.</returns>
         [HlePspFunction(NID = 0x707B7629, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegFlushAllStream(SceMpegPointer* sceMpegPointer)
         {
             var mpeg = GetMpeg(sceMpegPointer);
             mpeg.FlushAllStream();
-            //throw(new NotImplementedException());
             return 0;
         }
     }

@@ -1,5 +1,5 @@
 ﻿using ScePSP.Core;
-using ScePSP.Core.Types;
+using ScePSP.Types;
 using ScePSP.Hle.Types;
 using System;
 using System.Globalization;
@@ -20,7 +20,7 @@ namespace ScePSP.Hle
 
         public bool DebugThreadSwitching = false;
 
-        public bool DebugNotImplemented = true;
+        public bool DebugHLECall = true;
 
         //public PspConfirmButton ConfirmButton;
 

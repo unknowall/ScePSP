@@ -10,7 +10,7 @@ namespace ScePSP.Hle.Modules._unknownPrx
         HleModuleManager ModuleManager => PSPDrivers.HLE.HleModuleManager;
 
         [HlePspFunction(NID = 0xA1A78C58, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelLoadModuleForLoadExecVSHDisc(string FileName, uint Flags, ModuleMgrForUser.SceKernelLMOption* option)
         {
             return sceKernelLoadModule(FileName, Flags, option);

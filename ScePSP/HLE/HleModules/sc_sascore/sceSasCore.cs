@@ -11,9 +11,6 @@ namespace ScePSP.Hle.Modules.sc_sascore
     {
         static Logger Logger = Logger.GetLogger("sceSasCore");
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="SasCorePointer"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xBD11B7C2, FirmwareVersion = 150)]
@@ -31,14 +28,11 @@ namespace ScePSP.Hle.Modules.sc_sascore
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="SasCorePointer"></param>
         /// <param name="GrainSamples"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xD1E0A01E, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int __sceSasSetGrain(uint SasCorePointer, int GrainSamples)
         {
             var SasCore = GetSasCore(SasCorePointer);
@@ -49,29 +43,22 @@ namespace ScePSP.Hle.Modules.sc_sascore
             return 0;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="SasCorePointer"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xE175EF66, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public OutputMode __sceSasGetOutputmode(uint SasCorePointer)
         {
             var SasCore = GetSasCore(SasCorePointer);
 
-            //throw(new NotImplementedException());
             return SasCore.OutputMode;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="SasCorePointer"></param>
         /// <param name="OutputMode"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xE855BF76, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int __sceSasSetOutputmode(uint SasCorePointer, OutputMode OutputMode)
         {
             var SasCore = GetSasCore(SasCorePointer);
@@ -101,7 +88,7 @@ namespace ScePSP.Hle.Modules.sc_sascore
         /// <param name="SampleRate">Sample Rate</param>
         /// <returns>0 on success</returns>
         [HlePspFunction(NID = 0x42778A9F, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public uint __sceSasInit(uint SasCorePointer, int GrainSamples, int MaxVoices, OutputMode OutputMode,
             int SampleRate)
         {
@@ -145,7 +132,7 @@ namespace ScePSP.Hle.Modules.sc_sascore
         /// <param name="SasCorePointer">Core</param>
         /// <returns>A set of flags indiciating the end of the voices.</returns>
         [HlePspFunction(NID = 0x68A46B95, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        //[HleTrackCall]
         public uint __sceSasGetEndFlag(uint SasCorePointer)
         {
             var SasCore = GetSasCore(SasCorePointer);
@@ -159,7 +146,7 @@ namespace ScePSP.Hle.Modules.sc_sascore
         /// <param name="WaveformEffectType">Effect</param>
         /// <returns>0 on success.</returns>
         [HlePspFunction(NID = 0x33D4AB37, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public uint __sceSasRevType(uint SasCorePointer, WaveformEffectType WaveformEffectType)
         {
             var SasCore = GetSasCore(SasCorePointer);
@@ -175,7 +162,7 @@ namespace ScePSP.Hle.Modules.sc_sascore
         /// <param name="WaveformEffectIsWet">WaveformEffectIsWet</param>
         /// <returns>0 on success.</returns>
         [HlePspFunction(NID = 0xF983B186, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public uint __sceSasRevVON(uint SasCorePointer, bool WaveformEffectIsDry, bool WaveformEffectIsWet)
         {
             var SasCore = GetSasCore(SasCorePointer);
@@ -192,25 +179,21 @@ namespace ScePSP.Hle.Modules.sc_sascore
         /// <param name="RightVolume">Right volume</param>
         /// <returns>0 on success</returns>
         [HlePspFunction(NID = 0xD5A229C9, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public uint __sceSasRevEVOL(uint SasCorePointer, int LeftVolume, int RightVolume)
         {
             var SasCore = GetSasCore(SasCorePointer);
             SasCore.LeftVolume = LeftVolume;
             SasCore.RightVolume = RightVolume;
-            //throw(new NotImplementedException());
             return 0;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="SasCorePointer"></param>
         /// <param name="Delay"></param>
         /// <param name="Feedback"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x267A6DD2, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int __sceSasRevParam(uint SasCorePointer, int Delay, int Feedback)
         {
             var SasCore = GetSasCore(SasCorePointer);
@@ -218,7 +201,6 @@ namespace ScePSP.Hle.Modules.sc_sascore
             SasCore.Delay = Delay;
             SasCore.Feedback = Feedback;
 
-            //throw(new NotImplementedException());
             return 0;
         }
 
@@ -230,7 +212,7 @@ namespace ScePSP.Hle.Modules.sc_sascore
         /// <param name="SetPause"> when 0: reset the pause flag for all the voices having a bit 1 in the voice_bit field  when non-0: set the pause flag for all the voices having a bit 1 in the voice_bit field</param>
         /// <returns>0 on success. ERROR_SAS_NOT_INIT if an invalid sasCore handle is provided</returns>
         [HlePspFunction(NID = 0x787D04D5, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HleTrackCall]
         public int __sceSasSetPause(uint SasCorePointer, uint VoiceBits, bool SetPause)
         {
             var SasCore = GetSasCore(SasCorePointer);
@@ -256,7 +238,7 @@ namespace ScePSP.Hle.Modules.sc_sascore
         /// ERROR_SAS_NOT_INIT if an invalid sasCore handle is provided
         /// </returns>
         [HlePspFunction(NID = 0x2C8E6AB3, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        //[HleTrackCall]
         public int __sceSasGetPauseFlag(uint SasCorePointer)
         {
             //return 1;
@@ -286,7 +268,7 @@ namespace ScePSP.Hle.Modules.sc_sascore
         ///		ERROR_SAS_NOT_INIT if an invalid SasCore handle is provided
         /// </returns>
         [HlePspFunction(NID = 0x50A14DFC, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        //[HleTrackCall]
         public int __sceSasCoreWithMix(uint SasCorePointer, short* SasInOut, int LeftVolume, int RightVolume)
         {
             return __sceSasCore_Internal(GetSasCore(SasCorePointer), SasInOut, SasInOut, LeftVolume, RightVolume);
@@ -307,15 +289,12 @@ namespace ScePSP.Hle.Modules.sc_sascore
         ///		ERROR_SAS_NOT_INIT if an invalid sasCore handle is provided
         /// </returns>
         [HlePspFunction(NID = 0xA3589D81, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        //[HleTrackCall]
         public int __sceSasCore(uint SasCorePointer, short* SasOut)
         {
             return __sceSasCore_Internal(GetSasCore(SasCorePointer), SasOut, null, 0x1000, 0x1000);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="SasCore"></param>
         /// <param name="SasOut"></param>
         /// <param name="SasIn"></param>
@@ -403,7 +382,7 @@ namespace ScePSP.Hle.Modules.sc_sascore
         /// ERROR_SAS_NOT_INIT if an invalid SasCore handle is provided
         /// </returns>
         [HlePspFunction(NID = 0x07F58C24, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int __sceSasGetAllEnvelopeHeights(uint SasCorePointer, int* Heights)
         {
             var SasCore = GetSasCore(SasCorePointer);
@@ -415,21 +394,21 @@ namespace ScePSP.Hle.Modules.sc_sascore
         }
 
         [HlePspFunction(NID = 0xE1CD9561, FirmwareVersion = 500)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int __sceSasSetVoicePCM()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xD5EBBBCD, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int __sceSasSetSteepWave()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xA232CBE6, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int __sceSasSetTriangularWave()
         {
             return 0;

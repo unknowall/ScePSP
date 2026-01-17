@@ -55,7 +55,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="pArg">Value to be passed to the pArg parameter of the handler function.</param>
         /// <returns>A handler id or less than 0 on error.</returns>
         [HlePspFunction(NID = 0x8ABADD51, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetApctlAddHandler(sceNetApctlHandler handler, uint pArg)
         {
             //throw(new NotImplementedException());
@@ -68,7 +68,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="handlerId">A handler as created returned from <see cref="sceNetApctlAddHandler"/>.</param>
         /// <returns>Less than 0 on error.</returns>
         [HlePspFunction(NID = 0x5963991B, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetApctlDelHandler(int handlerId)
         {
             return 0;
@@ -80,7 +80,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="ConnectionIndex">The index of the connection.</param>
         /// <returns>Less than 0 on error.</returns>
         [HlePspFunction(NID = 0xCFB957C6, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetApctlConnect(int ConnectionIndex)
         {
             //throw(new NotImplementedException());
@@ -92,7 +92,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// </summary>
         /// <returns>Less than 0 on error.</returns>
         [HlePspFunction(NID = 0x24FE91A1, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetApctlDisconnect()
         {
             //throw(new NotImplementedException());
@@ -105,7 +105,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="pState">Pointer to receive the current state (one of the PSP_NET_APCTL_STATE_* defines).</param>
         /// <returns>Less than 0 on error.</returns>
         [HlePspFunction(NID = 0x5DEAC81B, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetApctlGetState(PspNetApctlState* pState)
         {
             *pState = PspNetApctlState.GotIp;

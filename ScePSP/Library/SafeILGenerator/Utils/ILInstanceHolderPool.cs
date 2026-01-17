@@ -3,17 +3,18 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime;
 
 namespace SafeILGenerator.Utils
 {
-    public class IlInstanceHolderPoolItem : IDisposable
+    public class ILInstanceHolderPoolItem : IDisposable
     {
-        private readonly IlInstanceHolderPool _parent;
+        private readonly ILInstanceHolderPool _parent;
         public readonly int Index;
         internal bool Allocated;
         public readonly FieldInfo FieldInfo;
 
-        public IlInstanceHolderPoolItem(IlInstanceHolderPool parent, int index, FieldInfo fieldInfo)
+        public ILInstanceHolderPoolItem(ILInstanceHolderPool parent, int index, FieldInfo fieldInfo)
         {
             _parent = parent;
             Index = index;
@@ -22,11 +23,11 @@ namespace SafeILGenerator.Utils
 
         public object Value
         {
-
-
+            
+            
             set { FieldInfo.SetValue(null, value); }
-
-
+            
+            
             get { return FieldInfo.GetValue(null); }
         }
 
@@ -49,12 +50,12 @@ namespace SafeILGenerator.Utils
         }
     }
 
-    public class IlInstanceHolderPool
+    public class ILInstanceHolderPool
     {
         //private static AstGenerator _ast = AstGenerator.Instance;
 
         public readonly Type ItemType;
-        private readonly IlInstanceHolderPoolItem[] _fieldInfos;
+        private readonly ILInstanceHolderPoolItem[] _fieldInfos;
         private readonly LinkedList<int> _freeItems = new LinkedList<int>();
         private static int _autoincrement;
         public readonly int CapacityCount;
@@ -62,7 +63,7 @@ namespace SafeILGenerator.Utils
         public int FreeCount => _freeItems.Count;
         public bool HasAvailable => FreeCount > 0;
 
-        public IlInstanceHolderPoolItem Alloc()
+        public ILInstanceHolderPoolItem Alloc()
         {
             var item = _fieldInfos[_freeItems.First.Value];
             _freeItems.RemoveFirst();
@@ -71,30 +72,29 @@ namespace SafeILGenerator.Utils
             return item;
         }
 
-        internal void Free(IlInstanceHolderPoolItem item) => _freeItems.AddLast(item.Index);
+        internal void Free(ILInstanceHolderPoolItem item) => _freeItems.AddLast(item.Index);
 
-        //private static string DllName = "Temp.dll";
         private static readonly ModuleBuilder ModuleBuilder;
 
-        static IlInstanceHolderPool()
+        static ILInstanceHolderPool()
         {
             var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(
                 new AssemblyName("DynamicAssembly" + _autoincrement++),
                 AssemblyBuilderAccess.RunAndCollect
-            //, DllName
+                //, DllName
             );
             //ModuleBuilder = assemblyBuilder.DefineDynamicModule(assemblyBuilder.GetName().Name, DllName, false);
             ModuleBuilder = assemblyBuilder.DefineDynamicModule(assemblyBuilder.GetName().Name);
         }
 
-        public IlInstanceHolderPool(Type itemType, int count, string typeName = null)
+        public ILInstanceHolderPool(Type itemType, int count, string typeName = null)
         {
             ItemType = itemType;
             CapacityCount = count;
             if (typeName == null) typeName = "DynamicType" + _autoincrement++;
             var typeBuilder = ModuleBuilder.DefineType(typeName,
                 TypeAttributes.Sealed | TypeAttributes.Public | TypeAttributes.Class);
-            _fieldInfos = new IlInstanceHolderPoolItem[count];
+            _fieldInfos = new ILInstanceHolderPoolItem[count];
             var names = new string[count];
             for (var n = 0; n < count; n++)
             {
@@ -107,7 +107,7 @@ namespace SafeILGenerator.Utils
             var fields = holderType.GetFields();
             for (var n = 0; n < count; n++)
             {
-                _fieldInfos[n] = new IlInstanceHolderPoolItem(this, n, fields[n]);
+                _fieldInfos[n] = new ILInstanceHolderPoolItem(this, n, fields[n]);
                 _freeItems.AddLast(n);
             }
         }

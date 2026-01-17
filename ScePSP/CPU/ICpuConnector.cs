@@ -1,7 +1,7 @@
-﻿namespace ScePSP.Core.Cpu
+﻿namespace ScePSP.Cpu
 {
     public interface ICpuConnector
     {
-        void Yield(CpuThreadState cpuThreadState);
+        void Yield(CpuThreadState CpuThreadState);
     }
 }

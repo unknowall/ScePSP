@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Cpu;
+﻿using ScePSP.Cpu;
 using ScePSP.Hle.Attributes;
 using ScePSP.Utils;
 using ScePSPUtils;
@@ -19,7 +19,7 @@ namespace ScePSP.Hle.Modules.sysmem
         /// <param name="Handler">Function pointer to the handler.</param>
         /// <returns>less than 0 on error.</returns>
         [HlePspFunction(NID = 0x7CEB2C09, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelRegisterKprintfHandler(PspDebugKprintfHandler Handler)
         {
             return 0;

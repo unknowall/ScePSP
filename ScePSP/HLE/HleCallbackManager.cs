@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Cpu;
+﻿using ScePSP.Cpu;
 using ScePSP.Hle.Interop;
 using ScePSP.Hle.Vfs.MemoryStick;
 using System;
@@ -9,7 +9,6 @@ using System.Collections.Generic;
 
 namespace ScePSP.Hle.Managers
 {
-    //[Obsolete("Should check Interop and decide which one to use, or refactor or something.")]
     public class HleCallbackManager : IMemoryStickEventHandler
     {
         public HleUidPool<HleCallback> Callbacks { get; protected set; }
@@ -27,7 +26,7 @@ namespace ScePSP.Hle.Managers
 
         public void ScheduleCallback(HleCallback hleCallback)
         {
-            Console.WriteLine("ScheduleCallback! {0}", hleCallback);
+            //Console.WriteLine("ScheduleCallback! {0}", hleCallback);
             lock (this)
             {
                 _scheduledCallbacks.Enqueue(hleCallback);
@@ -39,7 +38,7 @@ namespace ScePSP.Hle.Managers
             lock (this)
             {
                 var hleCallback = _scheduledCallbacks.Dequeue();
-                Console.WriteLine("DequeueScheduledCallback! : {0}", hleCallback);
+                //Console.WriteLine("DequeueScheduledCallback! : {0}", hleCallback);
                 return hleCallback;
             }
         }

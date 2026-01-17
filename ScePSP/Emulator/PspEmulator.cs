@@ -42,7 +42,7 @@ namespace ScePSP
             PSPDrivers.Config.CpuConfig.TrackCallStack = TrackCallStack;
 
             PSPDrivers.Config.HleConfig.DebugSyscalls = TraceSyscalls;
-            PSPDrivers.Config.HleConfig.UseCoRoutines = false;
+            PSPDrivers.Config.HleConfig.UseCoRoutines = true;
 
             PSPDrivers.Runner.StartSynchronized();
 

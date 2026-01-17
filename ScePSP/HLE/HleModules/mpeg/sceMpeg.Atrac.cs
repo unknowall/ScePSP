@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Memory;
+﻿using ScePSP.Memory;
 
 namespace ScePSP.Hle.Modules.mpeg
 {
@@ -12,7 +12,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="OutputSize">Will contain size of decoded data</param>
         /// <returns>0 if successful.</returns>
         [HlePspFunction(NID = 0xF8DCB679, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegQueryAtracEsSize(SceMpegPointer* Mpeg, out int ElementaryStreamSize, out int OutputSize)
         {
             ElementaryStreamSize = MPEG_ATRAC_ES_SIZE;
@@ -31,7 +31,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="Atrac3PlusPointer">Pointer to ATRAC3plus stream (from PSMF file).</param>
         /// <returns>0 if successful.</returns>
         [HlePspFunction(NID = 0xE1CE83A7, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegGetAtracAu(SceMpegPointer* SceMpegPointer, StreamId StreamId, out SceMpegAu MpegAccessUnit, out PspPointer Atrac3PlusPointer)
         {
             var Mpeg = GetMpeg(SceMpegPointer);
@@ -56,7 +56,7 @@ namespace ScePSP.Hle.Modules.mpeg
         ///		0 if successful.
         /// </returns>
         [HlePspFunction(NID = 0x800C44DF, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegAtracDecode(SceMpegPointer* SceMpegPointer, SceMpegAu* MpegAccessUnit, byte* OutputBuffer, int Init)
         {
             var Mpeg = GetMpeg(SceMpegPointer);

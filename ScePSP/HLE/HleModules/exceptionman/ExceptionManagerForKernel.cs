@@ -13,7 +13,7 @@ namespace ScePSP.Hle.Modules.exceptionman
         /// <param name="ExceptionHandlerFunction">Pointer to the exception handler function</param>
         /// <returns>0 on success, less than 0 on error</returns>
         [HlePspFunction(NID = 0x565C0B0E, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelRegisterDefaultExceptionHandler(uint ExceptionHandlerFunction)
         {
             return 0;

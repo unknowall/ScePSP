@@ -53,7 +53,7 @@ namespace ScePSP.Hle.Modules.sysmem
         /// <param name="OutSize">Pointer to an int which will hold the size of the memory</param>
         /// <returns>0 on success</returns>
         [HlePspFunction(NID = 0x3E0271D3, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelVolatileMemLock(int Type, out uint OutAddress, out int OutSize)
         {
             if (Type != 0)
@@ -82,7 +82,7 @@ namespace ScePSP.Hle.Modules.sysmem
         /// <param name="OutSize"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xA14F40B2, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelVolatileMemTryLock(int Type, out uint OutAddress, out int OutSize)
         {
             return sceKernelVolatileMemLock(Type, out OutAddress, out OutSize);
@@ -94,7 +94,7 @@ namespace ScePSP.Hle.Modules.sysmem
         /// <param name="Type"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xA569E425, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelVolatileMemUnlock(int Type)
         {
             if (Type != 0)

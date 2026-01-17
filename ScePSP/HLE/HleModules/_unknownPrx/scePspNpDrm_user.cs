@@ -16,7 +16,7 @@ namespace ScePSP.Hle.Modules._unknownPrx
         /// <param name="npDrmKeyAddr"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xA1336091, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNpDrmSetLicenseeKey(byte* npDrmKeyAddr)
         {
             PointerUtils.Memcpy(npDrmKey, npDrmKeyAddr, PSP_NPDRM_KEY_LENGHT);
@@ -28,7 +28,7 @@ namespace ScePSP.Hle.Modules._unknownPrx
         /// </summary>
         /// <returns></returns>
         [HlePspFunction(NID = 0x9B745542, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNpDrmClearLicenseeKey()
         {
             Array.Clear(npDrmKey, 0, npDrmKey.Length);

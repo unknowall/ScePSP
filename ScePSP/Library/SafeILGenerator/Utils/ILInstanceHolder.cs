@@ -6,18 +6,18 @@ using System.Linq;
 
 namespace SafeILGenerator.Utils
 {
-    public class IlInstanceHolder
+    public class ILInstanceHolder
     {
-        private static Dictionary<Type, List<IlInstanceHolderPool>> TypePools =
-            new Dictionary<Type, List<IlInstanceHolderPool>>();
+        private static Dictionary<Type, List<ILInstanceHolderPool>> TypePools =
+            new Dictionary<Type, List<ILInstanceHolderPool>>();
 
-        public static IlInstanceHolderPoolItem Alloc(Type type, object value = null)
+        public static ILInstanceHolderPoolItem Alloc(Type type, object value = null)
         {
             lock (TypePools)
             {
                 if (!TypePools.ContainsKey(type))
                 {
-                    TypePools[type] = new List<IlInstanceHolderPool>();
+                    TypePools[type] = new List<ILInstanceHolderPool>();
                 }
                 var poolsType = TypePools[type];
                 var freePool = poolsType.FirstOrDefault(pool => pool.HasAvailable);
@@ -31,7 +31,7 @@ namespace SafeILGenerator.Utils
 					Console.Error.Write("Create ILInstanceHolderPool({0})[{1}]...", Type, NextPoolSize);
 					var Start = DateTime.UtcNow;
 #endif
-                    poolsType.Add(freePool = new IlInstanceHolderPool(type, nextPoolSize));
+                    poolsType.Add(freePool = new ILInstanceHolderPool(type, nextPoolSize));
 #if DEBUG_ILINSTANCEHOLDERPOOL_TIME
 					var End = DateTime.UtcNow;
 					Console.Error.WriteLine("Ok({0})", End - Start);
@@ -44,9 +44,9 @@ namespace SafeILGenerator.Utils
             }
         }
 
-        public static IlInstanceHolderPoolItem<TType> TaAlloc<TType>(TType value = default(TType))
+        public static ILInstanceHolderPoolItem<TType> TAlloc<TType>(TType value = default(TType))
         {
-            return new IlInstanceHolderPoolItem<TType>(Alloc(typeof(TType), value));
+            return new ILInstanceHolderPoolItem<TType>(Alloc(typeof(TType), value));
         }
 
         public static int FreeCount => TypePools.Values.Sum(pools => pools.Sum(pool => pool.FreeCount));

@@ -2,9 +2,9 @@
 
 //#define DISABLE_CALLBACKS
 
-using ScePSP.Core.Components.Display;
-using ScePSP.Core.Cpu;
-using ScePSP.Core.GpuBackEnd;
+using ScePSP.Devices.Display;
+using ScePSP.Cpu;
+using ScePSP.GE;
 using ScePSP.Hle.Interop;
 using ScePSP.HLE;
 using ScePSPUtils;
@@ -15,7 +15,7 @@ using System.Threading;
 
 namespace ScePSP.Hle.Managers
 {
-    public class HleThreadManager : ICpuConnector, IGpuConnector
+    public class HleThreadManager : ICpuConnector, IGEConnector
     {
         private static readonly Logger Logger = Logger.GetLogger("HleThreadManager");
 
@@ -58,14 +58,14 @@ namespace ScePSP.Hle.Managers
             }
         }
 #pragma warning disable CS0162
-        void IGpuConnector.Signal(uint PC, PspGeCallbackData CallbackData, uint Signal, SignalBehavior Behavior, bool ExecuteNow)
+        void IGEConnector.Signal(uint PC, GeCallbackData CallbackData, uint Signal, SignalBehavior Behavior, bool ExecuteNow)
         {
-            if (DynarecConfig.EnableGpuSignalsCallback)
+            if (_DynarecConfig.EnableGpuSignalsCallback)
             {
                 if (HleConfig.CompilerVersion <= 0x01FFFFFF) PC = 0;
 
                 Console.Error.WriteLine(
-                    "HleThreadManager:: IGpuConnector.Signal :: 0x{0:X8}, 0x{1:X8}, 0x{2:X8}, {3}, {4}",
+                    "HleThreadManager:: IGEConnector.Signal :: 0x{0:X8}, 0x{1:X8}, 0x{2:X8}, {3}, {4}",
                     CallbackData.SignalFunction, CallbackData.SignalArgument, PC, Signal, Behavior);
                 HleInterop.ExecuteFunctionNowLater(CallbackData.SignalFunction, ExecuteNow,
                     new object[] { Signal, CallbackData.SignalArgument, PC });
@@ -75,13 +75,13 @@ namespace ScePSP.Hle.Managers
             }
         }
 
-        void IGpuConnector.Finish(uint PC, PspGeCallbackData CallbackData, uint Arg, bool ExecuteNow)
+        void IGEConnector.Finish(uint PC, GeCallbackData CallbackData, uint Arg, bool ExecuteNow)
         {
-            if (DynarecConfig.EnableGpuFinishCallback)
+            if (_DynarecConfig.EnableGpuFinishCallback)
             {
                 if (HleConfig.CompilerVersion <= 0x01FFFFFF) PC = 0;
 
-                Console.Error.WriteLine("HleThreadManager:: IGpuConnector.Finish :: 0x{0:X8}, 0x{1:X8}, 0x{2:X8}, {3}",
+                Console.Error.WriteLine("HleThreadManager:: IGEConnector.Finish :: 0x{0:X8}, 0x{1:X8}, 0x{2:X8}, {3}",
                     CallbackData.FinishFunction, CallbackData.FinishArgument, PC, Arg);
                 HleInterop.ExecuteFunctionNowLater(CallbackData.FinishFunction, ExecuteNow,
                     new object[] { Arg, CallbackData.FinishArgument, PC });
@@ -260,7 +260,7 @@ namespace ScePSP.Hle.Managers
                         ConsoleUtils.SaveRestoreConsoleState(() =>
                         {
                             Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine("Execute: {0} : PC: 0x{1:X}", CurrentCurrent, CurrentCurrent.CpuThreadState.Pc);
+                            Console.WriteLine("Execute: {0} : PC: 0x{1:X}", CurrentCurrent, CurrentCurrent.CpuThreadState.PC);
                         });
                     }
 

@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Components.Battery;
+﻿using ScePSP.Devices.Battery;
 using ScePSP.Hle.Attributes;
 using System;
 
@@ -310,7 +310,7 @@ namespace ScePSP.Hle.Modules.power
         /// <param name="type"></param>
         /// <returns>0 on success</returns>
         [HlePspFunction(NID = 0xEFD3C963, FirmwareVersion = 150)]
-        [HlePspNotImplemented(Notice = false, PartialImplemented = true)]
+        [HleTrackCall(Notice = false, PartialImplemented = true)]
         public int scePowerTick(PspPowerTick type)
         {
             //throw(new NotImplementedException());
@@ -422,7 +422,7 @@ namespace ScePSP.Hle.Modules.power
         /// <param name="unknown">Pass 0</param>
         /// <returns>0 on success, less than 0 on error.</returns>
         [HlePspFunction(NID = 0xD6D016EF, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePowerLock(int unknown)
         {
             return 0;
@@ -434,14 +434,14 @@ namespace ScePSP.Hle.Modules.power
         /// <param name="unknown">Pass 0</param>
         /// <returns>0 on success, less than 0 on error.</returns>
         [HlePspFunction(NID = 0xCA3D34C1, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePowerUnlock(int unknown)
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xEA382A27, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int scePowerGetPllClockFrequencyFloat()
         {
             return 0;

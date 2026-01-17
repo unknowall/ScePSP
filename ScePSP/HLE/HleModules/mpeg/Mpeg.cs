@@ -1,9 +1,9 @@
 ﻿#define DUMP_STREAMS
 
-using ScePSP.Core.Components.Display;
-using ScePSP.Core.GpuBackEnd;
-using ScePSP.Core.Memory;
-using ScePSP.Core.Types;
+using ScePSP.Devices.Display;
+using ScePSP.BackEnd;
+using ScePSP.Memory;
+using ScePSP.Types;
 using ScePSP.Hle.Formats.video;
 using ScePSP.Utils;
 using ScePSPUtils;
@@ -16,6 +16,7 @@ using System.Runtime.InteropServices;
 
 using LightCodec.av;
 using LightCodec.h264;
+using ScePSP.GE;
 
 namespace ScePSP.Hle.Modules.mpeg
 {
@@ -28,7 +29,7 @@ namespace ScePSP.Hle.Modules.mpeg
     {
         public PspMemory Memory => PSPDrivers.PspMemory;
 
-        public GpuBackEnd Gpubackend => PSPDrivers.GpuBackEnd;
+        public GEBackEnd Gpubackend => PSPDrivers.GeBackEnd;
 
         public PspDisplay PspDisplay => PSPDrivers.PspDisplay;
 
@@ -196,16 +197,16 @@ namespace ScePSP.Hle.Modules.mpeg
 
             try
             {
-                //while (Decoder.hasMoreNAL)
+                while (Decoder.hasMoreNAL)
                 {
-                    Console.WriteLine("VideoStream.Length: {0}", VideoStream.Length);
+                    //Console.WriteLine("VideoStream.Length: {0}", VideoStream.Length);
 
                     var Frame = Decoder.DecodeFrame();
 
-                    if (Frame == null) return;
+                    if (Frame == null) continue;
 
                     ConsoleUtils.SaveRestoreConsoleColor(ConsoleColor.DarkGreen,
-                        () => { Console.WriteLine("DecodedFrame: {0}", FrameIndex); });
+                        () => { Console.Write("\rDecodedFrame: {0}", FrameIndex); });
 
                     var Bitmap = FrameUtils.imageFromFrameWithoutEdges(Frame, FrameWidth, 272);
 
@@ -232,8 +233,8 @@ namespace ScePSP.Hle.Modules.mpeg
                             PixelFormatDecoder.Encode(
                                 PspDisplay.CurrentInfo.PixelFormat, 
                                 InputBuffer,
-                                (byte*)Memory.PspAddressToPointerSafe(PspDisplay.CurrentInfo.FrameAddress), 
-                                512,
+                                (byte*)Memory.PspAddressToPointerSafe(PspDisplay.CurrentInfo.FrameAddress),
+                                FrameWidth,
                                 Bitmap.Width, 
                                 Bitmap.Height
                                 );

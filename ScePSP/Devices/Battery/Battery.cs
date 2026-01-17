@@ -1,4 +1,4 @@
-﻿namespace ScePSP.Core.Components.Battery
+﻿namespace ScePSP.Devices.Battery
 {
     public class Battery
     {

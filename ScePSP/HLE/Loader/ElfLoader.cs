@@ -1,6 +1,6 @@
 ﻿//#define DEBUG_ELF_LOADER
 
-using ScePSP.Core.Memory;
+using ScePSP.Memory;
 using ScePSP.Hle.Formats;
 using ScePSPUtils;
 using ScePSPUtils.Extensions;

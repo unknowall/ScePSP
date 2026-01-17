@@ -1,5 +1,5 @@
 ﻿using ScePSP.Core;
-using ScePSP.Core.Components.Rtc;
+using ScePSP.Devices.Rtc;
 using ScePSP.Utils;
 using System;
 

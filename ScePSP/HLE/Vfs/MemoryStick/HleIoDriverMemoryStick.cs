@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Memory;
+﻿using ScePSP.Memory;
 using System;
 
 namespace ScePSP.Hle.Vfs.MemoryStick

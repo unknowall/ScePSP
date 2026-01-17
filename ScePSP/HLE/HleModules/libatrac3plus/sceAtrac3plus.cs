@@ -1,13 +1,15 @@
-﻿using ScePSP.Core.AudioBackEnd;
-using ScePSP.Core.Cpu;
-using ScePSP.Core.Memory;
+﻿using ScePSP.BackEnd;
+using ScePSP.Cpu;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Formats.audio;
 using ScePSP.Hle.Managers;
 using ScePSP.Hle.Modules.audio;
+using ScePSP.Memory;
 using ScePSPUtils;
 using System;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace ScePSP.Hle.Modules.libatrac3plus
 {
@@ -49,14 +51,14 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// <param name="DataLength">The size of the buffer pointed by buf</param>
         /// <returns>The new atrac ID, or less than 0 on error </returns>
         [HlePspFunction(NID = 0x7A20E7AF, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public Atrac sceAtracSetDataAndGetID(byte* DataPointer, int DataLength)
         {
             return TryToAlloc(new Atrac(DataPointer, DataLength));
         }
 
         [HlePspFunction(NID = 0xB3B5D042, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracGetOutputChannel(CpuThreadState CpuThreadState, Atrac Atrac, out int OutputChannel)
         {
             OutputChannel = sceAudio.sceAudioChReserve(CpuThreadState, -1, Atrac.MaximumSamples, PspAudio.FormatEnum.Stereo);
@@ -70,7 +72,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// <param name="Bitrate">Pointer to a integer that receives the bitrate in kbps</param>
         /// <returns>Less than 0 on error, otherwise 0</returns>
         [HlePspFunction(NID = 0xA554A158, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracGetBitrate(Atrac Atrac, out uint Bitrate)
         {
             //Bitrate = Atrac.Format.Bitrate;
@@ -88,6 +90,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         }
 
         [HlePspFunction(NID = 0x0E2A73AB, FirmwareVersion = 150)]
+        [HleTrackCall]
         public int sceAtracSetData(Atrac Atrac, byte* BufferPointer, int BufferSizeInBytes)
         {
             Atrac.SetData(BufferPointer, BufferSizeInBytes);
@@ -102,7 +105,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// <param name="MaxNumberOfSamples">Pointer to a integer that receives the maximum number of samples.</param>
         /// <returns>Less than 0 on error, otherwise 0</returns>
         [HlePspFunction(NID = 0xD6A5F2F7, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracGetMaxSample(Atrac Atrac, out int MaxNumberOfSamples)
         {
             MaxNumberOfSamples = Atrac.MaximumSamples;
@@ -110,7 +113,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         }
 
         [HlePspFunction(NID = 0xFAA4F89B, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracGetLoopStatus(Atrac Atrac, out int piLoopNum, out int puiLoopStatus)
         {
             piLoopNum = Atrac.NumberOfLoops;
@@ -129,7 +132,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// </param>
         /// <returns>Less than 0 on error, otherwise 0</returns>
         [HlePspFunction(NID = 0x868120B5, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracSetLoopNum(Atrac Atrac, int NumberOfLoops)
         {
             if (Atrac.Smpl.LoopCount == 0) throw new SceKernelException(SceKernelErrors.ATRAC_ERROR_UNSET_PARAM);
@@ -149,7 +152,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// </param>
         /// <returns>Less than 0 on error, otherwise 0</returns>
         [HlePspFunction(NID = 0x9AE849A7, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracGetRemainFrame(Atrac Atrac, out int RemainFramePointer)
         {
             RemainFramePointer = Atrac.RemainingFrames;
@@ -169,7 +172,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// </param>
         /// <returns>Less than 0 on error, otherwise 0</returns>
         [HlePspFunction(NID = 0x6A8C3CD5, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracDecodeData(Atrac Atrac, StereoShortSoundSample* SamplesOut,
             [HleInvalidAsInvalidPointer] out int NumberOfSamples, [HleInvalidAsInvalidPointer] out int ReachedEnd,
             [HleInvalidAsInvalidPointer] out int RemainingFramesToDecode)
@@ -212,7 +215,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
                     NumberOfSamples = 0;
                     ReachedEnd = 1;
                     RemainingFramesToDecode = 0;
-                    Console.WriteLine("SceKernelErrors.ERROR_ATRAC_ALL_DATA_DECODED");
+                    //Console.WriteLine("SceKernelErrors.ERROR_ATRAC_ALL_DATA_DECODED");
                     return (int)(SceKernelErrors.ERROR_ATRAC_ALL_DATA_DECODED);
                 }
                 if (Atrac.NumberOfLoops > 0) Atrac.NumberOfLoops--;
@@ -222,7 +225,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
                 if (Atrac.InputBuffer.Position == Atrac.InputBuffer.CurrentSize)
                     Atrac.SetPlayPosition(0, Atrac.InputBuffer.CurrentSize, 0);
 
-                Console.WriteLine($"LoopInfoList {Atrac.NumberOfLoops} Start {Atrac.LoopInfoList[0].StartSample} Set 0x{Atrac.InputBuffer.Available():X}");
+                //Console.WriteLine($"LoopInfoList {Atrac.NumberOfLoops} Start {Atrac.LoopInfoList[0].StartSample} Set 0x{Atrac.InputBuffer.Available():X}");
             }
 
             // Delay the thread decoding the Atrac data,
@@ -241,7 +244,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// <param name="AtracId">The atrac ID to release</param>
         /// <returns>Less than 0 on error</returns>
         [HlePspFunction(NID = 0x61EB33F5, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracReleaseAtracID(Atrac Atrac)
         {
             Atrac.RemoveUid();
@@ -249,7 +252,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         }
 
         [HlePspFunction(NID = 0x780F88D1, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public Atrac sceAtracGetAtracID(CodecType CodecType)
         {
             if (CodecType != CodecType.PSP_MODE_AT_3 && CodecType != CodecType.PSP_MODE_AT_3_PLUS)
@@ -267,7 +270,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// <param name="NumberOfSamplesInNextFrame">Pointer to receives the number of samples of the next frame.</param>
         /// <returns>Less than 0 on error, otherwise 0</returns>
         [HlePspFunction(NID = 0x36FAABFB, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracGetNextSample(Atrac Atrac, out int NumberOfSamplesInNextFrame)
         {
             NumberOfSamplesInNextFrame = 0;
@@ -286,7 +289,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         }
 
         [HlePspFunction(NID = 0xE88F759B, FirmwareVersion = 150)]
-        [HlePspNotImplemented(Notice = false)]
+        [HleTrackCall(Notice = false)]
         public int sceAtracGetInternalErrorInfo(Atrac Atrac, out int ErrorResult)
         {
             ErrorResult = 0;
@@ -299,7 +302,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// <param name="ReadOffset">Offset where to seek into the atrac file before reading</param>
         /// <returns>Less than 0 on error, otherwise 0</returns>
         [HlePspFunction(NID = 0x5D268707, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracGetStreamDataInfo(Atrac Atrac, out PspPointer WritePointerPointer, out int AvailableBytes, out int ReadOffset)
         {
             //Console.WriteLine($"sceAtracGetStreamDataInfo 0x{Atrac.InputBuffer.CurrentSize:X} 0x{Atrac.InputBuffer.AvailableWriteSize():X}");
@@ -315,7 +318,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         /// <param name="bytesToAdd">Number of bytes read into location given by sceAtracGetStreamDataInfo().</param>
         /// <returns>Less than 0 on error, otherwise 0</returns>
         [HlePspFunction(NID = 0x7DB31251, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracAddStreamData(Atrac Atrac, int bytesToAdd)
         {
             //Console.WriteLine($"sceAtracAddStreamData 0x{bytesToAdd:X}");
@@ -326,7 +329,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         }
 
         [HlePspFunction(NID = 0x83E85EA0, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracGetSecondBufferInfo(Atrac Atrac, out uint puiPosition, out uint puiDataByte)
         {
             //Console.WriteLine("sceAtracGetSecondBufferInfo");
@@ -347,6 +350,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
 
         /// <returns>0 - not needed ; 1 - needed</returns>
         [HlePspFunction(NID = 0xECA32A99, FirmwareVersion = 150)]
+        [HleTrackCall]
         public int sceAtracIsSecondBufferNeeded(Atrac Atrac)
         {
             Console.WriteLine("sceAtracIsSecondBufferNeeded)");
@@ -355,6 +359,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         }
 
         [HlePspFunction(NID = 0x83BF7AFD, FirmwareVersion = 150)]
+        [HleTrackCall]
         public int sceAtracSetSecondBuffer(Atrac Atrac, byte* SecondBufferAddr, uint uiSecondBufferByte)
         {
             Console.WriteLine($"sceAtracSetSecondBuffer Szie 0x{uiSecondBufferByte:X})");
@@ -365,6 +370,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         }
 
         [HlePspFunction(NID = 0xE23E3A35, FirmwareVersion = 150)]
+        [HleTrackCall]
         public int sceAtracGetNextDecodePosition(Atrac Atrac, out int SamplePosition)
         {
             SamplePosition = Atrac.CurrentFrame;
@@ -378,7 +384,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         }
 
         [HlePspFunction(NID = 0xA2BBA8BE, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracGetSoundSample(Atrac Atrac, int* EndSamplePointer, int* LoopStartSamplePointer, int* LoopEndSamplePointer)
         {
             var HasLoops = Atrac.LoopInfoList != null && Atrac.LoopInfoList.Length > 0;
@@ -390,14 +396,14 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         }
 
         [HlePspFunction(NID = 0xCA3CA3D2, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracGetBufferInfoForReseting(Atrac Atrac, uint uiSample, PspBufferInfo* pBufferInfo)
         {
             throw new NotImplementedException();
         }
 
         [HlePspFunction(NID = 0x644E5607, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracResetPlayPosition(Atrac Atrac, int uiSample, int uiWriteByteFirstBuf, int uiWriteByteSecondBuf)
         {
             Atrac.SetPlayPosition(uiSample, uiWriteByteFirstBuf, uiWriteByteSecondBuf);
@@ -405,14 +411,14 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         }
 
         [HlePspFunction(NID = 0x2DD3E298, FirmwareVersion = 250)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracGetBufferInfoForResetting(Atrac Atrac, uint uiSample, void* BufferInfoAddr)
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x31668baa, FirmwareVersion = 250)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracGetChannel(Atrac Atrac, out int Channels)
         {
             Channels = Atrac.Format.AtracChannels;
@@ -424,7 +430,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         int MaxAtrac3 = 2;
 
         [HlePspFunction(NID = 0x132F1ECA, FirmwareVersion = 250)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracReinit(int at3Count, int at3plusCount)
         {
             PSPDrivers.HLE.HleUidPoolManager.RemoveAll<Atrac>();
@@ -460,7 +466,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         }
 
         [HlePspFunction(NID = 0x3F6E26B5, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracSetHalfwayBuffer(Atrac Atrac, byte* halfBuffer, int readSize, int halfBufferSize)
         {
             Atrac.SetData(halfBuffer, halfBufferSize, readSize);
@@ -469,7 +475,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         }
 
         [HlePspFunction(NID = 0x5CF9D852, FirmwareVersion = 250)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracSetMOutHalfwayBuffer(Atrac Atrac, byte* MOutHalfBuffer, int readSize, int MOutHalfBufferSize)
         {
             Atrac.SetData(MOutHalfBuffer, MOutHalfBufferSize, readSize, true);
@@ -478,46 +484,75 @@ namespace ScePSP.Hle.Modules.libatrac3plus
         }
 
         [HlePspFunction(NID = 0x0FAE370E, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public Atrac sceAtracSetHalfwayBufferAndGetID(byte* HalfBufferPointer, int readSize, int HalfBufferSize)
         {
             return TryToAlloc(new Atrac(HalfBufferPointer, HalfBufferSize, readSize));
         }
 
         [HlePspFunction(NID = 0x9CD7DE03, FirmwareVersion = 250)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public Atrac sceAtracSetMOutHalfwayBufferAndGetID(byte* halfBuffer, int readSize, int halfBufferSize)
         {
             return TryToAlloc(new Atrac(halfBuffer, halfBufferSize, readSize, true));
         }
 
         [HlePspFunction(NID = 0x5DD66588, FirmwareVersion = 250)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracSetAA3HalfwayBufferAndGetID(byte* halfBuffer, uint readSize, uint halfBufferSize)
         {
             throw new SceKernelException((SceKernelErrors)(-1));
         }
 
         [HlePspFunction(NID = 0x5622B7C1, FirmwareVersion = 250)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public Atrac sceAtracSetAA3DataAndGetID(byte* buffer, int bufferSize, int fileSize, uint metadataSizeAddr)
         {
             throw new SceKernelException((SceKernelErrors)(-1));
         }
 
         [HlePspFunction(NID = 0xD5C28CC0, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracEndEntry()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xD1F59FDB, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAtracStartEntry()
         {
             return 0;
         }
 
+        [HlePspFunction(NID = 0x231FC6B7, FirmwareVersion = 600)]
+        [HleTrackCall]
+        public int _sceAtracGetContextAddress(int atID)
+        {
+            return 0;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
+        public struct LowLevelParam
+        {
+            public int numberOfChannels;
+            public int outputChannels;
+            public int sourceBufferLength;
+        }
+
+        [HlePspFunction(NID = 0x1575D64B, FirmwareVersion = 620)]
+        [HleTrackCall]
+        public int sceAtracLowLevelInitDecoder(Atrac Atrac, LowLevelParam* param)
+        {
+            Atrac.Decoder.init(param->sourceBufferLength, param->numberOfChannels, param->outputChannels, 0);
+            return 0;
+        }
+
+        [HlePspFunction(NID = 0x0C116E1B, FirmwareVersion = 620)]
+        [HleTrackCall]
+        public int sceAtracLowLevelDecode(int atID, byte* sourceAddr, PspPointer sourceBytesConsumedAddr, byte* samplesAddr, PspPointer sampleBytesAddr)
+        {
+            return 0;
+        }
     }
 }

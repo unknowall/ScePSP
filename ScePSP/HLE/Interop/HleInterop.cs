@@ -1,5 +1,5 @@
-﻿using ScePSP.Core.Cpu;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Cpu;
+using ScePSP.Memory;
 using ScePSP.Hle.Managers;
 using ScePSPUtils;
 using System;
@@ -39,9 +39,9 @@ namespace ScePSP.Hle.Interop
             currentFakeHleThread.CpuThreadState.CopyRegistersFrom(HleThreadManager.CurrentOrAny.CpuThreadState);
             SetArgumentsToCpuThreadState(currentFakeHleThread.CpuThreadState, function, arguments);
             //Console.Out.WriteLineColored(ConsoleColor.Magenta, "ExecuteFunctionNow: 0x{0:X8}", function);
-            currentFakeHleThread.CpuThreadState.ExecuteFunctionAndReturn(currentFakeHleThread.CpuThreadState.Pc);
-            //Console.Out.WriteLineColored(ConsoleColor.Magenta, "... {0}", currentFakeHleThread.CpuThreadState.Gpr2);
-            return currentFakeHleThread.CpuThreadState.Gpr2;
+            currentFakeHleThread.CpuThreadState.ExecuteFunctionAndReturn(currentFakeHleThread.CpuThreadState.PC);
+            //Console.Out.WriteLineColored(ConsoleColor.Magenta, "... {0}", currentFakeHleThread.CpuThreadState.GPR2);
+            return currentFakeHleThread.CpuThreadState.GPR2;
         }
 
         public class QueuedExecution
@@ -93,7 +93,7 @@ namespace ScePSP.Hle.Interop
             currentFakeHleThread.CpuThreadState.CopyRegistersFrom(fakeCpuThreadState);
             //HleCallback.SetArgumentsToCpuThreadState(CurrentFake.CpuThreadState);
 
-            currentFakeHleThread.CpuThreadState.ExecuteAt(currentFakeHleThread.CpuThreadState.Pc);
+            currentFakeHleThread.CpuThreadState.ExecuteAT(currentFakeHleThread.CpuThreadState.PC);
 
             ////CurrentFake.CpuThreadState.PC = HleCallback.Function;
             //CurrentFakeHleThread.CpuThreadState.RA = HleEmulatorSpecialAddresses.CODE_PTR_FINALIZE_CALLBACK;
@@ -122,22 +122,22 @@ namespace ScePSP.Hle.Interop
                 if (argumentType == typeof(uint))
                 {
                     Align(1);
-                    cpuThreadState.Gpr[gprIndex++] = (int)(uint)argument;
+                    cpuThreadState.GPR[gprIndex++] = (int)(uint)argument;
                 }
                 else if (argumentType == typeof(int))
                 {
                     Align(1);
-                    cpuThreadState.Gpr[gprIndex++] = (int)argument;
+                    cpuThreadState.GPR[gprIndex++] = (int)argument;
                 }
                 else if (argumentType == typeof(PspPointer))
                 {
                     Align(1);
-                    cpuThreadState.Gpr[gprIndex++] = (int)(uint)(PspPointer)argument;
+                    cpuThreadState.GPR[gprIndex++] = (int)(uint)(PspPointer)argument;
                 }
                 else if (argumentType.IsEnum)
                 {
                     Align(1);
-                    cpuThreadState.Gpr[gprIndex++] = Convert.ToInt32(argument);
+                    cpuThreadState.GPR[gprIndex++] = Convert.ToInt32(argument);
                 }
                 else
                 {
@@ -145,7 +145,7 @@ namespace ScePSP.Hle.Interop
                 }
             }
 
-            cpuThreadState.Pc = function;
+            cpuThreadState.PC = function;
             //Console.Error.WriteLine(CpuThreadState);
             //CpuThreadState.DumpRegisters(Console.Error);
         }

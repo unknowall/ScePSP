@@ -1,11 +1,12 @@
-﻿using ScePSPUtils;
+﻿using ScePSP.Devices.Display;
+using ScePSPUtils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Xml.Serialization;
 
-namespace ScePSP.Core
+namespace ScePSP
 {
     public class ControllerConfig
     {
@@ -29,6 +30,17 @@ namespace ScePSP.Core
 
         public string LeftTriggerButton = "Q";
         public string RightTriggerButton = "E";
+    }
+
+    public class DisplayConfig
+    {
+        public bool NoticeUnimplementedGpuCommands = true;
+        public bool VerticalSynchronization = true;
+        public bool Enabled = true;
+        public IntPtr WindowHandle = IntPtr.Zero;
+        public int Width = PspDisplay.MaxVisibleWidth * 2;
+        public int Height = PspDisplay.MaxVisibleHeight * 2;
+        public bool H264Enabled = false;
     }
 
     public static class ApplicationPaths

@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using static SDL2.SDL;
 
-namespace ScePSP.Core.AudioBackEnd.SDL
+namespace ScePSP.BackEnd.SDL
 {
     public unsafe class SDLAudioBackEnd : AudioBackEnd
     {

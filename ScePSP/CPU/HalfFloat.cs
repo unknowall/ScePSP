@@ -1,6 +1,6 @@
 ﻿using ScePSPUtils;
 
-namespace ScePSP.Core.Cpu
+namespace ScePSP.Cpu
 {
     public struct Float32
     {
@@ -11,11 +11,9 @@ namespace ScePSP.Core.Cpu
     {
         public ushort Value;
 
-        public bool Sign => BitUtils.Extract(Value, 15, 1) != 0;
-
-        public uint Exponent => BitUtils.Extract(Value, 10, 5);
-
-        public uint Fraction => BitUtils.Extract(Value, 0, 10);
+        public bool Sign { get { return BitUtils.Extract(Value, 15, 1) != 0; } }
+        public uint Exponent { get { return BitUtils.Extract(Value, 10, 5); } }
+        public uint Fraction { get { return BitUtils.Extract(Value, 0, 10); } }
     }
 
     public class HalfFloat
@@ -65,12 +63,12 @@ namespace ScePSP.Core.Cpu
         //	return o;
         //}
 
-        public static int FloatToHalfFloat(float Float)
+        static public int FloatToHalfFloat(float Float)
         {
             var i = MathFloat.ReinterpretFloatAsInt(Float);
-            var s = (i >> 16) & 0x00008000; // sign
-            var e = ((i >> 23) & 0x000000ff) - (127 - 15); // exponent
-            var f = (i >> 0) & 0x007fffff; // fraction
+            int s = ((i >> 16) & 0x00008000);              // sign
+            int e = ((i >> 23) & 0x000000ff) - (127 - 15); // exponent
+            int f = ((i >> 0) & 0x007fffff);              // fraction
 
             // need to handle NaNs and Inf?
             if (e <= 0)
@@ -96,7 +94,7 @@ namespace ScePSP.Core.Cpu
                 }
                 // NAN
                 f >>= 13;
-                return s | 0x7c00 | f | (f == 0 ? 1 : 0);
+                return s | 0x7c00 | f | ((f == 0) ? 1 : 0);
             }
             if (e > 30)
             {
@@ -108,9 +106,9 @@ namespace ScePSP.Core.Cpu
 
         public static float ToFloat(int imm16)
         {
-            var s = (imm16 >> 15) & 0x00000001; // Sign
-            var e = (imm16 >> 10) & 0x0000001f; // Exponent
-            var f = (imm16 >> 0) & 0x000003ff; // Fraction
+            int s = (imm16 >> 15) & 0x00000001; // Sign
+            int e = (imm16 >> 10) & 0x0000001f; // Exponent
+            int f = (imm16 >> 0) & 0x000003ff;  // Fraction
 
             // Need to handle 0x7C00 INF and 0xFC00 -INF?
             if (e == 0)
@@ -148,22 +146,22 @@ namespace ScePSP.Core.Cpu
         }
 
         /*
-        private static float ToFloat(ushort ShortValue)
-        {
-            uint Value = 0;
-            var Significand = BitUtils.Extract(ShortValue, 0, 10);
-            var Exponent    = BitUtils.Extract(ShortValue, 10, 5);
-            var Sign        = BitUtils.Extract(ShortValue, 15, 1);
-            BitUtils.Insert(ref Value, 0, 23, Significand);
-            BitUtils.Insert(ref Value, 23, 8, Exponent);
-            //BitUtils.Insert(ref Value, 13, 10, Significand);
-            //BitUtils.Insert(ref Value, 26, 5, Exponent);
-            BitUtils.Insert(ref Value, 31, 1, Exponent);
-            //Console.Error.WriteLine("%032b".Sprintf(Value));
-            float ValueFloat = MathFloat.ReinterpretUIntAsFloat(Value);
-            Console.Error.WriteLine(ValueFloat);
-            return ValueFloat;
-        }
-        */
+		private static float ToFloat(ushort ShortValue)
+		{
+			uint Value = 0;
+			var Significand = BitUtils.Extract(ShortValue, 0, 10);
+			var Exponent    = BitUtils.Extract(ShortValue, 10, 5);
+			var Sign        = BitUtils.Extract(ShortValue, 15, 1);
+			BitUtils.Insert(ref Value, 0, 23, Significand);
+			BitUtils.Insert(ref Value, 23, 8, Exponent);
+			//BitUtils.Insert(ref Value, 13, 10, Significand);
+			//BitUtils.Insert(ref Value, 26, 5, Exponent);
+			BitUtils.Insert(ref Value, 31, 1, Exponent);
+			//Console.Error.WriteLine("%032b".Sprintf(Value));
+			float ValueFloat = MathFloat.ReinterpretUIntAsFloat(Value);
+			Console.Error.WriteLine(ValueFloat);
+			return ValueFloat;
+		}
+		*/
     }
 }

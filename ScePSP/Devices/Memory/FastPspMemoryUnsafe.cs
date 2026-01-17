@@ -3,7 +3,7 @@ using ScePSP.Utils;
 using System;
 using System.Diagnostics;
 
-namespace ScePSP.Core.Memory
+namespace ScePSP.Memory
 {
     public sealed unsafe class FastPspMemoryUnsafe : PspMemory
     {

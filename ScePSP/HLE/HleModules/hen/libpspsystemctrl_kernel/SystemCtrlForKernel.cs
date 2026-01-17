@@ -10,7 +10,7 @@ namespace ScePSP.Hle.Modules.hen
     public unsafe class SystemCtrlForKernel : HleModuleHost
     {
         [HlePspFunction(NID = 0x1C90BECB, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sctrlHENSetStartModuleHandler()
         {
             //throw(new NotImplementedException());

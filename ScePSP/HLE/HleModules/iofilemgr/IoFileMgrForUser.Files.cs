@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Memory;
+﻿using ScePSP.Memory;
 using ScePSP.Hle.Interop;
 using ScePSP.Hle.Managers;
 using ScePSP.Hle.Modules.stdio;
@@ -318,7 +318,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
         /// <param name="FileDescriptor">The old filedescriptor to reopen</param>
         /// <returns>Less than 0 on error, otherwise the reopened fd.</returns>
         [HlePspFunction(NID = 0x3C54E908, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceIoReopen(string NewFileName, HleIoFlags SceIoFlags, SceMode SceMode, SceUID FileDescriptor)
         {
             //throw(new NotImplementedException());
@@ -577,7 +577,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
         ///		Less than 0 on error.
         /// </returns>
         [HlePspFunction(NID = 0xB2A628C1, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceIoAssign(string Device1, string Device2, string Device3, int mode, void* unk1, long unk2)
         {
             // IoFileMgrForUser.sceIoAssign(Device1:'disc0:', Device2:'umd0:', Device3:'isofs0:', mode:1, unk1:0x00000000, unk2:0x0880001E)
@@ -586,7 +586,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
         }
 
         [HlePspFunction(NID = 0xAB96437F, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceIoSync()
         {
             return 0;

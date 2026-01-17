@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Components.Rtc;
+﻿using ScePSP.Devices.Rtc;
 using ScePSP.Hle.Attributes;
 using ScePSPUtils;
 using System;
@@ -106,7 +106,7 @@ namespace ScePSP.Hle.Modules.threadman
         ///		less than 0 on error.
         /// </returns>
         [HlePspFunction(NID = 0x6652B8CA, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelSetAlarm(int clock, /*SceKernelAlarmHandler*/uint handler, uint common)
         {
             //throw(new NotImplementedException());
@@ -168,7 +168,7 @@ namespace ScePSP.Hle.Modules.threadman
         /// </summary>
         /// <returns></returns>
         [HlePspFunction(NID = 0xFFC36A14, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelReferThreadRunStatus()
         {
             throw new NotImplementedException();
@@ -180,7 +180,7 @@ namespace ScePSP.Hle.Modules.threadman
         /// <param name="sysclocksPointer">Address of delay in sysclocks</param>
         /// <returns>0 on success, &lt; 0 on error</returns>
         [HlePspFunction(NID = 0xBD123D9E, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelDelaySysClockThread(uint sysclocksPointer)
         {
             throw new NotImplementedException();

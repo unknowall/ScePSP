@@ -1,73 +1,138 @@
 ﻿using SafeILGenerator.Ast.Nodes;
 using SafeILGenerator.Utils;
-using ScePSP.Core.Cpu.Dynarec;
+using ScePSP.Cpu.Dynarec;
 using System;
 
-namespace ScePSP.Core.Cpu.InstructionCache
+namespace ScePSP.Cpu.InstructionCache
 {
     public sealed class MethodCacheInfo
     {
-        public static readonly MethodCacheInfo Methods = new MethodCacheInfo();
+        static public readonly MethodCacheInfo Methods = new MethodCacheInfo();
 
-        private DynarecFunction _dynarecFunction;
+        /// <summary>
+        /// 
+        /// </summary>
+        private DynarecFunction _DynarecFunction;
 
-        private Action<CpuThreadState> _functionDelegate;
+        /// <summary>
+        /// 
+        /// </summary>
+        private Action<CpuThreadState> FunctionDelegate;
 
-        public DynarecFunction DynarecFunction => _dynarecFunction;
-
-        public void SetDynarecFunction(DynarecFunction dynarecFunction)
+        public DynarecFunction DynarecFunction
         {
-            _dynarecFunction = dynarecFunction;
-            _functionDelegate = dynarecFunction.Delegate;
-            StaticField.Value = dynarecFunction.Delegate;
+            get
+            {
+                return _DynarecFunction;
+            }
         }
 
-        public bool HasSpecialName => !string.IsNullOrEmpty(DynarecFunction?.Name);
+        public void SetDynarecFunction(DynarecFunction DynarecFunction)
+        {
+            this._DynarecFunction = DynarecFunction;
+            this.FunctionDelegate = DynarecFunction.Delegate;
+            this.StaticField.Value = DynarecFunction.Delegate;
+        }
 
-        public string Name => HasSpecialName ? DynarecFunction.Name : $"0x{EntryPc:X8}";
+        public bool HasSpecialName
+        {
+            get
+            {
+                return (DynarecFunction != null) && !String.IsNullOrEmpty(DynarecFunction.Name);
+            }
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Name
+        {
+            get
+            {
+                if (HasSpecialName) return DynarecFunction.Name;
+                return String.Format("0x{0:X8}", EntryPC);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public MethodCache MethodCache;
 
-        // Functions that are calling to this one.
-        // And that should be uncached when this function
+        /// <summary>
+        /// Functions that are calling to this one.
+        /// And that should be uncached when this function
+        /// </summary>
         //public List<MethodCacheInfo> FunctionsUsingThis = new List<MethodCacheInfo>();
 
-        // Static Field that will hold the Delegate
-        public IlInstanceHolderPoolItem<Action<CpuThreadState>> StaticField;
+        /// <summary>
+        /// Static Field that will hold the Delegate
+        /// </summary>
+        public ILInstanceHolderPoolItem<Action<CpuThreadState>> StaticField;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool FollowPspCallingConventions;
 
         private MethodCacheInfo()
         {
         }
 
-        public MethodCacheInfo(MethodCache methodCache, Action<CpuThreadState> delegateGeneratorForPc, uint pc)
+        public MethodCacheInfo(MethodCache MethodCache, Action<CpuThreadState> DelegateGeneratorForPC, uint PC)
         {
-            MethodCache = methodCache;
-            _functionDelegate = delegateGeneratorForPc;
-            StaticField = IlInstanceHolder.TaAlloc(delegateGeneratorForPc);
-            Pc = pc;
+            this.MethodCache = MethodCache;
+            this.FunctionDelegate = DelegateGeneratorForPC;
+            this.StaticField = ILInstanceHolder.TAlloc<Action<CpuThreadState>>(DelegateGeneratorForPC);
+            this.PC = PC;
         }
 
-        /// <summary>EntryPoint setted first.</summary>
-        public uint Pc;
+        /// <summary>
+        /// EntryPoint setted first.
+        /// </summary>
+        public uint PC;
 
-        /// <summary>EntryPoint for this function.</summary>
-        public uint EntryPc => DynarecFunction.EntryPc;
+        /// <summary>
+        /// EntryPoint for this function.
+        /// </summary>
+        public uint EntryPC { get { return DynarecFunction.EntryPC; } }
 
-        /// <summary>Address of the start of the function. Usually is equal to EntryPC but not always.</summary>
-        public uint MinPc => DynarecFunction.MinPc;
+        /// <summary>
+        /// Address of the start of the function. Usually is equal to EntryPC but not always.
+        /// </summary>
+        public uint MinPC { get { return DynarecFunction.MinPC; } }
 
-        /// <summary>Last address with code for this function.</summary>
-        public uint MaxPc => DynarecFunction.MaxPc;
+        /// <summary>
+        /// Last address with code for this function.
+        /// </summary>
+        public uint MaxPC { get { return DynarecFunction.MaxPC; } }
 
-        public uint TotalInstructions => (DynarecFunction.MaxPc - DynarecFunction.MinPc) / 7;
+        /// <summary>
+        /// 
+        /// </summary>
+        public uint TotalInstructions { get { return (DynarecFunction.MaxPC - DynarecFunction.MinPC) / 7; } }
 
-        /// <summary>Ast for this function.</summary>
-        public AstNodeStm AstTree => DynarecFunction?.AstNode;
+        /// <summary>
+        /// Ast for this function.
+        /// </summary>
+        public AstNodeStm AstTree { get { return DynarecFunction != null ? DynarecFunction.AstNode : null; } }
 
-        public void CallDelegate(CpuThreadState cpuThreadState) => _functionDelegate(cpuThreadState);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="CpuThreadState"></param>
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void CallDelegate(CpuThreadState CpuThreadState)
+        {
+            FunctionDelegate(CpuThreadState);
+        }
 
-        public void Free() => MethodCache.Free(this);
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Free()
+        {
+            MethodCache.Free(this);
+        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace ScePSP.Core.Memory
+namespace ScePSP.Memory
 {
     public sealed unsafe class FastPspMemory : PspMemory
     {

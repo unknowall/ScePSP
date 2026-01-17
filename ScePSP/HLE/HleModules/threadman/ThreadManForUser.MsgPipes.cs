@@ -1,6 +1,6 @@
 ﻿//#define DEBUG_MSG_PIPES
 
-using ScePSP.Core.Memory;
+using ScePSP.Memory;
 using ScePSP.Hle.Managers;
 using System;
 using System.Collections.Generic;

@@ -8,7 +8,7 @@
         /// <param name="Params">OSK parameters.</param>
         /// <returns>Less than 0 on error</returns>
         [HlePspFunction(NID = 0xF6269B82, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityOskInitStart(SceUtilityOskParams* Params)
         {
             return 0;
@@ -20,7 +20,7 @@
         /// </summary>
         /// <returns>Less than 0 on error</returns>
         [HlePspFunction(NID = 0x3DFAEBA9, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityOskShutdownStart()
         {
             return 0;
@@ -32,7 +32,7 @@
         /// <param name="n">Unknown, pass 1.</param>
         /// <returns>Less than 0 on error</returns>
         [HlePspFunction(NID = 0x4B85C861, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityOskUpdate(int n)
         {
             return 0;
@@ -43,7 +43,7 @@
         /// </summary>
         /// <returns>the current status of the keyboard. See <see cref="pspUtilityDialogState"/> for details.</returns>
         [HlePspFunction(NID = 0xF3F76017, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public pspUtilityDialogState sceUtilityOskGetStatus()
         {
             return pspUtilityDialogState.Finished;

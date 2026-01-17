@@ -1,9 +1,9 @@
-﻿using ScePSP.Core.Memory;
+﻿using ScePSP.Memory;
+using ScePSP.Types;
 using System;
 
 namespace ScePSP.Hle.Modules.mpeg
 {
-
     public unsafe partial class sceMpeg
     {
         protected bool[] AbvEsBufAllocated = new bool[2];
@@ -15,13 +15,12 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="AvcDecodeDetail">AvcDecodeDetail</param>
         /// <returns>0 if successful.</returns>
         [HlePspFunction(NID = 0x0F6C18D7, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegAvcDecodeDetail(SceMpegPointer* SceMpegPointer, AvcDecodeDetailStruct* AvcDecodeDetail)
         {
             var Mpeg = GetMpeg(SceMpegPointer);
             var SceMpegData = GetSceMpegData(SceMpegPointer);
 
-            //throw(new NotImplementedException());
             AvcDecodeDetail->AvcDecodeResult = 0;
             AvcDecodeDetail->VideoFrameCount = Mpeg.FrameIndex;
             AvcDecodeDetail->AvcDetailFrameWidth = SceMpegData->FrameWidth;
@@ -41,7 +40,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="SceMpegPointer">SceMpeg handle</param>
         /// <returns>0 if successful.</returns>
         [HlePspFunction(NID = 0x4571CC64, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegAvcDecodeFlush(SceMpegPointer* SceMpegPointer)
         {
             var Mpeg = GetMpeg(SceMpegPointer);
@@ -56,7 +55,6 @@ namespace ScePSP.Hle.Modules.mpeg
                 _FinishMpeg(SceMpegData);
             }
 
-            //throw(new NotImplementedException());
             return 0;
         }
 
@@ -74,7 +72,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="DataAttributes">Unknown</param>
         /// <returns>0 if successful.</returns>
         [HlePspFunction(NID = 0xFE246728, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegGetAvcAu(SceMpegPointer* SceMpegPointer, StreamId StreamId, out SceMpegAu MpegAccessUnit, int* DataAttributes)
         {
             if (DataAttributes != null)
@@ -96,7 +94,7 @@ namespace ScePSP.Hle.Modules.mpeg
         ///		0 if error, else a ElementaryStream ID.
         /// </returns>
         [HlePspFunction(NID = 0xA780CF7E, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegMallocAvcEsBuf(SceMpegPointer* Mpeg)
         {
             for (int n = 0; n < 2; n++)
@@ -116,7 +114,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="Mpeg"></param>
         /// <param name="ElementaryStream">Value returned from <see cref="sceMpegMallocAvcEsBuf"/></param>
         [HlePspFunction(NID = 0xCEB870B1, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public uint sceMpegFreeAvcEsBuf(SceMpegPointer* Mpeg, int ElementaryStream)
         {
             AbvEsBufAllocated[ElementaryStream - 1] = false;
@@ -130,7 +128,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="Mode">Pointer to <see cref="SceMpegAvcMode"/> struct defining the decode mode (pixelformat)</param>
         /// <returns>0 if success.</returns>
         [HlePspFunction(NID = 0xA11C7026, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegAvcDecodeMode(SceMpegPointer* SceMpegPointer, SceMpegAvcMode* Mode)
         {
             var Mpeg = GetMpeg(SceMpegPointer);
@@ -140,9 +138,9 @@ namespace ScePSP.Hle.Modules.mpeg
             {
                 switch (Mode->PixelFormat)
                 {
-                    case Core.Types.GuPixelFormats.Rgba5650:
-                    case Core.Types.GuPixelFormats.Rgba5551:
-                    case Core.Types.GuPixelFormats.Rgba8888:
+                    case GuPixelFormats.Rgba5650:
+                    case GuPixelFormats.Rgba5551:
+                    case GuPixelFormats.Rgba8888:
                         SceMpegData->SceMpegAvcMode = *Mode;
                         break;
                     default:
@@ -163,7 +161,7 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="Init">Will be set to 0 on first call, then 1</param>
         /// <returns>0 if successful.</returns>
         [HlePspFunction(NID = 0x0E3C2E9D, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegAvcDecode(SceMpegPointer* SceMpegPointer, SceMpegAu* MpegAccessUnit, int FrameWidth, PspPointer* OutputBufferPointer, PspPointer* Init)
         {
             var SceMpegData = GetSceMpegData(SceMpegPointer);
@@ -179,15 +177,11 @@ namespace ScePSP.Hle.Modules.mpeg
                 SceMpegData->SceMpegAvcMode.PixelFormat,
                 *OutputBufferPointer
             );
-            int threadUid = PSPDrivers.HLE.ModuleMgrForUser.ThreadManager.Current.Id;
 
             //阻塞当前hle线程直至数据用完
-            //PSPDrivers.HLE.ThreadManForUser.ThreadManager.SuspendThread(PSPDrivers.HLE.ModuleMgrForUser.ThreadManager.Current);
-            //Modules.ThreadManForUserModule.hleBlockCurrentThread(SceKernelThreadInfo. WAIT_VIDEO_DECODER);
 
             SceMpegData->AvcFrameStatus = 1;
 
-            //throw (new SceKernelException(SceKernelErrors.ERROR_MPEG_NO_DATA));
             return 0;
         }
 
@@ -206,12 +200,10 @@ namespace ScePSP.Hle.Modules.mpeg
             }
 
             *Result = Width / 2 * (Height / 2) * 6 + 128;
+
             return 0;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="Mpeg"></param>
         /// <param name="source_addr"></param>
         /// <param name="range_addr"></param>
@@ -224,9 +216,6 @@ namespace ScePSP.Hle.Modules.mpeg
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="Mpeg"></param>
         /// <param name="mode"></param>
         /// <param name="width"></param>
@@ -234,44 +223,34 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="ycbcr_addr"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x67179B1B, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegAvcInitYCbCr(SceMpegPointer* Mpeg, int mode, int width, int height, int ycbcr_addr)
         {
-            //throw (new NotImplementedException());
-            //return -1;
             return 0;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="Mpeg"></param>
         /// <param name="au_addr"></param>
         /// <param name="buffer_addr"></param>
         /// <param name="init_addr"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xF0EB1125, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegAvcDecodeYCbCr(SceMpegPointer* Mpeg, int au_addr, int buffer_addr, int init_addr)
         {
-            //throw (new NotImplementedException());
             return -1;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="Mpeg"></param>
         /// <param name="buffer_addr"></param>
         /// <param name="status_addr"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xF2930C9C, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegAvcDecodeStopYCbCr(SceMpegPointer* Mpeg, byte* OutputBuffer, out int Status)
         {
             Status = 0;
-            //throw (new NotImplementedException());
-            //return -1;
+
             return 0;
         }
 
@@ -284,10 +263,9 @@ namespace ScePSP.Hle.Modules.mpeg
         /// <param name="Status">Frame number</param>
         /// <returns>0 if successful.</returns>
         [HlePspFunction(NID = 0x740FCCD1, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceMpegAvcDecodeStop(SceMpegPointer* SceMpegPointer, int FrameWidth, byte* OutputBuffer, out int Status)
         {
-            //throw(new NotImplementedException());
             var Mpeg = GetMpeg(SceMpegPointer);
 
             var SceMpegData = GetSceMpegData(SceMpegPointer);
@@ -296,7 +274,6 @@ namespace ScePSP.Hle.Modules.mpeg
 
             Status = 0;
 
-            //throw(new NotImplementedException());
             return 0;
         }
     }

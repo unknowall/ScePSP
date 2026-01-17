@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Cpu;
+﻿using ScePSP.Cpu;
 using ScePSP.Utils;
 using ScePSPUtils;
 
@@ -19,7 +19,7 @@ namespace ScePSP
         {
             try
             {
-                return CpuThreadState.Gpr[GprPosition];
+                return CpuThreadState.GPR[GprPosition];
             }
             finally
             {
@@ -31,8 +31,8 @@ namespace ScePSP
         {
             try
             {
-                var Low = CpuThreadState.Gpr[GprPosition + 0];
-                var High = CpuThreadState.Gpr[GprPosition + 1];
+                var Low = CpuThreadState.GPR[GprPosition + 0];
+                var High = CpuThreadState.GPR[GprPosition + 1];
                 return (long)((High << 32) | (Low << 0));
             }
             finally
@@ -50,7 +50,7 @@ namespace ScePSP
         {
             try
             {
-                return CpuThreadState.Fpr[FprPosition];
+                return CpuThreadState.FPR[FprPosition];
             }
             finally
             {

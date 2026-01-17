@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ScePSP.Core.AudioBackEnd.Null
+namespace ScePSP.BackEnd.NullAudio
 {
     public class NullAudio : AudioBackEnd
     {

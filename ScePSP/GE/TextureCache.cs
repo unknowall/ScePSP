@@ -1,8 +1,9 @@
 ﻿//#define DEBUG_TEXTURE_CACHE
 
-using ScePSP.Core.GpuBackEnd.State;
-using ScePSP.Core.Memory;
-using ScePSP.Core.Types;
+using ScePSP.BackEnd.OpenGL;
+using ScePSP.GE.State;
+using ScePSP.Memory;
+using ScePSP.Types;
 using ScePSP.Utils;
 using ScePSPUtils;
 using ScePSPUtils.Drawing;
@@ -13,31 +14,38 @@ using System.Collections.Generic;
 using System.Drawing;
 using Hashing = ScePSP.Utils.Hashing;
 
-namespace ScePSP.Core.GpuBackEnd
+namespace ScePSP.GE
 {
-    public abstract unsafe class PspTexture : IDisposable
+    public unsafe abstract class Texture<TBackEnd> : IDisposable
     {
         //public int TextureId { get; private set; }
-        public ulong TextureHash => TextureCacheKey.TextureHash;
+        public ulong TextureHash { get { return TextureCacheKey.TextureHash; } }
 
+        public TBackEnd BackEnd;
         public DateTime RecheckTimestamp;
         public TextureCacheKey TextureCacheKey;
         public int Width;
         public int Height;
         protected OutputPixel[] Data;
 
-        protected PspTexture()
+        protected Texture()
         {
         }
 
-        public virtual void Init()
+        public Texture<TBackEnd> Init(TBackEnd GpuImpl)
         {
+            this.BackEnd = GpuImpl;
+            Init();
+            return this;
+        }
 
+        protected virtual void Init()
+        {
         }
 
         public void Save(string File)
         {
-            var Bitmap = new Bitmap(Width, Height);
+            var Bitmap = new Bitmap(this.Width, this.Height);
             fixed (OutputPixel* DataPtr = Data)
             {
                 BitmapUtils.TransferChannelsDataInterleaved(
@@ -54,14 +62,10 @@ namespace ScePSP.Core.GpuBackEnd
             Bitmap.Save(File);
         }
 
-        public PspTexture Load(string FileName)
+        public Texture<TBackEnd> Load(string FileName)
         {
             var Bitmap = new Bitmap(Image.FromFile(FileName));
-            SetData(
-                Bitmap.GetChannelsDataInterleaved(BitmapChannelList.Argb).
-                CastToStructArray<OutputPixel>(),
-                Bitmap.Width, Bitmap.Height
-                );
+            this.SetData(Bitmap.GetChannelsDataInterleaved(BitmapChannelList.Argb).CastToStructArray<OutputPixel>(), Bitmap.Width, Bitmap.Height);
             return this;
         }
 
@@ -99,30 +103,30 @@ namespace ScePSP.Core.GpuBackEnd
         }
     }
 
-    public unsafe class TextureCache<TTexture> where TTexture : PspTexture, new()
+    public unsafe class TextureCache<TBackEnd, TTexture> where TTexture : Texture<TBackEnd>, new()
     {
         private PspMemory PspMemory;
         public readonly Dictionary<ulong, TTexture> Cache = new Dictionary<ulong, TTexture>();
+        public TBackEnd BackEnd;
 
         private byte[] SwizzlingBuffer = new byte[4 * 1024 * 1024];
         private OutputPixel[] DecodedTextureBuffer = new OutputPixel[1024 * 1024];
 
-        TTexture InvalidTexture;
-
-        public Action<OutputPixel[], int, int, TextureCacheKey> OnTextureReady;
-
-        public TextureCache(PspMemory PspMemory)
+        public TextureCache(PspMemory PspMemory, TBackEnd BackEnd)
         {
             this.PspMemory = PspMemory;
+            this.BackEnd = BackEnd;
         }
 
-        public TTexture Get(GpuStateStruct GpuState)
+        TTexture InvalidTexture;
+
+        public TTexture Get(GpuStateStruct* GpuState)
         {
-            var TextureMappingState = GpuState.TextureMappingState;
+            var TextureMappingState = GpuState->TextureMappingState;
             var ClutState = TextureMappingState.ClutState;
             var TextureState = TextureMappingState.TextureState;
 
-            TTexture Texture = null;
+            TTexture Texture;
 
             bool Swizzled = TextureState.Swizzled;
             uint TextureAddress = TextureState.Mipmap0.Address;
@@ -150,15 +154,11 @@ namespace ScePSP.Core.GpuBackEnd
             if (Recheck)
             {
                 var TextureFormat = TextureState.PixelFormat;
+                //var Width = TextureState.Mipmap0.TextureWidth;
 
                 int BufferWidth = TextureState.Mipmap0.BufferWidth;
 
-                var Width = TextureState.Mipmap0.TextureWidth;
                 var Height = TextureState.Mipmap0.TextureHeight;
-
-                if (BufferWidth > 512)
-                    BufferWidth = Width;
-
                 var TextureDataSize = PixelFormatDecoder.GetPixelsSize(TextureFormat, BufferWidth * Height);
                 if (ClutState.NumberOfColors > 256)
                 {
@@ -169,22 +169,17 @@ namespace ScePSP.Core.GpuBackEnd
                 var ClutShift = ClutState.Shift;
                 var ClutMask = ClutState.Mask;
 
+                //Console.WriteLine(TextureFormat);
+
                 // INVALID TEXTURE
-                bool isVaild = PspMemory.IsRangeValid(TextureAddress, TextureDataSize);
-                if (!isVaild || TextureDataSize > 2048 * 2048 * 4 || TextureDataSize < 1)
+                if (!PspMemory.IsRangeValid(TextureAddress, TextureDataSize) || TextureDataSize > 2048 * 2048 * 4)
                 {
-                    Console.Error.WriteLineColored(ConsoleColor.DarkRed,
-                        "UPDATE_TEXTURE(TEX={0},CLUT={1}:{2}:{3}:{4}:0x{5:X},SIZE={6}x{7},{8},Swizzled={9})",
-                        TextureFormat, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask, Width, Height,
-                        BufferWidth, Swizzled);
-
-                    Console.Error.WriteLineColored(ConsoleColor.DarkRed,
-                        $"Invalid TEXTURE! isVaild={isVaild} Address=0x{TextureAddress:X8}, Clut=0x{ClutAddress:X8}, DataSize={TextureDataSize}");
-
+                    Console.Error.WriteLineColored(ConsoleColor.DarkRed, "UPDATE_TEXTURE(TEX={0},CLUT={1}:{2}:{3}:{4}:0x{5:X},SIZE={6}x{7},{8},Swizzled={9})", TextureFormat, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask, BufferWidth, Height, BufferWidth, Swizzled);
+                    Console.Error.WriteLineColored(ConsoleColor.DarkRed, "Invalid TEXTURE! TextureAddress=0x{0:X}, TextureDataSize={1}", TextureAddress, TextureDataSize);
                     if (InvalidTexture == null)
                     {
                         InvalidTexture = new TTexture();
-                        InvalidTexture.Init();
+                        InvalidTexture.Init(BackEnd);
 
                         int InvalidTextureWidth = 2, InvalidTextureHeight = 2;
                         int InvalidTextureSize = InvalidTextureWidth * InvalidTextureHeight;
@@ -195,7 +190,7 @@ namespace ScePSP.Core.GpuBackEnd
                             var Color2 = OutputPixel.FromRgba(0x00, 0x00, 0xFF, 0xFF);
                             for (int n = 0; n < InvalidTextureSize; n++)
                             {
-                                DataPtr[n] = (n & 1) != 0 ? Color1 : Color2;
+                                DataPtr[n] = ((n & 1) != 0) ? Color1 : Color2;
                             }
                             InvalidTexture.SetData(Data, InvalidTextureWidth, InvalidTextureHeight);
                         }
@@ -207,6 +202,7 @@ namespace ScePSP.Core.GpuBackEnd
 
                 byte* TexturePointer = null;
                 byte* ClutPointer = null;
+
                 try
                 {
                     TexturePointer = (byte*)PspMemory.PspAddressToPointerSafe(TextureAddress);
@@ -214,8 +210,7 @@ namespace ScePSP.Core.GpuBackEnd
                 }
                 catch (PspMemory.InvalidAddressException InvalidAddressException)
                 {
-                    //throw InvalidAddressException;
-                    Console.WriteLine("PspMemory.InvalidAddressException: " + InvalidAddressException);
+                    throw (InvalidAddressException);
                 }
 
                 TextureCacheKey TextureCacheKey = new TextureCacheKey()
@@ -224,7 +219,7 @@ namespace ScePSP.Core.GpuBackEnd
                     TextureFormat = TextureFormat,
                     TextureHash = FastHash(TexturePointer, TextureDataSize),
 
-                    ClutHash = FastHash(&ClutPointer[ClutDataStart], ClutDataSize),
+                    ClutHash = FastHash(&(ClutPointer[ClutDataStart]), ClutDataSize),
                     ClutAddress = ClutAddress,
                     ClutFormat = ClutFormat,
                     ClutStart = ClutStart,
@@ -232,25 +227,21 @@ namespace ScePSP.Core.GpuBackEnd
                     ClutMask = ClutMask,
                     Swizzled = Swizzled,
 
-                    ColorTestEnabled = GpuState.ColorTestState.Enabled,
-                    ColorTestRef = GpuState.ColorTestState.Ref,
-                    ColorTestMask = GpuState.ColorTestState.Mask,
-                    ColorTestFunction = GpuState.ColorTestState.Function,
+                    ColorTestEnabled = GpuState->ColorTestState.Enabled,
+                    ColorTestRef = GpuState->ColorTestState.Ref,
+                    ColorTestMask = GpuState->ColorTestState.Mask,
+                    ColorTestFunction = GpuState->ColorTestState.Function,
                 };
 
-                if (Texture == null || !Texture.TextureCacheKey.Equals(TextureCacheKey))
+                if (Texture == null || (!Texture.TextureCacheKey.Equals(TextureCacheKey)))
                 {
-                    string TextureName = "texture_" + TextureCacheKey.TextureHash + "_" + TextureCacheKey.ClutHash +
-                                         "_" + TextureFormat + "_" + ClutFormat + "_" + BufferWidth + "x" + Height +
-                                         "_" + Swizzled;
+                    string TextureName = "texture_" + TextureCacheKey.TextureHash + "_" + TextureCacheKey.ClutHash + "_" + TextureFormat + "_" + ClutFormat + "_" + BufferWidth + "x" + Height + "_" + Swizzled;
 #if DEBUG_TEXTURE_CACHE
-                    Console.Error.WriteLine($"UPDATE_TEXTURE TextureAddress 0x{TextureAddress:X8} ClutAddress 0x{ClutAddress:X8})");
 
-                    Console.Error.WriteLine("UPDATE_TEXTURE(TEX={0},CLUT={1}:{2}:{3}:{4}:0x{5:X},SIZE={6}x{7},{8},Swizzled={9})",
-                        TextureFormat, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask, BufferWidth, Height, BufferWidth, Swizzled);
+					Console.Error.WriteLine("UPDATE_TEXTURE(TEX={0},CLUT={1}:{2}:{3}:{4}:0x{5:X},SIZE={6}x{7},{8},Swizzled={9})", TextureFormat, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask, BufferWidth, Height, BufferWidth, Swizzled);
 #endif
                     Texture = new TTexture();
-                    Texture.Init();
+                    Texture.Init(BackEnd);
                     Texture.TextureCacheKey = TextureCacheKey;
                     //Texture.Hash = Hash1;
 
@@ -267,19 +258,11 @@ namespace ScePSP.Core.GpuBackEnd
                             {
                                 fixed (byte* SwizzlingBufferPointer = SwizzlingBuffer)
                                 {
-                                    new Span<byte>(TexturePointer, TextureDataSize).CopyTo(new Span<byte>(SwizzlingBufferPointer, TextureDataSize));
-
-                                    //byte[] buf = new byte[TextureDataSize];
-                                    //System.Runtime.InteropServices.Marshal.Copy((nint)SwizzlingBufferPointer, buf, 0, TextureDataSize);
-                                    //System.IO.File.WriteAllBytes(ApplicationPaths.AssertPath + "/" + TextureName + ".tex", buf);
-
+                                    PointerUtils.Memcpy(SwizzlingBuffer, TexturePointer, TextureDataSize);
                                     PixelFormatDecoder.UnswizzleInline(TextureFormat, (void*)SwizzlingBufferPointer, BufferWidth, Height);
-
                                     PixelFormatDecoder.Decode(
-                                        TextureFormat, (void*)SwizzlingBufferPointer, TexturePixelsPointer,
-                                        BufferWidth, Height,
-                                        ClutPointer, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask,
-                                        strideWidth: PixelFormatDecoder.GetPixelsSize(TextureFormat, TextureWidth)
+                                        TextureFormat, (void*)SwizzlingBufferPointer, TexturePixelsPointer, BufferWidth, Height,
+                                        ClutPointer, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask, strideWidth: PixelFormatDecoder.GetPixelsSize(TextureFormat, TextureWidth)
                                     );
                                 }
                             }
@@ -287,8 +270,7 @@ namespace ScePSP.Core.GpuBackEnd
                             {
                                 PixelFormatDecoder.Decode(
                                     TextureFormat, (void*)TexturePointer, TexturePixelsPointer, BufferWidth, Height,
-                                    ClutPointer, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask,
-                                    strideWidth: PixelFormatDecoder.GetPixelsSize(TextureFormat, TextureWidth)
+                                    ClutPointer, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask, strideWidth: PixelFormatDecoder.GetPixelsSize(TextureFormat, TextureWidth)
                                 );
                             }
 
@@ -298,38 +280,23 @@ namespace ScePSP.Core.GpuBackEnd
 
                                 switch (TextureCacheKey.ColorTestFunction)
                                 {
-                                    case ColorTestFunctionEnum.GuAlways:
-                                        EqualValue = 0xFF;
-                                        NotEqualValue = 0xFF;
-                                        break;
-                                    case ColorTestFunctionEnum.GuNever:
-                                        EqualValue = 0x00;
-                                        NotEqualValue = 0x00;
-                                        break;
-                                    case ColorTestFunctionEnum.GuEqual:
-                                        EqualValue = 0xFF;
-                                        NotEqualValue = 0x00;
-                                        break;
-                                    case ColorTestFunctionEnum.GuNotequal:
-                                        EqualValue = 0x00;
-                                        NotEqualValue = 0xFF;
-                                        break;
-                                    default: throw new NotImplementedException();
+                                    case ColorTestFunctionEnum.GU_ALWAYS: EqualValue = 0xFF; NotEqualValue = 0xFF; break;
+                                    case ColorTestFunctionEnum.GU_NEVER: EqualValue = 0x00; NotEqualValue = 0x00; break;
+                                    case ColorTestFunctionEnum.GU_EQUAL: EqualValue = 0xFF; NotEqualValue = 0x00; break;
+                                    case ColorTestFunctionEnum.GU_NOTEQUAL: EqualValue = 0x00; NotEqualValue = 0xFF; break;
+                                    default: throw (new NotImplementedException());
                                 }
 
                                 ConsoleUtils.SaveRestoreConsoleState(() =>
                                 {
                                     Console.BackgroundColor = ConsoleColor.Red;
                                     Console.ForegroundColor = ConsoleColor.Yellow;
-                                    Console.Error.WriteLine("ColorTest {0} : {1}, {2} : ref:{3} : mask:{4}",
-                                        TextureCacheKey.ColorTestFunction, EqualValue, NotEqualValue,
-                                        TextureCacheKey.ColorTestRef, TextureCacheKey.ColorTestMask);
+                                    Console.Error.WriteLine("{0} : {1}, {2} : ref:{3} : mask:{4}", TextureCacheKey.ColorTestFunction, EqualValue, NotEqualValue, TextureCacheKey.ColorTestRef, TextureCacheKey.ColorTestMask);
                                 });
 
                                 for (int n = 0; n < TextureWidthHeight; n++)
                                 {
-                                    if ((TexturePixelsPointer[n] & TextureCacheKey.ColorTestMask).Equals(
-                                        TextureCacheKey.ColorTestRef & TextureCacheKey.ColorTestMask))
+                                    if ((TexturePixelsPointer[n] & TextureCacheKey.ColorTestMask).Equals((TextureCacheKey.ColorTestRef & TextureCacheKey.ColorTestMask)))
                                     {
                                         TexturePixelsPointer[n].A = EqualValue;
                                     }
@@ -339,19 +306,12 @@ namespace ScePSP.Core.GpuBackEnd
                                     }
                                     if (TexturePixelsPointer[n].A == 0)
                                     {
-                                        //Console.Write("yup!");
+                                        //?
                                     }
                                 }
                             }
 
-                            //TextureCacheKey
-
-                            OnTextureReady?.Invoke(DecodedTextureBuffer, TextureWidth, TextureHeight, TextureCacheKey);
-
                             var Result = Texture.SetData(DecodedTextureBuffer, TextureWidth, TextureHeight);
-#if DEBUG_TEXTURE_CACHE
-                            Texture.Save(ApplicationPaths.AssertPath+"/"+ TextureName + ".bmp");
-#endif
                         }
                     }
                     if (Cache.ContainsKey(Hash1))

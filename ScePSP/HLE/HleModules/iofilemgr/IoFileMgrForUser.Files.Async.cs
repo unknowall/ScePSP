@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Cpu;
+﻿using ScePSP.Cpu;
 using ScePSP.Hle.Vfs;
 using System;
 
@@ -126,7 +126,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
         {
             var File = HleIoManager.HleIoDrvFileArgPool.Get(FileId);
             Result = File.AsyncLastResult;
-            CpuThreadState.Lo = (int)FileId;
+            CpuThreadState.LO = (int)FileId;
 
             return 0;
             /*
@@ -234,14 +234,14 @@ namespace ScePSP.Hle.Modules.iofilemgr
         /// <param name="FileId">The file descriptor to perform cancel on.</param>
         /// <returns>less than 0 on error.</returns>
         [HlePspFunction(NID = 0xE8BC6571, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceIoCancel(SceUID FileId)
         {
             throw new NotImplementedException();
         }
 
         [HlePspFunction(NID = 0x6D08A871, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceIoUnassign()
         {
             throw new NotImplementedException();
@@ -255,7 +255,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
         /// <param name="NotifyArgument">Pointer to an argument to pass to the callback.</param>
         /// <returns>Less than 0 on error</returns>
         [HlePspFunction(NID = 0xA12A0514, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceIoSetAsyncCallback(SceUID FileId, int CallbackId, int NotifyArgument)
         {
             throw new NotImplementedException();

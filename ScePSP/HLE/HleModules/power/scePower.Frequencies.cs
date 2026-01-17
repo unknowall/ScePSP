@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Cpu;
+﻿using ScePSP.Cpu;
 
 namespace ScePSP.Hle.Modules.power
 {

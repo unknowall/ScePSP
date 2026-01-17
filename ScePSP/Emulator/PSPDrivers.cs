@@ -1,21 +1,18 @@
 ﻿using ScePSP.cheats;
-using ScePSP.Core;
-using ScePSP.Core.AudioBackEnd;
-using ScePSP.Core.AudioBackEnd.Null;
-using ScePSP.Core.AudioBackEnd.SDL;
-using ScePSP.Core.Components.Battery;
-using ScePSP.Core.Components.Controller;
-using ScePSP.Core.Components.Crypto;
-using ScePSP.Core.Components.Display;
-using ScePSP.Core.Components.Rtc;
-using ScePSP.Core.Cpu;
-using ScePSP.Core.Cpu.Dynarec;
-using ScePSP.Core.Cpu.InstructionCache;
-using ScePSP.Core.GpuBackEnd;
-using ScePSP.Core.GpuBackEnd.Null;
-using ScePSP.Core.GpuBackEnd.OpenGL;
-using ScePSP.Core.GpuBackEnd.Soft;
-using ScePSP.Core.Memory;
+using ScePSP.BackEnd.NullAudio;
+using ScePSP.BackEnd.SDL;
+using ScePSP.Devices.Battery;
+using ScePSP.Devices.Controller;
+using ScePSP.Devices.Crypto;
+using ScePSP.Devices.Display;
+using ScePSP.Devices.Rtc;
+using ScePSP.Cpu;
+using ScePSP.Cpu.Dynarec;
+using ScePSP.Cpu.InstructionCache;
+using ScePSP.BackEnd;
+using ScePSP.BackEnd.OpenGL;
+using ScePSP.Memory;
+using ScePSP.GE;
 using ScePSP.Hle;
 using ScePSP.Hle.Formats;
 using ScePSP.Hle.Interop;
@@ -35,7 +32,7 @@ using ScePSP.Runner;
 using ScePSP.Runner.Tasks.Audio;
 using ScePSP.Runner.Tasks.Cpu;
 using ScePSP.Runner.Tasks.Display;
-using ScePSP.Runner.Tasks.Gpu;
+using ScePSP.Runner.Tasks.GE;
 using System;
 using System.Collections.Generic;
 using static ScePSP.Hle.Modules.iofilemgr.IoFileMgrForUser;
@@ -47,13 +44,15 @@ namespace ScePSP
     {
         public static bool Inited = false;
 
+        public static bool Runing = false;
+
         public static PspRunner Runner;
 
         public static CpuProcessor CPU;
 
         public static ICpuConnector CpuConnector;
 
-        public static IGpuConnector GpuConnector;
+        public static IGEConnector GEConnector;
 
         public static IInterruptManager InterruptManager;
 
@@ -61,7 +60,7 @@ namespace ScePSP
 
         public static DynarecFunctionCompiler DynarecFunctionCompiler;
 
-        public static GpuProcessor GE;
+        public static GEList GEList;
 
         public static PspAudio PspAudio;
 
@@ -69,7 +68,7 @@ namespace ScePSP
 
         public static PspRtc PspRtc;
 
-        public static GpuBackEnd GpuBackEnd;
+        public static GEBackEnd GeBackEnd;
 
         public static AudioBackEnd AudioBackEnd;
 
@@ -96,7 +95,7 @@ namespace ScePSP
         {
             public static CpuTask CpuTask;
 
-            public static GpuTask GpuTask;
+            public static GETask GpuTask;
 
             public static AudioTask AudioTask;
 
@@ -171,8 +170,6 @@ namespace ScePSP
 
             public static Kirk Kirk;
 
-            public static PspDisplay Display;
-
             public static PspController PspController;
         }
 
@@ -181,8 +178,6 @@ namespace ScePSP
             public static PspStoredConfig StoredConfig;
 
             public static CpuConfig CpuConfig;
-
-            public static GpuConfig GpuConfig;
 
             public static ElfConfig ElfConfig;
 
@@ -196,7 +191,6 @@ namespace ScePSP
         public enum PspGpuType
         {
             OpenGL,
-            Soft,
             Null
         }
 
@@ -210,7 +204,6 @@ namespace ScePSP
         {
             Config.StoredConfig = new PspStoredConfig();
             Config.CpuConfig = new CpuConfig();
-            Config.GpuConfig = new GpuConfig();
             Config.ElfConfig = new ElfConfig();
             Config.HleConfig = new HleConfig();
             Config.DisplayConfig = new DisplayConfig();
@@ -234,7 +227,7 @@ namespace ScePSP
             DynarecFunctionCompiler = new DynarecFunctionCompiler();
             MethodCache = new MethodCache();
 
-            GE = new GpuProcessor();
+            GEList = new GEList();
             PspRtc = new PspRtc();
             PspAudio = new PspAudio();
             PspDisplay = new PspDisplay();
@@ -243,7 +236,6 @@ namespace ScePSP
 
             Loader = new ElfPspLoader();
 
-            Devices.Display = new PspDisplay();
             Devices.PspBattery = new Battery();
             Devices.Kirk = new Kirk();
             Devices.PspController = new PspController();
@@ -251,13 +243,11 @@ namespace ScePSP
             switch (gpu)
             {
                 case PspGpuType.OpenGL:
-                    GpuBackEnd = new OpenglBackEnd();
+                    GeBackEnd = new GLBackEnd();
                     break;
-                case PspGpuType.Soft:
-                    GpuBackEnd = new SoftBackEnd();
                     break;
                 case PspGpuType.Null:
-                    GpuBackEnd = new NullBackEnd();
+                    GeBackEnd = new NullRender();
                     break;
             }
 
@@ -296,15 +286,19 @@ namespace ScePSP
             HleModules.KDebugForKernel = new KDebugForKernel();
 
             CpuConnector = HLE.HleThreadManager;
-            GpuConnector = HLE.HleThreadManager;
+            GEConnector = HLE.HleThreadManager;
             InterruptManager = HLE.HleInterruptManager;
 
             Tasks.CpuTask = new CpuTask();
-            Tasks.GpuTask = new GpuTask();
+            Tasks.GpuTask = new GETask();
             Tasks.AudioTask = new AudioTask();
             Tasks.DisplayTask = new DisplayTask();
 
+            Tasks.DisplayTask.type = gpu;
+
             Runner = new PspRunner();
+
+            Runing = true;
 
             Inited = true;
         }
@@ -312,6 +306,8 @@ namespace ScePSP
         public static void free()
         {
             if (!Inited) return;
+
+            Runing = false;
 
             PspMemory.Dispose();
 

@@ -62,7 +62,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="BufferLength">Length of the temporary buffer</param>
         /// <returns>0 on sucess, less than 0 on error.</returns>
         [HlePspFunction(NID = 0x244172AF, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetResolverCreate(int* PointerToResolverId, void* Buffer, int BufferLength)
         {
             var Resolver = new Resolver();

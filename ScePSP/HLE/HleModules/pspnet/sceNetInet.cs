@@ -430,7 +430,7 @@ namespace ScePSP.Hle.Modules.pspnet
 
 
         [HlePspFunction(NID = 0x8CA3A97E, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetInetGetPspError()
         {
             return 0;

@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.AudioBackEnd;
+﻿using ScePSP.BackEnd;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
 
@@ -20,7 +20,7 @@ namespace ScePSP.Hle.Modules.audio
         /// </summary>
         /// <returns></returns>
         [HlePspFunction(NID = 0x67585DFD, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceVaudioChRelease()
         {
             if (!PspVaudioChannel.IsReserved)
@@ -88,7 +88,7 @@ namespace ScePSP.Hle.Modules.audio
         /// <param name="Volume"></param>
         /// <param name="Buffer"></param>
         [HlePspFunction(NID = 0x8986295E, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public void sceVaudioOutputBlocking(int Volume, byte* Buffer)
         {
             if (Buffer == null) throw new SceKernelException(SceKernelErrors.ERROR_AUDIO_PRIV_REQUIRED);
@@ -122,7 +122,7 @@ namespace ScePSP.Hle.Modules.audio
         /// <param name="Volume"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x346FBE94, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceVaudioSetEffectType(int Type, int Volume)
         {
             return 0;
@@ -134,7 +134,7 @@ namespace ScePSP.Hle.Modules.audio
         /// <param name="AlcMode"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xCBD4AC51, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceVaudioSetAlcMode(int AlcMode)
         {
             return 0;

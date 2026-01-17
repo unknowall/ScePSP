@@ -23,25 +23,27 @@ namespace SafeILGenerator.Ast
 
         public AstNodeStmComment Comment(string comment) => new AstNodeStmComment(comment);
 
-        public AstNodeExprArgument Argument(Type type, int index, string name = null) => new AstNodeExprArgument(new AstArgument(index, type, name));
+        public AstNodeExprArgument Argument(Type type, int index, string name = null) =>
+            new AstNodeExprArgument(new AstArgument(index, type, name));
 
         public AstNodeExprArgument Argument<T>(int index, string name = null) => Argument(typeof(T), index, name);
-
         public AstNodeExprArgument Argument(AstArgument astArgument) => new AstNodeExprArgument(astArgument);
-
         public AstNodeExprLocal Local(AstLocal astLocal) => new AstNodeExprLocal(astLocal);
-
         public AstNodeStmGoto GotoAlways(AstLabel astLabel) => new AstNodeStmGotoAlways(astLabel);
 
-        public AstNodeStmGotoIfTrue GotoIfTrue(AstLabel astLabel, AstNodeExpr condition) => new AstNodeStmGotoIfTrue(astLabel, condition);
+        public AstNodeStmGotoIfTrue GotoIfTrue(AstLabel astLabel, AstNodeExpr condition) =>
+            new AstNodeStmGotoIfTrue(astLabel, condition);
 
-        public AstNodeStmGotoIfFalse GotoIfFalse(AstLabel astLabel, AstNodeExpr condition) => new AstNodeStmGotoIfFalse(astLabel, condition);
+        public AstNodeStmGotoIfFalse GotoIfFalse(AstLabel astLabel, AstNodeExpr condition) =>
+            new AstNodeStmGotoIfFalse(astLabel, condition);
 
         public AstNodeStmLabel Label(AstLabel astLabel) => new AstNodeStmLabel(astLabel);
 
-        public AstNodeExprFieldAccess FieldAccess(AstNodeExpr instance, FieldInfo fieldInfo, string fieldName = "") => new AstNodeExprFieldAccess(instance, fieldInfo, fieldName);
+        public AstNodeExprFieldAccess FieldAccess(AstNodeExpr instance, FieldInfo fieldInfo, string fieldName = "") =>
+            new AstNodeExprFieldAccess(instance, fieldInfo, fieldName);
 
-        public AstNodeExprFieldAccess FieldAccess(AstNodeExpr instance, string fieldName) => new AstNodeExprFieldAccess(instance, fieldName);
+        public AstNodeExprFieldAccess FieldAccess(AstNodeExpr instance, string fieldName) =>
+            new AstNodeExprFieldAccess(instance, fieldName);
 
         public AstNodeExprLValue FieldPropertyAccess(AstNodeExpr instance, string fieldPropertyName)
         {
@@ -127,14 +129,14 @@ namespace SafeILGenerator.Ast
             Indirect(Cast(type.MakePointerType(), GetAddress(value), Explicit: false));
 
         public AstNodeExprIndirect Indirect(AstNodeExpr pointerExpr) => new AstNodeExprIndirect(pointerExpr);
-        public AstNodeStm DebugWrite(string text) => Statement(CallStatic((Action<string>)Console.WriteLine, text));
+        public AstNodeStm DebugWrite(string text) => Statement(CallStatic((Action<string>) Console.WriteLine, text));
         public AstNodeExprLValue StaticFieldAccess(FieldInfo fieldInfo) => new AstNodeExprStaticFieldAccess(fieldInfo);
 
         public AstNodeExprLValue StaticFieldAccess<T>(Expression<Func<T>> expression) =>
             StaticFieldAccess(_fieldof(expression));
 
         private static FieldInfo _fieldof<T>(Expression<Func<T>> expression) =>
-            (FieldInfo)((MemberExpression)expression.Body).Member;
+            (FieldInfo) ((MemberExpression) expression.Body).Member;
 
         public AstNodeCase Case(object value, AstNodeStm code) => new AstNodeCase(value, code);
         public AstNodeCaseDefault Default(AstNodeStm code) => new AstNodeCaseDefault(code);

@@ -1,10 +1,10 @@
 ﻿using SafeILGenerator.Ast.Generators;
 using SafeILGenerator.Ast.Nodes;
 using SafeILGenerator.Utils;
-using ScePSP.Core.Cpu;
-using ScePSP.Core.Cpu.Dynarec.Ast;
-using ScePSP.Core.Cpu.Emitter;
-using ScePSP.Core.Memory;
+using ScePSP.Cpu;
+using ScePSP.Cpu.Dynarec.Ast;
+using ScePSP.Cpu.Emitter;
+using ScePSP.Memory;
 using ScePSP.Hle.Managers;
 using ScePSPUtils;
 using ScePSPUtils.Extensions;
@@ -24,15 +24,15 @@ namespace ScePSP.Hle
 
         internal HleConfig HleConfig => PSPDrivers.Config.HleConfig;
 
-        private IlInstanceHolderPoolItem _ThisILInstanceHolder = null;
+        private ILInstanceHolderPoolItem _ThisILInstanceHolder = null;
 
-        private IlInstanceHolderPoolItem ThisILInstanceHolder
+        private ILInstanceHolderPoolItem ThisILInstanceHolder
         {
             get
             {
                 if (_ThisILInstanceHolder == null)
                 {
-                    this._ThisILInstanceHolder = IlInstanceHolder.Alloc(this.GetType(), this);
+                    this._ThisILInstanceHolder = ILInstanceHolder.Alloc(this.GetType(), this);
                 }
                 return _ThisILInstanceHolder;
             }
@@ -70,12 +70,12 @@ namespace ScePSP.Hle
 
             protected override object ReadFromFpr(Type Type, int Index)
             {
-                return this.CpuThreadState.Fpr[Index];
+                return this.CpuThreadState.FPR[Index];
             }
 
             protected override object ReadFromGpr(Type Type, int Index)
             {
-                return this.CpuThreadState.Gpr[Index];
+                return this.CpuThreadState.GPR[Index];
             }
 
             protected override object ReadFromStack(Type Type, int Index)
@@ -83,12 +83,12 @@ namespace ScePSP.Hle
                 if (Type == typeof(int) || Type == typeof(uint))
                 {
                     return CpuThreadState.Memory.ReadSafe<uint>(
-                        (uint)(this.CpuThreadState.Gpr[29] + (MaxGprIndex - Index) * 4));
+                        (uint)(this.CpuThreadState.GPR[29] + (MaxGprIndex - Index) * 4));
                 }
                 if (Type == typeof(long) || Type == typeof(ulong))
                 {
                     return CpuThreadState.Memory.ReadSafe<ulong>(
-                        (uint)(this.CpuThreadState.Gpr[29] + (MaxGprIndex - Index) * 4));
+                        (uint)(this.CpuThreadState.GPR[29] + (MaxGprIndex - Index) * 4));
                 }
                 throw new NotImplementedException("Invalid operation");
             }
@@ -108,12 +108,12 @@ namespace ScePSP.Hle
 
             protected override AstNodeExpr ReadFromFpr(Type Type, int Index)
             {
-                return ast.Fpr(Index);
+                return ast.FPR(Index);
             }
 
             protected override AstNodeExpr ReadFromGpr(Type Type, int Index)
             {
-                return ast.Gpr(Type, Index);
+                return ast.GPR(Type, Index);
             }
 
             protected override AstNodeExpr ReadFromStack(Type Type, int Index)
@@ -239,7 +239,7 @@ namespace ScePSP.Hle
                     // The CpuThreadState
                     if (ParameterType == typeof(CpuThreadState))
                     {
-                        AstParameters.Add(ast.CpuThreadStateExpr);
+                        AstParameters.Add(ast.CpuThreadState);
                     }
                     // A stringz
                     else if (ParameterType == typeof(string))
@@ -247,7 +247,7 @@ namespace ScePSP.Hle
                         AstParameters.Add(
                             ast.CallStatic(
                                 (Func<CpuThreadState, uint, string>)HleModuleHost.StringFromAddress,
-                                ast.CpuThreadStateExpr,
+                                ast.CpuThreadState,
                                 RegisterReader.Read<uint>(ParameterInfo)
                             )
                         );
@@ -261,10 +261,10 @@ namespace ScePSP.Hle
                                 ast.MemoryGetPointer(
                                     CpuProcessor.Memory,
                                     RegisterReader.Read<uint>(ParameterInfo),
-                                    safe: true,
-                                    errorDescription: "Invalid Pointer for Argument '" + ParameterType.Name + " " +
+                                    Safe: true,
+                                    ErrorDescription: "Invalid Pointer for Argument '" + ParameterType.Name + " " +
                                                       ParameterInfo.Name + "'",
-                                    invalidAddress: InvalidAddressAsEnum
+                                    InvalidAddress: InvalidAddressAsEnum
                                 )
                             )
                         );
@@ -298,7 +298,7 @@ namespace ScePSP.Hle
 
                         AstParameters.Add(ast.Cast(ParameterType, ast.CallStatic(
                             (Func<CpuThreadState, Type, int, bool, object>)GetObjectFromPoolHelper,
-                            ast.CpuThreadStateExpr,
+                            ast.CpuThreadState,
                             ast.Immediate(ParameterType),
                             RegisterReader.Read<int>(ParameterInfo),
                             InvalidAddressAsEnum == InvalidAddressAsEnum.Null
@@ -324,7 +324,7 @@ namespace ScePSP.Hle
             else if (AstMethodCall.Type == typeof(long))
                 AstNodes.AddStatement(ast.Assign(ast.GPR_l(2), ast.Cast<long>(AstMethodCall)));
             else if (AstMethodCall.Type == typeof(float))
-                AstNodes.AddStatement(ast.Assign(ast.Fpr(0), ast.Cast<float>(AstMethodCall)));
+                AstNodes.AddStatement(ast.Assign(ast.FPR(0), ast.Cast<float>(AstMethodCall)));
             else if (AstMethodCall.Type.IsClass)
             {
                 if (!AstMethodCall.Type.Implements(typeof(IHleUidPoolClass)))
@@ -333,16 +333,16 @@ namespace ScePSP.Hle
                         $"Can't use a class '{AstMethodCall.Type}' not implementing IHleUidPoolClass as return value");
                 }
                 AstNodes.AddStatement(ast.Assign(
-                    ast.Gpr(2),
+                    ast.GPR(2),
                     ast.CallStatic(
                         (Func<CpuThreadState, Type, IHleUidPoolClass, uint>)GetOrAllocIndexFromPoolHelper,
-                        ast.CpuThreadStateExpr,
+                        ast.CpuThreadState,
                         ast.Immediate(AstMethodCall.Type),
                         ast.Cast<IHleUidPoolClass>(AstMethodCall)
                     )
                 ));
             }
-            else AstNodes.AddStatement(ast.Assign(ast.Gpr(2), ast.Cast<uint>(AstMethodCall)));
+            else AstNodes.AddStatement(ast.Assign(ast.GPR(2), ast.Cast<uint>(AstMethodCall)));
 
             return AstNodes;
         }
@@ -355,8 +355,8 @@ namespace ScePSP.Hle
             }
 
             bool SkipLog = HlePspFunctionAttribute.SkipLog;
-            var NotImplementedAttribute = (HlePspNotImplementedAttribute)MethodInfo
-                .GetCustomAttributes(typeof(HlePspNotImplementedAttribute), true).FirstOrDefault();
+            var NotImplementedAttribute = (HleTrackCallAttribute)MethodInfo
+                .GetCustomAttributes(typeof(HleTrackCallAttribute), true).FirstOrDefault();
             bool NotImplementedFunc = NotImplementedAttribute != null && NotImplementedAttribute.Notice;
 
             List<ParamInfo> ParamInfoList;
@@ -369,7 +369,7 @@ namespace ScePSP.Hle
                 )
             );
 
-            var Delegate = AstNodeExtensions.GeneratorIlPsp.GenerateDelegate<Action<CpuThreadState>>(
+            var Delegate = AstNodeExtensions._GeneratorILPsp.GenerateDelegate<Action<CpuThreadState>>(
                 $"Proxy_{this.GetType().Name}_{MethodInfo.Name}", AstNodes
             );
 
@@ -378,7 +378,7 @@ namespace ScePSP.Hle
             return (CpuThreadState) =>
             {
                 bool Trace = !SkipLog && CpuThreadState.CpuProcessor.CpuConfig.DebugSyscalls;
-                bool NotImplemented = NotImplementedFunc && HleConfig.DebugNotImplemented;
+                bool NotImplemented = NotImplementedFunc && HleConfig.DebugHLECall;
 
                 if (Trace && MethodInfo.DeclaringType.Name == "Kernel_Library") Trace = false;
 
@@ -407,7 +407,7 @@ namespace ScePSP.Hle
                             "Thread({0}:'{1}') : RA(0x{2:X})",
                             ThreadManager.Current.Id,
                             ThreadManager.Current.Name,
-                            ThreadManager.Current.CpuThreadState.Ra
+                            ThreadManager.Current.CpuThreadState.RA
                         );
                     }
                     else
@@ -442,7 +442,7 @@ namespace ScePSP.Hle
 
                 try
                 {
-                    CpuThreadState.Pc = CpuThreadState.Ra;
+                    CpuThreadState.PC = CpuThreadState.RA;
                     Delegate(CpuThreadState);
                 }
                 catch (InvalidProgramException)
@@ -450,7 +450,7 @@ namespace ScePSP.Hle
                     Console.WriteLine("CALLING: {0}", MethodInfo);
                     Console.WriteLine("{0}", new GeneratorCSharp().GenerateRoot(AstNodes).ToString());
 
-                    foreach (var Line in AstNodeExtensions.GeneratorIlPsp.GenerateToStringList(MethodInfo, AstNodes))
+                    foreach (var Line in AstNodeExtensions._GeneratorILPsp.GenerateToStringList(MethodInfo, AstNodes))
                     {
                         Console.WriteLine(Line);
                     }
@@ -459,11 +459,11 @@ namespace ScePSP.Hle
                 }
                 catch (MemoryPartitionNoMemoryException)
                 {
-                    CpuThreadState.Gpr[2] = (int)SceKernelErrors.ERROR_ERRNO_NO_MEMORY;
+                    CpuThreadState.GPR[2] = (int)SceKernelErrors.ERROR_ERRNO_NO_MEMORY;
                 }
                 catch (SceKernelException SceKernelException)
                 {
-                    CpuThreadState.Gpr[2] = (int)SceKernelException.SceKernelError;
+                    CpuThreadState.GPR[2] = (int)SceKernelException.SceKernelError;
                 }
                 catch (SceKernelSelfStopUnloadModuleException)
                 {
@@ -485,8 +485,8 @@ namespace ScePSP.Hle
                         Out.WriteLine(" : {0}",
                             ToNormalizedTypeString(MethodInfo.ReturnType, CpuThreadState,
                                 MethodInfo.ReturnType == typeof(float)
-                                    ? (object)CpuThreadState.Fpr[0]
-                                    : (object)CpuThreadState.Gpr[2]));
+                                    ? (object)CpuThreadState.FPR[0]
+                                    : (object)CpuThreadState.GPR[2]));
                         Out.WriteLine("");
                     }
                 }

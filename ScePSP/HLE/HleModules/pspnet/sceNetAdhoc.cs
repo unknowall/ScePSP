@@ -28,7 +28,7 @@ namespace ScePSP.Hle.Modules.pspnet
         ///		Less than 0 on error.
         /// </returns>
         [HlePspFunction(NID = 0xA62C6F57, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocTerm()
         {
             return 0;
@@ -39,7 +39,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// </summary>
         /// <returns></returns>
         [HlePspFunction(NID = 0x7A662D6B, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocPollSocket(int socketAddress, int count, int timeout, int nonblock)
         {
             return -1;
@@ -66,7 +66,7 @@ namespace ScePSP.Hle.Modules.pspnet
         ///	</returns>
         /// 
         [HlePspFunction(NID = 0x6F92741B, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public PDP sceNetAdhocPdpCreate(byte* mac, ushort port, uint bufsize, int unk1)
         {
             //throw(new NotImplementedException());
@@ -83,7 +83,7 @@ namespace ScePSP.Hle.Modules.pspnet
         ///		Less than 0 on error.
         /// </returns>
         [HlePspFunction(NID = 0x7F27BB5E, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocPdpDelete(PDP PDP, int unk1)
         {
             PDP.RemoveUid();
@@ -102,7 +102,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="nonblock">Set to 0 to block, 1 for non-blocking.</param>
         /// <returns>Bytes sent, &lt; 0 on error</returns>
         [HlePspFunction(NID = 0xABED3790, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocPdpSend(PDP PDP, byte* destMacAddr, ushort port, void* data, uint len, uint timeout,
             int nonblock)
         {
@@ -124,7 +124,7 @@ namespace ScePSP.Hle.Modules.pspnet
         ///		less than 0 on error.
         /// </returns>
         [HlePspFunction(NID = 0xDFE53E03, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocPdpRecv(PDP PDP, byte* srcMacAddr, ushort* port, void* data, void* dataLength, uint timeout,
             int nonblock)
         {
@@ -139,7 +139,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="stat">Pointer to a list of ::pspStatStruct structures.</param>
         /// <returns> on success, &lt; 0 on error</returns>
         [HlePspFunction(NID = 0xC7C1FC57, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocGetPdpStat(int* size, pdpStatStruct* stat)
         {
             throw new NotImplementedException();
@@ -152,7 +152,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="size">Size of the game data.</param>
         /// <returns>0 on success, &lt; 0 on error.</returns>
         [HlePspFunction(NID = 0x7F75C338, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocGameModeCreateMaster(void* data, int size)
         {
             throw new NotImplementedException();
@@ -166,7 +166,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="size">Size of the game data.</param>
         /// <returns>The id of the replica on success, &lt; 0 on error.</returns>
         [HlePspFunction(NID = 0x3278AB0C, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocGameModeCreateReplica(byte* mac, void* data, int size)
         {
             throw new NotImplementedException();
@@ -177,7 +177,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// </summary>
         /// <returns>0 on success, &lt; 0 on error.</returns>
         [HlePspFunction(NID = 0x98C204C8, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocGameModeUpdateMaster()
         {
             throw new NotImplementedException();
@@ -190,7 +190,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="unk1">Pass 0.</param>
         /// <returns>0 on success, &lt; 0 on error.</returns>
         [HlePspFunction(NID = 0xFA324B4E, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocGameModeUpdateReplica(int id, int unk1)
         {
             throw new NotImplementedException();
@@ -201,7 +201,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// </summary>
         /// <returns>0 on success, &lt; 0 on error.</returns>
         [HlePspFunction(NID = 0xA0229362, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocGameModeDeleteMaster()
         {
             throw new NotImplementedException();
@@ -213,7 +213,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="id">The ID of the replica</param>
         /// <returns>0 on success, &lt; 0 on error.</returns>
         [HlePspFunction(NID = 0x0B2228E9, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocGameModeDeleteReplica(int id)
         {
             throw new NotImplementedException();

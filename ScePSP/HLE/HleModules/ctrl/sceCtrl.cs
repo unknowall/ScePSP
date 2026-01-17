@@ -1,5 +1,5 @@
-﻿using ScePSP.Core.Components.Controller;
-using ScePSP.Core.Types.Controller;
+﻿using ScePSP.Devices.Controller;
+using ScePSP.Types.Controller;
 using ScePSP.Hle.Attributes;
 
 namespace ScePSP.Hle.Modules.ctrl
@@ -168,21 +168,21 @@ namespace ScePSP.Hle.Modules.ctrl
         ///		Less than 0 on error
         /// </returns>
         [HlePspFunction(NID = 0xA7144800, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceCtrlSetIdleCancelThreshold(int idlereset, int idleback)
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xC152080A, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceCtrlPeekBufferNegative()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xA68FD260, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceCtrlClearRapidFire()
         {
             return 0;
@@ -195,21 +195,21 @@ namespace ScePSP.Hle.Modules.ctrl
         /// <param name="idleback">Movement needed by the analog to bring the PSP back from an idle state.</param>
         /// <returns>&lt; 0 on error.</returns>
         [HlePspFunction(NID = 0x687660FA, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceCtrlGetIdleCancelThreshold(int* idlerest, int* idleback)
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x6841BE1A, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceCtrlSetRapidFire()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x60B81F86, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceCtrlReadBufferNegative()
         {
             return 0;
@@ -221,7 +221,7 @@ namespace ScePSP.Hle.Modules.ctrl
         /// <param name="pcycle">Return value.</param>
         /// <returns>Return 0</returns>
         [HlePspFunction(NID = 0x02BAAD91, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceCtrlGetSamplingCycle(int* pcycle)
         {
             return 0;

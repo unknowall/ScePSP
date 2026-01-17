@@ -1,4 +1,4 @@
-﻿namespace ScePSP.Core.Cpu.VFpu
+﻿namespace ScePSP.Cpu.VFpu
 {
     public class VfpuCell
     {
@@ -6,11 +6,11 @@
         public readonly int Column;
         public readonly int Row;
 
-        public VfpuCell(int matrix, int column, int row)
+        public VfpuCell(int Matrix, int Column, int Row)
         {
-            Matrix = matrix;
-            Column = column;
-            Row = row;
+            this.Matrix = Matrix;
+            this.Column = Column;
+            this.Row = Row;
         }
     }
 }

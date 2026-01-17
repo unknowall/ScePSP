@@ -16,7 +16,7 @@ namespace ScePSP.Hle.Modules.openpsid
         /// <param name="OpenPSID"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xC69BEBCE, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceOpenPSIDGetOpenPSID(PspOpenPSID* OpenPSID)
         {
             var DummyPspOpenPSID = default(PspOpenPSID);

@@ -1,6 +1,6 @@
 ﻿#define MUTEX_USE_WAIT_CALLBACK
 
-using ScePSP.Core.Cpu;
+using ScePSP.Cpu;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -162,7 +162,7 @@ namespace ScePSP.Hle.Modules.threadman
         /// 
         /// </summary>
         [HlePspFunction(NID = 0x5BF4DD27, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelLockMutexCB(CpuThreadState CpuThreadState, PspMutex Mutex, int Count, uint* Timeout)
         {
             return sceKernelLockMutex(CpuThreadState, Mutex, Count, Timeout);

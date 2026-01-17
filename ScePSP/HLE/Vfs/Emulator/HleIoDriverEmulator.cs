@@ -1,5 +1,5 @@
 ﻿using ScePSP.Core;
-using ScePSP.Core.Components.Display;
+using ScePSP.Devices.Display;
 using System;
 using System.Drawing.Imaging;
 using System.Text;

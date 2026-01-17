@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Cpu;
+﻿using ScePSP.Cpu;
 using ScePSP.Hle.Managers;
 
 namespace ScePSP.Hle.Modules.threadman
@@ -37,7 +37,7 @@ namespace ScePSP.Hle.Modules.threadman
         /// <param name="Argument2">Passed as arg2 into the callback function</param>
         /// <returns>0 on success, less than 0 on error</returns>
         [HlePspFunction(NID = 0xC11BA8C4, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelNotifyCallback(int CallbackId, int Argument2)
         {
             var Callback = CallbackManager.Callbacks.Get(CallbackId);
@@ -82,7 +82,7 @@ namespace ScePSP.Hle.Modules.threadman
         /// <param name="cb">The UID of the specified callback</param>
         /// <returns>The callback count, less than 0 on error</returns>
         [HlePspFunction(NID = 0x2A3D44FF, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelGetCallbackCount(int cb)
         {
             return 0;

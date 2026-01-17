@@ -1,5 +1,5 @@
-﻿using ScePSP.Core.AudioBackEnd;
-using ScePSP.Core.Cpu;
+﻿using ScePSP.BackEnd;
+using ScePSP.Cpu;
 using ScePSP.Hle.Attributes;
 using System;
 using System.Linq;
@@ -72,7 +72,7 @@ namespace ScePSP.Hle.Modules.audio
         /// <param name="SampleCount">The number of samples to output in one output call (min 17, max 4111).</param>
         /// <returns>0 on success, an error if less than 0.</returns>
         [HlePspFunction(NID = 0x01562BA3, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAudioOutput2Reserve(int SampleCount)
         {
             if (!IsValidSampleCountOutput2(SampleCount))
@@ -507,7 +507,7 @@ namespace ScePSP.Hle.Modules.audio
             if (!IsValidSampleCountOutput2(SampleCount))
                 throw new SceKernelException(SceKernelErrors.ERROR_INVALID_SIZE);
             _sceAudioChReserve(() => PspAudio.SrcOutput2Channel, SampleCount,
-                Channels == 2 ? Core.AudioBackEnd.PspAudio.FormatEnum.Stereo : Core.AudioBackEnd.PspAudio.FormatEnum.Mono);
+                Channels == 2 ? BackEnd.PspAudio.FormatEnum.Stereo : BackEnd.PspAudio.FormatEnum.Mono);
             PspAudio.SrcOutput2Channel.Frequency = Frequency;
             return 0;
         }
@@ -562,7 +562,7 @@ namespace ScePSP.Hle.Modules.audio
         /// </summary>
         /// <returns>Number of samples to be played, an error if less than 0.</returns>
         [HlePspFunction(NID = 0x647CEF33, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAudioOutput2GetRestSample()
         {
             //throw (new NotImplementedException());
@@ -575,7 +575,7 @@ namespace ScePSP.Hle.Modules.audio
         /// <param name="parameters">A pointer to a <see cref="pspAudioInputParams"/> struct.</param>
         /// <returns>0 on success, an error if less than 0.</returns>
         [HlePspFunction(NID = 0xE926D3FB, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceAudioInputInitEx(pspAudioInputParams* parameters)
         {
             return 0;

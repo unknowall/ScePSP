@@ -255,7 +255,7 @@ namespace ScePSP.Hle.Modules.threadman
         /// <param name="NumWaitThread"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xCD203292, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelCancelEventFlag(HleEventFlag EventFlag, int NewPattern, int* NumWaitThread)
         {
             foreach (var WaitingThread in EventFlag.WaitingThreads)

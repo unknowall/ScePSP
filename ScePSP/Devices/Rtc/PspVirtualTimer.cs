@@ -1,7 +1,7 @@
 ﻿using ScePSPUtils.Extensions;
 using System;
 
-namespace ScePSP.Core.Components.Rtc
+namespace ScePSP.Devices.Rtc
 {
     public class PspVirtualTimer
     {

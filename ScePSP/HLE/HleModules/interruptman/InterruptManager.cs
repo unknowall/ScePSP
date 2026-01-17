@@ -30,7 +30,7 @@ namespace ScePSP.Hle.Modules.interruptman
         /// <param name="CallbackArgument">An argument passed to the interrupt handler</param>
         /// <returns>Less than 0 on error</returns>
         [HlePspFunction(NID = 0xCA04A2B9, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelRegisterSubIntrHandler(PspInterrupts PspInterrupt, int HandlerIndex, uint CallbackAddress,
             uint CallbackArgument)
         {

@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Memory;
+﻿using ScePSP.Memory;
 using System.Text;
 
 namespace ScePSP.Hle.Modules.iofilemgr
@@ -47,7 +47,7 @@ namespace ScePSP.Hle.Modules.iofilemgr
         /// <param name="PspIoDrv">Pointer to a filled out driver structure</param>
         /// <returns>Less than 0 on error.</returns>
         [HlePspFunction(NID = 0x8E982A74, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceIoAddDrv(PspIoDrv* PspIoDrv)
         {
             var Name = Memory.ReadStringz(PspIoDrv->name, Encoding.UTF8);

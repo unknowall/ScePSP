@@ -10,7 +10,7 @@ namespace ScePSP.Hle.Modules.utility
         /// <param name="Params">Dialog parameters</param>
         /// <returns>0 on success</returns>
         [HlePspFunction(NID = 0x2AD8E239, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityMsgDialogInitStart(pspUtilityMsgDialogParams* Params)
         {
             var Message = Params->Message;
@@ -46,7 +46,7 @@ namespace ScePSP.Hle.Modules.utility
         /// you get a status of 4.
         /// </summary>
         [HlePspFunction(NID = 0x67AF3428, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public void sceUtilityMsgDialogShutdownStart()
         {
             CurrentDialogStep = DialogStepEnum.SHUTDOWN;
@@ -85,7 +85,7 @@ namespace ScePSP.Hle.Modules.utility
         }
 
         [HlePspFunction(NID = 0x4928BD96, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityMsgDialogAbort()
         {
             return 0;

@@ -1,5 +1,5 @@
 ﻿using SafeILGenerator.Utils;
-using ScePSP.Core.Cpu;
+using ScePSP.Cpu;
 using ScePSPUtils;
 using System;
 using System.Collections.Generic;
@@ -133,8 +133,10 @@ namespace ScePSP.Hle.Managers
 
         public HleModuleGuest GetGuestModuleByAddress(int Address)
         {
+            if (LoadedGuestModules != null)
             foreach(var module in LoadedGuestModules)
             {
+                if (module.Loaded)
                 if (Address >= module.SceModuleStructPartition.Low && Address <= module.SceModuleStructPartition.High)
                     return module;
             }
@@ -173,8 +175,8 @@ namespace ScePSP.Hle.Managers
             {
                 ModuleImportName = ModuleImportName,
                 FunctionEntryName = FunctionEntry.Name,
-                Nid = FunctionEntry.NID,
-                PoolItem = IlInstanceHolder.TaAlloc<Action<CpuThreadState>>(FunctionEntry.Delegate),
+                NID = FunctionEntry.NID,
+                PoolItem = ILInstanceHolder.TAlloc<Action<CpuThreadState>>(FunctionEntry.Delegate),
             };
             DelegateTable[DelegateId] = new DelegateInfo()
             {

@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Memory;
+﻿using ScePSP.Memory;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Interop;
 using ScePSP.Hle.Managers;
@@ -46,7 +46,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="MemSize">Internal memory pool size. Lumines uses 0x20000</param>
         /// <returns>0 on success, less than 0 on error</returns>
         [HlePspFunction(NID = 0x2A2A1E07, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocMatchingInit(int MemSize)
         {
             PoolStat.size = MemSize;
@@ -60,7 +60,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// </summary>
         /// <returns>0 on success, less than 0 on error</returns>
         [HlePspFunction(NID = 0x7945ECDA, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocMatchingTerm()
         {
             return 0;
@@ -430,7 +430,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="Callback">Callback to be called for matching</param>
         /// <returns>ID of object on success, less than 0 on error.</returns>
         [HlePspFunction(NID = 0xCA5EDA6F, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public Matching sceNetAdhocMatchingCreate(Mode Mode, int MaxPeers, int Port, int BufSize, int HelloDelay,
             int PingDelay, int InitCount, int MsgDelay, uint Callback)
         {
@@ -466,7 +466,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="optData">Pointer to block of data passed to callback</param>
         /// <returns>0 on success, less than 0 on error</returns>
         [HlePspFunction(NID = 0x93EF3843, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocMatchingStart(Matching Matching, int evthPri, int evthStack, int inthPri, int inthStack,
             int optLen, byte* optData)
         {
@@ -481,7 +481,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="Matching">The ID returned from <see cref="sceNetAdhocMatchingCreate"/></param>
         /// <returns>0 on success, less than 0 on error.</returns>
         [HlePspFunction(NID = 0x32B156B3, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocMatchingStop(Matching Matching)
         {
             Matching.Stop();
@@ -494,7 +494,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="Matching">The ID returned from <see cref="sceNetAdhocMatchingCreate"/></param>
         /// <returns>0 on success, less than 0 on error.</returns>
         [HlePspFunction(NID = 0xF16EAF4F, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocMatchingDelete(Matching Matching)
         {
             Matching.RemoveUid();
@@ -510,7 +510,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="DataPointer">Pointer to the data</param>
         /// <returns>0 on success, less than 0 on error.</returns>
         [HlePspFunction(NID = 0xF79472D7, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocMatchingSendData(Matching Matching, ref MacAddress MacAddress, int DataLength,
             byte* DataPointer)
         {
@@ -525,7 +525,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="macAddr">The MAC address to send the data to</param>
         /// <returns>0 on success, less than 0 on error.</returns>
         [HlePspFunction(NID = 0xEC19337D, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocMatchingAbortSendData(Matching Matching, ref MacAddress MacAddress)
         {
             return 0;
@@ -540,7 +540,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="DataPointer">Pointer to the optional data</param>
         /// <returns>0 on success, less than 0 on error.</returns>
         [HlePspFunction(NID = 0x5E3D4B79, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocMatchingSelectTarget(Matching Matching, ref MacAddress MacAddress, int DataLength,
             byte* DataPointer)
         {
@@ -555,7 +555,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="macAddr">The MAC address to cancel</param>
         /// <returns>0 on success, less than 0 on error.</returns>
         [HlePspFunction(NID = 0xEA3C6108, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocMatchingCancelTarget(Matching Matching, ref MacAddress MacAddress)
         {
             Matching.CancelTarget(MacAddress);
@@ -571,7 +571,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="optData">Pointer to the optional data</param>
         /// <returns>0 on success, less than 0 on error.</returns>
         [HlePspFunction(NID = 0x8F58BEDF, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocMatchingCancelTargetWithOpt(Matching Matching, ref MacAddress MacAddress, int DataLength,
             byte* DataPointer)
         {
@@ -587,7 +587,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="DataPointer">Pointer to the hello data</param>
         /// <returns>0 on success, less than 0 on error.</returns>
         [HlePspFunction(NID = 0xB5D96C2A, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocMatchingGetHelloOpt(Matching Matching, ref int DataLength, byte* DataPointer)
         {
             var Data = Matching.GetHelloOpt();
@@ -604,7 +604,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="DataPointer">Pointer to the hello data</param>
         /// <returns>0 on success, less than 0 on error.</returns>
         [HlePspFunction(NID = 0xB58E61B7, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocMatchingSetHelloOpt(Matching Matching, int DataLength, byte* DataPointer)
         {
             var Data = PointerUtils.PointerToByteArray(DataPointer, DataLength);
@@ -626,7 +626,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="buf">An allocated area of size length.</param>
         /// <returns>0 on success, less than 0 on error.</returns>
         [HlePspFunction(NID = 0xC58BCD9E, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocMatchingGetMembers(Matching Matching, uint* sizeAddr, void* buf)
         {
             throw new NotImplementedException();
@@ -638,7 +638,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="PoolStat">A ::pspAdhocPoolStat.</param>
         /// <returns>0 on success, less than 0 on error.</returns>
         [HlePspFunction(NID = 0x9C5CFB7D, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocMatchingGetPoolStat(out pspAdhocPoolStat PoolStat)
         {
             PoolStat = this.PoolStat;
@@ -650,7 +650,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// </summary>
         /// <returns>The memory usage on success, less than 0 on error.</returns>
         [HlePspFunction(NID = 0x40F8F435, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetAdhocMatchingGetPoolMaxAlloc()
         {
             throw new NotImplementedException();

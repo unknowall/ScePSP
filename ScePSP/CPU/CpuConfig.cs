@@ -1,19 +1,40 @@
-﻿namespace ScePSP.Core.Cpu
+﻿namespace ScePSP.Cpu
 {
     public class CpuConfig
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public bool EnableAstOptimizations = true;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool TrackCallStack = false;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool CountInstructionsAndYield = false;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool LogInstructionStats = true;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool DebugSyscalls = false;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool ShowInstructionStats = true;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool ShowInstructionStatsJustNew = true;
 
         /// <summary>

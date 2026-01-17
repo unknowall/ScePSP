@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Cpu;
+﻿using ScePSP.Cpu;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
 using ScePSP.Hle.Modules.modulemgr;
@@ -22,7 +22,7 @@ namespace ScePSP.Hle.Modules.loadcore
         }
 
         [HlePspFunction(NID = 0xACE23476, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         [HlePspUnknownDefinitionAttribute]
         public void sceKernelCheckPspConfig()
         {
@@ -30,7 +30,7 @@ namespace ScePSP.Hle.Modules.loadcore
         }
 
         [HlePspFunction(NID = 0xBF983EF2, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         [HlePspUnknownDefinitionAttribute]
         public void sceKernelProbeExecutableObject()
         {
@@ -43,7 +43,7 @@ namespace ScePSP.Hle.Modules.loadcore
         /// <param name="ModuleId">The UID of the module.</param>
         /// <returns>Pointer to the <see cref="SceModule"/> structure if found, otherwise NULL.</returns>
         [HlePspFunction(NID = 0xCCE4A157, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public uint sceKernelFindModuleByUID(int ModuleId)
         {
             var Module = ModuleMgrForUser.Modules.Get(ModuleId);
@@ -54,11 +54,10 @@ namespace ScePSP.Hle.Modules.loadcore
         /// Invalidate the CPU's instruction cache.
         /// </summary>
         [HlePspFunction(NID = 0xD8779AC6, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public void sceKernelIcacheClearAll()
         {
-            CpuProcessor.SceKernelIcacheInvalidateAll();
-            //unimplemented();
+            CpuProcessor.sceKernelIcacheInvalidateAll();
         }
 
         /// <summary>
@@ -67,17 +66,11 @@ namespace ScePSP.Hle.Modules.loadcore
         /// <param name="ModuleName">The name of the module.</param>
         /// <returns>Pointer to the <see cref="SceModule"/> structure if found, otherwise NULL.</returns>
         [HlePspFunction(NID = 0xCF8A41B1, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelFindModuleByName(string ModuleName)
         {
             Console.WriteLine("sceKernelFindModuleByName('{0}') not implemented", ModuleName);
             return 0;
-            /*
-            logWarning();
-            //unimplemented();
-            return null;
-            */
-            //throw(new NotImplementedException());
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace ScePSP.Core.Memory
+﻿namespace ScePSP.Memory
 {
     public class DefaultMemoryInfo : IPspMemoryInfo
     {

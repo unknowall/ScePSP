@@ -1,4 +1,4 @@
-﻿namespace ScePSP.Core.Cpu.Table
+﻿namespace ScePSP.Cpu.Table
 {
     public enum AddressType
     {

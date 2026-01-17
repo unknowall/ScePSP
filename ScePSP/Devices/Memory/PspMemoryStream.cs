@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace ScePSP.Core.Memory
+namespace ScePSP.Memory
 {
     public unsafe class PspMemoryStream : Stream
     {

@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Types;
+﻿using ScePSP.Types;
 using ScePSPUtils.Drawing;
 
 namespace ScePSP.Utils

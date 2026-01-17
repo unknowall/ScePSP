@@ -1,9 +1,9 @@
-﻿using ScePSP.Core.Types.Controller;
+﻿using ScePSP.Types.Controller;
 using ScePSPUtils;
 using System;
 using System.Collections.Generic;
 
-namespace ScePSP.Core.Components.Controller
+namespace ScePSP.Devices.Controller
 {
     public class PspController
     {

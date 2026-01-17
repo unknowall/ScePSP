@@ -1,7 +1,7 @@
-﻿using ScePSP.Core.Components.Display;
-using ScePSP.Core.Components.Rtc;
-using ScePSP.Core.Cpu;
-using ScePSP.Core.Types;
+﻿using ScePSP.Devices.Display;
+using ScePSP.Devices.Rtc;
+using ScePSP.Cpu;
+using ScePSP.Types;
 using ScePSP.Hle.Attributes;
 using System;
 
@@ -31,6 +31,7 @@ namespace ScePSP.Hle.Modules.display
             PspDisplay.CurrentInfo.Mode = Mode;
             PspDisplay.CurrentInfo.Width = Width;
             PspDisplay.CurrentInfo.Height = Height;
+
             return 0;
         }
 
@@ -85,6 +86,7 @@ namespace ScePSP.Hle.Modules.display
         /// </summary>
         /// <returns></returns>
         [HlePspFunction(NID = 0x4D4E10EC, FirmwareVersion = 150)]
+        [HleTrackCall]
         public bool sceDisplayIsVblank()
         {
             return PspDisplay.IsVblank;
@@ -140,7 +142,7 @@ namespace ScePSP.Hle.Modules.display
         /// </summary>
         /// <returns></returns>
         [HlePspFunction(NID = 0x773DD3A3, FirmwareVersion = 150)]
-        [HlePspNotImplemented(Notice = false)]
+        [HleTrackCall(Notice = false)]
         public int sceDisplayGetCurrentHcount()
         {
             return PspDisplay.GetHCount();
@@ -163,7 +165,7 @@ namespace ScePSP.Hle.Modules.display
         /// </summary>
         /// <returns></returns>
         [HlePspFunction(NID = 0x210EAB3A, FirmwareVersion = 150)]
-        [HlePspNotImplemented(Notice = false)]
+        [HleTrackCall(Notice = false)]
         public int sceDisplayGetAccumulatedHcount()
         {
             return (int)(sceDisplayGetCurrentHcount() + sceDisplayGetVcount() * PspDisplay.HCountPerVblank);
@@ -197,25 +199,19 @@ namespace ScePSP.Hle.Modules.display
             return 0;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="CycleNum">Number of VSYNCs to wait before blocking the thread on VBLANK.</param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x40F1469C, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceDisplayWaitVblankStartMulti(int CycleNum)
         {
             return 0;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="holdMode"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x7ED59BC4, FirmwareVersion = 150)]
-        [HlePspNotImplemented(Notice = false)]
+        [HleTrackCall(Notice = false)]
         public int sceDisplaySetHoldMode(int holdMode)
         {
             return 0;
@@ -238,9 +234,6 @@ namespace ScePSP.Hle.Modules.display
             return 0;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="CpuThreadState"></param>
         /// <param name="CycleCount">Number of VSYNCs to wait before blocking the thread on VBLANK.</param>
         /// <returns></returns>
@@ -250,9 +243,6 @@ namespace ScePSP.Hle.Modules.display
             return _waitVblankCB(CpuThreadState, HandleCallbacks: false, CycleCount: CycleCount, Start: true);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="CpuThreadState"></param>
         /// <param name="CycleCount">Number of VSYNCs to wait before blocking the thread on VBLANK.</param>
         /// <returns></returns>
@@ -306,7 +296,7 @@ namespace ScePSP.Hle.Modules.display
         /// </summary>
         /// <returns></returns>
         [HlePspFunction(NID = 0xB4F378FA, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceDisplayIsForeground()
         {
             if (PspDisplay.CurrentInfo.FrameAddress == 0)

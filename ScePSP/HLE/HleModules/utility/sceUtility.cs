@@ -1,6 +1,6 @@
-﻿using ScePSP.Core.Cpu;
-using ScePSP.Core.Memory;
-using ScePSP.Core.Types;
+﻿using ScePSP.Cpu;
+using ScePSP.Memory;
+using ScePSP.Types;
 using ScePSP.Hle.Attributes;
 using ScePSPUtils;
 using System;
@@ -1092,203 +1092,203 @@ namespace ScePSP.Hle.Modules.utility
         }
 
         [HlePspFunction(NID = 0x1281DA8E, FirmwareVersion = 200)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityInstallInitStart()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x5EF1C24A, FirmwareVersion = 200)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityInstallShutdownStart()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xA03D29BA, FirmwareVersion = 200)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityInstallUpdate()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xC4700FA3, FirmwareVersion = 200)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityInstallGetStatus()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x4DB1E739, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityNetconfInitStart()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x91E70E35, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityNetconfUpdate()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xF88155F6, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityNetconfShutdownStart()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x180F7B62, FirmwareVersion = 600)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityGamedataInstallAbort()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x24AC31EB, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityGamedataInstallInitStart()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x32E32DCB, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityGamedataInstallShutdownStart()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x4AECD179, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityGamedataInstallUpdate()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xB57E95D9, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityGamedataInstallGetStatus()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x05AFB9E4, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityHtmlViewerUpdate()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xBDA7D894, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityHtmlViewerGetStatus()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xCDC3AA41, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityHtmlViewerInitStart()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xF5CE1134, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityHtmlViewerShutdownStart()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x7853182D, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityGameSharingUpdate()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xC492F751, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityGameSharingInitStart()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x16D02AF0, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityNpSigninInitStart()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x86ABDB1B, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityNpSigninGetStatus()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xE19C97D6, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityNpSigninShutdownStart()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xF3FBC572, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityNpSigninUpdate()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x0251B134, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityScreenshotInitStart()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x41E30674, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilitySetSystemParamString()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x45C18506, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilitySetSystemParamInt()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x4FED24D8, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityGetNetParamLatestID()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xAB083EA9, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityScreenshotUpdate()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xD81957B7, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityScreenshotGetStatus()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xF9E0008C, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityScreenshotShutdownStart()
         {
             return 0;

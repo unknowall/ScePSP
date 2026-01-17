@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Cpu;
+﻿using ScePSP.Cpu;
 using ScePSP.Hle.Managers;
 using ScePSP.Hle.Threading.Semaphores;
 using System;
@@ -206,7 +206,7 @@ namespace ScePSP.Hle.Modules.threadman
         }
 
         [HlePspFunction(NID = 0x8FFDF9A2, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         [HlePspUnknownDefinition]
         public void sceKernelCancelSema()
         {

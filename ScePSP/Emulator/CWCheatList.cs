@@ -1,5 +1,5 @@
-﻿using ScePSP.Core.Components.Display;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Devices.Display;
+using ScePSP.Memory;
 using ScePSPUtils;
 using System;
 using System.Collections.Generic;

@@ -6,7 +6,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace ScePSP.Core.Memory
+namespace ScePSP.Memory
 {
     public unsafe class NormalPspMemory : PspMemory
     {

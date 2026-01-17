@@ -1,6 +1,6 @@
 ﻿using ScePSP.Utils;
 
-namespace ScePSP.Core.Types.Controller
+namespace ScePSP.Types.Controller
 {
     public struct SceCtrlData
     {

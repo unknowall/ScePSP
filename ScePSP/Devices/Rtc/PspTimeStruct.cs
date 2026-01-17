@@ -2,7 +2,7 @@
 using ScePSPUtils;
 using System;
 
-namespace ScePSP.Core.Components.Rtc
+namespace ScePSP.Devices.Rtc
 {
     public struct PspTimeStruct
     {

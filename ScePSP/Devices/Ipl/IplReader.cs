@@ -1,13 +1,14 @@
-﻿using ScePSPUtils;
+﻿using ScePSP.Devices;
+using ScePSPUtils;
 using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Kirk = ScePSP.Core.Components.Crypto.Kirk;
+using Kirk = ScePSP.Devices.Crypto.Kirk;
 
-namespace ScePSP.Core.Components.Ipl
+namespace ScePSP.Devices.Ipl
 {
     /// <see cref="http://silverspring.lan.st/NPSPTD_01.txt"/>
     /// <see cref="http://daxhordes.org/forum/viewtopic.php?f=33&t=808"/>

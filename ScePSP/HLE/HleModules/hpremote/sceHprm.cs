@@ -60,7 +60,7 @@ namespace ScePSP.Hle.Modules.hpremote
         /// </summary>
         /// <returns>1 if the remote is plugged in, else 0.</returns>
         [HlePspFunction(NID = 0x208DB1BD, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceHprmIsRemoteExist()
         {
             return 0;
@@ -72,7 +72,7 @@ namespace ScePSP.Hle.Modules.hpremote
         /// <param name="Latch">Pointer a to a 4 dword array to contain the latch data.</param>
         /// <returns>Less than 0 on error.</returns>
         [HlePspFunction(NID = 0x40D2F9F0, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceHprmReadLatch(uint* Latch)
         {
             throw new NotImplementedException();

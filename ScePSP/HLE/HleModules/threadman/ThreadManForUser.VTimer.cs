@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Memory;
+﻿using ScePSP.Memory;
 
 namespace ScePSP.Hle.Modules.threadman
 {
@@ -56,7 +56,7 @@ namespace ScePSP.Hle.Modules.threadman
         /// <param name="Time">A <see cref="SceKernelSysClock"/> structure</param>
         /// <returns>Possibly the last time</returns>
         [HlePspFunction(NID = 0xFB6425C3, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         [PspUntested]
         public int sceKernelSetVTimerTimeWide(VirtualTimer VirtualTimer, long Time)
         {

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ScePSP.Core.Components.Rtc
+namespace ScePSP.Devices.Rtc
 {
     public unsafe class PspRtc
     {

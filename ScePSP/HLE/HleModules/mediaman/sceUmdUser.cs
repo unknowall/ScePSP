@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Cpu;
+﻿using ScePSP.Cpu;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
 using ScePSP.Hle.Modules.threadman;
@@ -169,7 +169,7 @@ namespace ScePSP.Hle.Modules.mediaman
         /// <param name="Drive">A prefix string for the fs device to mount the UMD on (e.g. "disc0:")</param>
         /// <returns>Less than 0 on error</returns>
         [HlePspFunction(NID = 0xE83742BA, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUmdDeactivate(int Mode, string Drive)
         {
             _DispatchCallback();
@@ -227,7 +227,7 @@ namespace ScePSP.Hle.Modules.mediaman
         /// Cancel an sceUmdWait* call
         /// </summary>
         [HlePspFunction(NID = 0x6AF9B50A, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUmdCancelWaitDriveStat()
         {
             return 0;
@@ -238,7 +238,7 @@ namespace ScePSP.Hle.Modules.mediaman
         /// </summary>
         /// <returns>Less than 0 on error</returns>
         [HlePspFunction(NID = 0x87533940, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUmdReplaceProhibit()
         {
             return 0;
@@ -249,7 +249,7 @@ namespace ScePSP.Hle.Modules.mediaman
         /// </summary>
         /// <returns>&lt; 0 on error.</returns>
         [HlePspFunction(NID = 0xCBE9F02A, FirmwareVersion = 200)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUmdReplacePermit()
         {
             return 0;
@@ -299,7 +299,7 @@ namespace ScePSP.Hle.Modules.mediaman
         /// <param name="pspUmdInfo">A pointer to a <see cref="pspUmdInfo"/> struct</param>
         /// <returns>Less than 0 on error</returns>
         [HlePspFunction(NID = 0x340B7686, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUmdGetDiscInfo(pspUmdInfo* pspUmdInfo)
         {
             //pspUmdInfo->Size = sizeof(pspUmdInfo);

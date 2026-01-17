@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace ScePSP.Core.Memory
+namespace ScePSP.Memory
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4)]
     public unsafe struct PspPointer<TType>

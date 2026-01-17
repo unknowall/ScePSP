@@ -1,73 +1,76 @@
 ﻿//#define DEBUG_FUNCTION_CREATION
 
-using ScePSP.Core.Cpu.Assembler;
-using ScePSP.Core.Cpu.Dynarec;
-using ScePSP.Core.Cpu.Emitter;
-using ScePSP.Core.Cpu.InstructionCache;
-using ScePSP.Core.Cpu.VFpu;
-using ScePSP.Core.Memory;
-using ScePSPUtils;
+using ScePSP.Cpu.Assembler;
+using ScePSP.Cpu.Dynarec;
+using ScePSP.Cpu.Emitter;
+using ScePSP.Cpu.InstructionCache;
+using ScePSP.Cpu.VFpu;
+using ScePSP.Memory;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime;
 
-namespace ScePSP.Core.Cpu
+namespace ScePSP.Cpu
 {
-    internal unsafe delegate void* GetMemoryPtrSafeWithErrorDelegate(uint address, string errorDescription, bool canBeNull);
+    unsafe delegate void* GetMemoryPtrSafeWithErrorDelegate(uint Address, String ErrorDescription, bool CanBeNull);
+    unsafe delegate void* GetMemoryPtrNotNullDelegate(uint Address);
 
-    internal unsafe delegate void* GetMemoryPtrNotNullDelegate(uint address);
-
-    public sealed unsafe class CpuThreadState
+    unsafe sealed public partial class CpuThreadState
     {
-        public static readonly CpuThreadState Methods = new CpuThreadState();
+        static public readonly CpuThreadState Methods = new CpuThreadState();
 
         public CpuProcessor CpuProcessor;
 
-        public PspMemory Memory => CpuProcessor.Memory;
-
+        ////[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public PspMemory Memory
+        {
+            get
+            {
+                return CpuProcessor.Memory;
+            }
+        }
         public MethodCache MethodCache;
 
         public object CallerModule;
 
         public int StepInstructionCount;
-
         public long TotalInstructionCount;
 
-        public uint LastValidPc = 0xFFFFFFFF;
+        /// <summary>
+        /// Las Valid Registered PC
+        /// </summary>
+        public uint LastValidPC = 0xFFFFFFFF;
 
-        public uint Pc;
-
-        public uint nPC;
-
-        public void SetPc(uint pc)
-        {
-            Pc = pc;
-            nPC = pc + 4;
-        }
+        /// <summary>
+        /// Current PC
+        /// </summary>
+        public uint PC;
+        //public uint nPC;
 
         /// <summary>
         /// LOw, HIgh registers.
         /// Used for mult/div.
         /// </summary>
-        public int Lo, Hi;
+        public int LO, HI;
 
-        public long HiLo
+        public long HI_LO
         {
-
-            get
-            {
-                fixed (int* loPtr = &Lo) return *(long*)loPtr;
-            }
-
-            set
-            {
-                fixed (int* loPtr = &Lo) *(long*)loPtr = value;
-            }
+            //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { fixed (int* LOPtr = &LO) return *(long*)LOPtr; }
+            //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set { fixed (int* LOPtr = &LO) *(long*)LOPtr = value; }
         }
 
-        public uint Ic;
+        /// <summary>
+        /// 
+        /// </summary>
+        public uint IC;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool BranchFlag;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,343 +80,34 @@ namespace ScePSP.Core.Cpu
         // C0R: Cop0 registers
         // VFR_CC: Vfpu comparison flags
         /////////////////////////////////////////////////////////////////////////////////////////////////
-        public uint Gpr0,
-            Gpr1,
-            Gpr2,
-            Gpr3,
-            Gpr4,
-            Gpr5,
-            Gpr6,
-            Gpr7,
-            Gpr8,
-            Gpr9,
-            Gpr10,
-            Gpr11,
-            Gpr12,
-            Gpr13,
-            Gpr14,
-            Gpr15,
-            Gpr16,
-            Gpr17,
-            Gpr18,
-            Gpr19,
-            Gpr20,
-            Gpr21,
-            Gpr22,
-            Gpr23,
-            Gpr24,
-            Gpr25,
-            Gpr26,
-            Gpr27,
-            Gpr28,
-            Gpr29,
-            Gpr30,
-            Gpr31;
+        public uint GPR0, GPR1, GPR2, GPR3, GPR4, GPR5, GPR6, GPR7, GPR8, GPR9, GPR10, GPR11, GPR12, GPR13, GPR14, GPR15, GPR16, GPR17, GPR18, GPR19, GPR20, GPR21, GPR22, GPR23, GPR24, GPR25, GPR26, GPR27, GPR28, GPR29, GPR30, GPR31;
+        public float FPR0, FPR1, FPR2, FPR3, FPR4, FPR5, FPR6, FPR7, FPR8, FPR9, FPR10, FPR11, FPR12, FPR13, FPR14, FPR15, FPR16, FPR17, FPR18, FPR19, FPR20, FPR21, FPR22, FPR23, FPR24, FPR25, FPR26, FPR27, FPR28, FPR29, FPR30, FPR31;
+        public uint C0R0, C0R1, C0R2, C0R3, C0R4, C0R5, C0R6, C0R7, C0R8, C0R9, C0R10, C0R11, C0R12, C0R13, C0R14, C0R15, C0R16, C0R17, C0R18, C0R19, C0R20, C0R21, C0R22, C0R23, C0R24, C0R25, C0R26, C0R27, C0R28, C0R29, C0R30, C0R31;
 
-        public float Fpr0,
-            Fpr1,
-            Fpr2,
-            Fpr3,
-            Fpr4,
-            Fpr5,
-            Fpr6,
-            Fpr7,
-            Fpr8,
-            Fpr9,
-            Fpr10,
-            Fpr11,
-            Fpr12,
-            Fpr13,
-            Fpr14,
-            Fpr15,
-            Fpr16,
-            Fpr17,
-            Fpr18,
-            Fpr19,
-            Fpr20,
-            Fpr21,
-            Fpr22,
-            Fpr23,
-            Fpr24,
-            Fpr25,
-            Fpr26,
-            Fpr27,
-            Fpr28,
-            Fpr29,
-            Fpr30,
-            Fpr31;
+        public float VFR0, VFR1, VFR2, VFR3, VFR4, VFR5, VFR6, VFR7, VFR8, VFR9, VFR10, VFR11, VFR12, VFR13, VFR14, VFR15, VFR16, VFR17, VFR18, VFR19, VFR20, VFR21, VFR22, VFR23, VFR24, VFR25, VFR26, VFR27, VFR28, VFR29, VFR30, VFR31, VFR32, VFR33, VFR34, VFR35, VFR36, VFR37, VFR38, VFR39, VFR40, VFR41, VFR42, VFR43, VFR44, VFR45, VFR46, VFR47, VFR48, VFR49, VFR50, VFR51, VFR52, VFR53, VFR54, VFR55, VFR56, VFR57, VFR58, VFR59, VFR60, VFR61, VFR62, VFR63, VFR64, VFR65, VFR66, VFR67, VFR68, VFR69, VFR70, VFR71, VFR72, VFR73, VFR74, VFR75, VFR76, VFR77, VFR78, VFR79, VFR80, VFR81, VFR82, VFR83, VFR84, VFR85, VFR86, VFR87, VFR88, VFR89, VFR90, VFR91, VFR92, VFR93, VFR94, VFR95, VFR96, VFR97, VFR98, VFR99, VFR100, VFR101, VFR102, VFR103, VFR104, VFR105, VFR106, VFR107, VFR108, VFR109, VFR110, VFR111, VFR112, VFR113, VFR114, VFR115, VFR116, VFR117, VFR118, VFR119, VFR120, VFR121, VFR122, VFR123, VFR124, VFR125, VFR126, VFR127;
+        public bool VFR_CC_0, VFR_CC_1, VFR_CC_2, VFR_CC_3, VFR_CC_4, VFR_CC_5, VFR_CC_6, VFR_CC_7;
 
-        public uint C0R0,
-            C0R1,
-            C0R2,
-            C0R3,
-            C0R4,
-            C0R5,
-            C0R6,
-            C0R7,
-            C0R8,
-            C0R9,
-            C0R10,
-            C0R11,
-            C0R12,
-            C0R13,
-            C0R14,
-            C0R15,
-            C0R16,
-            C0R17,
-            C0R18,
-            C0R19,
-            C0R20,
-            C0R21,
-            C0R22,
-            C0R23,
-            C0R24,
-            C0R25,
-            C0R26,
-            C0R27,
-            C0R28,
-            C0R29,
-            C0R30,
-            C0R31;
+        public bool VFR_CC_ANY { get { return VFR_CC_4; } }
+        public bool VFR_CC_ALL { get { return VFR_CC_5; } }
 
-        public float Vfr0,
-            Vfr1,
-            Vfr2,
-            Vfr3,
-            Vfr4,
-            Vfr5,
-            Vfr6,
-            Vfr7,
-            Vfr8,
-            Vfr9,
-            Vfr10,
-            Vfr11,
-            Vfr12,
-            Vfr13,
-            Vfr14,
-            Vfr15,
-            Vfr16,
-            Vfr17,
-            Vfr18,
-            Vfr19,
-            Vfr20,
-            Vfr21,
-            Vfr22,
-            Vfr23,
-            Vfr24,
-            Vfr25,
-            Vfr26,
-            Vfr27,
-            Vfr28,
-            Vfr29,
-            Vfr30,
-            Vfr31,
-            Vfr32,
-            Vfr33,
-            Vfr34,
-            Vfr35,
-            Vfr36,
-            Vfr37,
-            Vfr38,
-            Vfr39,
-            Vfr40,
-            Vfr41,
-            Vfr42,
-            Vfr43,
-            Vfr44,
-            Vfr45,
-            Vfr46,
-            Vfr47,
-            Vfr48,
-            Vfr49,
-            Vfr50,
-            Vfr51,
-            Vfr52,
-            Vfr53,
-            Vfr54,
-            Vfr55,
-            Vfr56,
-            Vfr57,
-            Vfr58,
-            Vfr59,
-            Vfr60,
-            Vfr61,
-            Vfr62,
-            Vfr63,
-            Vfr64,
-            Vfr65,
-            Vfr66,
-            Vfr67,
-            Vfr68,
-            Vfr69,
-            Vfr70,
-            Vfr71,
-            Vfr72,
-            Vfr73,
-            Vfr74,
-            Vfr75,
-            Vfr76,
-            Vfr77,
-            Vfr78,
-            Vfr79,
-            Vfr80,
-            Vfr81,
-            Vfr82,
-            Vfr83,
-            Vfr84,
-            Vfr85,
-            Vfr86,
-            Vfr87,
-            Vfr88,
-            Vfr89,
-            Vfr90,
-            Vfr91,
-            Vfr92,
-            Vfr93,
-            Vfr94,
-            Vfr95,
-            Vfr96,
-            Vfr97,
-            Vfr98,
-            Vfr99,
-            Vfr100,
-            Vfr101,
-            Vfr102,
-            Vfr103,
-            Vfr104,
-            Vfr105,
-            Vfr106,
-            Vfr107,
-            Vfr108,
-            Vfr109,
-            Vfr110,
-            Vfr111,
-            Vfr112,
-            Vfr113,
-            Vfr114,
-            Vfr115,
-            Vfr116,
-            Vfr117,
-            Vfr118,
-            Vfr119,
-            Vfr120,
-            Vfr121,
-            Vfr122,
-            Vfr123,
-            Vfr124,
-            Vfr125,
-            Vfr126,
-            Vfr127;
-
-        //var name = 'C0R'; for (var n = 0; n < 32; n += 4) console.log('nameof(' + name + (n) + '), nameof(' + name + (n + 1) + '), nameof(' + name + (n + 2) + '), nameof(' + name + (n + 3) + '),');
-        public static readonly string[] C0RNames =
-        {
-            nameof(C0R0), nameof(C0R1), nameof(C0R2), nameof(C0R3),
-            nameof(C0R4), nameof(C0R5), nameof(C0R6), nameof(C0R7),
-            nameof(C0R8), nameof(C0R9), nameof(C0R10), nameof(C0R11),
-            nameof(C0R12), nameof(C0R13), nameof(C0R14), nameof(C0R15),
-            nameof(C0R16), nameof(C0R17), nameof(C0R18), nameof(C0R19),
-            nameof(C0R20), nameof(C0R21), nameof(C0R22), nameof(C0R23),
-            nameof(C0R24), nameof(C0R25), nameof(C0R26), nameof(C0R27),
-            nameof(C0R28), nameof(C0R29), nameof(C0R30), nameof(C0R31),
-        };
-
-        public static readonly string[] GprNames =
-        {
-            nameof(Gpr0), nameof(Gpr1), nameof(Gpr2), nameof(Gpr3),
-            nameof(Gpr4), nameof(Gpr5), nameof(Gpr6), nameof(Gpr7),
-            nameof(Gpr8), nameof(Gpr9), nameof(Gpr10), nameof(Gpr11),
-            nameof(Gpr12), nameof(Gpr13), nameof(Gpr14), nameof(Gpr15),
-            nameof(Gpr16), nameof(Gpr17), nameof(Gpr18), nameof(Gpr19),
-            nameof(Gpr20), nameof(Gpr21), nameof(Gpr22), nameof(Gpr23),
-            nameof(Gpr24), nameof(Gpr25), nameof(Gpr26), nameof(Gpr27),
-            nameof(Gpr28), nameof(Gpr29), nameof(Gpr30), nameof(Gpr31),
-        };
-
-        public static readonly string[] FprNames =
-        {
-            nameof(Fpr0), nameof(Fpr1), nameof(Fpr2), nameof(Fpr3),
-            nameof(Fpr4), nameof(Fpr5), nameof(Fpr6), nameof(Fpr7),
-            nameof(Fpr8), nameof(Fpr9), nameof(Fpr10), nameof(Fpr11),
-            nameof(Fpr12), nameof(Fpr13), nameof(Fpr14), nameof(Fpr15),
-            nameof(Fpr16), nameof(Fpr17), nameof(Fpr18), nameof(Fpr19),
-            nameof(Fpr20), nameof(Fpr21), nameof(Fpr22), nameof(Fpr23),
-            nameof(Fpr24), nameof(Fpr25), nameof(Fpr26), nameof(Fpr27),
-            nameof(Fpr28), nameof(Fpr29), nameof(Fpr30), nameof(Fpr31),
-        };
-
-        public static readonly string[] VfrNames =
-        {
-            nameof(Vfr0), nameof(Vfr1), nameof(Vfr2), nameof(Vfr3),
-            nameof(Vfr4), nameof(Vfr5), nameof(Vfr6), nameof(Vfr7),
-            nameof(Vfr8), nameof(Vfr9), nameof(Vfr10), nameof(Vfr11),
-            nameof(Vfr12), nameof(Vfr13), nameof(Vfr14), nameof(Vfr15),
-            nameof(Vfr16), nameof(Vfr17), nameof(Vfr18), nameof(Vfr19),
-            nameof(Vfr20), nameof(Vfr21), nameof(Vfr22), nameof(Vfr23),
-            nameof(Vfr24), nameof(Vfr25), nameof(Vfr26), nameof(Vfr27),
-            nameof(Vfr28), nameof(Vfr29), nameof(Vfr30), nameof(Vfr31),
-            nameof(Vfr32), nameof(Vfr33), nameof(Vfr34), nameof(Vfr35),
-            nameof(Vfr36), nameof(Vfr37), nameof(Vfr38), nameof(Vfr39),
-            nameof(Vfr40), nameof(Vfr41), nameof(Vfr42), nameof(Vfr43),
-            nameof(Vfr44), nameof(Vfr45), nameof(Vfr46), nameof(Vfr47),
-            nameof(Vfr48), nameof(Vfr49), nameof(Vfr50), nameof(Vfr51),
-            nameof(Vfr52), nameof(Vfr53), nameof(Vfr54), nameof(Vfr55),
-            nameof(Vfr56), nameof(Vfr57), nameof(Vfr58), nameof(Vfr59),
-            nameof(Vfr60), nameof(Vfr61), nameof(Vfr62), nameof(Vfr63),
-            nameof(Vfr64), nameof(Vfr65), nameof(Vfr66), nameof(Vfr67),
-            nameof(Vfr68), nameof(Vfr69), nameof(Vfr70), nameof(Vfr71),
-            nameof(Vfr72), nameof(Vfr73), nameof(Vfr74), nameof(Vfr75),
-            nameof(Vfr76), nameof(Vfr77), nameof(Vfr78), nameof(Vfr79),
-            nameof(Vfr80), nameof(Vfr81), nameof(Vfr82), nameof(Vfr83),
-            nameof(Vfr84), nameof(Vfr85), nameof(Vfr86), nameof(Vfr87),
-            nameof(Vfr88), nameof(Vfr89), nameof(Vfr90), nameof(Vfr91),
-            nameof(Vfr92), nameof(Vfr93), nameof(Vfr94), nameof(Vfr95),
-            nameof(Vfr96), nameof(Vfr97), nameof(Vfr98), nameof(Vfr99),
-            nameof(Vfr100), nameof(Vfr101), nameof(Vfr102), nameof(Vfr103),
-            nameof(Vfr104), nameof(Vfr105), nameof(Vfr106), nameof(Vfr107),
-            nameof(Vfr108), nameof(Vfr109), nameof(Vfr110), nameof(Vfr111),
-            nameof(Vfr112), nameof(Vfr113), nameof(Vfr114), nameof(Vfr115),
-            nameof(Vfr116), nameof(Vfr117), nameof(Vfr118), nameof(Vfr119),
-            nameof(Vfr120), nameof(Vfr121), nameof(Vfr122), nameof(Vfr123),
-            nameof(Vfr124), nameof(Vfr125), nameof(Vfr126), nameof(Vfr127),
-        };
-
-        public static readonly string[] VfrCcNames =
-        {
-            nameof(VfrCc0),
-            nameof(VfrCc1),
-            nameof(VfrCc2),
-            nameof(VfrCc3),
-            nameof(VfrCc4),
-            nameof(VfrCc5),
-            nameof(VfrCc6),
-            nameof(VfrCc7),
-        };
-
-        public bool VfrCc0, VfrCc1, VfrCc2, VfrCc3, VfrCc4, VfrCc5, VfrCc6, VfrCc7;
-
-        public bool VfrCcAny => VfrCc4;
-
-        public bool VfrCcAll => VfrCc5;
-
-        public uint VfrCcValue
+        public uint VFR_CC_Value
         {
             get
             {
-                uint value = 0;
-                fixed (bool* vfrCc = &VfrCc0)
+                uint Value = 0;
+                fixed (bool* VFR_CC = &VFR_CC_0)
                 {
-                    for (int n = 0; n < 8; n++) value |= (uint)(vfrCc[n] ? 1 << n : 0);
+                    for (int n = 0; n < 8; n++) Value |= (uint)(VFR_CC[n] ? (1 << n) : 0);
                 }
-                return value;
+                return Value;
             }
             set
             {
-                fixed (bool* vfrCc = &VfrCc0)
+                fixed (bool* VFR_CC = &VFR_CC_0)
                 {
                     for (int n = 0; n < 8; n++)
                     {
-                        vfrCc[n] = ((value >> n) & 1) != 0;
+                        VFR_CC[n] = (((value >> n) & 1) != 0);
                     }
                 }
             }
@@ -426,7 +120,7 @@ namespace ScePSP.Core.Cpu
 
         public Random Random = new Random();
 
-        public Fcr31Struct Fcr31;
+        public FCR31 Fcr31;
 
         public readonly uint[] CallStack = new uint[10240];
         public int CallStackCount;
@@ -434,16 +128,20 @@ namespace ScePSP.Core.Cpu
         public uint[] GetCurrentCallStack()
         {
             var Out = new List<uint>();
-            var count = Math.Min(10240, CallStackCount);
-            for (var n = 0; n < count; n++)
+            var Count = Math.Min(10240, CallStackCount);
+            for (int n = 0; n < Count; n++)
+            {
                 Out.Add(CallStack[(CallStackCount - n - 1) % CallStack.Length]);
+            }
             return Out.ToArray();
         }
 
-        public void CallStackPush(uint pc)
+        public void CallStackPush(uint PC)
         {
             if (CallStackCount >= 0 && CallStackCount < CallStack.Length)
-                CallStack[CallStackCount] = pc;
+            {
+                CallStack[CallStackCount] = PC;
+            }
             CallStackCount++;
         }
 
@@ -458,159 +156,153 @@ namespace ScePSP.Core.Cpu
         /// <summary>
         /// Points to the middle of the 64K block of memory in the static data segment.
         /// </summary>
-        public uint Gp
-        {
-            get => Gpr28;
-            set => Gpr28 = value;
-        }
+        public uint GP { get { return GPR28; } set { GPR28 = value; } }
 
         /// <summary>
         /// Points to last location on the stack.
         /// </summary>
-        public uint Sp
-        {
-            get => Gpr29;
-            set => Gpr29 = value;
-        }
+        public uint SP { get { return GPR29; } set { GPR29 = value; } }
 
         /// <summary>
         /// Reserved for use by the interrupt/trap handler 
         /// </summary>
-        public uint K0
-        {
-            get => Gpr26;
-            set => Gpr26 = value;
-        }
+        public uint K0 { get { return GPR26; } set { GPR26 = value; } }
 
         /// <summary>
         /// saved value / frame pointer
         /// Preserved across procedure calls
         /// </summary>
-        public uint Fp
-        {
-            get => Gpr30;
-            set => Gpr30 = value;
-        }
+        public uint FP { get { return GPR30; } set { GPR30 = value; } }
 
         /// <summary>
         /// Return Address
         /// </summary>
-        public uint Ra
-        {
-            get => Gpr31;
-            set => Gpr31 = value;
-        }
+        public uint RA { get { return GPR31; } set { GPR31 = value; } }
 
         /// <summary>
         /// V0
         /// </summary>
-        public uint V0
-        {
-            get => Gpr2;
-            set => Gpr2 = value;
-        }
+        public uint V0 { get { return GPR2; } set { GPR2 = value; } }
 
-        public void SetGpr(int index, int value)
-        {
-            if (index == 0) return;
-            fixed (uint* ptr = &Gpr0) ptr[index] = (uint)value;
-        }
-
-        public int GetGpr(int index)
-        {
-            fixed (uint* ptr = &Gpr0) return (int)ptr[index];
-        }
-
-        public GprList Gpr;
-        public C0RList C0R;
-        public FprList Fpr;
+        public GprList GPR;
+        public C0rList C0R;
+        public FprList FPR;
         public VfprList Vfpr;
-
-        public FprListInteger FprI;
+        public FprListInteger FPR_I;
         //readonly public float* FPR;
 
-        public void* GetMemoryPtr(uint address)
+        public void* GetMemoryPtr(uint Address)
         {
-            var pointer = Memory.PspAddressToPointerUnsafe(address);
+            var Pointer = Memory.PspAddressToPointerUnsafe(Address);
             //Console.WriteLine("%08X".Sprintf((uint)Pointer));
-            return pointer;
+            return Pointer;
         }
 
-        public void* GetMemoryPtrNotNull(uint address) => Memory.PspAddressToPointerNotNull(address);
+        public void* GetMemoryPtrNotNull(uint Address)
+        {
+            return Memory.PspAddressToPointerNotNull(Address);
+        }
 
-        public void* GetMemoryPtrSafe(uint address) => Memory.PspAddressToPointerSafe(address);
+        public void* GetMemoryPtrSafe(uint Address)
+        {
+            return Memory.PspAddressToPointerSafe(Address, 0);
+        }
 
-        public void* GetMemoryPtrSafeWithError(uint address, string errorDescription, bool canBeNull, InvalidAddressAsEnum invalid)
+        public void* GetMemoryPtrSafeWithError(uint Address, String ErrorDescription, bool CanBeNull, InvalidAddressAsEnum Invalid)
         {
             //Console.Error.WriteLine("{0:X8}, {1}, {2}", Address, CanBeNull, InvalidAsNull);
             try
             {
-                var result = Memory.PspAddressToPointerSafe(address, 0, canBeNull);
+                void* Result = Memory.PspAddressToPointerSafe(Address, 0, CanBeNull);
                 /*
-                if (Result == null && !CanBeNull)
-                {
-                    throw(new PspMemory.InvalidAddressException(""));
-                }
-                */
-                return result;
+				if (Result == null && !CanBeNull)
+				{
+					throw(new PspMemory.InvalidAddressException(""));
+				}
+				*/
+                return Result;
             }
-            catch (InvalidAddressException invalidAddressException)
+            catch (InvalidAddressException InvalidAddressException)
             {
-                if (invalid == InvalidAddressAsEnum.Null) return null;
-                if (invalid == InvalidAddressAsEnum.InvalidAddress) return PspMemory.InvalidPointer;
-                throw new InvalidAddressException(
-                    $"GetMemoryPtrSafeWithError:{errorDescription} : {invalidAddressException.Message}",
-                    invalidAddressException);
+                if (Invalid == InvalidAddressAsEnum.Null) return null;
+                if (Invalid == InvalidAddressAsEnum.InvalidAddress) return PspMemory.InvalidPointer;
+                throw (new InvalidAddressException("GetMemoryPtrSafeWithError:" + ErrorDescription + " : " + InvalidAddressException.Message, InvalidAddressException));
             }
-            catch (Exception exception)
+            catch (Exception Exception)
             {
-                if (invalid == InvalidAddressAsEnum.Null) return null;
-                if (invalid == InvalidAddressAsEnum.InvalidAddress) return PspMemory.InvalidPointer;
-                throw new Exception($"GetMemoryPtrSafeWithError: {errorDescription} : {exception.Message}",
-                    exception);
+                if (Invalid == InvalidAddressAsEnum.Null) return null;
+                if (Invalid == InvalidAddressAsEnum.InvalidAddress) return PspMemory.InvalidPointer;
+                throw (new Exception("GetMemoryPtrSafeWithError: " + ErrorDescription + " : " + Exception.Message, Exception));
             }
         }
 
-        public IEnumerable<int> GprItems(params int[] indexes) => indexes.Select(index => Gpr[index]);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Indexes"></param>
+        /// <returns></returns>
+        public IEnumerable<int> GPRList(params int[] Indexes)
+        {
+            return Indexes.Select(Index => GPR[Index]);
+        }
 
         private CpuThreadState()
         {
         }
 
-        static public CpuThreadState Dummy;
-
-        public CpuThreadState(CpuProcessor processor)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Processor"></param>
+        public CpuThreadState(CpuProcessor Processor)
         {
-            CpuProcessor = processor;
-            MethodCache = processor.MethodCache;
+            this.CpuProcessor = Processor;
+            this.MethodCache = Processor.MethodCache;
             //this.Memory = Processor.Memory;
 
-            Gpr = new GprList { CpuThreadState = this };
-            Fpr = new FprList { CpuThreadState = this };
-            C0R = new C0RList { CpuThreadState = this };
-            FprI = new FprListInteger { CpuThreadState = this };
-            Vfpr = new VfprList { CpuThreadState = this };
+            GPR = new GprList() { CpuThreadState = this };
+            FPR = new FprList() { CpuThreadState = this };
+            C0R = new C0rList() { CpuThreadState = this };
+            FPR_I = new FprListInteger() { CpuThreadState = this };
+            Vfpr = new VfprList() { CpuThreadState = this };
 
-            for (var n = 0; n < 32; n++) Gpr[n] = 0;
-            for (var n = 0; n < 32; n++) Fpr[n] = 0.0f;
+            for (int n = 0; n < 32; n++)
+            {
+                GPR[n] = 0;
+                FPR[n] = 0.0f;
+            }
 
-            VfrCc7 = VfrCc6 = VfrCc5 = VfrCc4 = VfrCc3 = VfrCc2 = VfrCc1 = VfrCc0 = true;
+            VFR_CC_7 = VFR_CC_6 = VFR_CC_5 = VFR_CC_4 = VFR_CC_3 = VFR_CC_2 = VFR_CC_1 = VFR_CC_0 = true;
 
-            for (var n = 0; n < 128; n++) Vfpr[n] = 0.0f;
+            for (int n = 0; n < 128; n++)
+            {
+                Vfpr[n] = 0.0f;
+            }
         }
 
         /// <summary>
         /// Calls a syscall.
         /// </summary>
-        /// <param name="code"></param>
-        public void Syscall(int code) => CpuProcessor.Syscall(code, this);
+        /// <param name="Code"></param>
+        public void Syscall(int Code)
+        {
+            CpuProcessor.Syscall(Code, this);
+        }
 
-        public void SyscallNative(uint delegateId) => CpuProcessor.RegisteredNativeSyscallMethods[delegateId].PoolItem.Value(this);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="DelegateId"></param>
+        public void SyscallNative(uint DelegateId)
+        {
+            CpuProcessor.RegisteredNativeSyscallMethods[DelegateId].PoolItem.Value(this);
+        }
 
         //private DateTime LastTick;
-        private int _tickCount;
+        private int TickCount = 0;
 
-        DateTime _lastTickYield = DateTime.UtcNow;
+        DateTime LastTickYield = DateTime.UtcNow;
 
         public bool EnableYielding = true;
 
@@ -618,14 +310,16 @@ namespace ScePSP.Core.Cpu
         /// Function called on some situations, that allow
         /// to yield the thread.
         /// </summary>
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [TargetedPatchingOptOut("Performance critical to inline across NGen image boundaries")]
         public void Tick()
         {
             //Console.WriteLine("Tick1");
             if (EnableYielding)
             {
-                _tickCount++;
+                TickCount++;
 
-                if ((_tickCount & 0x1F) == 1)
+                if ((TickCount & 0x1F) == 1)
                 //if ((TickCount & 3) == 1)
                 {
                     Tick2();
@@ -636,12 +330,12 @@ namespace ScePSP.Core.Cpu
         private void Tick2()
         {
             CpuProcessor.ExecuteInterrupt(this);
-            if (_tickCount > 10000)
+            if (TickCount > 10000)
             {
-                _tickCount = 0;
-                if ((DateTime.UtcNow - _lastTickYield).TotalMilliseconds >= 2)
+                TickCount = 0;
+                if ((DateTime.UtcNow - LastTickYield).TotalMilliseconds >= 2)
                 {
-                    _lastTickYield = DateTime.UtcNow;
+                    LastTickYield = DateTime.UtcNow;
                     Yield();
                 }
             }
@@ -652,298 +346,203 @@ namespace ScePSP.Core.Cpu
             Yield();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Yield()
         {
             if (EnableYielding)
             {
-                CpuProcessor.CpuConnector.Yield(this);
+                this.CpuProcessor.CpuConnector.Yield(this);
             }
         }
 
-        static MipsDisassembler _mipsDisassembler;
+        /// <summary>
+        /// 
+        /// </summary>
+        static MipsDisassembler MipsDisassembler;
 
-        public void Trace(uint pc)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="PC"></param>
+        public void Trace(uint PC)
         {
-            if (_mipsDisassembler == null) _mipsDisassembler = new MipsDisassembler();
-            var result = _mipsDisassembler.Disassemble(pc, Memory.Read4(pc));
-            Console.WriteLine("  Trace: PC:0x{0:X8} : DATA:0x{1:X8} : {2}", pc, Memory.Read4(pc), result);
+            if (MipsDisassembler == null) MipsDisassembler = new MipsDisassembler();
+            var Result = MipsDisassembler.Disassemble(PC, (Instruction)Memory.Read4(PC));
+            Console.WriteLine("  Trace: PC:0x{0:X8} : DATA:0x{1:X8} : {2}", PC, Memory.Read4(PC), Result);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         /// <see cref="http://msdn.microsoft.com/en-us/library/ms253512(v=vs.80).aspx"/>
-        private static readonly string[] RegisterMnemonicNames =
-        {
+        private static readonly string[] RegisterMnemonicNames = new string[] {
             "zr", "at", "v0", "v1", "a0", "a1", "a2", "a3",
             "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7",
             "s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7",
             "t8", "t9", "k0", "k1", "gp", "sp", "fp", "ra",
         };
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void DumpRegisters()
         {
             DumpRegisters(Console.Out);
         }
 
-        public void DumpRegistersCpu(TextWriter textWriter)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="TextWriter"></param>
+        public void DumpRegistersCpu(TextWriter TextWriter)
         {
-            textWriter.WriteLine("PC: 0x{0:X8}, HI: 0x{1:X8}, LO: 0x{2:X8}", Pc, Hi, Lo);
-            for (var n = 0; n < 32; n++)
+            TextWriter.WriteLine("PC: 0x{0:X8}, HI: 0x{1:X8}, LO: 0x{2:X8}", PC, HI, LO);
+            for (int n = 0; n < 32; n++)
             {
-                if (n % 4 != 0) textWriter.Write(", ");
-                textWriter.Write("r{0,2}({1}) : 0x{2:X8}", n, RegisterMnemonicNames[n], Gpr[n]);
-                if (n % 4 == 3) textWriter.WriteLine();
+                if (n % 4 != 0) TextWriter.Write(", ");
+                TextWriter.Write("r{0,2}({1}) : 0x{2:X8}", n, RegisterMnemonicNames[n], GPR[n]);
+                if (n % 4 == 3) TextWriter.WriteLine();
             }
-            textWriter.WriteLine();
+            TextWriter.WriteLine();
         }
 
-        public void DumpRegistersFpu(TextWriter textWriter)
+        public void DumpRegistersFpu(TextWriter TextWriter)
         {
-            for (var n = 0; n < 32; n++)
+            for (int n = 0; n < 32; n++)
             {
-                if (n % 4 != 0) textWriter.Write(", ");
-                textWriter.Write("f{0,2} : 0x{1:X8}, {2}", n, FprI[n], Fpr[n]);
-                if (n % 4 == 3) textWriter.WriteLine();
+                if (n % 4 != 0) TextWriter.Write(", ");
+                TextWriter.Write("f{0,2} : 0x{1:X8}, {2}", n, FPR_I[n], FPR[n]);
+                if (n % 4 == 3) TextWriter.WriteLine();
             }
-            textWriter.WriteLine();
+            TextWriter.WriteLine();
         }
 
-        public void DumpRegistersVFpu(TextWriter textWriter)
+        public void DumpRegistersVFpu(TextWriter TextWriter)
         {
-            for (var n = 0; n < 32; n++)
+            for (int n = 0; n < 32; n++)
             {
-                if (n % 4 != 0) textWriter.Write(", ");
-                textWriter.Write("c0r{0,2} : 0x{1:X8}", n, C0R[n]);
-                if (n % 4 == 3) textWriter.WriteLine();
+                if (n % 4 != 0) TextWriter.Write(", ");
+                TextWriter.Write("c0r{0,2} : 0x{1:X8}", n, C0R[n]);
+                if (n % 4 == 3) TextWriter.WriteLine();
             }
-            textWriter.WriteLine();
+            TextWriter.WriteLine();
         }
 
-        public void DumpRegisters(TextWriter textWriter)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="TextWriter"></param>
+        public void DumpRegisters(TextWriter TextWriter)
         {
-            DumpRegistersCpu(textWriter);
-            DumpRegistersFpu(textWriter);
-            DumpRegistersVFpu(textWriter);
+            DumpRegistersCpu(TextWriter);
+            DumpRegistersFpu(TextWriter);
+            DumpRegistersVFpu(TextWriter);
         }
 
-        public void DumpVfpuRegisters(TextWriter textWriter)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="TextWriter"></param>
+        public void DumpVfpuRegisters(TextWriter TextWriter)
         {
-            for (var matrix = 0; matrix < 8; matrix++)
+            for (int Matrix = 0; Matrix < 8; Matrix++)
             {
-                textWriter.WriteLine("Matrix: {0}", matrix);
-                for (var row = 0; row < 4; row++)
+                TextWriter.WriteLine("Matrix: {0}", Matrix);
+                for (int Row = 0; Row < 4; Row++)
                 {
-                    var line = "";
-                    for (var column = 0; column < 4; column++)
+                    var Line = "";
+                    for (int Column = 0; Column < 4; Column++)
                     {
-                        line += $", {Vfpr[matrix, column, row]}";
+                        Line += String.Format(", {0}", Vfpr[Matrix, Column, Row]);
                     }
-                    textWriter.WriteLine(line);
+                    TextWriter.WriteLine(Line);
                 }
-                textWriter.WriteLine("");
+                TextWriter.WriteLine("");
             }
         }
 
-        public void CopyRegistersFrom(CpuThreadState that)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="that"></param>
+        public unsafe void CopyRegistersFrom(CpuThreadState that)
         {
-            Pc = that.Pc;
-            Fcr31 = that.Fcr31;
-            Ic = that.Ic;
-            Lo = that.Lo;
-            Hi = that.Hi;
-            fixed (float* thisFpr = &Fpr0)
-            fixed (float* thatFpr = &that.Fpr0)
-            fixed (uint* thisGpr = &Gpr0)
-            fixed (uint* thatGpr = &that.Gpr0)
+            this.PC = that.PC;
+            this.Fcr31 = that.Fcr31;
+            this.IC = that.IC;
+            this.LO = that.LO;
+            this.HI = that.HI;
+            fixed (float* ThisFPR = &this.FPR0)
+            fixed (float* ThatFPR = &that.FPR0)
+            fixed (uint* ThisGPR = &this.GPR0)
+            fixed (uint* ThatGPR = &that.GPR0)
             {
-                for (var n = 0; n < 32; n++)
+                for (int n = 0; n < 32; n++)
                 {
-                    thisFpr[n] = thatFpr[n];
-                    thisGpr[n] = thatGpr[n];
+                    ThisFPR[n] = ThatFPR[n];
+                    ThisGPR[n] = ThatGPR[n];
                 }
             }
 
-            fixed (float* thisVfr = &Vfr0)
-            fixed (float* thatVfr = &that.Vfr0)
+            fixed (float* ThisVFR = &this.VFR0)
+            fixed (float* ThatVFR = &that.VFR0)
             {
-                for (var n = 0; n < 128; n++)
-                    thisVfr[n] = thatVfr[n];
+                for (int n = 0; n < 128; n++)
+                {
+                    ThisVFR[n] = ThatVFR[n];
+                }
             }
         }
 
-        public void ExecuteFunctionAndReturn(uint pc)
+        public void ExecuteFunctionAndReturn(uint PC)
         {
-            ExecuteAt(pc);
+            ExecuteAT(PC);
         }
 
-        public void ExecuteAt(uint pc)
+        public void ExecuteAT(uint PC)
         {
             try
             {
-                Pc = pc;
-                Ra = SpecialCpu.ReturnFromFunction;
-                MethodCache.GetForPc(Pc).CallDelegate(this);
+                RA = SpecialCpu.ReturnFromFunction;
+                MethodCache.GetForPC(this.PC).CallDelegate(this);
             }
             catch (SpecialCpu.ReturnFromFunctionException)
             {
             }
+
         }
 
-        public void _MethodCacheInfo_SetInternal(MethodCacheInfo methodCacheInfo, uint pc) => MethodCache._MethodCacheInfo_SetInternal(this, methodCacheInfo, pc);
-
-        public void SetPcWriteAddress(uint address, uint pc) => Memory.SetPCWriteAddress(address, pc);
-
-        public Action<CpuThreadState> GetFuncAtPc(uint pc) => CpuProcessor.MethodCache.GetForPc(pc).CallDelegate;
-
-        public struct Fcr31Struct
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="MethodCacheInfo"></param>
+        /// <param name="PC"></param>
+        public void _MethodCacheInfo_SetInternal(MethodCacheInfo MethodCacheInfo, uint PC)
         {
-            public enum TypeEnum : uint
-            {
-                Rint = 0,
-                Cast = 1,
-                Ceil = 2,
-                Floor = 3,
-            }
-
-            private uint _value;
-
-            public uint Value
-            {
-                get
-                {
-                    _value = BitUtils.Insert(_value, 0, 2, (uint)Rm);
-                    _value = BitUtils.Insert(_value, 23, 1, (uint)(Cc ? 1 : 0));
-                    _value = BitUtils.Insert(_value, 24, 1, (uint)(Fs ? 1 : 0));
-                    return _value;
-                }
-                set
-                {
-                    _value = value;
-                    Cc = BitUtils.Extract(value, 23, 1) != 0;
-                    Fs = BitUtils.Extract(value, 24, 1) != 0;
-                    Rm = (TypeEnum)BitUtils.Extract(value, 0, 2);
-                }
-            }
-
-            public TypeEnum Rm;
-            public bool Cc;
-            public bool Fs;
+            MethodCache._MethodCacheInfo_SetInternal(this, MethodCacheInfo, PC);
         }
 
-        public class GprList
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Address"></param>
+        /// <param name="PC"></param>
+        public void SetPCWriteAddress(uint Address, uint PC)
         {
-            public CpuThreadState CpuThreadState;
-
-            private int NameToIndex(string name) => Array.IndexOf(RegisterMnemonicNames, name);
-
-            public int this[string name]
-            {
-                get => this[NameToIndex(name)];
-                set => this[NameToIndex(name)] = value;
-            }
-
-            public int this[int index]
-            {
-                get => CpuThreadState.GetGpr(index);
-                set => CpuThreadState.SetGpr(index, value);
-            }
+            //Console.WriteLine("SetPCWriteAddress: {0:X} : {1:X}", Address, PC);
+            Memory.SetPCWriteAddress(Address, PC);
         }
 
-        public class C0RList
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="PC"></param>
+        /// <returns></returns>
+        public Action<CpuThreadState> GetFuncAtPC(uint PC)
         {
-            public CpuThreadState CpuThreadState;
-
-            public uint this[int index]
-            {
-                get
-                {
-                    fixed (uint* ptr = &CpuThreadState.C0R0) return ptr[index];
-                }
-                set
-                {
-                    fixed (uint* ptr = &CpuThreadState.C0R0) ptr[index] = value;
-                }
-            }
-        }
-
-        public class FprList
-        {
-            public CpuThreadState CpuThreadState;
-
-            public float this[int index]
-            {
-                get
-                {
-                    fixed (float* ptr = &CpuThreadState.Fpr0) return ptr[index];
-                }
-                set
-                {
-                    fixed (float* ptr = &CpuThreadState.Fpr0) ptr[index] = value;
-                }
-            }
-        }
-
-        public class FprListInteger
-        {
-            public CpuThreadState CpuThreadState;
-
-            public int this[int index]
-            {
-                get
-                {
-                    fixed (float* ptr = &CpuThreadState.Fpr0) return ((int*)ptr)[index];
-                }
-                set
-                {
-                    fixed (float* ptr = &CpuThreadState.Fpr0) ((int*)ptr)[index] = value;
-                }
-            }
-        }
-
-        public class VfprList
-        {
-            public CpuThreadState CpuThreadState;
-
-            public float this[int index]
-            {
-                get
-                {
-                    fixed (float* ptr = &CpuThreadState.Vfr0) return ptr[index];
-                }
-                set
-                {
-                    fixed (float* ptr = &CpuThreadState.Vfr0) ptr[index] = value;
-                }
-            }
-
-            public float this[int matrix, int column, int row]
-            {
-                get => this[VfpuUtils.GetIndexCell(matrix, column, row)];
-                set => this[VfpuUtils.GetIndexCell(matrix, column, row)] = value;
-            }
-
-            public float[] this[string nameWithSufix]
-            {
-                get { return VfpuUtils.GetIndices(nameWithSufix).Select(item => this[item]).ToArray(); }
-                set
-                {
-                    var indices = VfpuUtils.GetIndices(nameWithSufix);
-                    for (var n = 0; n < value.Length; n++) this[indices[n]] = value[n];
-                }
-            }
-
-            public float[] this[int size, string name]
-            {
-                get { return VfpuUtils.GetIndices(size, name).Select(item => this[item]).ToArray(); }
-                set
-                {
-                    var indices = VfpuUtils.GetIndices(size, name);
-                    for (var n = 0; n < value.Length; n++) this[indices[n]] = value[n];
-                }
-            }
-
-            public void ClearAll(float value = 0f)
-            {
-                for (var n = 0; n < 128; n++) this[n] = value;
-            }
+            return CpuProcessor.MethodCache.GetForPC(PC).CallDelegate;
         }
     }
 }

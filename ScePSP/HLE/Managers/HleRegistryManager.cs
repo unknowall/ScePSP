@@ -122,10 +122,10 @@ namespace ScePSP.Hle.Managers
     public class HleRegistryCategoryNode : IDisposable
     {
         HleRegistryNode HleRegistryNode;
+
         string Name;
 
-        Dictionary<RegKeyHandle, HleRegistryKeyNode> HleRegistryKeyNodeList =
-            new Dictionary<RegKeyHandle, HleRegistryKeyNode>();
+        Dictionary<RegKeyHandle, HleRegistryKeyNode> HleRegistryKeyNodeList = new Dictionary<RegKeyHandle, HleRegistryKeyNode>();
 
         public HleRegistryCategoryNode(HleConfig HleConfig, HleRegistryNode HleRegistryNode, string Name)
         {

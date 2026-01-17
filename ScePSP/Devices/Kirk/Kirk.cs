@@ -6,7 +6,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 
-namespace ScePSP.Core.Components.Crypto
+namespace ScePSP.Devices.Crypto
 {
     public unsafe delegate void PointerAction(byte* address);
 

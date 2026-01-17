@@ -5,12 +5,11 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace ScePSP.Core.Memory
+namespace ScePSP.Memory
 {
     public abstract unsafe class PspModel
     {
         public const bool IsSlim = false;
-        //public const bool IsSlim = true;
     }
 
     /// <summary>
@@ -51,8 +50,7 @@ namespace ScePSP.Core.Memory
             {
             }
 
-            public InvalidAddressException(ulong Address, Exception innerException) : base(
-                $"Invalid Address : 0x{Address:X8}", innerException)
+            public InvalidAddressException(ulong Address, Exception innerException) : base($"Invalid Address : 0x{Address:X8}", innerException)
             {
             }
         }

@@ -1,5 +1,5 @@
-﻿using ScePSP.Core.Cpu;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Cpu;
+using ScePSP.Memory;
 using ScePSPUtils;
 using System;
 using System.Collections.Generic;

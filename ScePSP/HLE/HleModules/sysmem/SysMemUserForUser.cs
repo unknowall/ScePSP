@@ -1,5 +1,5 @@
-﻿using ScePSP.Core.Cpu;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Cpu;
+using ScePSP.Memory;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Managers;
 using ScePSPUtils;
@@ -43,7 +43,7 @@ namespace ScePSP.Hle.Modules.sysmem
         }
 
         [HlePspFunction(NID = 0x6373995D, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public PspModelEnum sceKernelGetModel()
         {
             return PspModel.IsSlim ? PspModelEnum.Slim : PspModelEnum.Phat;
@@ -53,7 +53,7 @@ namespace ScePSP.Hle.Modules.sysmem
         /// 1.00 to 3.52, gone in 3.95+
         /// </summary>
         [HlePspFunction(NID = 0x35669D4C, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public void SysMemUserForUser_35669D4C()
         {
         }
@@ -88,26 +88,26 @@ namespace ScePSP.Hle.Modules.sysmem
         }
 
         [HlePspFunction(NID = 0x342061E5, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public void sceKernelSetCompiledSdkVersion370(uint SdkVersion)
         {
             _sceKernelSetCompiledSdkVersion(SdkVersion, "sceKernelSetCompiledSdkVersion370", new uint[] { 0x3070000 });
         }
 
         [HlePspFunction(NID = 0x315AD3A0, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public void sceKernelSetCompiledSdkVersion380_390(uint Param)
         {
         }
 
         [HlePspFunction(NID = 0x358CA1BB, FirmwareVersion = 660)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public void sceKernelSetCompiledSdkVersion660(uint Param)
         {
         }
 
         [HlePspFunction(NID = 0xEBD5C3E6, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public void sceKernelSetCompiledSdkVersion395(uint Param)
         {
         }
@@ -269,7 +269,7 @@ namespace ScePSP.Hle.Modules.sysmem
         }
 
         [HlePspFunction(NID = 0x91DE343C, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public void sceKernelSetCompiledSdkVersion500_505(uint SdkVersion)
         {
             _sceKernelSetCompiledSdkVersion(SdkVersion, "sceKernelSetCompiledSdkVersion500_505",
@@ -277,26 +277,26 @@ namespace ScePSP.Hle.Modules.sysmem
         }
 
         [HlePspFunction(NID = 0xFE707FDF, FirmwareVersion = 150, Name = "SysMemUserForUser_FE707FDF")]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int AllocMemoryBlock(string Name, uint Type, uint Size, uint ParamsAddrPtr)
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xDB83A952, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public void SysMemUserForUser_DB83A952()
         {
         }
 
         [HlePspFunction(NID = 0x50F61D8A, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public void SysMemUserForUser_50F61D8A()
         {
         }
 
         [HlePspFunction(NID = 0x1B4217BC, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public void sceKernelSetCompiledSdkVersion603_605(uint SdkVersion)
         {
             _sceKernelSetCompiledSdkVersion(SdkVersion, "sceKernelSetCompiledSdkVersion603_605",

@@ -1,5 +1,5 @@
-﻿using ScePSP.Core.Components.Rtc;
-using ScePSP.Core.Cpu;
+﻿using ScePSP.Devices.Rtc;
+using ScePSP.Cpu;
 using ScePSP.Hle.Attributes;
 using ScePSPUtils;
 using ScePSPUtils.Extensions;
@@ -51,7 +51,7 @@ namespace ScePSP.Hle.Modules.utils
         /// <param name="TimeZone"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x71EC4271, FirmwareVersion = 150, SkipLog = true)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelLibcGettimeofday(TimeValStruct* TimeVal, TimeZoneStruct* TimeZone)
         {
             if (TimeVal != null)
@@ -78,9 +78,10 @@ namespace ScePSP.Hle.Modules.utils
         /// Write back the data cache to memory
         /// </summary>
         [HlePspFunction(NID = 0x79D1C3FA, FirmwareVersion = 150)]
+        [HleTrackCall]
         public uint sceKernelDcacheWritebackAll()
         {
-            CpuProcessor.SceKernelDcacheWritebackAll();
+            CpuProcessor.sceKernelDcacheWritebackAll();
             return 0;
         }
 
@@ -90,9 +91,10 @@ namespace ScePSP.Hle.Modules.utils
         /// <param name="Pointer"></param>
         /// <param name="Size"></param>
         [HlePspFunction(NID = 0xBFA98062, FirmwareVersion = 150)]
+        [HleTrackCall]
         public uint sceKernelDcacheInvalidateRange(uint Pointer, int Size)
         {
-            CpuProcessor.SceKernelDcacheInvalidateRange(Pointer, Size);
+            CpuProcessor.sceKernelDcacheInvalidateRange(Pointer, Size);
             return 0;
         }
 
@@ -102,9 +104,10 @@ namespace ScePSP.Hle.Modules.utils
         /// <param name="Pointer"></param>
         /// <param name="Size"></param>
         [HlePspFunction(NID = 0x34B9FA9E, FirmwareVersion = 150)]
+        [HleTrackCall]
         public uint sceKernelDcacheWritebackInvalidateRange(uint Pointer, int Size)
         {
-            CpuProcessor.SceKernelDcacheWritebackInvalidateRange(Pointer, Size);
+            CpuProcessor.sceKernelDcacheWritebackInvalidateRange(Pointer, Size);
             return 0;
         }
 
@@ -114,10 +117,11 @@ namespace ScePSP.Hle.Modules.utils
         /// <param name="Pointer"></param>
         /// <param name="Size"></param>
         [HlePspFunction(NID = 0xB435DEC5, FirmwareVersion = 150)]
+        [HleTrackCall]
         public uint sceKernelDcacheWritebackRange(uint Pointer, int Size)
         {
             if (Size < 0) throw new SceKernelException(SceKernelErrors.ERROR_INVALID_SIZE);
-            CpuProcessor.SceKernelDcacheWritebackRange(Pointer, Size);
+            CpuProcessor.sceKernelDcacheWritebackRange(Pointer, Size);
             return 0;
         }
 
@@ -125,9 +129,10 @@ namespace ScePSP.Hle.Modules.utils
         /// Write back and invalidate the data cache
         /// </summary>
         [HlePspFunction(NID = 0x3EE30821, FirmwareVersion = 150)]
+        [HleTrackCall]
         public uint sceKernelDcacheWritebackInvalidateAll()
         {
-            CpuProcessor.SceKernelDcacheWritebackInvalidateAll();
+            CpuProcessor.sceKernelDcacheWritebackInvalidateAll();
             return 0;
         }
 
@@ -144,6 +149,7 @@ namespace ScePSP.Hle.Modules.utils
         /// <returns>Less than 0 on error</returns>
         [HlePspFunction(NID = 0x27CC57F0, FirmwareVersion = 150)]
         [HlePspFunction(NID = 0xE860E75E, FirmwareVersion = 150)]
+        [HleTrackCall]
         public int sceKernelUtilsMt19937Init(out SceKernelUtilsMt19937Context Context, uint Seed)
         {
             fixed (uint* State = Context.State)
@@ -172,6 +178,7 @@ namespace ScePSP.Hle.Modules.utils
         /// <param name="Context">Pointer to a pre-initialised context.</param>
         /// <returns>A pseudo random number (between 0 and MAX_INT).</returns>
         [HlePspFunction(NID = 0x06FB8A63, FirmwareVersion = 150, SkipLog = true)]
+        [HleTrackCall]
         public uint sceKernelUtilsMt19937UInt(ref SceKernelUtilsMt19937Context Context)
         {
             fixed (uint* State = Context.State)
@@ -214,6 +221,7 @@ namespace ScePSP.Hle.Modules.utils
         /// <param name="Time"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x27CC57F0, FirmwareVersion = 150)]
+        [HleTrackCall]
         public time_t sceKernelLibcTime([HleInvalidAsInvalidPointer] time_t* Time)
         {
             if (Time == Memory.InvalidPointerInstance) return 0;
@@ -235,6 +243,7 @@ namespace ScePSP.Hle.Modules.utils
         /// </summary>
         /// <returns></returns>
         [HlePspFunction(NID = 0x91E4F6A7, FirmwareVersion = 150)]
+        [HleTrackCall]
         public uint sceKernelLibcClock()
         {
             PspRtc.Update();
@@ -251,6 +260,7 @@ namespace ScePSP.Hle.Modules.utils
           * @return < 0 on error.
           */
         [HlePspFunction(NID = 0xC8186A58, FirmwareVersion = 150)]
+        [HleTrackCall]
         public int sceKernelUtilsMd5Digest(byte* Data, uint Size, byte* Digest)
         {
             throw new NotImplementedException();
@@ -275,6 +285,7 @@ namespace ScePSP.Hle.Modules.utils
         /// <param name="Digest">Pointer to a 20 byte array for storing the digest</param>
         /// <returns>&lt; 0 on error</returns>
         [HlePspFunction(NID = 0x840259F1, FirmwareVersion = 150)]
+        [HleTrackCall]
         public int sceKernelUtilsSha1Digest(byte* Data, uint Size, byte* Digest)
         {
             PointerUtils.Memcpy(
@@ -292,9 +303,10 @@ namespace ScePSP.Hle.Modules.utils
         /// <param name="Address"></param>
         /// <param name="Size"></param>
         [HlePspFunction(NID = 0xC2DF770E, FirmwareVersion = 150)]
+        [HleTrackCall]
         public void sceKernelIcacheInvalidateRange(uint Address, uint Size)
         {
-            this.CpuProcessor.SceKernelIcacheInvalidateRange(Address, Size);
+            this.CpuProcessor.sceKernelIcacheInvalidateRange(Address, Size);
             // Unimplemented cache.	
         }
 
@@ -302,29 +314,24 @@ namespace ScePSP.Hle.Modules.utils
         /// Invalidate the entire instruction cache
         /// </summary>
         [HlePspFunction(NID = 0x920F104A, FirmwareVersion = 150)]
+        [HleTrackCall]
         public void sceKernelIcacheInvalidateAll()
         {
-            this.CpuProcessor.SceKernelIcacheInvalidateAll();
+            this.CpuProcessor.sceKernelIcacheInvalidateAll();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+
         /// <param name="Value"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x6AD345D7, FirmwareVersion = 150)]
-        [HlePspNotImplemented(Notice = false)]
+        [HleTrackCall]
         public int sceKernelSetGPO(int Value)
         {
             return 0;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         [HlePspFunction(NID = 0x37FB5C42, FirmwareVersion = 150)]
-        [HlePspNotImplemented(Notice = false)]
+        [HleTrackCall]
         public int sceKernelGetGPI()
         {
             return 0;
@@ -339,7 +346,7 @@ namespace ScePSP.Hle.Modules.utils
         /// <param name="unknown">unknown, pass NULL</param>
         /// <returns>size decompressed on success, less than 0 on error</returns>
         [HlePspFunction(NID = 0x78934841, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelGzipDecompress(byte* dest, uint destSize, byte* src, uint unknown)
         {
             throw new NotImplementedException();
@@ -354,28 +361,28 @@ namespace ScePSP.Hle.Modules.utils
         /// <param name="unknown">unknown, pass NULL</param>
         /// <returns>size decompressed on success, less than 0 on error</returns>
         [HlePspFunction(NID = 0x7DD07271, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelLzrcDecode(byte* dest, uint destSize, byte* src, void* unknown)
         {
             throw new NotImplementedException();
         }
 
         [HlePspFunction(NID = 0x7853182D, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityGameSharingUpdate()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xC492F751, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityGameSharingInitStart()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xEFC6F80F, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityGameSharingShutdownStart()
         {
             return 0;

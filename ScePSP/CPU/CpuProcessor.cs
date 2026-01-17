@@ -1,34 +1,29 @@
-﻿using ScePSP.Core.Cpu.Dynarec;
-using ScePSP.Core.Cpu.InstructionCache;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Cpu.Dynarec;
+using ScePSP.Cpu.InstructionCache;
+using ScePSP.Memory;
 using System;
 using System.Collections.Generic;
 
-namespace ScePSP.Core.Cpu
+namespace ScePSP.Cpu
 {
-    /// <summary>
-    /// CpuState shareed by all CpuThreadState
-    /// </summary>
     public sealed class CpuProcessor
     {
         public readonly Dictionary<string, uint> GlobalInstructionStats = new Dictionary<string, uint>();
 
         public CpuConfig CpuConfig => PSPDrivers.Config.CpuConfig;
 
-        public PspMemory Memory => PSPDrivers.PspMemory;
+        public PspMemory Memory =>PSPDrivers.PspMemory;
 
         public ICpuConnector CpuConnector => PSPDrivers.CpuConnector;
 
         public DynarecFunctionCompiler DynarecFunctionCompiler => PSPDrivers.DynarecFunctionCompiler;
 
-        public IInterruptManager InterruptManager => PSPDrivers.InterruptManager;
+        public IInterruptManager IInterruptManager => PSPDrivers.InterruptManager;
 
         public MethodCache MethodCache => PSPDrivers.MethodCache;
 
         public Dictionary<uint, NativeSyscallInfo> RegisteredNativeSyscallMethods = new Dictionary<uint, NativeSyscallInfo>();
-
-        private readonly Dictionary<int, Action<CpuThreadState, int>> _registeredNativeSyscalls = new Dictionary<int, Action<CpuThreadState, int>>();
-
+        private Dictionary<int, Action<CpuThreadState, int>> RegisteredNativeSyscalls = new Dictionary<int, Action<CpuThreadState, int>>();
         public HashSet<uint> NativeBreakpoints = new HashSet<uint>();
 
         public event Action DebugCurrentThreadEvent;
@@ -37,74 +32,94 @@ namespace ScePSP.Core.Cpu
         public volatile bool InterruptEnabled = true;
         public volatile bool InterruptFlag = false;
 
-        public void ExecuteInterrupt(CpuThreadState cpuThreadState)
+        public void ExecuteInterrupt(CpuThreadState CpuThreadState)
         {
             if (InterruptEnabled && InterruptFlag)
             {
-                InterruptManager.Interrupt(cpuThreadState);
+                IInterruptManager.Interrupt(CpuThreadState);
             }
         }
 
-        public CpuProcessor RegisterNativeSyscall(int code, Action callback) => RegisterNativeSyscall(code, (_, processor) => callback());
-
-        public CpuProcessor RegisterNativeSyscall(int code, Action<CpuThreadState, int> callback)
+        public CpuProcessor()
         {
-            _registeredNativeSyscalls[code] = callback;
+        }
+
+        public CpuProcessor RegisterNativeSyscall(int Code, Action Callback)
+        {
+            return RegisterNativeSyscall(Code, (_Code, _Processor) => Callback());
+        }
+
+        public CpuProcessor RegisterNativeSyscall(int Code, Action<CpuThreadState, int> Callback)
+        {
+            RegisteredNativeSyscalls[Code] = Callback;
             return this;
         }
 
-        public Action<CpuThreadState, int> GetSyscall(int code)
+        public Action<CpuThreadState, int> GetSyscall(int Code)
         {
-            Action<CpuThreadState, int> callback;
-            return _registeredNativeSyscalls.TryGetValue(code, out callback) ? callback : null;
-        }
-
-        public void Syscall(int code, CpuThreadState cpuThreadState)
-        {
-            Action<CpuThreadState, int> callback;
-            if ((callback = GetSyscall(code)) != null)
+            Action<CpuThreadState, int> Callback;
+            if (RegisteredNativeSyscalls.TryGetValue(Code, out Callback))
             {
-                callback(cpuThreadState, code);
+                return Callback;
             }
             else
             {
-                Console.WriteLine("Undefined syscall: {0:X6} at 0x{1:X8}", code, cpuThreadState.Pc);
+                return null;
             }
         }
 
-        public void SceKernelDcacheWritebackInvalidateAll()
+        public void Syscall(int Code, CpuThreadState CpuThreadState)
+        {
+            Action<CpuThreadState, int> Callback;
+            if ((Callback = GetSyscall(Code)) != null)
+            {
+                Callback(CpuThreadState, Code);
+            }
+            else
+            {
+                Console.WriteLine("Undefined syscall: {0:X6} at 0x{1:X8}", Code, CpuThreadState.PC);
+            }
+        }
+
+        public void sceKernelDcacheWritebackInvalidateAll()
         {
         }
 
-        public void SceKernelDcacheWritebackRange(uint address, int size)
+        public void sceKernelDcacheWritebackRange(uint Address, int Size)
         {
         }
 
-        public void SceKernelDcacheWritebackInvalidateRange(uint address, int size)
+        public void sceKernelDcacheWritebackInvalidateRange(uint Address, int Size)
         {
         }
 
-        public void SceKernelDcacheInvalidateRange(uint address, int size)
+        public void sceKernelDcacheInvalidateRange(uint Address, int Size)
         {
         }
 
-        public void SceKernelDcacheWritebackAll()
+        public void sceKernelDcacheWritebackAll()
         {
         }
 
-        public void SceKernelIcacheInvalidateAll() => MethodCache.FlushAll();
-
-        public void SceKernelIcacheInvalidateRange(uint address, uint size) => MethodCache.FlushRange(address, address + size);
-
-        public static void DebugCurrentThread(CpuThreadState cpuThreadState)
+        public void sceKernelIcacheInvalidateAll()
         {
-            var cpuProcessor = cpuThreadState.CpuProcessor;
+            MethodCache.FlushAll();
+        }
+
+        public void sceKernelIcacheInvalidateRange(uint Address, uint Size)
+        {
+            MethodCache.FlushRange(Address, Address + Size);
+        }
+
+        public static void DebugCurrentThread(CpuThreadState CpuThreadState)
+        {
+            var CpuProcessor = CpuThreadState.CpuProcessor;
             Console.Error.WriteLine("*******************************************");
             Console.Error.WriteLine("* DebugCurrentThread **********************");
             Console.Error.WriteLine("*******************************************");
-            cpuProcessor.DebugCurrentThreadEvent();
+            CpuProcessor.DebugCurrentThreadEvent();
             Console.Error.WriteLine("*******************************************");
-            cpuThreadState.DumpRegisters();
+            CpuThreadState.DumpRegisters();
             Console.Error.WriteLine("*******************************************");
         }
     }

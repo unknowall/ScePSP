@@ -1,129 +1,166 @@
 ﻿using System;
 
-namespace ScePSP.Core.Cpu.Table
+namespace ScePSP.Cpu.Table
 {
     public sealed class InstructionInfo : Attribute
     {
+        /// <summary>
         /// Name of the instruction.
         /// Example: add
+        /// </summary>
         public string Name;
 
+        /// <summary>
         /// Mask extracted from BinaryEncoding
+        /// </summary>
         public uint Mask;
 
+        /// <summary>
         /// Value extracted from BinaryEncoding
+        /// </summary>
         public uint Value;
 
+        /// <summary>
         /// Example: 000000:rs:rt:rd:00000:100000
-        private string _binaryEncoding;
+        /// </summary>
+        private string _BinaryEncoding;
 
+        /// <summary>
         /// Example: %d, %s, %t
+        /// </summary>
         public string AsmEncoding;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public AddressType AddressType;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public InstructionType InstructionType;
-        private void ParseBinaryEncoding(string encoding)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Encoding"></param>
+        private void ParseBinaryEncoding(string Encoding)
         {
             Value = Mask = 0;
 
-            foreach (var part in encoding.Split(':'))
+            foreach (var Part in Encoding.Split(':'))
             {
-                if (part[0] == '-' || part[0] == '0' || part[0] == '1')
+                if (Part[0] == '-' || Part[0] == '0' || Part[0] == '1')
                 {
-                    foreach (var Char in part)
+                    foreach (var Char in Part)
                     {
-                        Mask <<= 1;
-                        Value <<= 1;
+                        Mask <<= 1; Value <<= 1;
                         switch (Char)
                         {
-                            case '0':
-                                Mask |= 1;
-                                Value |= 0;
-                                break;
-                            case '1':
-                                Mask |= 1;
-                                Value |= 1;
-                                break;
-                            case '-':
-                                Mask |= 0;
-                                Value |= 0;
-                                break;
+                            case '0': Mask |= 1; Value |= 0; break;
+                            case '1': Mask |= 1; Value |= 1; break;
+                            case '-': Mask |= 0; Value |= 0; break;
                         }
                     }
                 }
                 else
                 {
-                    var displacement = part switch
-                    {
-                        "cstw" => 1,
-                        "cstz" => 1,
-                        "csty" => 1,
-                        "cstx" => 1,
-                        "absw" => 1,
-                        "absz" => 1,
-                        "absy" => 1,
-                        "absx" => 1,
-                        "mskw" => 1,
-                        "mskz" => 1,
-                        "msky" => 1,
-                        "mskx" => 1,
-                        "negw" => 1,
-                        "negz" => 1,
-                        "negy" => 1,
-                        "negx" => 1,
-                        "one" => 1,
-                        "two" => 1,
-                        "vt1" => 1,
-                        "vt2" => 2,
-                        "satw" => 2,
-                        "satz" => 2,
-                        "saty" => 2,
-                        "satx" => 2,
-                        "swzw" => 2,
-                        "swzz" => 2,
-                        "swzy" => 2,
-                        "swzx" => 2,
-                        "imm3" => 3,
-                        "imm4" => 4,
-                        "fcond" => 4,
-                        "c0dr" => 5,
-                        "c0cr" => 5,
-                        "c1dr" => 5,
-                        "c1cr" => 5,
-                        "imm5" => 5,
-                        "vt5" => 5,
-                        "rs" => 5,
-                        "rd" => 5,
-                        "rt" => 5,
-                        "sa" => 5,
-                        "lsb" => 5,
-                        "msb" => 5,
-                        "fs" => 5,
-                        "fd" => 5,
-                        "ft" => 5,
-                        "vs" => 7,
-                        "vt" => 7,
-                        "vd" => 7,
-                        "imm7" => 7,
-                        "imm8" => 8,
-                        "imm14" => 14,
-                        "imm16" => 16,
-                        "imm20" => 20,
-                        "imm26" => 26,
-                        _ => throw new Exception($"Unknown part '{part}'")
-                    };
+                    int Displacement = 0;
 
-                    Mask <<= displacement;
-                    Value <<= displacement;
+                    switch (Part)
+                    {
+                        case "cstw":
+                        case "cstz":
+                        case "csty":
+                        case "cstx":
+                        case "absw":
+                        case "absz":
+                        case "absy":
+                        case "absx":
+                        case "mskw":
+                        case "mskz":
+                        case "msky":
+                        case "mskx":
+                        case "negw":
+                        case "negz":
+                        case "negy":
+                        case "negx":
+                        case "one":
+                        case "two":
+                        case "vt1":
+                            Displacement = 1;
+                            break;
+                        case "vt2":
+                        case "satw":
+                        case "satz":
+                        case "saty":
+                        case "satx":
+                        case "swzw":
+                        case "swzz":
+                        case "swzy":
+                        case "swzx":
+                            Displacement = 2;
+                            break;
+                        case "imm3":
+                            Displacement = 3;
+                            break;
+                        case "imm4":
+                        case "fcond":
+                            Displacement = 4;
+                            break;
+                        case "c0dr":
+                        case "c0cr":
+                        case "c1dr":
+                        case "c1cr":
+                        case "imm5":
+                        case "vt5":
+                        case "rs":
+                        case "rd":
+                        case "rt":
+                        case "sa":
+                        case "lsb":
+                        case "msb":
+                        case "fs":
+                        case "fd":
+                        case "ft":
+                            Displacement = 5;
+                            break;
+                        case "vs":
+                        case "vt":
+                        case "vd":
+                        case "imm7":
+                            Displacement = 7;
+                            break;
+                        case "imm8": Displacement = 8; break;
+                        case "imm14": Displacement = 14; break;
+                        case "imm16": Displacement = 16; break;
+                        case "imm20": Displacement = 20; break;
+                        case "imm26": Displacement = 26; break;
+                        default:
+                            throw (new Exception("Unknown part '" + Part + "'"));
+                    }
+
+                    Mask <<= Displacement; Value <<= Displacement;
                 }
             }
         }
 
         public string BinaryEncoding
         {
-            set => ParseBinaryEncoding(_binaryEncoding = value);
-            get => _binaryEncoding;
+            set
+            {
+                _BinaryEncoding = value;
+                ParseBinaryEncoding(_BinaryEncoding);
+            }
+            get
+            {
+                return _BinaryEncoding;
+            }
         }
 
-        public override string ToString() => $"InstructionInfo({Name} {AsmEncoding})";
+        public override string ToString()
+        {
+            return String.Format("InstructionInfo({0} {1})", Name, AsmEncoding);
+        }
     }
 }

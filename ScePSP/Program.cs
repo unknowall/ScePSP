@@ -1,6 +1,6 @@
 ﻿using ScePSP;
-using ScePSP.Core.Components.Display;
-using ScePSP.Core.Types.Controller;
+using ScePSP.Devices.Display;
+using ScePSP.Types.Controller;
 using ScePSPUtils;
 using SDL2;
 using System;

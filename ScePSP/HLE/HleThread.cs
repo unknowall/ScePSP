@@ -1,5 +1,5 @@
-﻿using ScePSP.Core.Cpu;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Cpu;
+using ScePSP.Memory;
 using ScePSP.Hle.Interop;
 using ScePSP.Hle.Loader;
 using ScePSP.Hle.Managers;
@@ -128,7 +128,7 @@ namespace ScePSP.Hle
             set
             {
                 Info.GP = value;
-                CpuThreadState.Gp = value;
+                CpuThreadState.GP = value;
             }
         }
 
@@ -248,7 +248,7 @@ namespace ScePSP.Hle
             var Memory = CpuThreadState.CpuProcessor.Memory;
             try
             {
-                CpuThreadState.ExecuteAt(CpuThreadState.Pc & FastPspMemory.FastMemoryMask);
+                CpuThreadState.ExecuteAT(CpuThreadState.PC & FastPspMemory.FastMemoryMask);
                 CpuThreadState.Syscall(HleEmulatorSpecialAddresses.CODE_PTR_EXIT_THREAD_SYSCALL);
             }
             catch (AccessViolationException AccessViolationException)
@@ -368,8 +368,8 @@ namespace ScePSP.Hle
         public string ToExtendedString()
         {
             var Ret =
-                $"HleTask(Id={Id}, Priority={PriorityValue}, PC=0x{CpuThreadState.Pc:X}, LastValidPC=0x{CpuThreadState.LastValidPc:X}," +
-                $" SP=0x{CpuThreadState.Sp:X}, Name='{Name}', Status={CurrentStatus}, YieldCount={YieldCount}";
+                $"HleTask(Id={Id}, Priority={PriorityValue}, PC=0x{CpuThreadState.PC:X}, LastValidPC=0x{CpuThreadState.LastValidPC:X}," +
+                $" SP=0x{CpuThreadState.SP:X}, Name='{Name}', Status={CurrentStatus}, YieldCount={YieldCount}";
             switch (CurrentStatus)
             {
                 case Status.Waiting:
@@ -395,7 +395,7 @@ namespace ScePSP.Hle
         public void DumpStack(TextWriter TextWriter)
         {
             var FullCallStack = CpuThreadState.GetCurrentCallStack();
-            TextWriter.WriteLine("   PC=(0x{0:X8})", CpuThreadState.Pc);
+            TextWriter.WriteLine("   PC=(0x{0:X8})", CpuThreadState.PC);
             TextWriter.WriteLine("   LastCalledHleFunction: {0}", LastCalledHleFunction);
             TextWriter.WriteLine("   CallStack({0})", FullCallStack.Length);
             CpuThreadState.DumpRegistersCpu(TextWriter);

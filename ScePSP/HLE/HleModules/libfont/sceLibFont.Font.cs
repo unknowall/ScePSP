@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Types;
+﻿using ScePSP.Types;
 using ScePSP.Hle.Formats.Font;
 using System;
 
@@ -29,7 +29,7 @@ namespace ScePSP.Hle.Modules.libfont
         ///		0 on success
         /// </returns>
         [HlePspFunction(NID = 0x0DA7535E, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceFontGetFontInfo(Font Font, FontInfo* FontInfoPointer)
         {
             *FontInfoPointer = Font.GetFontInfo();
@@ -44,7 +44,7 @@ namespace ScePSP.Hle.Modules.libfont
         /// <param name="FontCharInfoPointer"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xDCC80C2F, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceFontGetCharInfo(Font Font, ushort CharCode, ref FontCharInfo FontCharInfoPointer)
         {
             try

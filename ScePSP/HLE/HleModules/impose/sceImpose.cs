@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Types;
+﻿using ScePSP.Types;
 using ScePSP.Hle.Attributes;
 
 namespace ScePSP.Hle.Modules.impose
@@ -9,7 +9,7 @@ namespace ScePSP.Hle.Modules.impose
         uint umdPopupStatus;
 
         [HlePspFunction(NID = 0x72189C48, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public uint sceImposeSetUMDPopupFunction(uint UmdPopupStatus)
         {
             this.umdPopupStatus = UmdPopupStatus;
@@ -17,7 +17,7 @@ namespace ScePSP.Hle.Modules.impose
         }
 
         [HlePspFunction(NID = 0xE0887BC8, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public uint sceImposeGetUMDPopupFunction()
         {
             return this.umdPopupStatus;
@@ -30,7 +30,7 @@ namespace ScePSP.Hle.Modules.impose
         /// <param name="ConfirmButton">Button assignment (Cross or circle)</param>
         /// <returns>Less than 0 on error</returns>
         [HlePspFunction(NID = 0x36AA6E91, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceImposeSetLanguageMode(PspLanguages Language, PSP_SYSTEMPARAM_BUTTON_PREFERENCE ConfirmButton)
         {
             HleConfig.Language = Language;
@@ -45,7 +45,7 @@ namespace ScePSP.Hle.Modules.impose
         /// <param name="ConfirmButton">Pointer to store the button assignment (Cross or circle)</param>
         /// <returns>Less than 0 on error</returns>
         [HlePspFunction(NID = 0x24FD7BCF, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceImposeGetLanguageMode(out PspLanguages Language,
             out PSP_SYSTEMPARAM_BUTTON_PREFERENCE ConfirmButton)
         {
@@ -96,7 +96,7 @@ namespace ScePSP.Hle.Modules.impose
         /// <param name="value">The backlight timer. (30 to a lot of seconds)</param>
         /// <returns>&lt; 0 on error.</returns>
         [HlePspFunction(NID = 0x967F6D4A, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceImposeSetBacklightOffTime(int value)
         {
             return 0;
@@ -107,7 +107,7 @@ namespace ScePSP.Hle.Modules.impose
         /// </summary>
         /// <returns>Backlight timer in seconds, or &lt; 0 on error</returns>
         [HlePspFunction(NID = 0x8F6E3518, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceImposeGetBacklightOffTime()
         {
             return 0;

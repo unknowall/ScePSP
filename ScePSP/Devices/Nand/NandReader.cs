@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace ScePSP.Core
+namespace ScePSP.Devices
 {
     /// <summary>
     /// 512+16 bytes per page

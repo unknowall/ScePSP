@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Components.Rtc;
+﻿using ScePSP.Devices.Rtc;
 using ScePSP.Hle.Attributes;
 using ScePSP.Hle.Vfs;
 using ScePSPUtils;
@@ -25,7 +25,7 @@ namespace ScePSP.Hle.Modules.rtc
         }
 
         [HlePspFunction(NID = 0x27C4594C, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcGetTime_t(ref ScePspDateTime DateTime, out uint UnixTime)
         {
             UnixTime = (uint)DateTime.ToUnixTimestamp();
@@ -230,7 +230,7 @@ namespace ScePSP.Hle.Modules.rtc
         ///		Less than 0 on error
         /// </returns>
         [HlePspFunction(NID = 0x6FF40ACC, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcGetTick(ref ScePspDateTime Date, out ulong Tick)
         {
             try
@@ -256,7 +256,7 @@ namespace ScePSP.Hle.Modules.rtc
         ///		Less than 0 on error
         /// </returns>
         [HlePspFunction(NID = 0x7ED29E40, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcSetTick(ScePspDateTime* Date, ulong* Ticks)
         {
             try
@@ -380,7 +380,7 @@ namespace ScePSP.Hle.Modules.rtc
         }
 
         [HlePspFunction(NID = 0xCF561893, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcGetWin32FileTime(ScePspDateTime* DateTime, ulong* Win32Time)
         {
             return 0;
@@ -391,21 +391,21 @@ namespace ScePSP.Hle.Modules.rtc
         /// </summary>
         /// <returns></returns>
         [HlePspFunction(NID = 0x0498FB3C, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcFormatRFC3339()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x1909C99B, FirmwareVersion = 200)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcSetTime64_t()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x203CEB0D, FirmwareVersion = 200)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcGetLastReincarnatedTime()
         {
             return 0;
@@ -416,7 +416,7 @@ namespace ScePSP.Hle.Modules.rtc
         /// </summary>
         /// <returns></returns>
         [HlePspFunction(NID = 0x27F98543, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcFormatRFC3339LocalTime()
         {
             return 0;
@@ -427,14 +427,14 @@ namespace ScePSP.Hle.Modules.rtc
         /// </summary>
         /// <returns></returns>
         [HlePspFunction(NID = 0x28E1E988, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcParseRFC3339()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0x36075567, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcGetDosTime()
         {
             return 0;
@@ -447,7 +447,7 @@ namespace ScePSP.Hle.Modules.rtc
         /// <param name="?"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x3A807CC8, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcSetTime_t(out ScePspDateTime date, uint time)
         {
             date = ScePspDateTime.FromDateTime(DateTimeRange.ConvertFromUnixTimestamp(time));
@@ -460,7 +460,7 @@ namespace ScePSP.Hle.Modules.rtc
         /// <param name="year">Year to check if it's a leap year</param>
         /// <returns>1 if year is a leap year, 0 if not</returns>
         [HlePspFunction(NID = 0x42307A17, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public bool sceRtcIsLeapYear(int year)
         {
             return Calendar.IsLeapYear(year);
@@ -530,7 +530,7 @@ namespace ScePSP.Hle.Modules.rtc
         }
 
         [HlePspFunction(NID = 0x62685E98, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcGetLastAdjustedTime()
         {
             return 0;
@@ -548,7 +548,7 @@ namespace ScePSP.Hle.Modules.rtc
         /// <param name="TickUTC">pointer to u64 to receive tick in UTC based time</param>
         /// <returns>0 on success, &lt; 0 on error</returns>
         [HlePspFunction(NID = 0x779242A2, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcConvertLocalTimeToUTC(ref long TickLocal, out long TickUTC)
         {
             TickUTC = TickLocal + GetUTCOffsetInTicks();
@@ -569,7 +569,7 @@ namespace ScePSP.Hle.Modules.rtc
         }
 
         [HlePspFunction(NID = 0x7ACE4C04, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcSetWin32FileTime()
         {
             return 0;
@@ -580,7 +580,7 @@ namespace ScePSP.Hle.Modules.rtc
         /// </summary>
         /// <returns></returns>
         [HlePspFunction(NID = 0x7DE6711B, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcFormatRFC2822LocalTime()
         {
             return 0;
@@ -591,21 +591,21 @@ namespace ScePSP.Hle.Modules.rtc
         /// </summary>
         /// <returns></returns>
         [HlePspFunction(NID = 0xC663B3B9, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcFormatRFC2822()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xDFBC5F16, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcParseDateTime()
         {
             return 0;
         }
 
         [HlePspFunction(NID = 0xF006F264, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceRtcSetDosTime()
         {
             return 0;

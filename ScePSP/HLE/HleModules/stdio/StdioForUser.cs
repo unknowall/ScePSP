@@ -74,7 +74,7 @@ namespace ScePSP.Hle.Modules.stdio
         /// <param name="Mode">The file mode</param>
         /// <returns>&lt; 0 on error.</returns>
         [HlePspFunction(NID = 0x98220F3E, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public StdHandle sceKernelStdoutReopen(string File, HleIoFlags Flags, Vfs.SceMode Mode)
         {
             StdOut = (StdHandle)IoFileMgrForUser.sceIoOpen(File, Flags, Mode);
@@ -90,7 +90,7 @@ namespace ScePSP.Hle.Modules.stdio
         /// <param name="Mode">The file mode</param>
         /// <returns>&lt; 0 on error.</returns>
         [HlePspFunction(NID = 0xFB5380C5, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public StdHandle sceKernelStderrReopen(string File, HleIoFlags Flags, Vfs.SceMode Mode)
         {
             StdError = (StdHandle)IoFileMgrForUser.sceIoOpen(File, Flags, Mode);

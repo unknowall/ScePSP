@@ -1,24 +1,12 @@
 ﻿using System;
 
-namespace ScePSP.Core.Cpu
+namespace ScePSP.Cpu
 {
     public class InvalidAddressException : Exception
     {
-        public InvalidAddressException(string message) : base(message)
-        {
-        }
-
-        public InvalidAddressException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        public InvalidAddressException(ulong address) : base($"Invalid Address : 0x{address:X8}")
-        {
-        }
-
-        public InvalidAddressException(ulong address, Exception innerException) : base(
-            $"Invalid Address : 0x{address:X8}", innerException)
-        {
-        }
+        public InvalidAddressException(string message) : base(message) { }
+        public InvalidAddressException(string message, Exception innerException) : base(message, innerException) { }
+        public InvalidAddressException(ulong Address) : base(String.Format("Invalid Address : 0x{0:X8}", Address)) { }
+        public InvalidAddressException(ulong Address, Exception innerException) : base(String.Format("Invalid Address : 0x{0:X8}", Address), innerException) { }
     }
 }

@@ -62,9 +62,9 @@ namespace ScePSP.Hle.Modules.libatrac3plus
             public SmplStruct Smpl;
             public LoopInfoStruct[] LoopInfoList;
 
-            public int startSkippedSamples;
+            int BlockSize;
 
-            public int BlockSize => this.Format.BlockSize;
+            public int startSkippedSamples;
 
             public CodecType CodecType;
 
@@ -289,6 +289,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
                     {
                         case "fmt ":
                             Format = ChunkStream.ReadStructPartiallyEx<At3FormatStruct>();
+                            BlockSize = Format.BytesPerFrame;
                             break;
                         case "fact":
                             Fact = ChunkStream.ReadStructPartiallyEx<FactStruct>();
@@ -305,8 +306,8 @@ namespace ScePSP.Hle.Modules.libatrac3plus
                                 LoopInfo.StartSample -= Fact.SampleOffset;
                                 LoopInfo.EndSample -= Fact.SampleOffset;
 
-                                Console.WriteLine($"Atrac Loop[{i}]: StartSample {LoopInfo.StartSample} EndSample {LoopInfo.EndSample} " +
-                                    $"PlayCount {LoopInfo.PlayCount} Type {LoopInfo.Type} Fraction {LoopInfo.Fraction}");
+                                //Console.WriteLine($"Atrac Loop[{i}]: StartSample {LoopInfo.StartSample} EndSample {LoopInfo.EndSample} " +
+                                //    $"PlayCount {LoopInfo.PlayCount} Type {LoopInfo.Type} Fraction {LoopInfo.Fraction}");
                             }
 
                             break;
@@ -366,7 +367,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
 
             public void SetPlayPosition(int uiSample, int uiWriteByteFirstBuf, int uiWriteByteSecondBuf)
             {
-                Console.WriteLine($"SetPlayPosition {uiSample} 0x{uiWriteByteFirstBuf:X}");
+                //Console.WriteLine($"SetPlayPosition {uiSample} 0x{uiWriteByteFirstBuf:X}");
 
                 if (uiSample != CurrentFrame && uiSample >= 0 && uiSample < TotalSample)
                 {
@@ -385,7 +386,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
             {
                 if (SamplesOut == null) return 0;
 
-                int BlockSize = Format.BlockSize;
+                //int BlockSize = Format.BlockSize;
 
                 if (BlockSize <= 0)
                 {
@@ -438,7 +439,7 @@ namespace ScePSP.Hle.Modules.libatrac3plus
 
                 PrimaryBuffer.DeallocateFromParent();
 
-                Console.WriteLine($"Atrac {this.GetUidIndex()} Dispose");
+                //Console.WriteLine($"Atrac {this.GetUidIndex()} Dispose");
             }
 
         }

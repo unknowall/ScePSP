@@ -133,7 +133,7 @@ namespace ScePSP.Hle.Modules._unknownPrx
         /// </summary>
         /// <returns></returns>
         [HlePspFunction(NID = 0x5BE0E002, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUsbWaitState()
         {
             return 0;
@@ -144,7 +144,7 @@ namespace ScePSP.Hle.Modules._unknownPrx
         /// </summary>
         /// <returns></returns>
         [HlePspFunction(NID = 0x1C360735, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUsbWaitCancel()
         {
             return 0;

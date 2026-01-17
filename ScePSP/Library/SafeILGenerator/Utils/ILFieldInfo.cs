@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace SafeILGenerator.Utils
 {
-    public class IlFieldInfo
+    public class ILFieldInfo
     {
         private static FieldInfo GetFieldInfo(Expression expression)
         {
@@ -16,7 +16,7 @@ namespace SafeILGenerator.Utils
                         expression = expr.Body;
                         continue;
                     case MemberExpression expr:
-                        return (FieldInfo)expr.Member;
+                        return (FieldInfo) expr.Member;
                 }
                 throw new NotImplementedException("NodeType: " + expression.NodeType);
             }

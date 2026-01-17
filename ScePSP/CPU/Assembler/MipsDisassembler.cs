@@ -1,12 +1,11 @@
 ﻿using SafeILGenerator.Ast;
-using ScePSP.Core.Cpu.Switch;
-using ScePSP.Core.Cpu.Table;
-using ScePSP.Core.Memory;
+using ScePSP.Cpu.Table;
+using ScePSP.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ScePSP.Core.Cpu.Assembler
+namespace ScePSP.Cpu.Assembler
 {
     public class MipsDisassembler
     {
@@ -14,115 +13,127 @@ namespace ScePSP.Core.Cpu.Assembler
 
         public struct Result
         {
-            public uint InstructionPc;
+            public uint InstructionPC;
             public Instruction Instruction;
             public InstructionInfo InstructionInfo;
             public IPspMemoryInfo MemoryInfo;
 
-            public static string GprIndexToRegisterName(int registerIndex) => $"r{registerIndex}";
-            public static string FprIndexToRegisterName(int registerIndex) => $"f{registerIndex}";
+            public static String GprIndexToRegisterName(int RegisterIndex)
+            {
+                return String.Format("r{0}", RegisterIndex);
+            }
 
-            public static readonly Dictionary<string, Func<Result, string>> Opcodes =
-                new Dictionary<string, Func<Result, string>>
-                {
-                    //return (uint)(PC & ~PspMemory.MemoryMask) | (Instruction.JUMP << 2);
-                    {
-                        "O",
-                        result => $"0x{result.Instruction.GetBranchAddress(result.InstructionPc):X8}"
-                    },
-                    {"J", result => GprIndexToRegisterName(result.Instruction.Rs)},
-                    {
-                        "j",
-                        result => $"0x{result.Instruction.GetJumpAddress(result.MemoryInfo, result.InstructionPc):X8}"
-                    },
+            public static String FprIndexToRegisterName(int RegisterIndex)
+            {
+                return String.Format("f{0}", RegisterIndex);
+            }
 
-                    {"s", result => GprIndexToRegisterName(result.Instruction.Rs)},
-                    {"d", result => GprIndexToRegisterName(result.Instruction.Rd)},
-                    {"t", result => GprIndexToRegisterName(result.Instruction.Rt)},
+            public static readonly Dictionary<string, Func<Result, string>> Opcodes = new Dictionary<string, Func<Result, string>>()
+            {
+				//return (uint)(PC & ~PspMemory.MemoryMask) | (Instruction.JUMP << 2);
+				{ "O", Result => String.Format("0x{0:X8}", Result.Instruction.GetBranchAddress(Result.InstructionPC)) },
+                { "J", Result => GprIndexToRegisterName(Result.Instruction.RS) },
+                { "j", Result => String.Format("0x{0:X8}", Result.Instruction.GetJumpAddress(Result.MemoryInfo, Result.InstructionPC)) },
 
-                    {"S", result => FprIndexToRegisterName(result.Instruction.Fs)},
-                    {"D", result => FprIndexToRegisterName(result.Instruction.Fd)},
-                    {"T", result => FprIndexToRegisterName(result.Instruction.Ft)},
+                { "s", Result => GprIndexToRegisterName(Result.Instruction.RS) },
+                { "d", Result => GprIndexToRegisterName(Result.Instruction.RD) },
+                { "t", Result => GprIndexToRegisterName(Result.Instruction.RT) },
 
-                    {"C", result => $"{result.Instruction.Code}"},
-                    {"a", result => result.Instruction.Pos.ToString()},
-                    {"i", result => result.Instruction.Imm.ToString()},
-                    {"I", result => $"0x{result.Instruction.Immu:X4}"},
-                };
+                { "S", Result => FprIndexToRegisterName(Result.Instruction.FS) },
+                { "D", Result => FprIndexToRegisterName(Result.Instruction.FD) },
+                { "T", Result => FprIndexToRegisterName(Result.Instruction.FT) },
+
+                { "C", Result => String.Format("{0}", Result.Instruction.CODE) },
+                { "a", Result => Result.Instruction.POS.ToString() },
+                { "i", Result => Result.Instruction.IMM.ToString() },
+                { "I", Result => String.Format("0x{0:X4}", Result.Instruction.IMMU) },
+            };
 
             public string AssemblyLine
             {
                 get
                 {
-                    var parameters = "";
-                    var encoding = InstructionInfo.AsmEncoding;
-                    for (var n = 0; n < encoding.Length; n++)
+                    var Parameters = "";
+                    var Encoding = InstructionInfo.AsmEncoding;
+                    for (int n = 0; n < Encoding.Length; n++)
                     {
-                        var c = encoding[n];
-                        if (c == '%')
+                        var Char = Encoding[n];
+                        if (Char == '%')
                         {
-                            var found = false;
-                            for (var match = 2; match >= 0; match--)
+                            bool Found = false;
+                            for (int Match = 2; Match >= 0; Match--)
                             {
-                                var part = encoding.Substr(n + 1, match);
-                                if (!Opcodes.ContainsKey(part)) continue;
-                                parameters += Opcodes[part](this);
-                                n += part.Length;
-                                found = true;
-                                break;
+                                var Part = Encoding.Substr(n + 1, Match);
+                                if (Opcodes.ContainsKey(Part))
+                                {
+                                    Parameters += Opcodes[Part](this);
+                                    n += Part.Length;
+                                    Found = true;
+                                    break;
+                                }
                             }
-                            if (found) continue;
+                            if (Found) continue;
                             //Parameters += Char;
                         }
-                        parameters += c;
+                        Parameters += Char;
                     }
 
-                    return $"{InstructionInfo.Name} {parameters}";
+                    return String.Format("{0} {1}", InstructionInfo.Name, Parameters);
                 }
             }
 
-            public override string ToString() => AssemblyLine;
+            public override string ToString()
+            {
+                return AssemblyLine;
+            }
         }
+        static protected Func<uint, MipsDisassembler, Result> ProcessCallback;
 
-        protected static Func<uint, MipsDisassembler, Result> ProcessCallback;
+        public MipsDisassembler()
+        {
+        }
 
         protected static InstructionInfo[] InstructionLookup;
 
-        private static AstGenerator ast = AstGenerator.Instance;
+        static private AstGenerator ast = AstGenerator.Instance;
 
-        public Result Disassemble(uint pc, Instruction instruction)
+        public Result Disassemble(uint PC, Instruction Instruction)
         {
             if (ProcessCallback == null)
             {
-                var dictionary = new Dictionary<InstructionInfo, int>();
+                var Dictionary = new Dictionary<InstructionInfo, int>();
 
-                InstructionLookup = InstructionTable.All.ToArray();
-                for (var n = 0; n < InstructionLookup.Length; n++) dictionary[InstructionLookup[n]] = n;
+                InstructionLookup = InstructionTable.ALL.ToArray();
+                for (int n = 0; n < InstructionLookup.Length; n++) Dictionary[InstructionLookup[n]] = n;
 
-                ProcessCallback = EmitLookupGenerator.GenerateSwitch<Func<uint, MipsDisassembler, Result>>("",
-                    InstructionTable.All, instructionInfo => ast.Return(ast.CallStatic(
-                        (Func<uint, int, Result>)_InternalHandle,
+                ProcessCallback = EmitLookupGenerator.GenerateSwitch<Func<uint, MipsDisassembler, Result>>("", InstructionTable.ALL, (InstructionInfo) =>
+                {
+                    return ast.Return(ast.CallStatic(
+                        (Func<uint, int, Result>)MipsDisassembler._InternalHandle,
                         ast.Argument<uint>(0),
-                        instructionInfo != null ? dictionary[instructionInfo] : -1
-                    )));
+                        (InstructionInfo != null) ? Dictionary[InstructionInfo] : -1
+                    ));
+                });
             }
 
-            var result = ProcessCallback(instruction, this);
-            if (result.InstructionInfo == null)
+            var Result = ProcessCallback(Instruction, this);
+            if (Result.InstructionInfo == null)
             {
-                Console.Error.WriteLine(
-                    $"Instruction at 0x{pc:X8} with data 0x{(uint)instruction:X8} didn't generate a value");
-                result.InstructionInfo = InstructionTable.Unknown;
+                Console.Error.WriteLine(String.Format("Instruction at 0x{0:X8} with data 0x{1:X8} didn't generate a value", PC, (uint)Instruction));
+                Result.InstructionInfo = InstructionTable.Unknown;
             }
-            result.InstructionPc = pc;
-            return result;
+            Result.InstructionPC = PC;
+            return Result;
         }
 
-        public static Result _InternalHandle(uint data, int index) => new Result()
+        public static Result _InternalHandle(uint Data, int Index)
         {
-            MemoryInfo = DefaultMemoryInfo.Instance,
-            Instruction = data,
-            InstructionInfo = index != -1 ? InstructionLookup[index] : null,
-        };
+            return new Result()
+            {
+                MemoryInfo = DefaultMemoryInfo.Instance,
+                Instruction = Data,
+                InstructionInfo = (Index != -1) ? MipsDisassembler.InstructionLookup[Index] : null,
+            };
+        }
     }
 }

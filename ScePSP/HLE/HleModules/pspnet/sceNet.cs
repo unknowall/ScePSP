@@ -71,7 +71,7 @@ namespace ScePSP.Hle.Modules.pspnet
         /// <param name="String">The string to convert.</param>
         /// <param name="MacAddress">Pointer to a buffer to store the result.</param>
         [HlePspFunction(NID = 0xD27961C9, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceNetEtherStrton(string String, byte* MacAddress)
         {
             PointerUtils.Memset(MacAddress, 0, 6);

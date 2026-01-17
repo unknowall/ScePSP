@@ -1,6 +1,6 @@
 ﻿using ScePSP.Hle.Attributes;
 using System;
-using Kirk = ScePSP.Core.Components.Crypto.Kirk;
+using Kirk = ScePSP.Devices.Crypto.Kirk;
 
 namespace ScePSP.Hle.Modules.kirk
 {
@@ -10,14 +10,14 @@ namespace ScePSP.Hle.Modules.kirk
         Kirk Kirk = PSPDrivers.Devices.Kirk;
 
         [HlePspFunction(NID = 0x00EEC06A, FirmwareVersion = 150)]
-        [HlePspNotImplemented()]
+        [HleTrackCall()]
         public int sceUtilsBufferCopy()
         {
             throw new NotImplementedException();
         }
 
         [HlePspFunction(NID = 0x8EEB7BF2, FirmwareVersion = 150)]
-        [HlePspNotImplemented()]
+        [HleTrackCall()]
         public void sceUtilsBufferCopyByPolling()
         {
             throw new NotImplementedException();
@@ -30,7 +30,7 @@ namespace ScePSP.Hle.Modules.kirk
         }
 
         [HlePspFunction(NID = 0x77E97079, FirmwareVersion = 150)]
-        [HlePspNotImplemented()]
+        [HleTrackCall()]
         public void sceUtilsBufferCopyByPollingWithRange()
         {
             throw new NotImplementedException();

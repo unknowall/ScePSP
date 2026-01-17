@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace ScePSP.Core.Types
+namespace ScePSP.Types
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct OutputPixel

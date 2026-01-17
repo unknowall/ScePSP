@@ -1,6 +1,6 @@
-﻿using ScePSP.Core.Components.Rtc;
-using ScePSP.Core.Cpu;
-using ScePSP.Core.Memory;
+﻿using ScePSP.Devices.Rtc;
+using ScePSP.Cpu;
+using ScePSP.Memory;
 using ScePSP.Hle.Interop;
 using ScePSP.Hle.Managers;
 using ScePSPUtils;

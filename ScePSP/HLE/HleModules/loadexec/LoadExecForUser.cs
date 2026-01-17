@@ -47,7 +47,7 @@ namespace ScePSP.Hle.Modules.loadexec
         }
 
         [HlePspFunction(NID = 0x2AC9954B, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceKernelExitGameWithStatus()
         {
             return 0;

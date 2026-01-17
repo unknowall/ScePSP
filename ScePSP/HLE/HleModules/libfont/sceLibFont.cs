@@ -152,7 +152,7 @@ namespace ScePSP.Hle.Modules.libfont
         /// <param name="ErrorCode">Pointer to store any error code.</param>
         /// <returns>FontLibraryHandle</returns>
         [HlePspFunction(NID = 0x67F17ED7, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public FontLibrary sceFontNewLib(FontNewLibParams* Params, uint* ErrorCode)
         {
             //if (Params != null) throw (new NotImplementedException("(Params != null)"));

@@ -22,7 +22,7 @@ namespace ScePSP.Hle.Modules.utility
         /// <param name="id">ID of net Configuration (1 to n)</param>
         /// <returns>0 on success, </returns>
         [HlePspFunction(NID = 0x5EEE6548, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityCheckNetParam(int id)
         {
             //throw (new NotImplementedException());
@@ -58,7 +58,7 @@ namespace ScePSP.Hle.Modules.utility
         /// <param name="data">Parameter data</param>
         /// <returns>0 on success, </returns>
         [HlePspFunction(NID = 0x434D4B3A, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilityGetNetParam(int conf, int param, NetData* data)
         {
             PointerUtils.StoreStringOnPtr("Temp", Encoding.UTF8, data[0].asString, 128);

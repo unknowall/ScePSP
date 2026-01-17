@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ScePSP.Core.AudioBackEnd
+namespace ScePSP.BackEnd
 {
     public abstract class AudioBackEnd
     {

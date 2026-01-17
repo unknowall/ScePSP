@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ScePSP.Core.Types.Controller
+namespace ScePSP.Types.Controller
 {
     [Flags]
     public enum PspCtrlButtons : uint

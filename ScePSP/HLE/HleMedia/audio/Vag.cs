@@ -80,16 +80,12 @@ namespace ScePSP.Hle.Formats.audio
 
         public Vag(byte* DataPointer, int DataLength)
         {
-            //this.Data = Data;
             var Header = *(Header*)DataPointer;
             if (Header.Magic != 0)
             {
                 Console.Error.WriteLine("Error VAG Magic: {0:X}", Header.Magic);
-                throw new NotImplementedException("Invalid VAG header");
+                //throw new NotImplementedException("Invalid VAG header");
             }
-            //var Hash = CSPspEmu.Core.Hashing.FastHash(DataPointer, DataLength);
-            //Console.WriteLine("Header.SampleRate: {0}", Header.SampleRate);
-            //Console.ReadKey();
 
             /*
             switch (Header.magic) {
@@ -107,9 +103,6 @@ namespace ScePSP.Hle.Formats.audio
 
             SamplesCount = (DataLength - 0x10) * 56 / 16;
             SamplesDecoder = new Decoder((Block*)&DataPointer[0x10], (DataLength - 0x10) / 16);
-            //SamplesDecoder = Decoder.DecodeBlocksStream(Blocks).GetEnumerator();
-
-            //SaveToWav("output.wav");
         }
 
         public void SaveToWav(string FileName)

@@ -239,6 +239,8 @@ namespace LightGL
                     //GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_DEPTH_COMPONENT, this.Width, this.Height, 0, GL.GL_DEPTH_COMPONENT, GL.GL_UNSIGNED_SHORT, DataPtr); break;
                 }
             }
+
+            Data = new byte[0];
         }
 
         private int GetOpenglFormat()

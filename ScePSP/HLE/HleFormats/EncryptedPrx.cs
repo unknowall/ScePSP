@@ -3,7 +3,7 @@ using ScePSPUtils;
 using System;
 using System.IO;
 using System.Linq;
-using Kirk = ScePSP.Core.Components.Crypto.Kirk;
+using Kirk = ScePSP.Devices.Crypto.Kirk;
 
 namespace ScePSP.Hle.Formats
 {

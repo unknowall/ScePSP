@@ -1,15 +1,13 @@
-﻿namespace ScePSP.Core.Cpu.VFpu
+﻿namespace ScePSP.Cpu.VFpu
 {
     public struct VfpuRegisterInt
     {
         public uint Value;
 
-        public static implicit operator int(VfpuRegisterInt value) => (int)value.Value;
-
-        public static implicit operator VfpuRegisterInt(int value) => new VfpuRegisterInt { Value = (uint)value };
-
-        public static implicit operator uint(VfpuRegisterInt value) => value.Value;
-
-        public static implicit operator VfpuRegisterInt(uint value) => new VfpuRegisterInt { Value = value };
+        static public implicit operator int(VfpuRegisterInt Value) { return (int)Value.Value; }
+        static public implicit operator VfpuRegisterInt(int Value) { return new VfpuRegisterInt() { Value = (uint)Value }; }
+        static public implicit operator uint(VfpuRegisterInt Value) { return Value.Value; }
+        static public implicit operator VfpuRegisterInt(uint Value) { return new VfpuRegisterInt() { Value = Value }; }
     }
+
 }

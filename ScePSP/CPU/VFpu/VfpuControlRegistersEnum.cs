@@ -1,22 +1,85 @@
-﻿namespace ScePSP.Core.Cpu.VFpu
+﻿namespace ScePSP.Cpu.VFpu
 {
     public enum VfpuControlRegistersEnum
     {
-        VfpuPfxs = 128, // Source prefix stack
-        VfpuPfxt = 129, // Target prefix stack
-        VfpuPfxd = 130, // Destination prefix stack
-        VfpuCc = 131, // Condition information
-        VfpuInf4 = 132, // VFPU internal information 4
-        VfpuRsv5 = 133, // Not used (reserved)
-        VfpuRsv6 = 134, // Not used (reserved)
-        VfpuRev = 135, // VFPU revision information
-        VfpuRcx0 = 136, // Pseudorandom number generator information 0
-        VfpuRcx1 = 137, // Pseudorandom number generator information 1
-        VfpuRcx2 = 138, // Pseudorandom number generator information 2
-        VfpuRcx3 = 139, // Pseudorandom number generator information 3
-        VfpuRcx4 = 140, // Pseudorandom number generator information 4
-        VfpuRcx5 = 141, // Pseudorandom number generator information 5
-        VfpuRcx6 = 142, // Pseudorandom number generator information 6
-        VfpuRcx7 = 143, // Pseudorandom number generator information 7
+        /// <summary>
+        /// Source prefix stack
+        /// </summary>
+        VFPU_PFXS = 128,
+
+        /// <summary>
+        /// Target prefix stack
+        /// </summary>
+        VFPU_PFXT = 129,
+
+        /// <summary>
+        /// Destination prefix stack
+        /// </summary>
+        VFPU_PFXD = 130,
+
+        /// <summary>
+        /// Condition information
+        /// </summary>
+        VFPU_CC = 131,
+
+        /// <summary>
+        /// VFPU internal information 4
+        /// </summary>
+        VFPU_INF4 = 132,
+
+        /// <summary>
+        /// Not used (reserved)
+        /// </summary>
+        VFPU_RSV5 = 133,
+
+        /// <summary>
+        /// Not used (reserved)
+        /// </summary>
+        VFPU_RSV6 = 134,
+
+        /// <summary>
+        /// VFPU revision information
+        /// </summary>
+        VFPU_REV = 135,
+
+        /// <summary>
+        /// Pseudorandom number generator information 0
+        /// </summary>
+        VFPU_RCX0 = 136,
+
+        /// <summary>
+        /// Pseudorandom number generator information 1
+        /// </summary>
+        VFPU_RCX1 = 137,
+
+        /// <summary>
+        /// Pseudorandom number generator information 2
+        /// </summary>
+        VFPU_RCX2 = 138,
+
+        /// <summary>
+        /// Pseudorandom number generator information 3
+        /// </summary>
+        VFPU_RCX3 = 139,
+
+        /// <summary>
+        /// Pseudorandom number generator information 4
+        /// </summary>
+        VFPU_RCX4 = 140,
+
+        /// <summary>
+        /// Pseudorandom number generator information 5
+        /// </summary>
+        VFPU_RCX5 = 141,
+
+        /// <summary>
+        /// Pseudorandom number generator information 6
+        /// </summary>
+        VFPU_RCX6 = 142,
+
+        /// <summary>
+        /// Pseudorandom number generator information 7
+        /// </summary>
+        VFPU_RCX7 = 143,
     }
 }

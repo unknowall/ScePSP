@@ -1,4 +1,4 @@
-﻿using ScePSP.Core.Memory;
+﻿using ScePSP.Memory;
 using ScePSP.Hle.Managers;
 using ScePSP.Hle.Vfs;
 using ScePSPUtils;
@@ -418,7 +418,7 @@ namespace ScePSP.Hle.Modules.utility
         /// </summary>
         /// <returns>0 on success</returns>
         [HlePspFunction(NID = 0x9790B33C, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int sceUtilitySavedataShutdownStart()
         {
             //throw(new NotImplementedException());
@@ -431,7 +431,7 @@ namespace ScePSP.Hle.Modules.utility
         /// </summary>
         /// <param name="unknown">unknown, pass 1</param>
         [HlePspFunction(NID = 0xD4B95FFB, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public void sceUtilitySavedataUpdate(int unknown)
         {
             throw new NotImplementedException();

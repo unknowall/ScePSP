@@ -107,7 +107,7 @@ namespace ScePSP.Hle.Modules.sc_sascore
         /// <param name="SustainLevel"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x5F9529F6, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int __sceSasSetSL(uint SasCorePointer, int Voice, int SustainLevel)
         {
             var SasVoice = GetSasCoreVoice(SasCorePointer, Voice);
@@ -150,9 +150,8 @@ namespace ScePSP.Hle.Modules.sc_sascore
         /// <returns>0 on success.</returns>
         /// <seealso cref="http://en.wikipedia.org/wiki/Synthesizer#ADSR_envelope"/>
         [HlePspFunction(NID = 0x019B25EB, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
-        public int __sceSasSetADSR(uint SasCorePointer, int Voice, AdsrFlags Flags, int AttackRate, int DecayRate,
-            int SustainRate, int ReleaseRate)
+        //[HlePspNotImplemented]
+        public int __sceSasSetADSR(uint SasCorePointer, int Voice, AdsrFlags Flags, int AttackRate, int DecayRate, int SustainRate, int ReleaseRate)
         {
             var SasVoice = GetSasCoreVoice(SasCorePointer, Voice);
 
@@ -173,7 +172,7 @@ namespace ScePSP.Hle.Modules.sc_sascore
         /// <param name="Env2Bitfield"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xCBCD4F79, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        //[HlePspNotImplemented]
         public int __sceSasSetSimpleADSR(uint SasCorePointer, int Voice, ushort Env1Bitfield, ushort Env2Bitfield)
         {
             var SasVoice = GetSasCoreVoice(SasCorePointer, Voice);
@@ -211,7 +210,7 @@ namespace ScePSP.Hle.Modules.sc_sascore
         /// <param name="releaseCurveMode"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x9EC3676A, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int __sceSasSetADSRmode(uint SasCorePointer, int voice, AdsrFlags flags, AdsrCurveMode attackCurveMode,
             AdsrCurveMode decayCurveMode, AdsrCurveMode sustainCurveMode, AdsrCurveMode releaseCurveMode)
         {
@@ -259,7 +258,7 @@ namespace ScePSP.Hle.Modules.sc_sascore
         /// <param name="NoiseFrequency"></param>
         /// <returns></returns>
         [HlePspFunction(NID = 0xB7660A23, FirmwareVersion = 150)]
-        [HlePspNotImplemented]
+        [HleTrackCall]
         public int __sceSasSetNoise(uint SasCorePointer, int Voice, int NoiseFrequency)
         {
             return 0;

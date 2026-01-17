@@ -36,16 +36,10 @@ _(Figure 1: runing Castlevania - The Dracula X Chronicles (USA) on title )_
 _(Figure 2: runing Castlevania - The Dracula X Chronicles (USA) in game )_  
 <img width="962" height="576" alt="捕获1" src="https://github.com/user-attachments/assets/ed22a0c8-2d8d-4698-8c1f-543399c8c323" />
 
-_(Figure 3: runing Valhalla Knights in game (many graphics issues))_  
-<img width="962" height="576" alt="捕获3" src="https://github.com/user-attachments/assets/505cf60a-aa29-436b-8ffc-4867aea3a19a" />
+_(Figure 3: playing Guilty Gear XX Accent Core Plus)_  
+<img width="962" height="576" alt="捕获03" src="https://github.com/user-attachments/assets/e2fb67a0-1944-4805-aabd-847da2f8acab" />
 
-_(Figure 4: runing PSPDemo/morphskin.elf)_  
-<img width="962" height="576" alt="PSP2" src="https://github.com/user-attachments/assets/355a362a-350e-4d66-b6ac-dc8bd4e6cc81" />
-
-_(Figure 5: runing PSPDemo/zbufferfog.elf)_  
-<img width="962" height="576" alt="PSP3" src="https://github.com/user-attachments/assets/73c29348-f7ba-47a4-86d0-47c0cc1ff248" />
-
-_(Figure 6: runing PSPDemo/lights.prx)_  
+_(Figure 4: runing PSPDemo/lights.prx)_  
 <img width="962" height="576" alt="捕获" src="https://github.com/user-attachments/assets/b80b1d4d-26ed-4664-8abb-0bf42749d7f8" />
 
 #### Compilation 

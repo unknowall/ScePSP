@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace ScePSP.Runner.Tasks
 {
-    public abstract class PspMainTask : IRunnableTask
+    public abstract class BaseTask : IRunnableTask
     {
         static Logger Logger = Logger.GetLogger("MainTask");
 
@@ -24,16 +24,13 @@ namespace ScePSP.Runner.Tasks
         protected AutoResetEvent PauseEvent = new AutoResetEvent(false);
         protected AutoResetEvent ResumeEvent = new AutoResetEvent(false);
 
-        protected PspMainTask()
+        protected BaseTask()
         {
         }
 
-        public void StartSynchronized(bool ForceRun = false)
+        public void StartSynchronized()
         {
-            if (Running && !ForceRun)
-            {
-                return;
-            }
+            if (Running) return;
 
             //Console.WriteLine("Task {0} Starting...", this);
 
@@ -81,12 +78,12 @@ namespace ScePSP.Runner.Tasks
                 }
             }
 
-            Console.WriteLine("Task {0} Stopped!", this);
+            //Console.WriteLine("Task {0} Stopped!", this);
         }
 
         public void PauseSynchronized()
         {
-            Console.WriteLine("Task {0} Pauseing!", this);
+            //Console.WriteLine("Task {0} Pauseing!", this);
 
             ThreadTaskQueue.EnqueueAndWaitStarted(() =>
             {
@@ -94,14 +91,14 @@ namespace ScePSP.Runner.Tasks
                 {
                     if (!Running) break;
                 }
-            }, TimeSpan.FromSeconds(2), () => { Console.WriteLine("Timed Out!"); });
+            }, TimeSpan.FromSeconds(2), () => { Console.WriteLine("Pauseing Timed Out!"); });
         }
 
         public void ResumeSynchronized()
         {
             if (!Running) return;
 
-            Console.WriteLine("Task {0} Resumeing!", this);
+            //Console.WriteLine("Task {0} Resumeing!", this);
 
             PauseEvent.Set();
         }

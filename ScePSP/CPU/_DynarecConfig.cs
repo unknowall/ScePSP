@@ -18,17 +18,17 @@
 
         public const bool DebugFunctionCreation = false;
 
-        public const bool EnableGpuSignalsCallback = false;
+        public const bool EnableGpuSignalsCallback = true;
 
         public const bool EnableGpuFinishCallback = false;
 
         public const bool ImmediateLinking = true;
 
-        public const bool AllowCreatingUsedFunctionsInBackground = false;
+        public const bool AllowCreatingUsedFunctionsInBackground = true;
 
         public const bool DisableDotNetJitOptimizations = false;
 
-        public const bool ForceJitOptimizationsOnEvenLargeFunctions = false;
+        public const bool ForceJitOptimizationsOnEvenLargeFunctions = true;
 
         //public const int InstructionCountToDisableOptimizations = 500;
         //public const int InstructionCountToDisableOptimizations = 200;

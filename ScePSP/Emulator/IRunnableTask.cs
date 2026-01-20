@@ -2,7 +2,7 @@
 {
     public interface IRunnableTask
     {
-        void StartSynchronized(bool ForceRun = false);
+        void StartSynchronized();
 
         void StopSynchronized();
 

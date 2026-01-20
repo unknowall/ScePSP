@@ -24,13 +24,19 @@ namespace ScePSP.GE
 
         public volatile AutoResetEvent QueueEvent = new AutoResetEvent(false);
 
+        public enum WaitStatus
+        {
+            Pending = 0,
+            AllSync = 1,
+            Idle = 2
+        }
+        public WaitableStateMachine<WaitStatus> SyncStatus = new WaitableStateMachine<WaitStatus>();
+
         protected volatile Queue<GECore> FreeQueue;
 
         public const int GECoreCount = 64;
 
         public readonly GECore[] List = new GECore[GECoreCount];
-
-        public AutoResetEvent GEEvent = new AutoResetEvent(false);
 
         public volatile GECore First, Last, Current = null;
 
@@ -48,6 +54,7 @@ namespace ScePSP.GE
                 List[n] = GE;
                 EnqueueFree(List[n]);
             }
+            SyncStatus.SetValue(WaitStatus.Idle);
         }
 
         public GECore Get(int Index)
@@ -63,7 +70,6 @@ namespace ScePSP.GE
                 result = FreeQueue.Dequeue();
                 result.Available = false;
             }
-
             return result;
         }
 
@@ -74,11 +80,11 @@ namespace ScePSP.GE
                 FreeQueue.Enqueue(GE);
                 GE.SetFree();
             }
-            GEEvent.Set();
         }
 
         public void EnqueueFirst(GECore GE)
         {
+            SyncStatus.SetValue(WaitStatus.Pending);
             lock (Queue)
             {
                 Queue.AddFirst(GE);
@@ -89,6 +95,7 @@ namespace ScePSP.GE
 
         public void Enqueue(GECore GE)
         {
+            SyncStatus.SetValue(WaitStatus.Pending);
             lock (Queue)
             {
                 Queue.AddLast(GE);
@@ -116,29 +123,18 @@ namespace ScePSP.GE
                     Last = Current;
                 }
                 Current = null;
+                SyncStatus.SetValue(WaitStatus.AllSync);
             }
         }
 
-        public void WaitSync(GEStatusEnum type, Action CallBack = null)
+        public void WaitSync(Action CallBack = null)
         {
             Syncing = true;
-            bool alldone = false;
-            while (!alldone && PSPDrivers.Runing)
+            SyncStatus.CallbackOnStateOnce(WaitStatus.AllSync, () =>
             {
-                alldone = true;
-                foreach (GECore GE in Queue)
-                {
-                    if (GE.Status != type)
-                    {
-                        alldone = false;
-                        break;
-                    }
-                }
-                Thread.Sleep(10);
-            }
-            if (BackEnd != null && Last != null) BackEnd.Sync(Last.GEStateStruct);
-            CallBack?.Invoke();
-            Syncing = false;
+                CallBack?.Invoke();
+                Syncing = false;
+            });
         }
 
         public void SetCurrent()
@@ -150,12 +146,5 @@ namespace ScePSP.GE
         {
             BackEnd.UnsetCurrent();
         }
-
-        public int GeContinue()
-        {
-            return 0;
-        }
-
-
     }
 }

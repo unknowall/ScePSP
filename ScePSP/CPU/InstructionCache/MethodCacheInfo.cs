@@ -2,6 +2,7 @@
 using SafeILGenerator.Utils;
 using ScePSP.Cpu.Dynarec;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace ScePSP.Cpu.InstructionCache
 {
@@ -9,14 +10,8 @@ namespace ScePSP.Cpu.InstructionCache
     {
         static public readonly MethodCacheInfo Methods = new MethodCacheInfo();
 
-        /// <summary>
-        /// 
-        /// </summary>
         private DynarecFunction _DynarecFunction;
 
-        /// <summary>
-        /// 
-        /// </summary>
         private Action<CpuThreadState> FunctionDelegate;
 
         public DynarecFunction DynarecFunction
@@ -42,9 +37,6 @@ namespace ScePSP.Cpu.InstructionCache
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public string Name
         {
             get
@@ -54,25 +46,10 @@ namespace ScePSP.Cpu.InstructionCache
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public MethodCache MethodCache;
 
-        /// <summary>
-        /// Functions that are calling to this one.
-        /// And that should be uncached when this function
-        /// </summary>
-        //public List<MethodCacheInfo> FunctionsUsingThis = new List<MethodCacheInfo>();
-
-        /// <summary>
-        /// Static Field that will hold the Delegate
-        /// </summary>
         public ILInstanceHolderPoolItem<Action<CpuThreadState>> StaticField;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public bool FollowPspCallingConventions;
 
         private MethodCacheInfo()
@@ -87,49 +64,24 @@ namespace ScePSP.Cpu.InstructionCache
             this.PC = PC;
         }
 
-        /// <summary>
-        /// EntryPoint setted first.
-        /// </summary>
         public uint PC;
 
-        /// <summary>
-        /// EntryPoint for this function.
-        /// </summary>
         public uint EntryPC { get { return DynarecFunction.EntryPC; } }
 
-        /// <summary>
-        /// Address of the start of the function. Usually is equal to EntryPC but not always.
-        /// </summary>
         public uint MinPC { get { return DynarecFunction.MinPC; } }
 
-        /// <summary>
-        /// Last address with code for this function.
-        /// </summary>
         public uint MaxPC { get { return DynarecFunction.MaxPC; } }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public uint TotalInstructions { get { return (DynarecFunction.MaxPC - DynarecFunction.MinPC) / 7; } }
 
-        /// <summary>
-        /// Ast for this function.
-        /// </summary>
         public AstNodeStm AstTree { get { return DynarecFunction != null ? DynarecFunction.AstNode : null; } }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="CpuThreadState"></param>
         //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void CallDelegate(CpuThreadState CpuThreadState)
         {
             FunctionDelegate(CpuThreadState);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void Free()
         {
             MethodCache.Free(this);

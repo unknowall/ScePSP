@@ -11,6 +11,8 @@ namespace ScePSP
 
         public bool Paused => PSPDrivers.Runner?.Paused ?? false;
 
+        public bool Runing;
+
         public void Pause()
         {
             if (!Paused)
@@ -39,7 +41,7 @@ namespace ScePSP
             PSPDrivers.initialize(PSPDrivers.PspGpuType.OpenGL, PSPDrivers.PspAudioType.SDL, WindowHandle);
 
             PSPDrivers.Config.CpuConfig.DebugSyscalls = TraceSyscalls;
-            PSPDrivers.Config.CpuConfig.TrackCallStack = TrackCallStack;
+            PSPDrivers.Config.CpuConfig.TrackCallStack = false;
 
             PSPDrivers.Config.HleConfig.DebugSyscalls = TraceSyscalls;
             PSPDrivers.Config.HleConfig.UseCoRoutines = true;
@@ -53,9 +55,13 @@ namespace ScePSP
         {
             PSPDrivers.Runner?.StopSynchronized();
 
+            PSPDrivers.GeBackEnd?.StopSynchronized();
+
             PSPDrivers.Config.StoredConfig?.Save();
 
             PSPDrivers.free();
+
+            Runing = false;
         }
 
         private void LoadFile(string FileName)
@@ -67,13 +73,12 @@ namespace ScePSP
                 throw new Exception($"File '{FileName}' doesn't exists");
             }
 
-            //for SFA3 Crash
-            //PSPDrivers.Tasks.CpuTask.StartSynchronized(true);
-
             PSPDrivers.Runner.CpuTask.ThreadTaskQueue.EnqueueAndWaitCompleted(() =>
             {
                 PSPDrivers.Runner.CpuTask._LoadFile(FileName);
             });
+
+            Runing = true;
         }
 
         public void ShowDebugInformation()

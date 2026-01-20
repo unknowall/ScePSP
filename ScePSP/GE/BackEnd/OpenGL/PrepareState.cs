@@ -485,20 +485,6 @@ namespace ScePSP.BackEnd.OpenGL
 
             var textureState = gpuState->TextureMappingState.TextureState;
 
-            TexUnit
-                .SetWrap(
-                    (GLWrap)(textureState.WrapU == WrapMode.Repeat ? GL.GL_REPEAT : GL.GL_CLAMP_TO_EDGE),
-                    (GLWrap)(textureState.WrapV == WrapMode.Repeat ? GL.GL_REPEAT : GL.GL_CLAMP_TO_EDGE)
-                )
-                .SetFiltering(
-                    (GLScaleFilter)(textureState.FilterMinification == TextureFilter.Linear
-                        ? GL.GL_LINEAR
-                        : GL.GL_NEAREST),
-                    (GLScaleFilter)(textureState.FilterMagnification == TextureFilter.Linear
-                        ? GL.GL_LINEAR
-                        : GL.GL_NEAREST)
-                );
-
             if (GeTexture.ContainsKey(textureState.Mipmap0.Address))
             {
                 var Texture = GeTexture.GetOrDefault(textureState.Mipmap0.Address, null);
@@ -509,12 +495,26 @@ namespace ScePSP.BackEnd.OpenGL
             }
             else
             {
-                CurrentTextureCache = TextureCache.Get(GeContext);
+                TexCache = TextureCache.Get(GeContext);
 
-                CurrentTextureCache.Texture.Bind();
+                TexCache.Bind();
 
-                TexUnit.SetTexture(CurrentTextureCache.Texture);
+                TexUnit.SetTexture(null).SetIndex(0);
             }
+
+            TexUnit
+            .SetWrap(
+                (GLWrap)(textureState.WrapU == WrapMode.Repeat ? GL.GL_REPEAT : GL.GL_CLAMP_TO_EDGE),
+                (GLWrap)(textureState.WrapV == WrapMode.Repeat ? GL.GL_REPEAT : GL.GL_CLAMP_TO_EDGE)
+            )
+            .SetFiltering(
+                (GLScaleFilter)(textureState.FilterMinification == TextureFilter.Linear
+                    ? GL.GL_LINEAR
+                    : GL.GL_NEAREST),
+                (GLScaleFilter)(textureState.FilterMagnification == TextureFilter.Linear
+                    ? GL.GL_LINEAR
+                    : GL.GL_NEAREST)
+            );
 
             ShaderInfo.texture0.Set(TexUnit);
 

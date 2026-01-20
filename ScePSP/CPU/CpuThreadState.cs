@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime;
+using System.Runtime.CompilerServices;
 
 namespace ScePSP.Cpu
 {
@@ -23,7 +24,7 @@ namespace ScePSP.Cpu
 
         public CpuProcessor CpuProcessor;
 
-        ////[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         public PspMemory Memory
         {
             get
@@ -63,14 +64,8 @@ namespace ScePSP.Cpu
             set { fixed (int* LOPtr = &LO) *(long*)LOPtr = value; }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public uint IC;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public bool BranchFlag;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -236,12 +231,6 @@ namespace ScePSP.Cpu
             }
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Indexes"></param>
-        /// <returns></returns>
         public IEnumerable<int> GPRList(params int[] Indexes)
         {
             return Indexes.Select(Index => GPR[Index]);
@@ -251,10 +240,6 @@ namespace ScePSP.Cpu
         {
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Processor"></param>
         public CpuThreadState(CpuProcessor Processor)
         {
             this.CpuProcessor = Processor;
@@ -281,44 +266,29 @@ namespace ScePSP.Cpu
             }
         }
 
-        /// <summary>
-        /// Calls a syscall.
-        /// </summary>
-        /// <param name="Code"></param>
         public void Syscall(int Code)
         {
             CpuProcessor.Syscall(Code, this);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="DelegateId"></param>
         public void SyscallNative(uint DelegateId)
         {
             CpuProcessor.RegisteredNativeSyscallMethods[DelegateId].PoolItem.Value(this);
         }
 
-        //private DateTime LastTick;
         private int TickCount = 0;
 
         DateTime LastTickYield = DateTime.UtcNow;
 
         public bool EnableYielding = true;
 
-        /// <summary>
-        /// Function called on some situations, that allow
-        /// to yield the thread.
-        /// </summary>
-        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [TargetedPatchingOptOut("Performance critical to inline across NGen image boundaries")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Tick()
         {
             //Console.WriteLine("Tick1");
             if (EnableYielding)
             {
                 TickCount++;
-
                 if ((TickCount & 0x1F) == 1)
                 //if ((TickCount & 3) == 1)
                 {
@@ -346,9 +316,6 @@ namespace ScePSP.Cpu
             Yield();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void Yield()
         {
             if (EnableYielding)
@@ -357,15 +324,8 @@ namespace ScePSP.Cpu
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         static MipsDisassembler MipsDisassembler;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="PC"></param>
         public void Trace(uint PC)
         {
             if (MipsDisassembler == null) MipsDisassembler = new MipsDisassembler();
@@ -373,9 +333,6 @@ namespace ScePSP.Cpu
             Console.WriteLine("  Trace: PC:0x{0:X8} : DATA:0x{1:X8} : {2}", PC, Memory.Read4(PC), Result);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <see cref="http://msdn.microsoft.com/en-us/library/ms253512(v=vs.80).aspx"/>
         private static readonly string[] RegisterMnemonicNames = new string[] {
             "zr", "at", "v0", "v1", "a0", "a1", "a2", "a3",
@@ -384,18 +341,11 @@ namespace ScePSP.Cpu
             "t8", "t9", "k0", "k1", "gp", "sp", "fp", "ra",
         };
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void DumpRegisters()
         {
             DumpRegisters(Console.Out);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="TextWriter"></param>
         public void DumpRegistersCpu(TextWriter TextWriter)
         {
             TextWriter.WriteLine("PC: 0x{0:X8}, HI: 0x{1:X8}, LO: 0x{2:X8}", PC, HI, LO);
@@ -430,10 +380,6 @@ namespace ScePSP.Cpu
             TextWriter.WriteLine();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="TextWriter"></param>
         public void DumpRegisters(TextWriter TextWriter)
         {
             DumpRegistersCpu(TextWriter);
@@ -441,10 +387,6 @@ namespace ScePSP.Cpu
             DumpRegistersVFpu(TextWriter);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="TextWriter"></param>
         public void DumpVfpuRegisters(TextWriter TextWriter)
         {
             for (int Matrix = 0; Matrix < 8; Matrix++)
@@ -463,10 +405,6 @@ namespace ScePSP.Cpu
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="that"></param>
         public unsafe void CopyRegistersFrom(CpuThreadState that)
         {
             this.PC = that.PC;
@@ -511,35 +449,19 @@ namespace ScePSP.Cpu
             catch (SpecialCpu.ReturnFromFunctionException)
             {
             }
-
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="MethodCacheInfo"></param>
-        /// <param name="PC"></param>
         public void _MethodCacheInfo_SetInternal(MethodCacheInfo MethodCacheInfo, uint PC)
         {
             MethodCache._MethodCacheInfo_SetInternal(this, MethodCacheInfo, PC);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Address"></param>
-        /// <param name="PC"></param>
         public void SetPCWriteAddress(uint Address, uint PC)
         {
             //Console.WriteLine("SetPCWriteAddress: {0:X} : {1:X}", Address, PC);
             Memory.SetPCWriteAddress(Address, PC);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="PC"></param>
-        /// <returns></returns>
         public Action<CpuThreadState> GetFuncAtPC(uint PC)
         {
             return CpuProcessor.MethodCache.GetForPC(PC).CallDelegate;

@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace ScePSP.Runner
 {
-    public class PspRunner : IRunnableTask
+    public class Runner : IRunnableTask
     {
         public CpuTask CpuTask => PSPDrivers.Tasks.CpuTask;
 
@@ -22,7 +22,7 @@ namespace ScePSP.Runner
 
         public bool Paused { get; protected set; }
 
-        public PspRunner()
+        public Runner()
         {
             RunnableTaskList.Add(CpuTask);
             RunnableTaskList.Add(GpuTask);
@@ -30,10 +30,10 @@ namespace ScePSP.Runner
             RunnableTaskList.Add(DisplayTask);
         }
 
-        public void StartSynchronized(bool ForceRun = false)
+        public void StartSynchronized()
         {
             RunnableTaskList.ForEach(runnableComponent =>
-                runnableComponent.StartSynchronized(ForceRun)
+                runnableComponent.StartSynchronized()
             );
         }
 

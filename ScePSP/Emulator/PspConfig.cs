@@ -92,14 +92,20 @@ namespace ScePSP
 
         public DateTime LastCheckedTime;
         public bool LimitVerticalSync = true;
-        public int DisplayScale = 2;
+        public int MaxTexCache = 500;
+        public int TexMinMinutes = 1;
+        public int TexMinHits = 50;
         public int RenderScale = 2;
         public bool UseFastMemory = true;
         public bool EnableAstOptimizations = true;
         public ControllerConfig ControllerConfig = new ControllerConfig();
         public List<string> RecentFiles = new List<string>();
         public string IsosPath = null;
-        public bool ScaleTextures = false;
+        public int TexScaleType = 0;
+        public int TexScale = 0;
+        public bool TrackHLECalls = false;
+        public bool H264Enable = false;
+        public string FromPos = null;
 
         #region Serializing
 

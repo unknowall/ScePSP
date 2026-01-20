@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace ScePSP.Runner.Tasks.Display
 {
-    public sealed class DisplayTask : PspMainTask
+    public sealed class DisplayTask : BaseTask, IDisposable
     {
         protected override string ThreadName => "DisplayTask";
 
@@ -21,7 +21,7 @@ namespace ScePSP.Runner.Tasks.Display
         TimeSpan vSyncTimeIncrement = TimeSpan.FromSeconds(1.0 / (PspDisplay.HorizontalSyncHertz / (double)PspDisplay.VsyncRow));
 
         // HACK to give more time to render!
-        //var VSyncTimeIncrement = TimeSpan.FromSeconds(1.0 / (PspDisplay.HorizontalSyncHertz / (double)(PspDisplay.VsyncRow / 2))); 
+        //TimeSpan vSyncTimeIncrement = TimeSpan.FromSeconds(1.0 / (PspDisplay.HorizontalSyncHertz / (double)(PspDisplay.VsyncRow / 2))); 
 
         TimeSpan endTimeIncrement = TimeSpan.FromSeconds(1.0 / (PspDisplay.HorizontalSyncHertz / (double)PspDisplay.NumberOfRows));
 
@@ -36,9 +36,6 @@ namespace ScePSP.Runner.Tasks.Display
         GLTexture2D TexVram;
         bool Vflip;
 
-        private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
-        private int _frameCount;
-        public float CurrentFPS { get; private set; }
         public PSPDrivers.PspGpuType type;
 
         public class ShaderInfoClass
@@ -50,6 +47,7 @@ namespace ScePSP.Runner.Tasks.Display
         static ShaderInfoClass ShaderInfo = new ShaderInfoClass();
 
         public bool triggerStuff = true;
+        public bool FullSpeed = false;
 
         public DisplayTask()
         {
@@ -84,8 +82,22 @@ namespace ScePSP.Runner.Tasks.Display
 
                 Context.ReleaseCurrent();
 
-                _pspDisplay.VBlankEventCall += RenderToWindow;
+                PspDisplay.DrawEvent += RenderToWindow;
             }
+        }
+
+        public void Dispose()
+        {
+            if (Context == null) return;
+
+            PspDisplay.DrawEvent -= RenderToWindow;
+
+            TexVram?.Dispose();
+            VertexBuffer.Dispose();
+            TexCoordsBuffer.Dispose();
+            Shader.Dispose();
+            Context.ReleaseCurrent();
+            Context.Dispose();
         }
 
         private unsafe void GetFromRam()
@@ -111,18 +123,6 @@ namespace ScePSP.Runner.Tasks.Display
             fixed (uint* pp = pixels2)
             {
                 GL.TexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, 512, 272, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, pp);
-            }
-        }
-
-        public void UpdateFrame()
-        {
-            _frameCount++;
-            double elapsedSeconds = _stopwatch.Elapsed.TotalSeconds;
-            if (elapsedSeconds >= 1.0f)
-            {
-                CurrentFPS = (float)(_frameCount / elapsedSeconds);
-                _frameCount = 0;
-                _stopwatch.Restart();
             }
         }
 
@@ -168,8 +168,6 @@ namespace ScePSP.Runner.Tasks.Display
 
             Context.SwapBuffers();
 
-            UpdateFrame();
-
             //Console.WriteLine($" Current GETexture: {GLE.GeTexture.Count}");
 
             //GLE.FrameFB.Clear();
@@ -177,9 +175,9 @@ namespace ScePSP.Runner.Tasks.Display
 
         public void Step(Action DrawStart, Action VBlankStart, Action VBlankEnd)
         {
-            var startTime = DateTime.UtcNow;
-            var vSyncTime = startTime + vSyncTimeIncrement;
-            var endTime = startTime + endTimeIncrement;
+            //var startTime = DateTime.UtcNow;
+            //var vSyncTime = startTime + vSyncTimeIncrement;
+            //var endTime = startTime + endTimeIncrement;
 
             ThreadTaskQueue.HandleEnqueued();
 
@@ -187,12 +185,14 @@ namespace ScePSP.Runner.Tasks.Display
 
             // Draw time
             DrawStart();
-            //ThreadUtils.SleepUntilUtc(vSyncTime);
+            //if (!FullSpeed) ThreadUtils.SleepUntilUtc(vSyncTime);
 
             // VBlank time
             VBlankStart();
             vBlankInterruptHandler.Trigger();
-            ThreadUtils.SleepUntilUtc(endTime);
+            //if (!FullSpeed) ThreadUtils.SleepUntilUtc(endTime);
+            //if (!FullSpeed) ThreadUtils.SleepUntilUtc(vSyncTime);
+            if (!FullSpeed) Thread.Sleep(15.Milliseconds());
             VBlankEnd();
         }
 

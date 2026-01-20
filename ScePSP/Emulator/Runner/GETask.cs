@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace ScePSP.Runner.Tasks.GE
 {
-    public sealed class GETask : PspMainTask
+    public sealed class GETask : BaseTask
     {
         protected override string ThreadName => "GpuTask";
 
@@ -27,7 +27,7 @@ namespace ScePSP.Runner.Tasks.GE
 
             GEList.ProcessInit();
 
-            while (Running)
+            while (true)
             {
                 WaitHandle.WaitAny(new WaitHandle[] { GEList.QueueEvent, ThreadTaskQueue.EnqueuedEvent, RunningUpdatedEvent }, 200.Milliseconds());
 

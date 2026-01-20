@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace ScePSP.Runner.Tasks.Audio
 {
-    public sealed class AudioTask : PspMainTask
+    public sealed class AudioTask : BaseTask
     {
         private PspAudio PspAudio => PSPDrivers.PspAudio;
 
@@ -13,22 +13,15 @@ namespace ScePSP.Runner.Tasks.Audio
         protected override void Main()
         {
             var threadId = Environment.CurrentManagedThreadId;
-
             Console.Out.WriteLineColored(ConsoleColor.White, $"## AUDIO Runing ThreadId={threadId}");
-
-            while (Running)
+            while (true)
             {
                 ThreadTaskQueue.HandleEnqueued();
-
                 if (!Running) break;
-
                 PspAudio.Update();
-
                 Thread.Sleep(1);
             }
-
             PspAudio.StopSynchronized();
-
         }
     }
 }

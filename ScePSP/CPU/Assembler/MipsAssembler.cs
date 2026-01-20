@@ -8,11 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-//using CSPspEmu.Memory;
-//using CSPspEmu.Utils;
-//using CSharpUtils.Arrays;
-//using CSharpUtils.Streams;
-//using CSharpUtils;
 
 namespace ScePSP.Cpu.Assembler
 {

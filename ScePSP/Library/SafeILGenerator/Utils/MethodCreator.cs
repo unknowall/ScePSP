@@ -9,8 +9,7 @@ namespace SafeILGenerator.Utils
 {
     public class MethodCreator
     {
-        public static TDelegate CreateDynamicMethod<TDelegate>(Module module, string name, bool disableOptimizations,
-            Action<MethodInfo> createMethod)
+        public static TDelegate CreateDynamicMethod<TDelegate>(Module module, string name, bool disableOptimizations, Action<MethodInfo> createMethod)
         {
             if (disableOptimizations) module = null;
             if (module == null) module = Assembly.GetExecutingAssembly().ManifestModule;
@@ -27,16 +26,13 @@ namespace SafeILGenerator.Utils
             return (TDelegate) (object) dynamicMethod.CreateDelegate(typeof(TDelegate));
         }
 
-        public static TDelegate CreateMethodInClass<TDelegate>(Module module, string name, bool disableOptimizations,
-            Action<MethodInfo> createMethod)
+        public static TDelegate CreateMethodInClass<TDelegate>(Module module, string name, bool disableOptimizations, Action<MethodInfo> createMethod)
         {
             var delegateType = typeof(TDelegate).GetMethod("Invoke");
-            //const string dllName = "_DynamicDll.dll";
             var dynamicAssemblyName = "DynamicAssembly";
             const string dynamicModuleName = "DynamicModule";
             var dynamicMethodName = name;
 
-            //var assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(dynamicAssemblyName), AssemblyBuilderAccess.RunAndCollect, dllName);
             var assembly = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(dynamicAssemblyName), AssemblyBuilderAccess.RunAndCollect);
             var mmodule = assembly.DefineDynamicModule(dynamicModuleName);
             var type = mmodule.DefineType("DynamicType");

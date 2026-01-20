@@ -266,10 +266,6 @@ namespace LightGL.Windows
                     _sharedContext = _context;
                     _sharedContextRefCount = 1;
                 }
-                else
-                {
-                    _sharedContextRefCount++;
-                }
             }
 
             SetVSync(1);

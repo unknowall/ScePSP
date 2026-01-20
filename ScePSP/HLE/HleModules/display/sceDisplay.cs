@@ -26,8 +26,6 @@ namespace ScePSP.Hle.Modules.display
         [HlePspFunction(NID = 0x0E20F177, FirmwareVersion = 150)]
         public int sceDisplaySetMode(int Mode, int Width, int Height)
         {
-            //Console.WriteLine("sceDisplay.sceDisplaySetMode");
-
             PspDisplay.CurrentInfo.Mode = Mode;
             PspDisplay.CurrentInfo.Width = Width;
             PspDisplay.CurrentInfo.Height = Height;
@@ -101,7 +99,7 @@ namespace ScePSP.Hle.Modules.display
         /// <param name="Sync">One of ::PspDisplaySetBufSync</param>
         /// <returns></returns>
         [HlePspFunction(NID = 0x289D82FE, FirmwareVersion = 150)]
-        //[HlePspNotImplemented]
+        [HleTrackCall]
         public int sceDisplaySetFrameBuf(uint Address, int BufferWidth, GuPixelFormats PixelFormat, PspDisplay.SyncMode Sync)
         {
             Action UpdateInfo = () =>
@@ -190,7 +188,6 @@ namespace ScePSP.Hle.Modules.display
         /// <param name="sync">One of ::PspDisplaySetBufSync</param>
         /// <returns>0 on success</returns>
         [HlePspFunction(NID = 0xEEDA2E54, FirmwareVersion = 150)]
-        //public int sceDisplayGetFrameBuf(uint* topaddr, int* bufferwidth, PspDisplayPixelFormats* pixelformat, PspDisplaySetBufSync sync)
         public int sceDisplayGetFrameBuf(ref uint topaddr, ref int bufferwidth, ref GuPixelFormats pixelformat, uint sync)
         {
             topaddr = PspDisplay.CurrentInfo.FrameAddress;

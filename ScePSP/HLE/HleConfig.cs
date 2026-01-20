@@ -20,7 +20,7 @@ namespace ScePSP.Hle
 
         public bool DebugThreadSwitching = false;
 
-        public bool DebugHLECall = true;
+        public bool DebugHLECall = false;
 
         //public PspConfirmButton ConfirmButton;
 

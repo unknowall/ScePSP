@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using static ScePSP.GE.GEList;
 
 namespace ScePSP.Hle.Modules.ge
 {
@@ -55,7 +56,7 @@ namespace ScePSP.Hle.Modules.ge
 
                 GE.OldSDK = true;
 
-                GE.SyncWaitDone(null);
+                //GE.SyncWaitDone(null);
             }
 
             GE.CallbacksId = -1;
@@ -385,12 +386,6 @@ namespace ScePSP.Hle.Modules.ge
             return 0;
         }
 
-        /// <summary>
-        /// Wait for syncronisation of a list.
-        /// </summary>
-        /// <param name="DisplayListId">The queue ID of the list to sync.</param>
-        /// <param name="SyncType">Specifies the condition to wait on.  One of PspGeSyncType.</param>
-        /// <returns>???</returns>
         [HlePspFunction(NID = 0x03444EB4, FirmwareVersion = 150)]
         [HleTrackCall]
         public int sceGeListSync(int GEProcessID, int Mode)
@@ -398,54 +393,47 @@ namespace ScePSP.Hle.Modules.ge
             var GE = GeList.Get(GEProcessID);
 
             int result = 0;
-
-            if (Mode == 0 && !GE.Done)
+            GEStatusEnum WaitAt = GEStatusEnum.Completed;
+            if (Mode == 0 && GE.Done)
             {
-                //if (ThreadManager.Current != null)
-                //    ThreadManager.Current.SetWaitAndPrepareWakeUp(
-                //            HleThread.WaitType.GraphicEngine, "sceGeListSync",
-                //            GE,
-                //            (WakeUp) => { GE.SyncWaitDone(WakeUp); }
-                //    );
-
-                GE.SyncWaitDone(null);
+                //GE.SyncWait(WaitAt);
+                return 0;
             }
             else if (Mode == 1)
             {
-                GE.SyncWaitStall(null);
-
+                WaitAt = GEStatusEnum.StallReached;
+                //GE.SyncWaitStall(WaitAt);
                 result = (int)GE.SyncStatus();
             }
+
+            if (ThreadManager.Current != null)
+                ThreadManager.Current.SetWaitAndPrepareWakeUp(
+                        HleThread.WaitType.GraphicEngine, "sceGeListSync",
+                        GE,
+                        (WakeUp) => { GE.SyncWait(WaitAt, WakeUp); }
+                );
 
             return result;
         }
 
-        /// <summary>
-        /// Wait for drawing to complete.
-        /// </summary>
-        /// <param name="SyncType">Specifies the condition to wait on.  One of ::PspGeSyncType.</param>
-        /// <returns>???</returns>
-        [HlePspFunction(NID = 0xB287BD61, FirmwareVersion = 150, CheckInsideInterrupt = true)]
+        [HlePspFunction(NID = 0xB287BD61, FirmwareVersion = 150, CheckInsideInterrupt = false)]
         [HleTrackCall]
         public int sceGeDrawSync(int Mode)
         {
             int result = 0;
-
             if (Mode == 0)
             {
-                //if (ThreadManager.Current != null)
-                //    ThreadManager.Current.SetWaitAndPrepareWakeUp(
-                //            HleThread.WaitType.GraphicEngine, "sceGeDrawSync",
-                //            GeList,
-                //            (WakeUp) => { GeList.WaitSync(GEStatusEnum.Completed, WakeUp); }
-                //    );
-
-                GeList.WaitSync(GEStatusEnum.Completed, null);
+                if (ThreadManager.Current != null)
+                    ThreadManager.Current.SetWaitAndPrepareWakeUp(
+                            HleThread.WaitType.GraphicEngine, "sceGeDrawSync",
+                            GeList,
+                            (WakeUp) => { GeList.WaitSync(WakeUp); }
+                    );
+                //GeList.WaitSync(null);
             }
             else if (Mode == 1)
             {
-                GeList.WaitSync(GEStatusEnum.StallReached, null);
-
+                //GeList.WaitSync( null);
                 result = (int)GeList.Last.SyncStatus();
             }
 

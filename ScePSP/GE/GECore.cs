@@ -27,13 +27,10 @@ namespace ScePSP.GE
         private static readonly Logger Logger = Logger.GetLogger("GE");
 
         internal PspMemory Memory;
-
         public GpuStateStruct* GEStateStruct;
 
         private GERunner Runner;
-
         public delegate void GeCoreOpDelegate(GERunner Runner, OpCodes GpuOpCode, uint Params);
-
         private static readonly GeCoreOpDelegate InstructionSwitch = GECore.GenerateSwitch();
 
         public int Id;
@@ -42,6 +39,7 @@ namespace ScePSP.GE
         public volatile uint AddressCurrent;
         public volatile uint AddressStall;
         public volatile uint AddressEnd;
+        public uint Pc;
 
         public AutoResetEvent StatusSync = new AutoResetEvent(false);
         private GlobalGpuState GlobalGpuState;
@@ -49,6 +47,7 @@ namespace ScePSP.GE
 
         int MaxWaitCount = 0;
         public GEStatusEnum Status;
+        public WaitableStateMachine<GEStatusEnum> WaitStatus = new WaitableStateMachine<GEStatusEnum>();
 
         public OptionalParams OptParam = new OptionalParams();
         public Stack<uint> CallStack = new Stack<uint>(0x100);
@@ -57,11 +56,9 @@ namespace ScePSP.GE
 
         public SignalBehavior Signal;
 
-        int _primCount;
+        public int _primCount;
 
         public int[] CMDValues = new int[0xFFFF];
-
-        public uint Pc;
 
         public bool StallReached
         {
@@ -82,40 +79,29 @@ namespace ScePSP.GE
         public void SetStartAddress(uint value, uint Stall)
         {
             uint Addr = value & PspMemory.MemoryMask;
-
             uint StallAddr = Stall & PspMemory.MemoryMask;
-
             AddressStart = Addr;
-
             AddressCurrent = Addr;
-
             AddressStall = StallAddr;
-
             Pc = AddressCurrent;
-
             Status = (Addr == StallAddr) ? GEStatusEnum.StallReached : GEStatusEnum.Queued;
+            WaitStatus.SetValue(Status);
         }
 
         public void SetStallAddress(uint value)
         {
             uint Addr = value & PspMemory.MemoryMask;
-
             if (Addr == AddressStall) return;
-
             //if (AddressStall != 0) SyncWaitStall();
-
             AddressStall = Addr;
-
             Sync();
         }
 
         public void SkipEnd()
         {
             var Current = AddressCurrent;
-
             var OP1 = *(GpuInstruction*)Memory.PspAddressToPointerUnsafe(Current);
             var OP2 = *(GpuInstruction*)Memory.PspAddressToPointerUnsafe(Current + 4);
-
             if (OP1.OpCode == OpCodes.FINISH && OP2.OpCode == OpCodes.END)
             {
                 AddressCurrent += 8;
@@ -140,19 +126,6 @@ namespace ScePSP.GE
             return Status == GEStatusEnum.StallReached && MaxWaitCount > 0;
         }
 
-        public bool WaitForSync(int millis)
-        {
-            while (true)
-            {
-                if (StatusSync.WaitOne(millis))
-                {
-                    break;
-                }
-                return false;
-            }
-            return true;
-        }
-
         public void Sync()
         {
             StatusSync.Set();
@@ -161,13 +134,11 @@ namespace ScePSP.GE
         public void WaitSyncStall()
         {
             //Console.Out.WriteLineColored(ConsoleColor.Red, "WaitSyncStall Start!");
-
             Status = GEStatusEnum.StallReached;
-
-            if (!WaitForSync(1000))
+            WaitStatus.SetValue(Status);
+            if (!StatusSync.WaitOne(1000))
             {
                 MaxWaitCount++;
-
                 if (MaxWaitCount > 60)
                 {
                     Console.Out.WriteLineColored(ConsoleColor.Red, "WaitSyncStall too long, aborting the list {0}", this);
@@ -176,16 +147,17 @@ namespace ScePSP.GE
             else if (!StallReached)
             {
                 Status = GEStatusEnum.Drawing;
+                WaitStatus.SetValue(Status);
             }
         }
 
         public void WaitSyncPause()
         {
             Status = GEStatusEnum.EndReached;
-            if (!WaitForSync(1000))
+            WaitStatus.SetValue(Status);
+            if (!StatusSync.WaitOne(1000))
             {
                 MaxWaitCount++;
-
                 if (MaxWaitCount > 60)
                 {
                     Console.Out.WriteLineColored(ConsoleColor.Red, "WaitSyncPause too long, aborting the list {0}", this);
@@ -194,6 +166,7 @@ namespace ScePSP.GE
             else
             {
                 Status = GEStatusEnum.Drawing;
+                WaitStatus.SetValue(Status);
             }
         }
 
@@ -206,6 +179,7 @@ namespace ScePSP.GE
             Pause = false;
             MaxWaitCount = 0;
             Status = GEStatusEnum.Drawing;
+            WaitStatus.SetValue(Status);
             while (!Done)
             {
                 if (Pause) { WaitSyncPause(); }
@@ -219,11 +193,8 @@ namespace ScePSP.GE
                 if (Done)
                 {
                     Status = GEStatusEnum.EndReached;
-                    if (Finish)
-                    {
-                        Status = GEStatusEnum.Completed;
-                        break;
-                    }
+                    if (Finish) Status = GEStatusEnum.Completed;
+                    WaitStatus.SetValue(Status);
                 }
             }
         }
@@ -241,7 +212,6 @@ namespace ScePSP.GE
             ILGenerator.Emit(System.Reflection.Emit.OpCodes.Ldarg_1);
             ILGenerator.Emit(System.Reflection.Emit.OpCodes.Switch, SwitchLabels);
             ILGenerator.Emit(System.Reflection.Emit.OpCodes.Ret);
-
             for (int n = 0; n < SwitchLabels.Length; n++)
             {
                 ILGenerator.MarkLabel(SwitchLabels[n]);
@@ -267,39 +237,29 @@ namespace ScePSP.GE
                 }
                 ILGenerator.Emit(System.Reflection.Emit.OpCodes.Ret);
             }
-
             return (GeCoreOpDelegate)DynamicMethod.CreateDelegate(typeof(GeCoreOpDelegate));
         }
 
         internal GpuInstruction ReadInstructionAndMoveNext()
         {
             Pc = AddressCurrent;
-
             GpuInstruction Value = *(GpuInstruction*)Memory.PspAddressToPointerUnsafe(AddressCurrent);
-
             AddressCurrent += 4;
-
             return Value;
         }
 
         private void ProcessInstruction()
         {
             Runner.PC = AddressCurrent;
-
             var Instruction = ReadInstructionAndMoveNext();
-
             Runner.OpCode = Instruction.OpCode;
-
             Runner.Params24 = Instruction.Params;
-
             CMDValues[(int)Runner.OpCode] = (int)Instruction.Instruction & 0x00FFFFFF;
-
             InstructionSwitch(Runner, Instruction.OpCode, Instruction.Params);
 
             //if (Debug)
             //{
             //    var WritePC = Memory.GetPCWriteAddress(Runner.PC);
-
             //    Console.Error.WriteLine(
             //        "CODE(0x{0:X}-0x{1:X}) : PC(0x{2:X}) : {3} : 0x{4:X} : Done:{5}",
             //        AddressCurrent,
@@ -359,16 +319,9 @@ namespace ScePSP.GE
             }
         }
 
-        public void SyncWaitDone(Action CallBack = null)
+        public void SyncWait(GEStatusEnum Status, Action CallBack = null)
         {
-            while (Status != GEStatusEnum.Completed && PSPDrivers.Runing) { Thread.Sleep(1); }
-            CallBack?.Invoke();
-        }
-
-        public void SyncWaitStall(Action CallBack = null)
-        {
-            while (Status != GEStatusEnum.StallReached && PSPDrivers.Runing) { Thread.Sleep(1); }
-            CallBack?.Invoke();
+            WaitStatus.CallbackOnStateOnce(Status, CallBack);
         }
 
         public Matrix4x4 GetMtx(PspGeMatrixTypes MatrixType)
@@ -430,6 +383,7 @@ namespace ScePSP.GE
         public void SetQueued()
         {
             Status = GEStatusEnum.Queued;
+            WaitStatus.SetValue(Status);
         }
 
         public void SetFree()

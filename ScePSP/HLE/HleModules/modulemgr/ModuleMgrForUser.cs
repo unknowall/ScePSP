@@ -121,9 +121,6 @@ namespace ScePSP.Hle.Modules.modulemgr
             throw new SceKernelSelfStopUnloadModuleException();
         }
 
-        //public int lastModuleId = 1;
-
-        //public HleUidPool<HleModule> Modules = new HleUidPool<HleModule>();
         public HleUidPool<HleModuleGuest> Modules = new HleUidPool<HleModuleGuest>();
 
         public ElfPspLoader Loader => PSPDrivers.Loader;
@@ -240,8 +237,7 @@ namespace ScePSP.Hle.Modules.modulemgr
         /// <returns>??? on success, otherwise one of ::PspKernelErrorCodes.</returns>
         [HlePspFunction(NID = 0x50F0C1EC, FirmwareVersion = 150)]
         [HleTrackCall]
-        public int sceKernelStartModule(CpuThreadState CpuThreadState, int ModuleId, int ArgumentsSize,
-            uint ArgumentsPointer, int* Status, SceKernelSMOption* SceKernelSMOption)
+        public int sceKernelStartModule(CpuThreadState CpuThreadState, int ModuleId, int ArgumentsSize, uint ArgumentsPointer, int* Status, SceKernelSMOption* SceKernelSMOption)
         {
             var Module = Modules.Get(ModuleId);
 
@@ -257,7 +253,6 @@ namespace ScePSP.Hle.Modules.modulemgr
                 ThreadManForUser.sceKernelStartThread(NewCpuThreadState, ThreadId, ArgumentsSize, ArgumentsPointer);
             }
 
-            //throw(new NotImplementedException());
             if (Status != null)
             {
                 *Status = 0;
@@ -423,7 +418,6 @@ namespace ScePSP.Hle.Modules.modulemgr
         [HleTrackCall]
         public int sceKernelStopUnloadSelfModule(int ArgumentSize, void* ArgumentPointer, int* StatusPointer, void* OptionsAddress)
         {
-            //throw new NotImplementedException("sceKernelStopUnloadSelfModule");
             return 0;
         }
     }

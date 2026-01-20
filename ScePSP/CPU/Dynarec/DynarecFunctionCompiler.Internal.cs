@@ -15,8 +15,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-#pragma warning disable CS0162
-
 namespace ScePSP.Cpu.Dynarec
 {
     public partial class DynarecFunctionCompiler
@@ -24,13 +22,9 @@ namespace ScePSP.Cpu.Dynarec
         internal class InternalFunctionCompiler
         {
             public static readonly Func<uint, CpuEmitter, AstNodeStm> CpuEmitterInstruction = EmitLookupGenerator.GenerateSwitchDelegateReturn<CpuEmitter, AstNodeStm>("CpuEmitterInstruction", InstructionTable.ALL);
-            
             static MipsDisassembler MipsDisassembler = new MipsDisassembler();
-
             CpuEmitter CpuEmitter;
-
             DynarecFunctionCompiler DynarecFunctionCompiler;
-
             IInstructionReader InstructionReader;
 
             CpuProcessor CpuProcessor => PSPDrivers.CPU;
@@ -96,10 +90,6 @@ namespace ScePSP.Cpu.Dynarec
                 }
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <returns></returns>
             internal DynarecFunction CreateFunction()
             {
                 CpuEmitter.SpecialName = "";
@@ -645,5 +635,4 @@ namespace ScePSP.Cpu.Dynarec
             }
         }
     }
-#pragma warning restore CS0162
 }

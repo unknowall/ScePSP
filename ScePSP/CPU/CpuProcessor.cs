@@ -12,7 +12,7 @@ namespace ScePSP.Cpu
 
         public CpuConfig CpuConfig => PSPDrivers.Config.CpuConfig;
 
-        public PspMemory Memory =>PSPDrivers.PspMemory;
+        public PspMemory Memory => PSPDrivers.PspMemory;
 
         public ICpuConnector CpuConnector => PSPDrivers.CpuConnector;
 

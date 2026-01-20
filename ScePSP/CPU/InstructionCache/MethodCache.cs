@@ -1,4 +1,5 @@
-﻿using LightGL.DynamicLibrary;
+﻿using LightCodec.h264.decoder;
+using LightGL.DynamicLibrary;
 using SafeILGenerator.Ast.Generators;
 using ScePSP.Cpu.Dynarec;
 using ScePSP.Cpu.Emitter;
@@ -24,7 +25,8 @@ namespace ScePSP.Cpu.InstructionCache
 
         public CpuProcessor CpuProcessor => PSPDrivers.CPU;
 
-        MethodCompilerThread MethodCompilerThread;
+        public MethodCompilerThread MethodCompilerThread;
+        public bool Runing = true;
 
         public MethodCache()
         {
@@ -118,7 +120,7 @@ namespace ScePSP.Cpu.InstructionCache
         }
     }
 
-    internal class MethodCompilerThread
+    public class MethodCompilerThread
     {
         private Thread Thread;
         private Dictionary<uint, DynarecFunction> Functions = new Dictionary<uint, DynarecFunction>();
@@ -138,15 +140,15 @@ namespace ScePSP.Cpu.InstructionCache
             this.Thread.Start();
         }
 
+        public void Clear()
+        {
+            Functions.Clear();
+            ExploringPCs.Clear();
+        }
+
         private bool _ShouldAdd(uint PC)
         {
             return !Functions.ContainsKey(PC) && !ExploringPCs.Contains(PC);
-        }
-
-        private void _AddedPC(uint PC)
-        {
-            //Console.WriteLine("Enqueing: {0:X8}", PC);
-            ExploringPCs.Add(PC);
         }
 
         public void AddPCNow(uint PC)
@@ -155,7 +157,7 @@ namespace ScePSP.Cpu.InstructionCache
             {
                 if (_ShouldAdd(PC))
                 {
-                    _AddedPC(PC);
+                    ExploringPCs.Add(PC);
                     ExploreQueue.AddFirst(PC);
                 }
             }
@@ -167,7 +169,7 @@ namespace ScePSP.Cpu.InstructionCache
             {
                 if (_ShouldAdd(PC))
                 {
-                    _AddedPC(PC);
+                    ExploringPCs.Add(PC);
                     ExploreQueue.AddLast(PC);
                 }
             }
@@ -177,22 +179,14 @@ namespace ScePSP.Cpu.InstructionCache
 
         private void Main()
         {
-            Console.WriteLine("MethodCache.Start()");
-            try
+            while (MethodCache.Runing)
             {
-                while (true)
-                {
-                    var PC = ExploreQueue.ReadOne();
-                    //Console.Write("Compiling {0:X8}...", PC);
-                    var DynarecFunction = _GenerateForPC(PC);
-                    lock (this) this.Functions[PC] = DynarecFunction;
-                    //Console.WriteLine("Ok");
-                    CompletedFunction.Set();
-                }
-            }
-            finally
-            {
-                Console.WriteLine("MethodCache.End()");
+                var PC = ExploreQueue.ReadOne();
+                //Console.Write("Compiling {0:X8}...", PC);
+                var DynarecFunction = _GenerateForPC(PC);
+                lock (this) this.Functions[PC] = DynarecFunction;
+                //Console.WriteLine("Ok");
+                CompletedFunction.Set();
             }
         }
 
@@ -203,7 +197,7 @@ namespace ScePSP.Cpu.InstructionCache
             {
                 Console.Write("PC=0x{0:X8}...", PC);
             }
-            //var Stopwatch = new Logger.Stopwatch();
+
             var Time0 = DateTime.UtcNow;
 
             var DynarecFunction = CpuProcessor.DynarecFunctionCompiler.CreateFunction(new InstructionStreamReader(new PspMemoryStream(Memory)), PC);
@@ -263,21 +257,6 @@ namespace ScePSP.Cpu.InstructionCache
 
             //DynarecFunction.AstNode = DynarecFunction.AstNode.Optimize(CpuProcessor);
 
-#if DEBUG_FUNCTION_CREATION
-					CpuProcessor.DebugFunctionCreation = true;
-#endif
-
-            //if (CpuProcessor.DebugFunctionCreation)
-            //{
-            //	Console.WriteLine("-------------------------------------");
-            //	Console.WriteLine("Created function for PC=0x{0:X8}", PC);
-            //	Console.WriteLine("-------------------------------------");
-            //	CpuThreadState.DumpRegistersCpu(Console.Out);
-            //	Console.WriteLine("-------------------------------------");
-            //	Console.WriteLine(DynarecFunction.AstNode.ToCSharpString());
-            //	Console.WriteLine("-------------------------------------");
-            //}
-
             return DynarecFunction;
         }
 
@@ -292,26 +271,5 @@ namespace ScePSP.Cpu.InstructionCache
                 return this.Functions[PC];
             }
         }
-
-        //public DynarecFunction GetDynarecFunctionForPC(uint PC)
-        //{
-        //	//var DynarecFunction = CpuProcessor.DynarecFunctionCompiler.CreateFunction(new InstructionStreamReader(new PspMemoryStream(Memory)), PC);
-        //
-        //	//Console.WriteLine("+++++++++++++++++++++++++++++: {0:X8}", PC);
-        //	while (true)
-        //	{
-        //		lock (this)
-        //		{
-        //			if (this.Functions.ContainsKey(PC))
-        //			{
-        //				//Console.WriteLine("-----------------------------");
-        //				return this.Functions[PC];
-        //			}
-        //		}
-        //		CompletedFunction.WaitOne();
-        //		//Console.WriteLine("*****************************");
-        //	}
-        //}
     }
-
 }

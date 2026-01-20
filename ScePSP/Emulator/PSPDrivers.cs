@@ -46,7 +46,7 @@ namespace ScePSP
 
         public static bool Runing = false;
 
-        public static PspRunner Runner;
+        public static Runner.Runner Runner;
 
         public static CpuProcessor CPU;
 
@@ -170,7 +170,7 @@ namespace ScePSP
 
             public static Kirk Kirk;
 
-            public static PspController PspController;
+            public static PspController Controller;
         }
 
         public static class Config
@@ -202,7 +202,7 @@ namespace ScePSP
 
         public static void initialize(PspGpuType gpu, PspAudioType audio, IntPtr WindowHandle = default)
         {
-            Config.StoredConfig = new PspStoredConfig();
+            Config.StoredConfig = PspStoredConfig.Load();
             Config.CpuConfig = new CpuConfig();
             Config.ElfConfig = new ElfConfig();
             Config.HleConfig = new HleConfig();
@@ -238,7 +238,7 @@ namespace ScePSP
 
             Devices.PspBattery = new Battery();
             Devices.Kirk = new Kirk();
-            Devices.PspController = new PspController();
+            Devices.Controller = new PspController();
 
             switch (gpu)
             {
@@ -296,7 +296,7 @@ namespace ScePSP
 
             Tasks.DisplayTask.type = gpu;
 
-            Runner = new PspRunner();
+            Runner = new Runner.Runner();
 
             Runing = true;
 
@@ -309,7 +309,14 @@ namespace ScePSP
 
             Runing = false;
 
+            Tasks.CpuTask.Running = false;
+            Tasks.GpuTask.Running = false;
+            Tasks.AudioTask.Running = false;
+            Tasks.DisplayTask.Running = false;
+
             PspMemory.Dispose();
+
+            MethodCache.Runing = false;
 
             HLE.ModuleMgrForUser.Dispose();
             HLE.HleModuleManager.Dispose();
@@ -335,6 +342,8 @@ namespace ScePSP
             HleModules.sceNetAdhocctl.Dispose();
             HleModules.sceNet.Dispose();
             HleModules.KDebugForKernel.Dispose();
+
+            Tasks.DisplayTask.Dispose();
 
             GC.Collect();
         }

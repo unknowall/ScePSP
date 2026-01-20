@@ -40,8 +40,8 @@ namespace ScePSP.BackEnd.OpenGL
         public GLFrameBuffer FrameFB;
         public GLTexture2D FrameTex2D, FrameTexDEPTH;
         public GLTexture2D LogicTex2D;
-        public TextureCacheGL TextureCache;
-        public TextureGL CurrentTextureCache;
+        public TextureCache TextureCache;
+        public TTexture TexCache;
         public GLTextureUnit TexUnit;
         public int _Width, _Height;
 
@@ -104,7 +104,7 @@ namespace ScePSP.BackEnd.OpenGL
 
         public GLBackEnd()
         {
-            TextureCache = new TextureCacheGL(Memory, this);
+            TextureCache = new TextureCache(Memory, PSPDrivers.Config.StoredConfig);
             VertexReader = new VertexReader();
         }
 
@@ -195,9 +195,6 @@ namespace ScePSP.BackEnd.OpenGL
 
         public override void StopSynchronized()
         {
-            //Running = false;
-            //StopEvent.WaitOne();
-
             if (AlreadyInitialized)
             {
                 _verticesPositionBuffer.Dispose();
@@ -220,9 +217,15 @@ namespace ScePSP.BackEnd.OpenGL
                 }
                 GeTexture.Clear();
 
-                CurrentTextureCache?.Dispose();
+                TextureCache.Dispose();
+
+                TexCache?.Dispose();
+
+                Context.ReleaseCurrent();
 
                 Context.Dispose();
+
+                AlreadyInitialized = false;
             }
         }
 

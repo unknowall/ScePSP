@@ -95,6 +95,7 @@ namespace ScePSP.Hle.Modules.threadman
         private int _sceKernelWaitSemaCB(SemaphoreId SemaphoreId, int Signal, uint* Timeout, bool HandleCallbacks)
         {
             var CurrentThread = ThreadManager.Current;
+            if (CurrentThread == null) return -1;
             var Semaphore = GetSemaphoreById(SemaphoreId);
             bool TimedOut = false;
 

@@ -358,7 +358,7 @@ namespace ScePSP.Cpu.VFpu
         public static readonly Info[] Constants = new[]
         {
             new Info("VFPU_ZERO", (float)0.0f),
-            new Info("VFPU_HUGE", (float)340282346638528859811704183484516925440f),
+            new Info("VFPU_HUGE", (float)float.MaxValue),
             new Info("VFPU_SQRT2", (float)(Math.Sqrt(2.0))),
             new Info("VFPU_SQRT1_2", (float)(Math.Sqrt(1.0 / 2.0))),
             new Info("VFPU_2_SQRTPI", (float)(2.0 / Math.Sqrt(Math.PI))),

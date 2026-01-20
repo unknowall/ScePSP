@@ -33,7 +33,7 @@ using System.Threading;
 
 namespace ScePSP.Runner.Tasks.Cpu
 {
-    public sealed unsafe class CpuTask : PspMainTask
+    public sealed unsafe class CpuTask : BaseTask
     {
         static Logger Logger = Logger.GetLogger("CpuTask");
 
@@ -88,7 +88,6 @@ namespace ScePSP.Runner.Tasks.Cpu
 
             MemoryStickMountable.Mount("/", new HleIoDriverLocalFileSystem(memoryStickRootFolder));
             var memoryStick = new HleIoDriverMemoryStick(PspMemory, HleCallbackManager, MemoryStickMountable);
-            //var MemoryStick = new HleIoDriverMemoryStick(new HleIoDriverLocalFileSystem(VirtualDirectory).AsReadonlyHleIoDriver());
 
             // http://forums.ps2dev.org/viewtopic.php?t=5680
             HleIoManager.SetDriver("host:", memoryStick);
@@ -153,8 +152,6 @@ namespace ScePSP.Runner.Tasks.Cpu
                         $"0x{HleEmulatorSpecialAddresses.CODE_PTR_FINALIZE_CALLBACK:X}")
             );
 
-            //var ThreadManForUser = ModuleManager.GetModule<ThreadManForUser>();
-
             RegisterModuleSyscall<ThreadManForUser>(0x206D, "sceKernelCreateThread");
             RegisterModuleSyscall<ThreadManForUser>(0x206F, "sceKernelStartThread");
             RegisterModuleSyscall<ThreadManForUser>(0x2071, "sceKernelExitDeleteThread");
@@ -179,8 +176,10 @@ namespace ScePSP.Runner.Tasks.Cpu
             RegisterModuleSyscall<Hle.Modules.emulator.Emulator>(0x1016, "emitLong");
             RegisterModuleSyscall<Hle.Modules.emulator.Emulator>(0x1017, "testArguments");
             //RegisterModuleSyscall<Emulator>(0x7777, "waitThreadForever");
+
             RegisterModuleSyscall<ThreadManForUser>(HleEmulatorSpecialAddresses.CODE_PTR_EXIT_THREAD_SYSCALL,
                 (Func<CpuThreadState, int>)new ThreadManForUser()._hle_sceKernelExitDeleteThread);
+
             RegisterModuleSyscall<Hle.Modules.emulator.Emulator>(HleEmulatorSpecialAddresses.CODE_PTR_FINALIZE_CALLBACK_SYSCALL,
                 (Action<CpuThreadState>)new Hle.Modules.emulator.Emulator().finalizeCallback);
         }
@@ -258,6 +257,7 @@ namespace ScePSP.Runner.Tasks.Cpu
                             id = (string)paramSfo.EntryDictionary.GetOrDefault("DISC_ID", ""); //GAMEDATA_ID
                             PSPDrivers.GameInfo.Psf = paramSfo;
                             PSPDrivers.GameInfo.ID = id;
+                            PSPDrivers.GameInfo.Title = title;
                         });
                         string[] filesToTry = {
                             "/PSP_GAME/SYSDIR/BOOT.BIN",
@@ -290,70 +290,77 @@ namespace ScePSP.Runner.Tasks.Cpu
                     throw new NotImplementedException("Can't load format '" + format + "'");
             }
 
-            Exception loadException = null;
-            HleModuleGuest hleModuleGuest = null;
+            Exception LoadException = null;
+            HleModuleGuest HleModuleGuest = null;
 
-            foreach (var elfLoadStream in elfLoadStreamTry)
+            foreach (var ElfLoadStream in elfLoadStreamTry)
             {
                 try
                 {
-                    loadException = null;
+                    LoadException = null;
 
-                    if (elfLoadStream.Length < 256) throw new InvalidProgramException("File too short");
+                    if (ElfLoadStream.Length < 256) throw (new InvalidProgramException("File too short"));
 
-                    hleModuleGuest = Loader.LoadModule(
-                        elfLoadStream,
+                    HleModuleGuest = Loader.LoadModule(
+                        ElfLoadStream,
                         memoryStream,
                         MemoryManager.GetPartition(MemoryPartitions.User),
                         ModuleManager,
                         title,
-                        moduleName: fileName,
-                        isMainModule: true
+                        fileName,
+                        true
                     );
 
-                    loadException = null;
+                    LoadException = null;
 
                     break;
                 }
-                catch (InvalidProgramException e)
+                catch (InvalidProgramException Exception)
                 {
-                    loadException = e;
+                    LoadException = Exception;
                 }
             }
 
-            if (title != "") PSPDrivers.GameInfo.Title = title;
-
-            if (loadException != null) throw loadException;
+            if (LoadException != null) throw (LoadException);
 
             RegisterSyscalls();
 
-            var argumentsChunk = arguments
-                    .Select(argument => Encoding.UTF8.GetBytes(argument + "\0"))
-                    .Aggregate(new byte[] { }, (accumulate, chunk) => accumulate.Concat(chunk));
+            uint StartArgumentAddress = 0x08000100;
+            uint EndArgumentAddress = StartArgumentAddress;
 
-            var reservedSyscallsPartition = MemoryManager.GetPartition(MemoryPartitions.Kernel0).Allocate(
+            var ArgumentsChunk = arguments
+                .Select(Argument => Encoding.UTF8.GetBytes(Argument + "\0"))
+                .Aggregate(new byte[] { }, (Accumulate, Chunk) => (byte[])Accumulate.Concat(Chunk))
+            ;
+
+            var ReservedSyscallsPartition = MemoryManager.GetPartition(MemoryPartitions.Kernel0).Allocate(
                 0x100,
                 Name: "ReservedSyscallsPartition"
             );
-            var argumentsPartition = MemoryManager.GetPartition(MemoryPartitions.Kernel0).Allocate(
-                argumentsChunk.Length,
+            var ArgumentsPartition = MemoryManager.GetPartition(MemoryPartitions.Kernel0).Allocate(
+                ArgumentsChunk.Length,
                 Name: "ArgumentsPartition"
             );
-            PspMemory.WriteBytes(argumentsPartition.Low, argumentsChunk);
+            PspMemory.WriteBytes(ArgumentsPartition.Low, ArgumentsChunk);
 
             Debug.Assert(ThreadManForUser != null);
 
-            var currentCpuThreadState = new CpuThreadState(CpuProcessor);
-            currentCpuThreadState.GP = hleModuleGuest.InitInfo.Gp;
-            currentCpuThreadState.CallerModule = hleModuleGuest;
+            var CurrentCpuThreadState = new CpuThreadState(CpuProcessor);
+            {
+                CurrentCpuThreadState.GP = HleModuleGuest.InitInfo.Gp;
+                CurrentCpuThreadState.CallerModule = HleModuleGuest;
 
-            var threadId = (int)ThreadManForUser.sceKernelCreateThread(currentCpuThreadState, "<EntryPoint>",
-                hleModuleGuest.InitInfo.Pc, 10, 0x1000, PspThreadAttributes.ClearStack, null);
+                int ThreadId = (int)ThreadManForUser.sceKernelCreateThread(CurrentCpuThreadState,
+                    "<EntryPoint>", HleModuleGuest.InitInfo.Pc, 10, 0x1000, PspThreadAttributes.ClearStack, null);
 
-            ThreadManForUser._sceKernelStartThread(currentCpuThreadState, threadId, argumentsPartition.Size, argumentsPartition.Low);
+                ThreadManForUser._sceKernelStartThread(CurrentCpuThreadState, ThreadId, ArgumentsPartition.Size, ArgumentsPartition.Low);
+            }
 
-            currentCpuThreadState.DumpRegisters(Logger.Output(Logger.Level.Info));
-            MemoryManager.GetPartition(MemoryPartitions.User).Dump(output: Logger.Output(Logger.Level.Info));
+            //CurrentCpuThreadState.DumpRegisters();
+
+            //MemoryManager.GetPartition(MemoryPartitions.User).Dump();
+
+            //ModuleManager.LoadedGuestModules.Add(HleModuleGuest);
 
             //MainThread.CurrentStatus = HleThread.Status.Ready;
         }
@@ -361,8 +368,6 @@ namespace ScePSP.Runner.Tasks.Cpu
         private void Main_Ended()
         {
             StoppedEndedEvent.Set();
-
-            // Completed execution. Wait for stopping.
             while (true)
             {
                 ThreadTaskQueue.HandleEnqueued();
@@ -377,7 +382,7 @@ namespace ScePSP.Runner.Tasks.Cpu
             Console.Out.WriteLineColored(ConsoleColor.White, $"## CPU Runing ThreadId={threadId}");
             Console.Out.WriteLineColored(ConsoleColor.White, $"   -> HLE Firmware Version: {HleConfig.FirmwareVersion.VersionStr}");
 
-            while (Running)
+            while (true)
             {
 #if !DEBUG_ENABLE
                 try

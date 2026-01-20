@@ -1,92 +1,324 @@
 ﻿//#define DEBUG_TEXTURE_CACHE
 
-using ScePSP.BackEnd.OpenGL;
+using LightGL;
+using ScePSP.Core;
 using ScePSP.GE.State;
 using ScePSP.Memory;
 using ScePSP.Types;
+using ScePSP.UI;
 using ScePSP.Utils;
 using ScePSPUtils;
 using ScePSPUtils.Drawing;
 using ScePSPUtils.Drawing.Extensions;
-using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using Hashing = ScePSP.Utils.Hashing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
 
 namespace ScePSP.GE
 {
-    public unsafe abstract class Texture<TBackEnd> : IDisposable
+    public unsafe class TextureCache : IDisposable
     {
-        //public int TextureId { get; private set; }
-        public ulong TextureHash { get { return TextureCacheKey.TextureHash; } }
+        PspStoredConfig Config;
 
-        public TBackEnd BackEnd;
-        public DateTime RecheckTimestamp;
-        public TextureCacheKey TextureCacheKey;
-        public int Width;
-        public int Height;
-        protected OutputPixel[] Data;
+        public readonly Dictionary<ulong, TTexture> Cache = new Dictionary<ulong, TTexture>();
 
-        protected Texture()
+        private IntPtr _swizzlingBufferPtr;
+        private readonly int _swizzlingBufferSize = 4 * 1024 * 1024;
+        private IntPtr _decodedTextureBufferPtr;
+        private readonly int _decodedTextureBufferSize = 1024 * 1024 * sizeof(OutputPixel);
+
+        private PspMemory _pspMemory;
+        private TTexture _invalidTexture;
+        private DateTime _recheckTimestamp = DateTime.MinValue;
+
+        public TextureCache(PspMemory pspMemory, PspStoredConfig cfg)
         {
+            Config = cfg;
+            _pspMemory = pspMemory;
+            _swizzlingBufferPtr = Marshal.AllocHGlobal(_swizzlingBufferSize);
+            _decodedTextureBufferPtr = Marshal.AllocHGlobal(_decodedTextureBufferSize);
         }
 
-        public Texture<TBackEnd> Init(TBackEnd GpuImpl)
+        public TTexture Get(GpuStateStruct* gpuState)
         {
-            this.BackEnd = GpuImpl;
-            Init();
-            return this;
-        }
+            TTexture texture;
 
-        protected virtual void Init()
-        {
-        }
+            var textureMappingState = gpuState->TextureMappingState;
+            var textureState = textureMappingState.TextureState;
+            var textureFormat = textureState.PixelFormat;
+            uint textureAddress = textureState.Mipmap0.Address;
+            int bufferWidth = textureState.Mipmap0.BufferWidth;
+            int height = textureState.Mipmap0.TextureHeight;
 
-        public void Save(string File)
-        {
-            var Bitmap = new Bitmap(this.Width, this.Height);
-            fixed (OutputPixel* DataPtr = Data)
+            var textureDataSize = PixelFormatDecoder.GetPixelsSize(textureFormat, bufferWidth * height);
+
+            byte* texturePointer = (byte*)_pspMemory.PspAddressToPointerSafe(textureAddress);
+
+            ulong hash1 = FastHash(texturePointer, textureDataSize);
+
+            bool recheck = false;
+
+            if (Cache.TryGetValue(hash1, out texture))
             {
-                BitmapUtils.TransferChannelsDataInterleaved(
-                    Bitmap.GetFullRectangle(),
-                    Bitmap,
-                    (byte*)DataPtr,
-                    BitmapUtils.Direction.FromDataToBitmap,
-                    BitmapChannel.Red,
-                    BitmapChannel.Green,
-                    BitmapChannel.Blue,
-                    BitmapChannel.Alpha
+                //if (texture.Info.RecheckTimestamp != _recheckTimestamp)
+                //{
+                //    recheck = true;
+                //}
+            }
+            else
+            {
+                recheck = true;
+            }
+            if (Cache.Count > Config.MaxTexCache)
+            {
+                var minTimeSpan = TimeSpan.FromMinutes(Config.TexMinMinutes);
+                var itemsToRemove = Cache.Values.Where(item =>
+                        item.Hit < Config.TexMinHits ||
+                        (DateTime.UtcNow - item.Info.RecheckTimestamp) < minTimeSpan
+                    ).ToList();
+                foreach (var item in itemsToRemove)
+                {
+                    item.Dispose();
+                    Cache.Remove(Cache.First(kvp => kvp.Value == item).Key);
+                }
+            }
+
+            if (recheck)
+            {
+                texture = Decoer(gpuState);
+                if (Cache.ContainsKey(hash1))
+                {
+                    Cache[hash1].Dispose();
+                }
+                Cache[hash1] = texture;
+            }
+
+            texture.Hit++;
+            texture.Info.RecheckTimestamp = _recheckTimestamp;
+
+            return texture;
+        }
+
+        public TTexture Decoer(GpuStateStruct* gpuState)
+        {
+            var textureMappingState = gpuState->TextureMappingState;
+            var clutState = textureMappingState.ClutState;
+            var textureState = textureMappingState.TextureState;
+
+            bool swizzled = textureState.Swizzled;
+            uint textureAddress = textureState.Mipmap0.Address;
+            uint clutAddress = clutState.Address;
+            var clutFormat = clutState.PixelFormat;
+            var clutStart = clutState.Start;
+            var clutCount = clutState.NumberOfColors;
+            var clutShift = clutState.Shift;
+            var clutMask = clutState.Mask;
+            var textureFormat = textureState.PixelFormat;
+            int bufferWidth = textureState.Mipmap0.BufferWidth;
+            int height = textureState.Mipmap0.TextureHeight;
+            var textureDataSize = PixelFormatDecoder.GetPixelsSize(textureFormat, bufferWidth * height);
+
+            if (clutCount > 256)
+            {
+                clutCount = 256;
+            }
+            var clutDataSize = PixelFormatDecoder.GetPixelsSize(clutFormat, clutCount);
+
+            if (!PspMemory.IsRangeValid(textureAddress, textureDataSize) || textureDataSize > 2048 * 2048 * 4)
+            {
+                Console.Error.WriteLineColored(ConsoleColor.DarkRed, "UPDATE_TEXTURE(TEX={0},CLUT={1}:{2}:{3}:{4}:0x{5:X},SIZE={6}x{7},{8},Swizzled={9})",
+                    textureFormat, clutFormat, clutCount, clutStart, clutShift, clutMask, bufferWidth, height, bufferWidth, swizzled);
+                Console.Error.WriteLineColored(ConsoleColor.DarkRed, "Invalid TEXTURE! TextureAddress=0x{0:X}, TextureDataSize={1}",
+                    textureAddress, textureDataSize);
+
+                if (_invalidTexture == null)
+                {
+                    _invalidTexture = new TTexture();
+                    int invalidTextureWidth = 2, invalidTextureHeight = 2;
+                    int invalidTextureSize = invalidTextureWidth * invalidTextureHeight;
+                    _invalidTexture.PixelDataLength = invalidTextureSize * sizeof(OutputPixel);
+                    _invalidTexture.PixelDataPtr = Marshal.AllocHGlobal(_invalidTexture.PixelDataLength);
+                    _invalidTexture.Width = invalidTextureWidth;
+                    _invalidTexture.Height = invalidTextureHeight;
+
+                    OutputPixel* dataPtr = (OutputPixel*)_invalidTexture.PixelDataPtr;
+                    var color1 = OutputPixel.FromRgba(0xFF, 0x00, 0x00, 0xFF);
+                    var color2 = OutputPixel.FromRgba(0x00, 0x00, 0xFF, 0xFF);
+                    for (int n = 0; n < invalidTextureSize; n++)
+                    {
+                        dataPtr[n] = ((n & 1) != 0) ? color1 : color2;
+                    }
+                }
+                return _invalidTexture;
+            }
+
+            byte* texturePointer = null;
+            byte* clutPointer = null;
+            try
+            {
+                texturePointer = (byte*)_pspMemory.PspAddressToPointerSafe(textureAddress);
+                clutPointer = (byte*)_pspMemory.PspAddressToPointerSafe(clutAddress);
+            }
+            catch (PspMemory.InvalidAddressException ex)
+            {
+                throw ex;
+            }
+
+            TextureInfo textureCacheKey = new TextureInfo()
+            {
+                TextureAddress = textureAddress,
+                TextureFormat = textureFormat,
+                TextureHash = FastHash(texturePointer, textureDataSize),
+                ClutHash = FastHash(&(clutPointer[clutStart]), clutDataSize),
+                ClutAddress = clutAddress,
+                ClutFormat = clutFormat,
+                ClutStart = clutStart,
+                ClutShift = clutShift,
+                ClutMask = clutMask,
+                Swizzled = swizzled,
+                ColorTestEnabled = gpuState->ColorTestState.Enabled,
+                ColorTestRef = gpuState->ColorTestState.Ref,
+                ColorTestMask = gpuState->ColorTestState.Mask,
+                ColorTestFunction = gpuState->ColorTestState.Function
+            };
+
+            TTexture texture = new TTexture();
+            texture.Info = textureCacheKey;
+            texture.Width = bufferWidth;
+            texture.Height = height;
+            texture.Hit = 0;
+            int textureWidthHeight = bufferWidth * height;
+
+            string TextureName = "texture_" + textureCacheKey.TextureHash + "_"
+                + textureCacheKey.ClutHash + "_" + textureFormat + "_"
+                + clutFormat + "_" + bufferWidth + "x" + height + "_" + swizzled;
+
+#if DEBUG_TEXTURE_CACHE
+            Console.Error.WriteLine("UPDATE_TEXTURE(TEX={0},CLUT={1}:{2}:{3}:{4}:0x{5:X},SIZE={6}x{7},{8},Swizzled={9})",
+            textureFormat, clutFormat, clutCount, clutStart, clutShift, clutMask, bufferWidth, height, bufferWidth, swizzled);
+#endif
+            OutputPixel* texturePixelsPointer = (OutputPixel*)_decodedTextureBufferPtr;
+            if (swizzled)
+            {
+                byte* swizzlingBufferPointer = (byte*)_swizzlingBufferPtr;
+
+                new Span<byte>(texturePointer, textureDataSize).CopyTo(new Span<byte>(swizzlingBufferPointer, textureDataSize));
+
+                PointerUtils.Memcpy(swizzlingBufferPointer, texturePointer, textureDataSize);
+                PixelFormatDecoder.UnswizzleInline(textureFormat, (void*)swizzlingBufferPointer, bufferWidth, height);
+                PixelFormatDecoder.Decode(
+                    textureFormat, (void*)swizzlingBufferPointer, texturePixelsPointer, bufferWidth, height,
+                    clutPointer, clutFormat, clutCount, clutStart, clutShift, clutMask, strideWidth: PixelFormatDecoder.GetPixelsSize(textureFormat, bufferWidth)
                 );
             }
-            Bitmap.Save(File);
+            else
+            {
+                PixelFormatDecoder.Decode(
+                    textureFormat, (void*)texturePointer, texturePixelsPointer, bufferWidth, height,
+                    clutPointer, clutFormat, clutCount, clutStart, clutShift, clutMask, strideWidth: PixelFormatDecoder.GetPixelsSize(textureFormat, bufferWidth)
+                );
+            }
+
+            if (textureCacheKey.ColorTestEnabled)
+            {
+                byte equalValue, notEqualValue;
+                switch (textureCacheKey.ColorTestFunction)
+                {
+                    case ColorTestFunctionEnum.GU_ALWAYS: equalValue = 0xFF; notEqualValue = 0xFF; break;
+                    case ColorTestFunctionEnum.GU_NEVER: equalValue = 0x00; notEqualValue = 0x00; break;
+                    case ColorTestFunctionEnum.GU_EQUAL: equalValue = 0xFF; notEqualValue = 0x00; break;
+                    case ColorTestFunctionEnum.GU_NOTEQUAL: equalValue = 0x00; notEqualValue = 0xFF; break;
+                    default: throw new NotImplementedException();
+                }
+
+                for (int n = 0; n < textureWidthHeight; n++)
+                {
+                    if ((texturePixelsPointer[n] & textureCacheKey.ColorTestMask).Equals((textureCacheKey.ColorTestRef & textureCacheKey.ColorTestMask)))
+                    {
+                        texturePixelsPointer[n].A = equalValue;
+                    }
+                    else
+                    {
+                        texturePixelsPointer[n].A = notEqualValue;
+                    }
+                }
+            }
+
+            texture.PixelDataLength = textureWidthHeight * sizeof(OutputPixel);
+            //texture.PixelDataPtr = Marshal.AllocHGlobal(texture.PixelDataLength);
+            //Buffer.MemoryCopy((void*)texturePixelsPointer, (void*)texture.PixelDataPtr, texture.PixelDataLength, texture.PixelDataLength);
+
+            if (Config.TexScaleType >= 1)
+            {
+                int[] Pixels = new int[textureWidthHeight];
+                Marshal.Copy(_decodedTextureBufferPtr, Pixels, 0, textureWidthHeight);
+
+                var Out = PixelsScaler.Scale(Pixels, texture.Width, texture.Height, 2, (ScaleMode)Config.TexScaleType);
+
+                texture.Info.ScaleMode = (ScaleMode)Config.TexScaleType;
+                texture.Info.ScaleX = 2;
+                texture.Width = texture.Width * 2;
+                texture.Height = texture.Height * 2;
+                texture.PixelDataLength = Out.Length;
+
+                texture.Initialize((byte*)Marshal.UnsafeAddrOfPinnedArrayElement(Out, 0));
+
+                Pixels = new int[0];
+                Out = new int[0];
+            }
+            else
+            {
+                texture.Initialize((byte*)texturePixelsPointer);
+            }
+            //texture.Save(ApplicationPaths.AssertFolder + "/" + TextureName + ".bmp");
+
+            return texture;
         }
 
-        public Texture<TBackEnd> Load(string FileName)
+        public static ulong FastHash(byte* Pointer, int Count, ulong StartHash = 0)
         {
-            var Bitmap = new Bitmap(Image.FromFile(FileName));
-            this.SetData(Bitmap.GetChannelsDataInterleaved(BitmapChannelList.Argb).CastToStructArray<OutputPixel>(), Bitmap.Width, Bitmap.Height);
-            return this;
+            return Utils.Hashing.FastHash(Pointer, Count, StartHash);
         }
 
-        public abstract bool SetData(OutputPixel[] Pixels, int TextureWidth, int TextureHeight);
-        public abstract void Bind();
-        public abstract void Dispose();
-
-        public override string ToString()
+        public void RecheckAll()
         {
-            return this.ToStringDefault();
+            _recheckTimestamp = DateTime.UtcNow;
+        }
+
+        public void Dispose()
+        {
+            if (_swizzlingBufferPtr != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_swizzlingBufferPtr);
+                _swizzlingBufferPtr = IntPtr.Zero;
+            }
+            if (_decodedTextureBufferPtr != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_decodedTextureBufferPtr);
+                _decodedTextureBufferPtr = IntPtr.Zero;
+            }
+            foreach (var item in Cache.Values)
+            {
+                item.Dispose();
+            }
+            Cache.Clear();
         }
     }
 
-    public struct TextureCacheKey
+    public class TextureInfo
     {
         public uint TextureAddress;
-        public ulong TextureHash;
         public GuPixelFormats TextureFormat;
-
-        public uint ClutAddress;
+        public ulong TextureHash;
         public ulong ClutHash;
+        public uint ClutAddress;
         public GuPixelFormats ClutFormat;
         public int ClutStart;
         public int ClutShift;
@@ -96,247 +328,90 @@ namespace ScePSP.GE
         public OutputPixel ColorTestRef;
         public OutputPixel ColorTestMask;
         public ColorTestFunctionEnum ColorTestFunction;
-
-        public override string ToString()
-        {
-            return this.ToStringDefault();
-        }
+        public DateTime RecheckTimestamp;
+        public ScaleMode ScaleMode;
+        public int ScaleX;
     }
 
-    public unsafe class TextureCache<TBackEnd, TTexture> where TTexture : Texture<TBackEnd>, new()
+    public unsafe class TTexture : IDisposable
     {
-        private PspMemory PspMemory;
-        public readonly Dictionary<ulong, TTexture> Cache = new Dictionary<ulong, TTexture>();
-        public TBackEnd BackEnd;
+        public TextureInfo Info;
+        public int Width;
+        public int Height;
+        public IntPtr PixelDataPtr;
+        public int PixelDataLength;
+        public int Hit;
+        public uint GLID;
 
-        private byte[] SwizzlingBuffer = new byte[4 * 1024 * 1024];
-        private OutputPixel[] DecodedTextureBuffer = new OutputPixel[1024 * 1024];
-
-        public TextureCache(PspMemory PspMemory, TBackEnd BackEnd)
+        public void Initialize(byte* Data)
         {
-            this.PspMemory = PspMemory;
-            this.BackEnd = BackEnd;
+            fixed (uint* TexturePtr = &GLID) GL.GenTextures(1, TexturePtr);
+
+            GL.BindTexture(GL.GL_TEXTURE_2D, GLID);
+
+            GL.TexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, Width, Height, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, Data);
+
+            //GL.TexParameteri((int)TextureTarget.Texture2d, (int)TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            //GL.TexParameteri((int)TextureTarget.Texture2d, (int)TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Linear);
+            //GL.TexParameteri((int)TextureTarget.Texture2d, (int)TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            //GL.TexParameteri((int)TextureTarget.Texture2d, (int)TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
         }
 
-        TTexture InvalidTexture;
-
-        public TTexture Get(GpuStateStruct* GpuState)
+        public void Bind()
         {
-            var TextureMappingState = GpuState->TextureMappingState;
-            var ClutState = TextureMappingState.ClutState;
-            var TextureState = TextureMappingState.TextureState;
-
-            TTexture Texture;
-
-            bool Swizzled = TextureState.Swizzled;
-            uint TextureAddress = TextureState.Mipmap0.Address;
-            uint ClutAddress = ClutState.Address;
-            var ClutFormat = ClutState.PixelFormat;
-            var ClutStart = ClutState.Start;
-            var ClutDataStart = PixelFormatDecoder.GetPixelsSize(ClutFormat, ClutStart);
-
-            ulong Hash1 = TextureAddress | (ulong)((ClutAddress + ClutDataStart) << 32);
-
-            bool Recheck = false;
-
-            if (Cache.TryGetValue(Hash1, out Texture))
-            {
-                if (Texture.RecheckTimestamp != RecheckTimestamp)
-                {
-                    Recheck = true;
-                }
-            }
-            else
-            {
-                Recheck = true;
-            }
-
-            if (Recheck)
-            {
-                var TextureFormat = TextureState.PixelFormat;
-                //var Width = TextureState.Mipmap0.TextureWidth;
-
-                int BufferWidth = TextureState.Mipmap0.BufferWidth;
-
-                var Height = TextureState.Mipmap0.TextureHeight;
-                var TextureDataSize = PixelFormatDecoder.GetPixelsSize(TextureFormat, BufferWidth * Height);
-                if (ClutState.NumberOfColors > 256)
-                {
-                    ClutState.NumberOfColors = 256;
-                }
-                var ClutDataSize = PixelFormatDecoder.GetPixelsSize(ClutFormat, ClutState.NumberOfColors);
-                var ClutCount = ClutState.NumberOfColors;
-                var ClutShift = ClutState.Shift;
-                var ClutMask = ClutState.Mask;
-
-                //Console.WriteLine(TextureFormat);
-
-                // INVALID TEXTURE
-                if (!PspMemory.IsRangeValid(TextureAddress, TextureDataSize) || TextureDataSize > 2048 * 2048 * 4)
-                {
-                    Console.Error.WriteLineColored(ConsoleColor.DarkRed, "UPDATE_TEXTURE(TEX={0},CLUT={1}:{2}:{3}:{4}:0x{5:X},SIZE={6}x{7},{8},Swizzled={9})", TextureFormat, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask, BufferWidth, Height, BufferWidth, Swizzled);
-                    Console.Error.WriteLineColored(ConsoleColor.DarkRed, "Invalid TEXTURE! TextureAddress=0x{0:X}, TextureDataSize={1}", TextureAddress, TextureDataSize);
-                    if (InvalidTexture == null)
-                    {
-                        InvalidTexture = new TTexture();
-                        InvalidTexture.Init(BackEnd);
-
-                        int InvalidTextureWidth = 2, InvalidTextureHeight = 2;
-                        int InvalidTextureSize = InvalidTextureWidth * InvalidTextureHeight;
-                        var Data = new OutputPixel[InvalidTextureSize];
-                        fixed (OutputPixel* DataPtr = Data)
-                        {
-                            var Color1 = OutputPixel.FromRgba(0xFF, 0x00, 0x00, 0xFF);
-                            var Color2 = OutputPixel.FromRgba(0x00, 0x00, 0xFF, 0xFF);
-                            for (int n = 0; n < InvalidTextureSize; n++)
-                            {
-                                DataPtr[n] = ((n & 1) != 0) ? Color1 : Color2;
-                            }
-                            InvalidTexture.SetData(Data, InvalidTextureWidth, InvalidTextureHeight);
-                        }
-                    }
-                    return InvalidTexture;
-                }
-
-                //Console.WriteLine("TextureAddress=0x{0:X}, TextureDataSize=0x{1:X}", TextureAddress, TextureDataSize);
-
-                byte* TexturePointer = null;
-                byte* ClutPointer = null;
-
-                try
-                {
-                    TexturePointer = (byte*)PspMemory.PspAddressToPointerSafe(TextureAddress);
-                    ClutPointer = (byte*)PspMemory.PspAddressToPointerSafe(ClutAddress);
-                }
-                catch (PspMemory.InvalidAddressException InvalidAddressException)
-                {
-                    throw (InvalidAddressException);
-                }
-
-                TextureCacheKey TextureCacheKey = new TextureCacheKey()
-                {
-                    TextureAddress = TextureAddress,
-                    TextureFormat = TextureFormat,
-                    TextureHash = FastHash(TexturePointer, TextureDataSize),
-
-                    ClutHash = FastHash(&(ClutPointer[ClutDataStart]), ClutDataSize),
-                    ClutAddress = ClutAddress,
-                    ClutFormat = ClutFormat,
-                    ClutStart = ClutStart,
-                    ClutShift = ClutShift,
-                    ClutMask = ClutMask,
-                    Swizzled = Swizzled,
-
-                    ColorTestEnabled = GpuState->ColorTestState.Enabled,
-                    ColorTestRef = GpuState->ColorTestState.Ref,
-                    ColorTestMask = GpuState->ColorTestState.Mask,
-                    ColorTestFunction = GpuState->ColorTestState.Function,
-                };
-
-                if (Texture == null || (!Texture.TextureCacheKey.Equals(TextureCacheKey)))
-                {
-                    string TextureName = "texture_" + TextureCacheKey.TextureHash + "_" + TextureCacheKey.ClutHash + "_" + TextureFormat + "_" + ClutFormat + "_" + BufferWidth + "x" + Height + "_" + Swizzled;
-#if DEBUG_TEXTURE_CACHE
-
-					Console.Error.WriteLine("UPDATE_TEXTURE(TEX={0},CLUT={1}:{2}:{3}:{4}:0x{5:X},SIZE={6}x{7},{8},Swizzled={9})", TextureFormat, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask, BufferWidth, Height, BufferWidth, Swizzled);
-#endif
-                    Texture = new TTexture();
-                    Texture.Init(BackEnd);
-                    Texture.TextureCacheKey = TextureCacheKey;
-                    //Texture.Hash = Hash1;
-
-                    {
-                        //int TextureWidth = Math.Max(BufferWidth, Height);
-                        //int TextureHeight = Math.Max(BufferWidth, Height);
-                        int TextureWidth = BufferWidth;
-                        int TextureHeight = Height;
-                        int TextureWidthHeight = TextureWidth * TextureHeight;
-
-                        fixed (OutputPixel* TexturePixelsPointer = DecodedTextureBuffer)
-                        {
-                            if (Swizzled)
-                            {
-                                fixed (byte* SwizzlingBufferPointer = SwizzlingBuffer)
-                                {
-                                    PointerUtils.Memcpy(SwizzlingBuffer, TexturePointer, TextureDataSize);
-                                    PixelFormatDecoder.UnswizzleInline(TextureFormat, (void*)SwizzlingBufferPointer, BufferWidth, Height);
-                                    PixelFormatDecoder.Decode(
-                                        TextureFormat, (void*)SwizzlingBufferPointer, TexturePixelsPointer, BufferWidth, Height,
-                                        ClutPointer, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask, strideWidth: PixelFormatDecoder.GetPixelsSize(TextureFormat, TextureWidth)
-                                    );
-                                }
-                            }
-                            else
-                            {
-                                PixelFormatDecoder.Decode(
-                                    TextureFormat, (void*)TexturePointer, TexturePixelsPointer, BufferWidth, Height,
-                                    ClutPointer, ClutFormat, ClutCount, ClutStart, ClutShift, ClutMask, strideWidth: PixelFormatDecoder.GetPixelsSize(TextureFormat, TextureWidth)
-                                );
-                            }
-
-                            if (TextureCacheKey.ColorTestEnabled)
-                            {
-                                byte EqualValue, NotEqualValue;
-
-                                switch (TextureCacheKey.ColorTestFunction)
-                                {
-                                    case ColorTestFunctionEnum.GU_ALWAYS: EqualValue = 0xFF; NotEqualValue = 0xFF; break;
-                                    case ColorTestFunctionEnum.GU_NEVER: EqualValue = 0x00; NotEqualValue = 0x00; break;
-                                    case ColorTestFunctionEnum.GU_EQUAL: EqualValue = 0xFF; NotEqualValue = 0x00; break;
-                                    case ColorTestFunctionEnum.GU_NOTEQUAL: EqualValue = 0x00; NotEqualValue = 0xFF; break;
-                                    default: throw (new NotImplementedException());
-                                }
-
-                                ConsoleUtils.SaveRestoreConsoleState(() =>
-                                {
-                                    Console.BackgroundColor = ConsoleColor.Red;
-                                    Console.ForegroundColor = ConsoleColor.Yellow;
-                                    Console.Error.WriteLine("{0} : {1}, {2} : ref:{3} : mask:{4}", TextureCacheKey.ColorTestFunction, EqualValue, NotEqualValue, TextureCacheKey.ColorTestRef, TextureCacheKey.ColorTestMask);
-                                });
-
-                                for (int n = 0; n < TextureWidthHeight; n++)
-                                {
-                                    if ((TexturePixelsPointer[n] & TextureCacheKey.ColorTestMask).Equals((TextureCacheKey.ColorTestRef & TextureCacheKey.ColorTestMask)))
-                                    {
-                                        TexturePixelsPointer[n].A = EqualValue;
-                                    }
-                                    else
-                                    {
-                                        TexturePixelsPointer[n].A = NotEqualValue;
-                                    }
-                                    if (TexturePixelsPointer[n].A == 0)
-                                    {
-                                        //?
-                                    }
-                                }
-                            }
-
-                            var Result = Texture.SetData(DecodedTextureBuffer, TextureWidth, TextureHeight);
-                        }
-                    }
-                    if (Cache.ContainsKey(Hash1))
-                    {
-                        Cache[Hash1].Dispose();
-                    }
-                    Cache[Hash1] = Texture;
-                }
-            }
-
-            Texture.RecheckTimestamp = RecheckTimestamp;
-
-            return Texture;
+            GL.BindTexture(GL.GL_TEXTURE_2D, GLID);
         }
 
-        private DateTime RecheckTimestamp = DateTime.MinValue;
-
-        public void RecheckAll()
+        public byte[] ReadPixels()
         {
-            RecheckTimestamp = DateTime.UtcNow;
+            Bind();
+            var Data = new byte[Width * Height * 4];
+            fixed (byte* DataPtr = Data)
+            {
+                GL.GetTexImage(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, DataPtr);
+            }
+            return Data;
         }
 
-        public static ulong FastHash(byte* Pointer, int Count, ulong StartHash = 0)
+        public void Save(string File)
         {
-            return Hashing.FastHash(Pointer, Count, StartHash);
+            var bitmap = new Bitmap(this.Width, this.Height);
+            BitmapUtils.TransferChannelsDataInterleaved(
+                bitmap.GetFullRectangle(),
+                bitmap,
+                (byte*)PixelDataPtr,
+                BitmapUtils.Direction.FromDataToBitmap,
+                BitmapChannel.Red,
+                BitmapChannel.Green,
+                BitmapChannel.Blue,
+                BitmapChannel.Alpha
+            );
+            bitmap.Save(File);
+        }
+
+        public void Load(string FileName)
+        {
+            var bitmap = new Bitmap(Image.FromFile(FileName));
+            OutputPixel[] data = bitmap.GetChannelsDataInterleaved(BitmapChannelList.Argb).CastToStructArray<OutputPixel>();
+            PixelDataLength = data.Length;
+            PixelDataPtr = Marshal.AllocHGlobal(PixelDataLength);
+            var ByteData = new byte[PixelDataLength];
+            data.CopyTo(ByteData, 0);
+            Marshal.Copy(ByteData, 0, PixelDataPtr, data.Length);
+            Width = bitmap.Width;
+            Height = bitmap.Height;
+            ByteData = new byte[0];
+        }
+
+        public void Dispose()
+        {
+            if (PixelDataPtr != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(PixelDataPtr);
+                PixelDataPtr = IntPtr.Zero;
+            }
+
+            fixed (uint* TexturePtr = &GLID) GL.DeleteTextures(1, TexturePtr);
         }
     }
 }

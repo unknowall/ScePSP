@@ -70,8 +70,8 @@ However, please note that **only a limited number of games are currently playabl
 
 ## Screenshots
 
-### Figure 1: Simple UI Interface
-![Simple UI](https://github.com/user-attachments/assets/b8f2a972-4323-4705-b6a9-7f370a839269)
+### Figure 1: Alpha UI Interface
+<img src="https://github.com/user-attachments/assets/9d47f5b8-0338-443b-a591-67305e91c0e1" />
 
 ### Figure 2: Playing Guilty Gear XX Accent Core Plus
 ![Guilty Gear Gameplay](https://github.com/user-attachments/assets/c6914d4f-62c3-4b61-a67d-69d0bc680097)

@@ -1,12 +1,10 @@
 ﻿//#define DEBUG_THREADS
-
 //#define DISABLE_CALLBACKS
 
-using ScePSP.Devices.Display;
+using ScePSP.Components.Display;
 using ScePSP.Cpu;
 using ScePSP.GE;
-using ScePSP.Hle.Interop;
-using ScePSP.HLE;
+using ScePSP.Runner.Threading;
 using ScePSPUtils;
 using System;
 using System.Collections.Generic;
@@ -15,21 +13,30 @@ using System.Threading;
 
 namespace ScePSP.Hle.Managers
 {
-    public class HleThreadManager : ICpuConnector, IGEConnector
+    public partial class HleThreadManager : IContextInitialize, ICpuConnector, IGEConnector
     {
         private static readonly Logger Logger = Logger.GetLogger("HleThreadManager");
 
-        internal CpuProcessor Processor => PSPDrivers.CPU;
+        [Context]
+        internal CpuProcessor Processor;
 
-        DisplayConfig DisplayConfig => PSPDrivers.Config.DisplayConfig;
+        [Context]
+        DisplayConfig DisplayConfig;
 
-        HleConfig HleConfig => PSPDrivers.Config.HleConfig;
+        [Context]
+        HleConfig HleConfig;
 
-        private HleCallbackManager HleCallbackManager => PSPDrivers.HLE.HleCallbackManager;
+        [Context]
+        private HleCallbackManager HleCallbackManager;
 
-        private HleInterruptManager HleInterruptManager => PSPDrivers.HLE.HleInterruptManager;
+        [Context]
+        private HleInterruptManager HleInterruptManager;
 
-        private HleInterop HleInterop => PSPDrivers.HLE.HleInterop;
+        [Context]
+        private HleInterop HleInterop;
+
+        [Context]
+        private PspContext PspContext;
 
         public readonly List<HleThread> Threads = new List<HleThread>(128);
 
@@ -41,9 +48,8 @@ namespace ScePSP.Hle.Managers
 
         public CoroutinePool CoroutinePool = new CoroutinePool();
 
-        public HleThreadManager()
+        private HleThreadManager()
         {
-            Processor.DebugCurrentThreadEvent += DebugCurrentThread;
         }
 
         void ICpuConnector.Yield(CpuThreadState CpuThreadState)
@@ -54,21 +60,18 @@ namespace ScePSP.Hle.Managers
             }
             else
             {
-                HLEWorkThreads.Yield();
+                HleWorkThread.Yield();
             }
         }
-#pragma warning disable CS0162
+
         void IGEConnector.Signal(uint PC, GeCallbackData CallbackData, uint Signal, SignalBehavior Behavior, bool ExecuteNow)
         {
-            if (_DynarecConfig.EnableGpuSignalsCallback)
+            if (DynarecConfig.EnableGpuSignalsCallback)
             {
                 if (HleConfig.CompilerVersion <= 0x01FFFFFF) PC = 0;
 
-                Console.Error.WriteLine(
-                    "HleThreadManager:: IGEConnector.Signal :: 0x{0:X8}, 0x{1:X8}, 0x{2:X8}, {3}, {4}",
-                    CallbackData.SignalFunction, CallbackData.SignalArgument, PC, Signal, Behavior);
-                HleInterop.ExecuteFunctionNowLater(CallbackData.SignalFunction, ExecuteNow,
-                    new object[] { Signal, CallbackData.SignalArgument, PC });
+                Console.Error.WriteLine("HleThreadManager:: IGpuConnector.Signal :: 0x{0:X8}, 0x{1:X8}, 0x{2:X8}, {3}, {4}", CallbackData.SignalFunction, CallbackData.SignalArgument, PC, Signal, Behavior);
+                HleInterop.ExecuteFunctionNowLater(CallbackData.SignalFunction, ExecuteNow, new Object[] { Signal, CallbackData.SignalArgument, PC });
             }
             else
             {
@@ -77,17 +80,19 @@ namespace ScePSP.Hle.Managers
 
         void IGEConnector.Finish(uint PC, GeCallbackData CallbackData, uint Arg, bool ExecuteNow)
         {
-            if (_DynarecConfig.EnableGpuFinishCallback)
+            if (DynarecConfig.EnableGpuFinishCallback)
             {
                 if (HleConfig.CompilerVersion <= 0x01FFFFFF) PC = 0;
 
-                Console.Error.WriteLine("HleThreadManager:: IGEConnector.Finish :: 0x{0:X8}, 0x{1:X8}, 0x{2:X8}, {3}",
-                    CallbackData.FinishFunction, CallbackData.FinishArgument, PC, Arg);
-                HleInterop.ExecuteFunctionNowLater(CallbackData.FinishFunction, ExecuteNow,
-                    new object[] { Arg, CallbackData.FinishArgument, PC });
+                Console.Error.WriteLine("HleThreadManager:: IGpuConnector.Finish :: 0x{0:X8}, 0x{1:X8}, 0x{2:X8}, {3}", CallbackData.FinishFunction, CallbackData.FinishArgument, PC, Arg);
+                HleInterop.ExecuteFunctionNowLater(CallbackData.FinishFunction, ExecuteNow, new Object[] { Arg, CallbackData.FinishArgument, PC });
             }
         }
-#pragma warning restore CS0162
+
+        void IContextInitialize.Initialize()
+        {
+            Processor.DebugCurrentThreadEvent += DebugCurrentThread;
+        }
 
         public PreemptiveScheduler<HleThread> PreemptiveScheduler = new PreemptiveScheduler<HleThread>(NewItemsFirst: true, ThrowException: false);
 
@@ -114,10 +119,6 @@ namespace ScePSP.Hle.Managers
             Console.Error.WriteLine(Current);
         }
 
-        /// <summary>
-        /// Execute current thread steps until it can execute other thread.
-        /// </summary>
-        /// <param name="Current"></param>
         private void ExecuteCurrent(HleThread Current)
         {
             do
@@ -127,7 +128,8 @@ namespace ScePSP.Hle.Managers
 
                 if (Current.HasAllStatus(HleThread.Status.Suspend)) return;
                 Current.Step();
-            } while (DispatchingThreads == SCE_KERNEL_DISPATCHTHREAD_STATE.DISABLED);
+            }
+            while (DispatchingThreads == SCE_KERNEL_DISPATCHTHREAD_STATE.DISABLED);
 
             Current = null;
         }
@@ -144,8 +146,7 @@ namespace ScePSP.Hle.Managers
 
         private HleThread FindCallbackHandlerWithHighestPriority()
         {
-            return Threads.Where(Thread => Thread.IsWaitingAndHandlingCallbacks)
-                .OrderByDescending(Thread => Thread.PriorityValue).FirstOrDefault();
+            return Threads.Where(Thread => Thread.IsWaitingAndHandlingCallbacks).OrderByDescending(Thread => Thread.PriorityValue).FirstOrDefault();
         }
 
         private void ExecuteQueuedCallbacks()
@@ -166,12 +167,12 @@ namespace ScePSP.Hle.Managers
 #endif
         }
 
-        /// <summary>
-        /// Inside the active thread, yields the execution, and terminates the step.
-        /// </summary>
         public void Yield()
         {
-            Current?.CpuThreadState.Yield();
+            if (Current != null)
+            {
+                Current.CpuThreadState.Yield();
+            }
         }
 
         public void UpdatedThread(HleThread HleThread)
@@ -219,7 +220,7 @@ namespace ScePSP.Hle.Managers
                     while (ChangeStatusActions.Count > 0)
                     {
                         var Action = ChangeStatusActions.Dequeue();
-                        Action?.Invoke();
+                        if (Action != null) Action();
                     }
 
                     NextThread = CalculateNext();
@@ -248,7 +249,6 @@ namespace ScePSP.Hle.Managers
             // Run that thread
             this.Current = NextThread;
             var CurrentCurrent = Current;
-            if (CurrentCurrent != null)
             {
                 // Ready -> Running
                 CurrentCurrent.SetStatus(HleThread.Status.Running);
@@ -264,7 +264,7 @@ namespace ScePSP.Hle.Managers
                         });
                     }
 
-                    DoBeforeSelectingNext?.Invoke();
+                    if (DoBeforeSelectingNext != null) DoBeforeSelectingNext();
 
                     ExecuteCurrent(CurrentCurrent);
                 }
@@ -285,20 +285,20 @@ namespace ScePSP.Hle.Managers
             //Debug.WriteLine(Threads.Count);
             if (Id == 0)
             {
-                if (!AllowSelf) throw new SceKernelException(SceKernelErrors.ERROR_KERNEL_ILLEGAL_THREAD);
+                if (!AllowSelf) throw (new SceKernelException(SceKernelErrors.ERROR_KERNEL_ILLEGAL_THREAD));
                 return Current;
             }
             HleThread HleThread = null;
             ThreadsById.TryGetValue(Id, out HleThread);
-            if (HleThread == null) throw new SceKernelException(SceKernelErrors.ERROR_KERNEL_NOT_FOUND_THREAD);
+            if (HleThread == null) throw (new SceKernelException(SceKernelErrors.ERROR_KERNEL_NOT_FOUND_THREAD));
             return HleThread;
         }
 
         public HleThread Create()
         {
-            var HlePspThread = new HleThread(new CpuThreadState(Processor));
+            var HlePspThread = new HleThread(PspContext, new CpuThreadState(Processor));
             HlePspThread.Id = LastId++;
-            HlePspThread.Name = "PspThread-" + HlePspThread.Id;
+            HlePspThread.Name = "Thread-" + HlePspThread.Id;
             HlePspThread.SetStatus(HleThread.Status.Stopped);
 
             //Console.Error.WriteLine("Created: {0}", HlePspThread);
@@ -345,6 +345,7 @@ namespace ScePSP.Hle.Managers
             ThreadsById.Remove(HleThread.Id);
             PreemptiveScheduler.Remove(HleThread);
         }
+
 
         public void ScheduleNext()
         {

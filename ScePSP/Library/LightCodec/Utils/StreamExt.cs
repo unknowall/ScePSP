@@ -232,7 +232,7 @@ namespace LightCodec
             return stream;
         }
 
-        public static T ReadStructPartially<T>(this Stream stream) where T : struct
+        public static T ReadStructPartiallyEx<T>(this Stream stream) where T : struct
         {
             var size = Marshal.SizeOf(typeof(T));
             var bufferPartial = stream.ReadBytes(Math.Min((int)stream.Available(), size));
@@ -249,7 +249,7 @@ namespace LightCodec
             return BytesToStruct<T>(buffer);
         }
 
-        public static T ReadStruct<T>(this Stream stream) where T : struct
+        public static T ReadStructEx<T>(this Stream stream) where T : struct
         {
             var size = Marshal.SizeOf(typeof(T));
             var buffer = stream.ReadBytes(size);
@@ -263,7 +263,7 @@ namespace LightCodec
             stream.PreservePositionAndLock(() =>
             {
                 stream.Position = offset;
-                value = stream.ReadStructVector<TType>(count, entrySize);
+                value = stream.ReadStructVectorEX<TType>(count, entrySize);
             });
 
 #pragma warning disable CS8603
@@ -271,9 +271,9 @@ namespace LightCodec
 #pragma warning restore CS8603
         }
 
-        public static TType[] ReadStructVector<TType>(this Stream stream, out TType[] vector, uint count, int entrySize = -1) where TType : struct
+        public static TType[] ReadStructVectorEX<TType>(this Stream stream, out TType[] vector, uint count, int entrySize = -1) where TType : struct
         {
-            vector = stream.ReadStructVector<TType>(count, entrySize);
+            vector = stream.ReadStructVectorEX<TType>(count, entrySize);
             return vector;
         }
 
@@ -294,7 +294,7 @@ namespace LightCodec
             return array;
         }
 
-        public static TType[] ReadStructVector<TType>(this Stream stream, uint count, int entrySize = -1, bool allowReadLess = false) where TType : struct
+        public static TType[] ReadStructVectorEX<TType>(this Stream stream, uint count, int entrySize = -1, bool allowReadLess = false) where TType : struct
         {
             if (count == 0) return new TType[0];
 
@@ -315,7 +315,7 @@ namespace LightCodec
 
             for (var n = 0; n < count; n++)
             {
-                vector[n] = ReadStruct<TType>(stream);
+                vector[n] = ReadStructEx<TType>(stream);
                 stream.Skip(skipSize);
             }
 
@@ -327,7 +327,7 @@ namespace LightCodec
             var entrySize = Marshal.SizeOf(typeof(T));
             var bytesAvailable = stream.Available();
             //Console.WriteLine("BytesAvailable={0}/EntrySize={1}", BytesAvailable, EntrySize);
-            return stream.ReadStructVector<T>((uint)(bytesAvailable / entrySize));
+            return stream.ReadStructVectorEX<T>((uint)(bytesAvailable / entrySize));
         }
 
         public static long Align(long value, long alignValue)
@@ -429,12 +429,6 @@ namespace LightCodec
         public static StreamStructArrayWrapper<TType> ConvertToStreamStructArrayWrapper<TType>(this Stream baseStream) where TType : struct
         {
             return new StreamStructArrayWrapper<TType>(baseStream);
-        }
-
-        public static StreamStructCachedArrayWrapper<TType> ConvertToStreamStructCachedArrayWrapper<TType>(
-            this Stream baseStream, int bufferCount) where TType : struct
-        {
-            return new StreamStructCachedArrayWrapper<TType>(bufferCount, baseStream);
         }
     }
 }

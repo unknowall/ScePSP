@@ -10,8 +10,6 @@
 
         public bool LogInstructionStats = true;
 
-        public bool DebugSyscalls = false;
-
         public bool ShowInstructionStats = true;
 
         public bool ShowInstructionStatsJustNew = true;

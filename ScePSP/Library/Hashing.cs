@@ -1,12 +1,9 @@
-﻿using ScePSPUtils;
-using System;
+﻿using System;
 
 namespace ScePSP.Utils
 {
     public static unsafe class Hashing
     {
-        private static Logger Logger = Logger.GetLogger("Hashing");
-
         public static ulong FastHash(byte* pointer, int count, ulong startHash = 0)
         {
             if (pointer == null)
@@ -16,7 +13,7 @@ namespace ScePSP.Utils
 
             if (count > 4 * 2048 * 2048)
             {
-                Logger.Error("FastHash too big count!");
+                Console.WriteLine("FastHash too big count!");
                 return startHash;
             }
 
@@ -26,11 +23,11 @@ namespace ScePSP.Utils
             }
             catch (NullReferenceException nullReferenceException)
             {
-                Logger.Error(nullReferenceException);
+                Console.WriteLine(nullReferenceException);
             }
             catch (AccessViolationException accessViolationException)
             {
-                Logger.Error(accessViolationException);
+                Console.WriteLine(accessViolationException);
             }
 
             return startHash;

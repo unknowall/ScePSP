@@ -42,7 +42,7 @@ namespace SafeILGenerator.Ast.Generators
             if (type == null) type = value?.GetType() ?? typeof(object);
             if (value == null) return "null";
             if (value is bool) return value.ToString().ToLower();
-            if (value is IntPtr) return $"0x{((IntPtr) value).ToInt64():X}";
+            if (value is IntPtr) return $"0x{((IntPtr)value).ToInt64():X}";
             if (value is string) return $"{AstStringUtils.ToLiteral(value as string)}";
             if (AstUtils.IsTypeSigned(type)) return value.ToString();
             if (Convert.ToInt64(value) > 9) return $"0x{value:X}";

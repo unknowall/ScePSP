@@ -1,17 +1,18 @@
 ﻿using ScePSP.Cpu;
-using ScePSP.Memory;
-using ScePSP.Hle.Interop;
 using ScePSP.Hle.Loader;
 using ScePSP.Hle.Managers;
 using ScePSP.Hle.Threading.EventFlags;
-using ScePSP.HLE;
+using ScePSP.Memory;
+using ScePSP.Runner.Threading;
 using ScePSPUtils;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 
 namespace ScePSP.Hle
 {
@@ -20,7 +21,13 @@ namespace ScePSP.Hle
         /// <summary>
         /// Lower priority value is a higher priority, so we negate the priorityvalue.
         /// </summary>
-        int IPreemptiveItem.Priority => -PriorityValue;
+        int IPreemptiveItem.Priority
+        {
+            get
+            {
+                return -PriorityValue;
+            }
+        }
 
         bool IPreemptiveItem.Ready
         {
@@ -35,9 +42,15 @@ namespace ScePSP.Hle
 
         private int _PriorityValue;
 
+        /// <summary>
+        /// Value used to schedule threads.
+        /// </summary>
         public int PriorityValue
         {
-            get => _PriorityValue;
+            get
+            {
+                return _PriorityValue;
+            }
             set
             {
                 if (_PriorityValue != value)
@@ -48,43 +61,42 @@ namespace ScePSP.Hle
             }
         }
 
-        HleInterruptManager HleInterruptManager => PSPDrivers.HLE.HleInterruptManager;
+        [Context]
+        HleInterruptManager HleInterruptManager;
 
-        private HleThreadManager HleThreadManager => PSPDrivers.HLE.HleThreadManager;
+        [Context]
+        private HleThreadManager HleThreadManager;
 
-        private HleConfig HleConfig => PSPDrivers.Config.HleConfig;
+        [Context]
+        private HleConfig HleConfig;
 
-        private ElfConfig ElfConfig => PSPDrivers.Config.ElfConfig;
+        [Context]
+        private ElfConfig ElfConfig;
 
+        /// <summary>
+        /// Event
+        /// </summary>
         public event Action OnTerminate;
 
         public DelegateInfo LastCalledHleFunction;
 
         //public int Priority = 1;
-        protected HLEWorkThreads HleTask;
+        public HleWorkThread WorkThread;
 
-        protected Coroutine Coroutine;
+        public Coroutine Coroutine;
 
         public CpuThreadState CpuThreadState { get; protected set; }
-
         //protected int MinimalInstructionCountForYield = 1000000;
         public int Id;
-
         //public String Name;
         private Status CurrentStatus;
-
         public WaitType CurrentWaitType;
-
         //public DateTime AwakeOnTime;
         public MemoryPartition Stack;
-
-        public string WaitDescription;
-
+        public String WaitDescription;
         public object WaitObject;
-
         //public int InitPriority;
         public PspThreadAttributes Attribute;
-
         public SceKernelThreadInfo Info;
         public bool HandleCallbacks;
         public Action WakeUpCallback;
@@ -107,7 +119,6 @@ namespace ScePSP.Hle
 
         public void SetStatus(Status NewStatus)
         {
-            //Console.WriteLine("@ {0} :: {1} -> {2}", this, this.CurrentStatus, NewStatus);
             if (CurrentStatus != NewStatus)
             {
                 CurrentStatus = NewStatus;
@@ -120,24 +131,23 @@ namespace ScePSP.Hle
         /// </summary>
         protected int YieldCount = 0;
 
-        public bool IsWaitingAndHandlingCallbacks => HasAllStatus(Status.Waiting) && HandleCallbacks;
-
-        public uint GP
-        {
-            get => Info.GP;
-            set
-            {
-                Info.GP = value;
-                CpuThreadState.GP = value;
-            }
-        }
-
-        public string Name
+        public bool IsWaitingAndHandlingCallbacks
         {
             get
             {
-                fixed (byte* NamePtr = Info.Name) return PointerUtils.PtrToString(NamePtr, Encoding.ASCII);
+                return HasAllStatus(Status.Waiting) && HandleCallbacks;
             }
+        }
+
+        public uint GP
+        {
+            get { return Info.GP; }
+            set { Info.GP = value; CpuThreadState.GP = value; }
+        }
+
+        public String Name
+        {
+            get { fixed (byte* NamePtr = Info.Name) return PointerUtils.PtrToString(NamePtr, Encoding.ASCII); }
             set
             {
                 fixed (byte* NamePtr = Info.Name) PointerUtils.StoreStringOnPtr(value, Encoding.ASCII, NamePtr);
@@ -147,14 +157,14 @@ namespace ScePSP.Hle
                 }
                 else
                 {
-                    this.HleTask.Name = value;
+                    this.WorkThread.Name = value;
                 }
             }
         }
 
-        public HleThread(CpuThreadState CpuThreadState)
+        public HleThread(PspContext PspContext, CpuThreadState CpuThreadState)
         {
-            //this.PspConfig = CpuThreadState.CpuProcessor.CpuConfig;
+            PspContext.InjectDependencesTo(this);
 
             if (this.HleConfig.UseCoRoutines)
             {
@@ -162,8 +172,8 @@ namespace ScePSP.Hle
             }
             else
             {
-                this.HleTask = new HLEWorkThreads();
-                HleTask.InitAndStartStopped(MainLoop);
+                this.WorkThread = new HleWorkThread();
+                WorkThread.InitAndStartStopped(this.Name, MainLoop);
             }
 
             this.CpuThreadState = CpuThreadState;
@@ -176,26 +186,25 @@ namespace ScePSP.Hle
             var CurrentWakeupCount = Info.WakeupCount;
 
             /*
-            Console.Error.WriteLine(
-                "{0} : ChangeWakeUpCount : {1} -> {2}",
-                this, PreviousWakeupCount, CurrentWakeupCount
-            );
-            */
+			Console.Error.WriteLine(
+				"{0} : ChangeWakeUpCount : {1} -> {2}",
+				this, PreviousWakeupCount, CurrentWakeupCount
+			);
+			*/
 
             var ThreadToSleep = this;
 
             // Sleep if sleeping decrement.
             if (Increment < 0 && CurrentWakeupCount < 0)
             {
-                ThreadToSleep.SetWaitAndPrepareWakeUp(HleThread.WaitType.None,
-                    "sceKernelSleepThread(" + HandleCallbacks + ")", null, WakeUpCallback =>
+                ThreadToSleep.SetWaitAndPrepareWakeUp(HleThread.WaitType.None, "sceKernelSleepThread(" + HandleCallbacks + ")", null, WakeUpCallback =>
+                {
+                    ThreadToSleep.WakeUpCallback = () =>
                     {
-                        ThreadToSleep.WakeUpCallback = () =>
-                        {
-                            WakeUpCallback();
-                            WakeUpCallback = null;
-                        };
-                    }, HandleCallbacks: HandleCallbacks);
+                        WakeUpCallback();
+                        WakeUpCallback = null;
+                    };
+                }, HandleCallbacks: HandleCallbacks);
             }
             // Awake 
             else if (Increment > 0 && PreviousWakeupCount < 0 && CurrentWakeupCount >= 0)
@@ -225,26 +234,27 @@ namespace ScePSP.Hle
             if (Increment > 0)
             {
                 /*
-                return;
-                Console.Error.WriteLine("Increment > 0 - Wakeup");
+				return;
+				Console.Error.WriteLine("Increment > 0 - Wakeup");
 
-                WakeupThread.SetWaitAndPrepareWakeUp(WaitType.None, "sceKernelWakeupThread", WakeUpCallback =>
-                {
-                    lock (WakeUpList)
-                    {
-                        WakeUpList.Add(() =>
-                        {
-                            WakeUpCallback();
-                        };
-                    }
-                }, HandleCallbacks: HandleCallbacks);
-                */
+				WakeupThread.SetWaitAndPrepareWakeUp(WaitType.None, "sceKernelWakeupThread", WakeUpCallback =>
+				{
+					lock (WakeUpList)
+					{
+						WakeUpList.Add(() =>
+						{
+							WakeUpCallback();
+						};
+					}
+				}, HandleCallbacks: HandleCallbacks);
+				*/
                 //WakeUpList.Add
             }
         }
 
         protected void MainLoop()
         {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
             var Memory = CpuThreadState.CpuProcessor.Memory;
             try
             {
@@ -258,28 +268,25 @@ namespace ScePSP.Hle
                 var Field = typeof(AccessViolationException)
                     .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                     .Single(FieldInfo => FieldInfo.Name == "_target");
+
                 var Address = (ulong)((IntPtr)Field.GetValue(AccessViolationException)).ToInt64();
-                throw new PspMemory.InvalidAddressException(Address);
-                //AccessViolationException.
+
+                throw (new PspMemory.InvalidAddressException(Address));
             }
         }
-
-        // 8903E08
 
         public void Step(int InstructionCountForYield = 1000000)
         {
             do
             {
-                //CpuThreadState.hlest
                 CpuThreadState.StepInstructionCount = InstructionCountForYield;
-                //this.MinimalInstructionCountForYield = InstructionCountForYield;
                 if (this.HleConfig.UseCoRoutines)
                 {
                     Coroutine.ExecuteStep();
                 }
                 else
                 {
-                    HleTask.SwitchTo();
+                    WorkThread.SwitchTo();
                 }
             } while (!HleInterruptManager.Enabled);
         }
@@ -294,12 +301,16 @@ namespace ScePSP.Hle
             if (!this.HasAllStatus(Status.Waiting))
             {
                 Console.Error.WriteLine("Trying to awake a non waiting thread '{0}'", this.CurrentStatus);
-                //throw (new InvalidOperationException());
             }
+
+            //Console.WriteLine("Thread:{0}:{1}", this, Thread.CurrentThread.Name);
 
             lock (HleThreadManager.ChangeStatusActions)
             {
-                HleThreadManager.ChangeStatusActions.Enqueue(() => { SetStatus(Status.Ready); });
+                HleThreadManager.ChangeStatusActions.Enqueue(() =>
+                {
+                    SetStatus(Status.Ready);
+                });
             }
 
             //this.CurrentStatus.pree
@@ -310,23 +321,24 @@ namespace ScePSP.Hle
             }
         }
 
-        public void SetWaitAndPrepareWakeUp(WaitType WaitType, string WaitDescription, object WaitObject, Action<Action> PrepareCallback, bool HandleCallbacks = false)
+        public void SetWaitAndPrepareWakeUp(WaitType WaitType, String WaitDescription, object WaitObject, Action<Action> PrepareCallback, bool HandleCallbacks = false)
         {
             if (this.HasAllStatus(Status.Waiting))
             {
-                Console.Error.WriteLine("[HLE] Trying to sleep an already sleeping thread!");
+                Console.Error.WriteLine("Trying to sleep an already sleeping thread!");
+                return;
             }
 
-            var calledAlready = false;
+            bool CalledAlready = false;
             YieldCount++;
             SetWait0(WaitType, WaitDescription, WaitObject, HandleCallbacks);
             {
                 //PrepareCallback(WakeUp);
                 PrepareCallback(() =>
                 {
-                    if (!calledAlready)
+                    if (!CalledAlready)
                     {
-                        calledAlready = true;
+                        CalledAlready = true;
                         ReleaseWaitThread();
                     }
                 });
@@ -334,13 +346,13 @@ namespace ScePSP.Hle
             SetWait1();
         }
 
-        protected void SetWait0(WaitType waitType, string waitDescription, object waitObject, bool handleCallbacks)
+        protected void SetWait0(WaitType WaitType, String WaitDescription, object WaitObject, bool HandleCallbacks)
         {
             this.SetStatus(Status.Waiting);
-            this.CurrentWaitType = waitType;
-            this.WaitDescription = waitDescription;
-            this.WaitObject = waitObject;
-            this.HandleCallbacks = handleCallbacks;
+            this.CurrentWaitType = WaitType;
+            this.WaitDescription = WaitDescription;
+            this.WaitObject = WaitObject;
+            this.HandleCallbacks = HandleCallbacks;
         }
 
         protected void SetWait1()
@@ -352,29 +364,36 @@ namespace ScePSP.Hle
         }
 
         /*
-        public void SetWait(WaitType WaitType, String WaitDescription, bool HandleCallbacks)
-        {
-            SetWait0(WaitType, WaitDescription, HandleCallbacks);
-            SetWait1();
-        }
-        */
+		public void SetWait(WaitType WaitType, String WaitDescription, bool HandleCallbacks)
+		{
+			SetWait0(WaitType, WaitDescription, HandleCallbacks);
+			SetWait1();
+		}
+		*/
 
         public override string ToString()
         {
-            return
-                $"HleTask(Id={Id}, Priority={PriorityValue}, Name='{Name}', Status={CurrentStatus}, WaitDescription='{WaitDescription}', YieldCount={YieldCount})";
+            return String.Format(
+                "HleThread(Id={0}, Priority={1}, Name='{2}', Status={3}, WaitDescription='{4}', YieldCount={5})",
+                Id, PriorityValue, Name, CurrentStatus, WaitDescription, YieldCount
+            );
         }
 
         public string ToExtendedString()
         {
-            var Ret =
-                $"HleTask(Id={Id}, Priority={PriorityValue}, PC=0x{CpuThreadState.PC:X}, LastValidPC=0x{CpuThreadState.LastValidPC:X}," +
-                $" SP=0x{CpuThreadState.SP:X}, Name='{Name}', Status={CurrentStatus}, YieldCount={YieldCount}";
+            var Ret = String.Format(
+                "HleThread(Id={0}, Priority={1}, PC=0x{2:X}, LastValidPC=0x{3:X}, SP=0x{4:X}, Name='{5}', Status={6}, YieldCount={7}",
+                Id, PriorityValue,
+                CpuThreadState.PC, CpuThreadState.LastValidPC, CpuThreadState.SP,
+                Name, CurrentStatus, YieldCount
+            );
             switch (CurrentStatus)
             {
                 case Status.Waiting:
-                    Ret +=
-                        $", CurrentWaitType={CurrentWaitType}, WaitDescription={WaitDescription}, WaitObject={WaitObject}, HandleCallbacks={HandleCallbacks}";
+                    Ret += String.Format(
+                        ", CurrentWaitType={0}, WaitDescription={1}, WaitObject={2}, HandleCallbacks={3}",
+                        CurrentWaitType, WaitDescription, WaitObject, HandleCallbacks
+                    );
                     break;
             }
             //Ret += String.Format(", LastCalledHleFunction={0}", LastCalledHleFunction);
@@ -383,13 +402,16 @@ namespace ScePSP.Hle
 
         public void Terminate()
         {
-            OnTerminate?.Invoke();
+            if (OnTerminate != null)
+            {
+                OnTerminate();
+            }
         }
 
         public void Dispose()
         {
-            Coroutine?.Dispose();
-            HleTask?.Dispose();
+            if (Coroutine != null) Coroutine.Dispose();
+            if (WorkThread != null) WorkThread.Dispose();
         }
 
         public void DumpStack(TextWriter TextWriter)
@@ -401,8 +423,7 @@ namespace ScePSP.Hle
             CpuThreadState.DumpRegistersCpu(TextWriter);
             foreach (var CallerPC in FullCallStack.Slice(0, 4))
             {
-                TextWriter.WriteLine("     MEM(0x{0:X}) : NOREL(0x{1:X})", CallerPC,
-                    CallerPC - ElfConfig.RelocatedBaseAddress);
+                TextWriter.WriteLine("     MEM(0x{0:X}) : NOREL(0x{1:X})", CallerPC, CallerPC - ElfConfig.RelocatedBaseAddress);
             }
             if (FullCallStack.Length > 4)
             {

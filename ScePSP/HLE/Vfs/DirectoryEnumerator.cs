@@ -15,12 +15,21 @@ namespace ScePSP.Hle.Vfs
         public bool MoveNext()
         {
             Index++;
-            return GetLeft() > 0;
+            return (GetLeft() > 0);
         }
 
-        public TType Current => List[Index];
+        public TType Current
+        {
+            get
+            {
+                return List[Index];
+            }
+        }
 
-        public int GetLeft() => List.Length - Index;
+        public int GetLeft()
+        {
+            return List.Length - Index;
+        }
 
         public void Dispose()
         {

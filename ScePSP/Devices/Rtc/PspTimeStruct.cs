@@ -2,32 +2,37 @@
 using ScePSPUtils;
 using System;
 
-namespace ScePSP.Devices.Rtc
+namespace ScePSP.Rtc
 {
+    // Token: 0x0200005D RID: 93
     public struct PspTimeStruct
     {
-        public static Logger Logger = Logger.GetLogger("Rtc");
-
-        public long TotalMicroseconds;
-
-        public void SetToDateTime(DateTime dateTime)
+        // Token: 0x06000191 RID: 401 RVA: 0x00046CAF File Offset: 0x00044EAF
+        public void SetToDateTime(DateTime DateTime)
         {
-            //DateTime.GetTotalMicroseconds();
-            //var Seconds = (uint)(DateTime - Platform.UnixStart).TotalSeconds;
-            TotalMicroseconds = Platform.CurrentUnixMicroseconds;
+            this.TotalMicroseconds = Platform.CurrentUnixMicroseconds;
         }
 
+        // Token: 0x06000192 RID: 402 RVA: 0x00068B74 File Offset: 0x00066D74
         public void SetToNow()
         {
-            var prevTotalMicroseconds = TotalMicroseconds;
-            var currentTotalMicroseconds = Platform.CurrentUnixMicroseconds;
-
-            if (currentTotalMicroseconds < prevTotalMicroseconds)
+            long totalMicroseconds = this.TotalMicroseconds;
+            long currentUnixMicroseconds = Platform.CurrentUnixMicroseconds;
+            if (currentUnixMicroseconds < totalMicroseconds)
             {
-                Logger.Error("Total Microseconds overflow Prev({0}), Now({1})", prevTotalMicroseconds,
-                    currentTotalMicroseconds);
+                PspTimeStruct.Logger.Error("Total Microseconds overflow Prev({0}), Now({1})", new object[]
+                {
+                    totalMicroseconds,
+                    currentUnixMicroseconds
+                });
             }
-            TotalMicroseconds = currentTotalMicroseconds;
+            this.TotalMicroseconds = currentUnixMicroseconds;
         }
+
+        // Token: 0x040001D8 RID: 472
+        public static Logger Logger = Logger.GetLogger("Rtc");
+
+        // Token: 0x040001D9 RID: 473
+        public long TotalMicroseconds;
     }
 }

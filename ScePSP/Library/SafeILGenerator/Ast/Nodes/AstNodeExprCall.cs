@@ -21,7 +21,7 @@ namespace SafeILGenerator.Ast.Nodes
             if (!methodParameters.SequenceEqual(parametersTypes))
             {
                 throw new Exception(
-                    $"Parameters mismatch Function({string.Join(",", (IEnumerable<Type>) methodParameters)}) != TryingToCall({string.Join(",", (IEnumerable<Type>) parametersTypes)}) for Method({methodInfo})");
+                    $"Parameters mismatch Function({string.Join(",", (IEnumerable<Type>)methodParameters)}) != TryingToCall({string.Join(",", (IEnumerable<Type>)parametersTypes)}) for Method({methodInfo})");
             }
 
             MethodInfo = methodInfo;

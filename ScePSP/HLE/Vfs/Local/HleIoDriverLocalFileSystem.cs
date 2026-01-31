@@ -14,6 +14,11 @@ namespace ScePSP.Hle.Vfs.Local
             this.BasePath = BasePath;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Path"></param>
+        /// <returns></returns>
         public static string GetSanitizedPath(string Path)
         {
             var Parts = new Stack<string>();
@@ -21,20 +26,14 @@ namespace ScePSP.Hle.Vfs.Local
             {
                 switch (Part)
                 {
-                    case "":
-                        if (Parts.Count == 0) Parts.Push("");
-                        break;
+                    case "": if (Parts.Count == 0) Parts.Push(""); break;
                     case ".": break;
-                    case "..":
-                        if (Parts.Count > 0) Parts.Pop();
-                        break;
-                    default:
-                        Parts.Push(Part);
-                        break;
+                    case "..": if (Parts.Count > 0) Parts.Pop(); break;
+                    default: Parts.Push(Part); break;
                 }
             }
 
-            return string.Join("/", Parts.Reverse());
+            return String.Join("/", Parts.Reverse());
         }
 
         protected string GetFullNormalizedAndSanitizedPath(string Path)
@@ -96,7 +95,7 @@ namespace ScePSP.Hle.Vfs.Local
 
         public unsafe int IoClose(HleIoDrvFileArg HleIoDrvFileArg)
         {
-            var FileStream = (FileStream)HleIoDrvFileArg.FileArgument;
+            var FileStream = ((FileStream)HleIoDrvFileArg.FileArgument);
             FileStream.Close();
             return 0;
         }
@@ -106,7 +105,7 @@ namespace ScePSP.Hle.Vfs.Local
             try
             {
                 var Buffer = new byte[OutputLength];
-                var FileStream = (FileStream)HleIoDrvFileArg.FileArgument;
+                var FileStream = ((FileStream)HleIoDrvFileArg.FileArgument);
                 //Console.WriteLine("ReadPosition: {0}", FileStream.Position);
                 int Readed = FileStream.Read(Buffer, 0, OutputLength);
                 for (int n = 0; n < Readed; n++) *OutputPointer++ = Buffer[n];
@@ -126,7 +125,7 @@ namespace ScePSP.Hle.Vfs.Local
                 var Buffer = new byte[InputLength];
                 for (int n = 0; n < InputLength; n++) Buffer[n] = *InputPointer++;
 
-                var FileStream = (FileStream)HleIoDrvFileArg.FileArgument;
+                var FileStream = ((FileStream)HleIoDrvFileArg.FileArgument);
                 FileStream.Write(Buffer, 0, InputLength);
                 FileStream.Flush();
                 return InputLength;
@@ -140,7 +139,7 @@ namespace ScePSP.Hle.Vfs.Local
 
         public unsafe long IoLseek(HleIoDrvFileArg HleIoDrvFileArg, long Offset, SeekAnchor Whence)
         {
-            var FileStream = (FileStream)HleIoDrvFileArg.FileArgument;
+            var FileStream = ((FileStream)HleIoDrvFileArg.FileArgument);
             switch (Whence)
             {
                 case SeekAnchor.Set:
@@ -156,7 +155,7 @@ namespace ScePSP.Hle.Vfs.Local
             return FileStream.Position;
         }
 
-        public unsafe int IoIoctl(HleIoDrvFileArg HleIoDrvFileArg, uint Command, Span<byte> Input, Span<byte> Output)
+        public unsafe int IoIoctl(HleIoDrvFileArg HleIoDrvFileArg, uint Command, byte* InputPointer, int InputLength, byte* OutputPointer, int OutputLength)
         {
             throw new NotImplementedException();
         }
@@ -188,10 +187,8 @@ namespace ScePSP.Hle.Vfs.Local
 
             Items.Add(CreateFakeDirectoryHleIoDirent(RealFileName, "."));
             Items.Add(CreateFakeDirectoryHleIoDirent(RealFileName, ".."));
-            Items.AddRange(new DirectoryInfo(RealFileName).EnumerateFiles()
-                .Select(Item => ConvertFileSystemInfoToHleIoDirent(Item)));
-            Items.AddRange(new DirectoryInfo(RealFileName).EnumerateDirectories()
-                .Select(Item => ConvertFileSystemInfoToHleIoDirent(Item)));
+            Items.AddRange(new DirectoryInfo(RealFileName).EnumerateFiles().Select(Item => ConvertFileSystemInfoToHleIoDirent(Item)));
+            Items.AddRange(new DirectoryInfo(RealFileName).EnumerateDirectories().Select(Item => ConvertFileSystemInfoToHleIoDirent(Item)));
 
             //HleIoDrvFileArg.FileArgument = new DisposableDummy<DirectoryEnumerator<HleIoDirent>>(new DirectoryEnumerator<HleIoDirent>(Items.ToArray()));
             HleIoDrvFileArg.FileArgument = new DirectoryEnumerator<HleIoDirent>(Items.ToArray());
@@ -204,18 +201,18 @@ namespace ScePSP.Hle.Vfs.Local
             return 0;
         }
 
-        public static unsafe HleIoDirent CreateFakeDirectoryHleIoDirent(string RealFileName, string Name)
+        public unsafe static HleIoDirent CreateFakeDirectoryHleIoDirent(string RealFileName, string Name)
         {
             var Ret = ConvertFileSystemInfoToHleIoDirent(new DirectoryInfo(RealFileName + "\\" + Name));
             Ret.Name = Name;
             return Ret;
         }
 
-        public static unsafe HleIoDirent ConvertFileSystemInfoToHleIoDirent(FileSystemInfo FileSystemInfo)
+        public unsafe static HleIoDirent ConvertFileSystemInfoToHleIoDirent(FileSystemInfo FileSystemInfo)
         {
             var HleIoDirent = default(HleIoDirent);
-            var FileInfo = FileSystemInfo as FileInfo;
-            var DirectoryInfo = FileSystemInfo as DirectoryInfo;
+            var FileInfo = (FileSystemInfo as FileInfo);
+            var DirectoryInfo = (FileSystemInfo as DirectoryInfo);
             {
                 if (DirectoryInfo != null)
                 {
@@ -251,8 +248,8 @@ namespace ScePSP.Hle.Vfs.Local
                 //Console.Error.WriteLine("'{0}'", Enumerator.Current.ToString());
                 *IoDirent = Enumerator.Current;
                 /*
-                
-                */
+				
+				*/
             }
             // No more items.
             else
@@ -291,7 +288,7 @@ namespace ScePSP.Hle.Vfs.Local
             }
             else
             {
-                throw new FileNotFoundException("Can't find file '" + RealFileName + "'");
+                throw (new FileNotFoundException("Can't find file '" + RealFileName + "'"));
             }
 
             Stat->TimeCreation = ScePspDateTime.FromDateTime(FileSystemInfo.CreationTimeUtc);
@@ -326,8 +323,7 @@ namespace ScePSP.Hle.Vfs.Local
             throw new NotImplementedException();
         }
 
-        public unsafe int IoDevctl(HleIoDrvFileArg HleIoDrvFileArg, string DeviceName, uint Command, Span<byte> Input,
-            Span<byte> Output, ref bool DoDleay)
+        public unsafe int IoDevctl(HleIoDrvFileArg HleIoDrvFileArg, string DeviceName, uint Command, byte* InputPointer, int InputLength, byte* OutputPointer, int OutputLength)
         {
             throw new NotImplementedException();
         }

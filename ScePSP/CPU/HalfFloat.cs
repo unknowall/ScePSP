@@ -18,51 +18,6 @@ namespace ScePSP.Cpu
 
     public class HalfFloat
     {
-        //public ushort Value;
-        //
-        //public bool Sign { get { return BitUtils.Extract(Value, 15, 1) != 0; } }
-        //public uint Exponent { get { return BitUtils.Extract(Value, 10, 5); } }
-        //public uint Fraction { get { return BitUtils.Extract(Value, 0, 10); } }
-
-        //public static ushort FloatToHalfFloat(float f)
-        //{
-        //	return FloatToHalfFloat(MathFloat.ReinterpretFloatAsUInt(f));
-        //}
-        //
-        //public static ushort FloatToHalfFloat(uint f)
-        //{
-        //	const uint f32infty = 255 << 23;
-        //	const uint f16infty = 31 << 23;
-        //	const uint magic = 15 << 23;
-        //
-        //	const uint round_mask = ~0xfffu;
-        //	const uint sign_mask = 0x80000000u;
-        //
-        //	ushort o;
-        //
-        //	uint sign = f & sign_mask;
-        //	f ^= sign;
-        //
-        //	// Inf or NaN (all exponent bits set)
-        //	if (f >= f32infty)
-        //	{
-        //		o = (ushort)((f > f32infty) ? 0x7e00 : 0x7c00); // NaN->qNaN and Inf->Inf
-        //	}
-        //	// (De)normalized number or zero
-        //	else 
-        //	{
-        //		f &= round_mask;
-        //		f = MathFloat.ReinterpretFloatAsUInt(MathFloat.ReinterpretUIntAsFloat(f) * MathFloat.ReinterpretUIntAsFloat(magic));
-        //		f -= round_mask;
-        //		if (f > f16infty) f = f16infty; // Clamp to signed infinity if overflowed
-        //
-        //		o = (ushort)(f >> 13); // Take the bits!
-        //	}
-        //
-        //	o |= (ushort)(sign >> 16);
-        //	return o;
-        //}
-
         static public int FloatToHalfFloat(float Float)
         {
             var i = MathFloat.ReinterpretFloatAsInt(Float);
@@ -144,24 +99,5 @@ namespace ScePSP.Cpu
 
             return MathFloat.ReinterpretIntAsFloat((s << 31) | (e << 23) | f);
         }
-
-        /*
-		private static float ToFloat(ushort ShortValue)
-		{
-			uint Value = 0;
-			var Significand = BitUtils.Extract(ShortValue, 0, 10);
-			var Exponent    = BitUtils.Extract(ShortValue, 10, 5);
-			var Sign        = BitUtils.Extract(ShortValue, 15, 1);
-			BitUtils.Insert(ref Value, 0, 23, Significand);
-			BitUtils.Insert(ref Value, 23, 8, Exponent);
-			//BitUtils.Insert(ref Value, 13, 10, Significand);
-			//BitUtils.Insert(ref Value, 26, 5, Exponent);
-			BitUtils.Insert(ref Value, 31, 1, Exponent);
-			//Console.Error.WriteLine("%032b".Sprintf(Value));
-			float ValueFloat = MathFloat.ReinterpretUIntAsFloat(Value);
-			Console.Error.WriteLine(ValueFloat);
-			return ValueFloat;
-		}
-		*/
     }
 }

@@ -5,7 +5,6 @@ namespace LightCodec.mp3
 {
     using LightCodec.Utils;
     using static LightCodec.mp3.Mp3Data;
-    using static LightCodec.mp3.Mp3Dsp;
     using BitBuffer = LightCodec.Utils.BitBuffer;
     using BitReader = LightCodec.Utils.BitReader;
     using CodecUtils = LightCodec.Utils.CodecUtils;

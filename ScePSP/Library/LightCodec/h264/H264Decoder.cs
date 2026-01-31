@@ -1,9 +1,7 @@
 ﻿using LightCodec.av;
 using LightCodec.h264.decoder;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace LightCodec.h264
 {
@@ -114,7 +112,7 @@ namespace LightCodec.h264
                 dataPointer = 4;
 
                 var cacheRead = stackalloc int[3];
-                
+
                 // Find next NAL
                 cacheRead[0] = ReadByte();
                 cacheRead[1] = ReadByte();

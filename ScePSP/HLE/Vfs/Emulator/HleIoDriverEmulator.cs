@@ -1,5 +1,6 @@
-﻿using ScePSP.Core;
-using ScePSP.Devices.Display;
+﻿using ScePSP.Components.Display;
+using ScePSP.Core;
+using ScePSP.Display;
 using System;
 using System.Drawing.Imaging;
 using System.Text;
@@ -15,15 +16,16 @@ namespace ScePSP.Hle.Vfs.Emulator
         EmitScreenshot = 0x00000020,
     }
 
-    public class HleIoDriverEmulator : AbstractHleIoDriver, IHleIoDriver
+    public class HleIoDriverEmulator : IHleIoDriver
     {
-        PspDisplay PspDisplay => PSPDrivers.PspDisplay;
+        [Context]
+        PspDisplay PspDisplay;
 
-        DisplayConfig DisplayConfig => PSPDrivers.Config.DisplayConfig;
+        [Context]
+        DisplayConfig DisplayConfig;
 
-        HleOutputHandler HleOutputHandler => PSPDrivers.HLE.HleOutputHandler;
-
-        PspHleRunningConfig PspHleRunningConfig => PSPDrivers.Config.PspHleRunningConfig;
+        [Context]
+        HleOutputHandler HleOutputHandler;
 
         public unsafe int IoInit()
         {
@@ -60,7 +62,7 @@ namespace ScePSP.Hle.Vfs.Emulator
             throw new NotImplementedException();
         }
 
-        public unsafe int IoIoctl(HleIoDrvFileArg HleIoDrvFileArg, uint Command, Span<byte> Input, Span<byte> Output)
+        public unsafe int IoIoctl(HleIoDrvFileArg HleIoDrvFileArg, uint Command, byte* InputPointer, int InputLength, byte* OutputPointer, int OutputLength)
         {
             throw new NotImplementedException();
         }
@@ -127,40 +129,34 @@ namespace ScePSP.Hle.Vfs.Emulator
 
         int ScreenShotCount = 0;
 
-        public unsafe int IoDevctl(HleIoDrvFileArg HleIoDrvFileArg, string DeviceName, uint Command, Span<byte> Input,
-            Span<byte> Output, ref bool DoDleay)
+        public unsafe int IoDevctl(HleIoDrvFileArg HleIoDrvFileArg, string DeviceName, uint Command, byte* InputPointer, int InputLength, byte* OutputPointer, int OutputLength)
         {
             switch (DeviceName)
             {
                 case "emulator:": break;
                 case "kemulator:": break;
-                default: throw new InvalidOperationException();
+                default: throw (new InvalidOperationException());
             }
 
             //Console.Error.WriteLine("     {0}", (EmulatorDevclEnum)Command);
             switch ((EmulatorDevclEnum)Command)
             {
                 case EmulatorDevclEnum.GetHasDisplay:
-                    ReinterpretSpan<int>(Output)[0] = DisplayConfig.Enabled ? 1 : 0;
+                    *((int*)OutputPointer) = DisplayConfig.Enabled ? 1 : 0;
                     break;
                 case EmulatorDevclEnum.SendOutput:
-                    var OutputString = Encoding.ASCII.GetString(ReinterpretSpan<byte>(Input));
-                    //Console.WriteLine($"HleOutputHandler :: {HleOutputHandler.GetType()}");
+                    var OutputString = new String((sbyte*)InputPointer, 0, InputLength, Encoding.ASCII);
                     this.HleOutputHandler.Output(OutputString);
                     //Console.Error.WriteLine("{0}", OutputString);
                     break;
                 case EmulatorDevclEnum.IsEmulator:
                     return 0;
                 case EmulatorDevclEnum.EmitScreenshot:
-                    if (PspHleRunningConfig.FileNameBase == null || PspHleRunningConfig.FileNameBase == "")
-                        throw new Exception("PspHleRunningConfig.FileNameBase is empty");
-                    this.PspDisplay.TakeScreenshot()
-                        .Save(
-                            $"{PspHleRunningConfig.FileNameBase}.lastoutput.{ScreenShotCount++}.png", ImageFormat.Png);
+                    this.PspDisplay.TakeScreenshot().Save(String.Format("{0}.lastoutput.{1}.png",
+                        ApplicationPaths.AssertFolder + "/", ScreenShotCount++), ImageFormat.Png);
                     break;
                 default:
-                    Console.Error.WriteLine("Unknown emulator command '{0}':0x{1:X} <- {2}", DeviceName, Command,
-                        (EmulatorDevclEnum)Command);
+                    Console.Error.WriteLine("Unknown emulator command '{0}':0x{1:X} <- {2}", DeviceName, Command, (EmulatorDevclEnum)Command);
                     return -1;
             }
             return -1;

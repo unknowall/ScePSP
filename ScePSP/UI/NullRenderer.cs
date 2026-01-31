@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace ScePSX.UI
+namespace ScePSP.UI
 {
     public class NullRenderer : UserControl
     {
@@ -81,7 +81,8 @@ namespace ScePSX.UI
             if (IntPtr.Size == 8)
             {
                 hinstance = GetWindowLongPtr(hwnd, -6);
-            } else
+            }
+            else
             {
                 hinstance = GetWindowLong32(hwnd, -6);
             }

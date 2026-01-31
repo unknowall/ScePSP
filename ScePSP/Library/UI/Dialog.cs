@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading;
+using System.Windows.Forms;
 
-namespace ScePSP.Utils.UI
+namespace ScePSPUtils.UI
 {
     public class Dialog
     {
@@ -22,14 +23,14 @@ namespace ScePSP.Utils.UI
         {
             new Thread(() =>
             {
-                //throw new NotImplementedException();
-                /*
-                var Value = MessageBox.Show(Message, "PSP", MessageBoxButtons.YesNo,
-                    (Type == Dialog.Type.Error) ? MessageBoxIcon.Error : MessageBoxIcon.Question,
-                    MessageBoxDefaultButton.Button1);
-                Done((Value == DialogResult.Yes) ? Result.Yes : Result.No);
-                */
-                Done(Result.Yes);
+                DialogResult dialogResult = MessageBox.Show(Message, "PSP", MessageBoxButtons.YesNo, (Type == Dialog.Type.Error) ? MessageBoxIcon.Hand : MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
+                Done((dialogResult == DialogResult.Yes) ? Dialog.Result.Yes : Dialog.Result.No);
+                //var Value = MessageBox.Show(Message, "PSP", MessageBoxButtons.YesNo,
+                //    (Type == Dialog.Type.Error) ? MessageBoxIcon.Error : MessageBoxIcon.Question,
+                //    MessageBoxDefaultButton.Button1);
+                //Done((Value == DialogResult.Yes) ? Result.Yes : Result.No);
+
+                //Done(Result.Yes);
             })
             {
                 IsBackground = true,

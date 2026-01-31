@@ -6,7 +6,7 @@ namespace ScePSP.Hle.Vfs
 {
     public unsafe class HleIoDriverMountable : IHleIoDriver
     {
-        Dictionary<string, IHleIoDriver> Mounts = new Dictionary<string, IHleIoDriver>();
+        Dictionary<String, IHleIoDriver> Mounts = new Dictionary<string, IHleIoDriver>();
 
         public IHleIoDriver GetMount(string MountAt)
         {
@@ -28,8 +28,9 @@ namespace ScePSP.Hle.Vfs
                     FileName = FileName.Substring(Mount.Key.Length);
                     return;
                 }
+
             }
-            throw new InvalidOperationException("Can't find mount point for '" + FileName + "'");
+            throw (new InvalidOperationException("Can't find mount point for '" + FileName + "'"));
         }
 
         public unsafe int IoOpen(HleIoDrvFileArg HleIoDrvFileArg, string FileName, HleIoFlags Flags, SceMode Mode)
@@ -69,7 +70,7 @@ namespace ScePSP.Hle.Vfs
             throw new NotImplementedException();
         }
 
-        public unsafe int IoIoctl(HleIoDrvFileArg HleIoDrvFileArg, uint Command, Span<byte> Input, Span<byte> Output)
+        public unsafe int IoIoctl(HleIoDrvFileArg HleIoDrvFileArg, uint Command, byte* InputPointer, int InputLength, byte* OutputPointer, int OutputLength)
         {
             throw new NotImplementedException();
         }
@@ -139,8 +140,7 @@ namespace ScePSP.Hle.Vfs
             throw new NotImplementedException();
         }
 
-        public unsafe int IoDevctl(HleIoDrvFileArg HleIoDrvFileArg, string DeviceName, uint Command, Span<byte> Input,
-            Span<byte> Output, ref bool DoDleay)
+        public unsafe int IoDevctl(HleIoDrvFileArg HleIoDrvFileArg, string DeviceName, uint Command, byte* InputPointer, int InputLength, byte* OutputPointer, int OutputLength)
         {
             throw new NotImplementedException();
         }

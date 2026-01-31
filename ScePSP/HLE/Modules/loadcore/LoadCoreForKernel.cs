@@ -1,0 +1,80 @@
+﻿using ScePSP.Cpu;
+using ScePSP.Hle.Attributes;
+using ScePSP.Hle.Managers;
+using ScePSP.Hle.Modules.modulemgr;
+using System;
+
+namespace ScePSP.Hle.Modules.loadcore
+{
+    [HlePspModule(ModuleFlags = ModuleFlags.KernelMode | ModuleFlags.Flags0x00010011)]
+    public class LoadCoreForKernel : HleModuleHost
+    {
+        [Context]
+        HleModuleManager ModuleManager;
+
+        [Context]
+        ModuleMgrForUser ModuleMgrForUser;
+
+        public enum SceUID : int { }
+
+        [HlePspFunction(NID = 0xACE23476, FirmwareVersion = 150)]
+        [HleTrackCall]
+        [HlePspUnknownDefinitionAttribute]
+        public void sceKernelCheckPspConfig()
+        {
+            throw (new NotImplementedException());
+        }
+
+        [HlePspFunction(NID = 0xBF983EF2, FirmwareVersion = 150)]
+        [HleTrackCall]
+        [HlePspUnknownDefinitionAttribute]
+        public void sceKernelProbeExecutableObject()
+        {
+            throw (new NotImplementedException());
+        }
+
+        /// <summary>
+        /// Find a module by it's UID.
+        /// </summary>
+        /// <param name="ModuleId">The UID of the module.</param>
+        /// <returns>Pointer to the <see cref="SceModule"/> structure if found, otherwise NULL.</returns>
+        [HlePspFunction(NID = 0xCCE4A157, FirmwareVersion = 150)]
+        [HleTrackCall]
+        public uint sceKernelFindModuleByUID(int ModuleId)
+        {
+            var Module = ModuleMgrForUser.Modules.Get(ModuleId);
+            return (Module.Loaded) ? Module.SceModuleStructPartition.Low : 0;
+        }
+
+        /// <summary>
+        /// Invalidate the CPU's instruction cache.
+        /// </summary>
+        [HlePspFunction(NID = 0xD8779AC6, FirmwareVersion = 150)]
+        [HleTrackCall]
+        public void sceKernelIcacheClearAll()
+        {
+            CpuProcessor.sceKernelIcacheInvalidateAll();
+            //unimplemented();
+        }
+
+        /// <summary>
+        /// Find a module by its name.
+        /// </summary>
+        /// <param name="ModuleName">The name of the module.</param>
+        /// <returns>Pointer to the <see cref="SceModule"/> structure if found, otherwise NULL.</returns>
+        [HlePspFunction(NID = 0xCF8A41B1, FirmwareVersion = 150)]
+        [HleTrackCall]
+        public int sceKernelFindModuleByName(string ModuleName)
+        {
+            Console.WriteLine("sceKernelFindModuleByName('{0}') not implemented", ModuleName);
+            return 0;
+            /*
+			logWarning();
+			//unimplemented();
+			return null;
+			*/
+            //throw(new NotImplementedException());
+        }
+
+    }
+}

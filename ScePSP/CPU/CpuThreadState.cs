@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime;
 using System.Runtime.CompilerServices;
 
 namespace ScePSP.Cpu
@@ -24,7 +23,6 @@ namespace ScePSP.Cpu
 
         public CpuProcessor CpuProcessor;
 
-        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         public PspMemory Memory
         {
             get
@@ -58,9 +56,7 @@ namespace ScePSP.Cpu
 
         public long HI_LO
         {
-            //[MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { fixed (int* LOPtr = &LO) return *(long*)LOPtr; }
-            //[MethodImpl(MethodImplOptions.AggressiveInlining)]
             set { fixed (int* LOPtr = &LO) *(long*)LOPtr = value; }
         }
 
@@ -451,9 +447,9 @@ namespace ScePSP.Cpu
             }
         }
 
-        public void _MethodCacheInfo_SetInternal(MethodCacheInfo MethodCacheInfo, uint PC)
+        public void GetFunc(MethodCacheInfo MethodCacheInfo, uint PC)
         {
-            MethodCache._MethodCacheInfo_SetInternal(this, MethodCacheInfo, PC);
+            MethodCache.GetFunc(this, MethodCacheInfo, PC);
         }
 
         public void SetPCWriteAddress(uint Address, uint PC)

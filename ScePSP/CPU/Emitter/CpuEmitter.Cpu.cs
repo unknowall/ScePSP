@@ -179,7 +179,7 @@ namespace ScePSP.Cpu.Emitter
                     ast.GetTickCall(true)
                 );
 
-                if (_DynarecConfig.FunctionCallWithStaticReferences)
+                if (DynarecConfig.FunctionCallWithStaticReferences)
                 {
                     Statements.AddStatement(ast.Statement(ast.CallDelegate(SyscallInfoInfo.PoolItem.AstFieldAccess, ast.CpuThreadState)));
                 }

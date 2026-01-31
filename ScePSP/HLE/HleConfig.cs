@@ -1,6 +1,6 @@
 ﻿using ScePSP.Core;
-using ScePSP.Types;
 using ScePSP.Hle.Types;
+using ScePSP.Types;
 using System;
 using System.Globalization;
 using System.Reflection;
@@ -16,11 +16,12 @@ namespace ScePSP.Hle
 
     public class HleConfig
     {
-        PspStoredConfig PspStoredConfig => PSPDrivers.Config.StoredConfig;
+        [Context]
+        PspStoredConfig PspStoredConfig;
 
         public bool DebugThreadSwitching = false;
 
-        public bool DebugHLECall = false;
+        public bool DebugNotImplemented = true;
 
         //public PspConfirmButton ConfirmButton;
 
@@ -31,9 +32,7 @@ namespace ScePSP.Hle
         public bool DebugSyscalls = false;
 
         public PspVersion FirmwareVersion = new PspVersion("6.6.0.0");
-
         public Assembly HleModulesDll;
-
         public bool TraceLastSyscalls;
 
         public SdkFlags SdkFlags;
@@ -49,27 +48,31 @@ namespace ScePSP.Hle
         public PSP_SYSTEMPARAM_DAYLIGHTSAVINGS DaylightSavings = PSP_SYSTEMPARAM_DAYLIGHTSAVINGS.STD;
         public double Timezone = -7;
         public string UserName = Environment.GetEnvironmentVariable("USERNAME");
+
+        private HleConfig()
+        {
+        }
     }
 
     class HleConfigUtils
     {
-        public static PspLanguages CultureInfoToPspLanguage(CultureInfo CultureInfo)
+        static public PspLanguages CultureInfoToPspLanguage(CultureInfo CultureInfo)
         {
             // http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
             switch (CultureInfo.TwoLetterISOLanguageName)
             {
-                case "ja": return PspLanguages.Japanese;
+                case "ja": return PspLanguages.JAPANESE;
                 default:
-                case "en": return PspLanguages.English;
-                case "fr": return PspLanguages.French;
-                case "es": return PspLanguages.Spanish;
-                case "de": return PspLanguages.German;
-                case "it": return PspLanguages.Italian;
-                case "nl": return PspLanguages.Dutch;
-                case "pt": return PspLanguages.Portuguese;
-                case "ru": return PspLanguages.Russian;
-                case "ko": return PspLanguages.Korean;
-                case "zh": return PspLanguages.SimplifiedChinese; // TODO: TRADITIONAL_CHINESE
+                case "en": return PspLanguages.ENGLISH;
+                case "fr": return PspLanguages.FRENCH;
+                case "es": return PspLanguages.SPANISH;
+                case "de": return PspLanguages.GERMAN;
+                case "it": return PspLanguages.ITALIAN;
+                case "nl": return PspLanguages.DUTCH;
+                case "pt": return PspLanguages.PORTUGUESE;
+                case "ru": return PspLanguages.RUSSIAN;
+                case "ko": return PspLanguages.KOREAN;
+                case "zh": return PspLanguages.SIMPLIFIED_CHINESE;
             }
         }
     }

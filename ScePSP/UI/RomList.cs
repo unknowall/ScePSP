@@ -3,19 +3,16 @@ using ScePSP.Hle.Vfs.Iso;
 using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 
-namespace ScePSX.UI
+namespace ScePSP.UI
 {
     public class RomList : ListBox
     {
@@ -84,6 +81,8 @@ namespace ScePSX.UI
         private static Color MenuHoverColor = Color.FromArgb(80, 80, 80); // 菜单悬停颜色
         private static Color MenuUnSelectColor = Color.FromArgb(45, 45, 45);
         private static Color SepColor = Color.FromArgb(100, 100, 100);
+
+        private static string Font_Name = "Segoe UI";
 
         public RomList()
         {
@@ -463,6 +462,8 @@ namespace ScePSX.UI
             }
 
             int padding = 5;
+            int titleX = bounds.Left + 150 + padding * 2;
+            int titleY = bounds.Top + padding * 2;
 
             DrawMainBox(e.Graphics, bounds);
 
@@ -470,7 +471,15 @@ namespace ScePSX.UI
 
             DrawName(e.Graphics, game.TITLE, bounds, 65, padding);
 
-            DrawInfoBoxes(e.Graphics, game, bounds, 150, padding);
+            //DrawInfoBoxes(e.Graphics, game, bounds, 150, padding);
+
+            int infoY = titleY + 45;
+            DrawText(e.Graphics, $"{game.DiscId0}", new Font(Font_Name, 9), Color.FromArgb(200, 200, 200), titleX + 5, infoY);
+
+            string infoText = $"Region: {game.REGION_STR} | Version: {game.DISC_VERSION} | FW: {game.PSP_SYSTEM_VER} | {TStr(game.DISC_ID)}";
+            infoY += 12;
+            titleX = bounds.Right - infoText.Length * 5 - 10;
+            DrawText(e.Graphics, infoText, new Font(Font_Name, 8), Color.FromArgb(180, 180, 180), titleX, infoY);
 
             //if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
             //{
@@ -503,13 +512,19 @@ namespace ScePSX.UI
 
         private void DrawName(Graphics g, string name, Rectangle bounds, int iconSize, int padding)
         {
-            using (var nameFont = new Font("Arial", 13, FontStyle.Bold))
+            using (var nameFont = new Font(Font_Name, 14, FontStyle.Bold))
             using (var brush = new SolidBrush(Color.White))
             {
-                int icony = bounds.Top + (bounds.Height - iconSize) / 2;
+                int icony = bounds.Top + (bounds.Height - iconSize) / 2 + 10;
                 SizeF nameSize = g.MeasureString(name, nameFont);
                 g.DrawString(name, nameFont, brush, bounds.Left + 150 + padding * 2, icony + 3);
             }
+        }
+
+        private void DrawText(Graphics g, string text, Font font, Color color, int x, int y)
+        {
+            using (var brush = new SolidBrush(color))
+                g.DrawString(text, font, brush, x, y);
         }
 
         private void DrawInfoBoxes(Graphics g, GameEntry game, Rectangle bounds, int iconSize, int padding)
@@ -541,7 +556,7 @@ namespace ScePSX.UI
             using (var boxBrush = new SolidBrush(InfoBackColor)) // 框背景颜色
             using (var borderPen = new Pen(InfoBorderColor)) // 边框颜色
             using (var textBrush = new SolidBrush(Color.White)) // 文字颜色
-            using (var font = new Font("Arial", fontSize))
+            using (var font = new Font(Font_Name, fontSize))
             {
                 int padding = 4;
 
@@ -559,7 +574,7 @@ namespace ScePSX.UI
             using (var boxBrush = new SolidBrush(Color.FromArgb(50, 50, 50))) // 框背景颜色
             using (var borderPen = new Pen(Color.FromArgb(100, 100, 100))) // 边框颜色
             using (var textBrush = new SolidBrush(Color.White)) // 文字颜色
-            using (var font = new Font("Arial", fontsize))
+            using (var font = new Font(Font_Name, fontsize))
             {
                 SizeF labelSize = g.MeasureString(label, font);
                 SizeF valueSize = g.MeasureString(value, font);

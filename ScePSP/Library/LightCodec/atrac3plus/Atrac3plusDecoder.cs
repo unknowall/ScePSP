@@ -1,8 +1,7 @@
-﻿using static LightCodec.Utils.CodecUtils;
+﻿using static LightCodec.atrac3plus.Atrac3plusData2;
+using static LightCodec.Utils.CodecUtils;
 using BitReader = LightCodec.Utils.BitReader;
 using FFT = LightCodec.Utils.FFT;
-using static LightCodec.atrac3plus.Atrac3plusData2;
-using Atrac3plusData2 = LightCodec.atrac3plus.Atrac3plusData2;
 
 namespace LightCodec.atrac3plus
 {
@@ -85,7 +84,7 @@ namespace LightCodec.atrac3plus
                     System.Console.WriteLine(string.Format("Too many channel blocks"));
                     return AT3P_ERROR;
                 }
-                
+
                 if (ctx.channelUnits[chBlock] == null)
                 {
                     System.Console.WriteLine(string.Format($"channelUnits[{chBlock}] = NULL!"));

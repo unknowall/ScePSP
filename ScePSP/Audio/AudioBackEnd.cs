@@ -1,16 +1,11 @@
 ﻿using System;
 
-namespace ScePSP.BackEnd
+namespace ScePSP.Audio
 {
     public abstract class AudioBackEnd
     {
         public abstract void Update(Action<short[]> ReadStream);
 
-        public abstract void Pause();
-
-        public abstract void Resume();
-
-        public abstract void Stop();
-
+        public abstract void StopSynchronized();
     }
 }

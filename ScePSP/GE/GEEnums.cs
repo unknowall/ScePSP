@@ -1,9 +1,33 @@
 ﻿namespace ScePSP.GE
 {
-    public enum SyncTypeEnum : byte
+    /// <summary>
+    /// alias void function(int id, void *arg) PspGeCallback;
+    /// </summary>
+    public enum PspGeCallback : uint { }
+
+    public struct GeCallbackData
     {
-        WaitForCompletion = 0,
-        Peek = 1,
+        /// <summary>
+        /// GE callback for the signal interrupt
+        /// alias void function(int id, void *arg) PspGeCallback;
+        /// </summary>
+        public uint SignalFunction;
+
+        /// <summary>
+        /// GE callback argument for signal interrupt
+        /// </summary>
+        public uint SignalArgument;
+
+        /// <summary>
+        /// GE callback for the finish interrupt
+        /// alias void function(int id, void *arg) PspGeCallback;
+        /// </summary>
+        public uint FinishFunction;
+
+        /// <summary>
+        /// GE callback argument for finish interrupt
+        /// </summary>
+        public uint FinishArgument;
     }
 
     public enum TextureLevelMode { Auto = 0, Const = 1, Slope = 2 }
@@ -94,7 +118,7 @@
         EndReached = 4,
 
         //PSP_GE_LIST_CANCEL_DONE
-        Cancel = 5
+        Cancel = 5,
     }
 
     public struct OptionalParams

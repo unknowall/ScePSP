@@ -64,19 +64,19 @@ namespace SafeILGenerator.Ast
                    type == typeof(decimal);
         }
 
-        public static TType CastType<TType>(object value) => (TType) CastType(value, typeof(TType));
+        public static TType CastType<TType>(object value) => (TType)CastType(value, typeof(TType));
 
         public static object CastType(object value, Type castType)
         {
-            if (castType == typeof(sbyte)) return (sbyte) Convert.ToInt64(value);
-            if (castType == typeof(short)) return (short) Convert.ToInt64(value);
-            if (castType == typeof(int)) return (int) Convert.ToInt64(value);
+            if (castType == typeof(sbyte)) return (sbyte)Convert.ToInt64(value);
+            if (castType == typeof(short)) return (short)Convert.ToInt64(value);
+            if (castType == typeof(int)) return (int)Convert.ToInt64(value);
             if (castType == typeof(long)) return Convert.ToInt64(value);
 
-            if (castType == typeof(byte)) return (byte) Convert.ToInt64(value);
-            if (castType == typeof(ushort)) return (ushort) Convert.ToInt64(value);
-            if (castType == typeof(uint)) return (uint) Convert.ToInt64(value);
-            if (castType == typeof(ulong)) return (ulong) Convert.ToInt64(value);
+            if (castType == typeof(byte)) return (byte)Convert.ToInt64(value);
+            if (castType == typeof(ushort)) return (ushort)Convert.ToInt64(value);
+            if (castType == typeof(uint)) return (uint)Convert.ToInt64(value);
+            if (castType == typeof(ulong)) return (ulong)Convert.ToInt64(value);
 
             if (castType == typeof(float)) return Convert.ToSingle(value);
             if (castType == typeof(double)) return Convert.ToDouble(value);
@@ -89,12 +89,12 @@ namespace SafeILGenerator.Ast
         public static object Negate(object value)
         {
             var valueType = value.GetType();
-            if (valueType == typeof(sbyte)) return -(sbyte) value;
-            if (valueType == typeof(short)) return -(short) value;
-            if (valueType == typeof(int)) return -(int) value;
-            if (valueType == typeof(long)) return -(long) value;
-            if (valueType == typeof(float)) return -(float) value;
-            if (valueType == typeof(double)) return -(double) value;
+            if (valueType == typeof(sbyte)) return -(sbyte)value;
+            if (valueType == typeof(short)) return -(short)value;
+            if (valueType == typeof(int)) return -(int)value;
+            if (valueType == typeof(long)) return -(long)value;
+            if (valueType == typeof(float)) return -(float)value;
+            if (valueType == typeof(double)) return -(double)value;
 
             throw new NotImplementedException("Negate for type '" + valueType + "'");
         }

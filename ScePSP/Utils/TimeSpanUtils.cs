@@ -1,21 +1,17 @@
-﻿using ScePSP.Utils;
-using System;
+﻿using System;
 using System.Timers;
 
 namespace ScePSPUtils
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public static class TimeSpanUtils
     {
-        public static TimeSpan FromMicroseconds(long microseconds) => microseconds.Microseconds();
+        public static TimeSpan FromMicroseconds(long microseconds)
+        {
+            long ticks = microseconds * 10;
 
-        /// <summary>
-        /// </summary>
-        /// <param name="description"></param>
-        /// <param name="action"></param>
-        /// <param name="loopAction"></param>
+            return TimeSpan.FromTicks(ticks);
+        }
+
         public static void InfiniteLoopDetector(string description, Action action, Action loopAction = null)
         {
             using (var timer = new Timer(4.0 * 1000))

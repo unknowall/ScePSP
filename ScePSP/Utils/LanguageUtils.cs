@@ -1,86 +1,58 @@
 ﻿using System;
+using System.Reflection;
 
 namespace ScePSPUtils
 {
-    /// <summary>
-    /// 
-    /// </summary>
+    // Token: 0x0200084B RID: 2123
     public class LanguageUtils
     {
-        /// <summary>
-        /// Swaps the value of two references.
-        /// </summary>
-        /// <typeparam name="TType"></typeparam>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        public static void Swap<TType>(ref TType left, ref TType right)
+        // Token: 0x06002E10 RID: 11792 RVA: 0x0010C9C0 File Offset: 0x0010ABC0
+        public static void Swap<TType>(ref TType Left, ref TType Right)
         {
-            var temp = left;
-            left = right;
-            right = temp;
+            TType ttype = Left;
+            Left = Right;
+            Right = ttype;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TType"></typeparam>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <param name="copyToLeft"></param>
-        public static void Transfer<TType>(ref TType left, ref TType right, bool copyToLeft)
+        // Token: 0x06002E11 RID: 11793 RVA: 0x0005EC17 File Offset: 0x0005CE17
+        public static void Transfer<TType>(ref TType Left, ref TType Right, bool CopyToLeft)
         {
-            if (copyToLeft)
+            if (CopyToLeft)
             {
-                left = right;
+                Left = Right;
+                return;
             }
-            else
-            {
-                right = left;
-            }
+            Right = Left;
         }
 
-        /// <summary>
-        /// Changes the value of a reference just while the execution of the LocalScope delegate.
-        /// </summary>
-        /// <typeparam name="TType"></typeparam>
-        /// <param name="variable"></param>
-        /// <param name="localValue"></param>
-        /// <param name="localScope"></param>
-        public static void LocalSet<TType>(ref TType variable, TType localValue, Action localScope)
+        // Token: 0x06002E12 RID: 11794 RVA: 0x0010C9E8 File Offset: 0x0010ABE8
+        public static void LocalSet<TType>(ref TType Variable, TType LocalValue, Action LocalScope)
         {
-            var oldValue = variable;
-            // @TODO: A resharper bug?
-            // ReSharper disable once RedundantAssignment
-            variable = localValue;
+            TType ttype = Variable;
+            Variable = LocalValue;
             try
             {
-                localScope();
+                LocalScope();
             }
             finally
             {
-                variable = oldValue;
+                Variable = ttype;
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Object"></param>
-        /// <param name="propertyName"></param>
-        /// <param name="localValue"></param>
-        /// <param name="localScope"></param>
-        public static void PropertyLocalSet(object Object, string propertyName, object localValue, Action localScope)
+        // Token: 0x06002E13 RID: 11795 RVA: 0x0010CA28 File Offset: 0x0010AC28
+        public static void PropertyLocalSet(object Object, string PropertyName, object LocalValue, Action LocalScope)
         {
-            var property = Object.GetType().GetProperty(propertyName);
-            var oldValue = property?.GetValue(Object);
-            property?.SetValue(Object, localValue);
+            PropertyInfo property = Object.GetType().GetProperty(PropertyName);
+            object value = property.GetValue(Object);
+            property.SetValue(Object, LocalValue);
             try
             {
-                localScope();
+                LocalScope();
             }
             finally
             {
-                property?.SetValue(Object, oldValue);
+                property.SetValue(Object, value);
             }
         }
     }

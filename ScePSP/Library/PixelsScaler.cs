@@ -101,7 +101,8 @@ namespace ScePSP
                             bool dSim = IsSimilarColors(e, d);
                             e0 = bSim ? AverageFast(e, b) : e;
                             e1 = dSim ? AverageFast(e, d) : e;
-                        } else if (iSim && !aSim)
+                        }
+                        else if (iSim && !aSim)
                         {
                             bool fSim = IsSimilarColors(e, f);
                             bool hSim = IsSimilarColors(e, h);
@@ -155,7 +156,8 @@ namespace ScePSP
                         bool dSim = IsSimilarColors(e, d);
                         e0 = bSim ? AverageFast(e, b) : e;
                         e1 = dSim ? AverageFast(e, d) : e;
-                    } else if (iSim && !aSim)
+                    }
+                    else if (iSim && !aSim)
                     {
                         bool fSim = IsSimilarColors(e, f);
                         bool hSim = IsSimilarColors(e, h);
@@ -218,7 +220,8 @@ namespace ScePSP
                     {
                         e0 = IsSimilar(vecE, b) ? AverageFast(e, b) : e;
                         e1 = IsSimilar(vecE, d) ? AverageFast(e, d) : e;
-                    } else if (IsSimilar(vecE, i) && !IsSimilar(vecE, a))
+                    }
+                    else if (IsSimilar(vecE, i) && !IsSimilar(vecE, a))
                     {
                         e2 = IsSimilar(vecE, f) ? AverageFast(e, f) : e;
                         e3 = IsSimilar(vecE, h) ? AverageFast(e, h) : e;

@@ -2,7 +2,7 @@
 
 namespace ScePSP.Hle
 {
-    public sealed class HleFinalizeCallbackException : Exception
+    public sealed class HleEmulatorFinalizeCallbackException : Exception
     {
     }
 }

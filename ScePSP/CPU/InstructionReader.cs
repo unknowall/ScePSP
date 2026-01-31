@@ -65,6 +65,7 @@ namespace ScePSP.Cpu
             }
         }
 
+
         public uint EndPC
         {
             get { return (uint)(Stream.Length - 4); }

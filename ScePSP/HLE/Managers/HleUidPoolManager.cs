@@ -1,4 +1,5 @@
-﻿using ScePSPUtils.Extensions;
+﻿using ScePSP.Hle.Managers;
+using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,23 +18,22 @@ namespace ScePSP.Hle
     {
     }
 
-    public static class IHleUidPoolClassExtensions
+    static public class IHleUidPoolClassExtensions
     {
-        public static T AllocateUid<T>(this T IHleUidPoolClass) where T : IHleUidPoolClass
+        static public T AllocateUid<T>(this T IHleUidPoolClass, PspContext PspContext) where T : IHleUidPoolClass
         {
-            PSPDrivers.HLE.HleUidPoolManager.Alloc(IHleUidPoolClass.GetType(), IHleUidPoolClass);
-
+            PspContext.GetInstance<HleUidPoolManager>().Alloc(IHleUidPoolClass.GetType(), IHleUidPoolClass);
             return IHleUidPoolClass;
         }
 
-        public static void RemoveUid(this IHleUidPoolClass IHleUidPoolClass)
+        static public void RemoveUid(this IHleUidPoolClass IHleUidPoolClass, PspContext PspContext)
         {
-            PSPDrivers.HLE.HleUidPoolManager.RemoveItem(IHleUidPoolClass.GetType(), IHleUidPoolClass);
+            PspContext.GetInstance<HleUidPoolManager>().RemoveItem(IHleUidPoolClass.GetType(), IHleUidPoolClass);
         }
 
-        public static int GetUidIndex(this IHleUidPoolClass IHleUidPoolClass)
+        static public int GetUidIndex(this IHleUidPoolClass IHleUidPoolClass, PspContext PspContext)
         {
-            return PSPDrivers.HLE.HleUidPoolManager.GetOrAllocIndex(IHleUidPoolClass.GetType(), IHleUidPoolClass);
+            return PspContext.GetInstance<HleUidPoolManager>().GetOrAllocIndex(IHleUidPoolClass.GetType(), IHleUidPoolClass);
         }
     }
 }
@@ -61,19 +61,19 @@ namespace ScePSP.Hle.Managers
                 }
             }
 
-            public bool ReuseIds => this.Info != null && this.Info.ReuseIds;
+            public bool ReuseIds
+            {
+                get { return (this.Info != null) ? this.Info.ReuseIds : false; }
+            }
 
             [MethodImpl(MethodImplOptions.Synchronized)]
             public int Alloc(IHleUidPoolClass Item)
             {
-                if (Item.GetType() != this.Type)
-                    throw new InvalidOperationException("Trying to insert invalid object type");
-
+                if (Item.GetType() != this.Type) throw (new InvalidOperationException("Trying to insert invalid object type"));
                 int Index = -1;
 
                 if (ReuseIds)
                 {
-                    //Console.Error.WriteLine("******************************************");
                     if (FreedIds.Count > 0)
                     {
                         Index = FreedIds.Min();
@@ -121,11 +121,11 @@ namespace ScePSP.Hle.Managers
             {
                 if (Info != null)
                 {
-                    throw new SceKernelException(Info.NotFoundError);
+                    throw (new SceKernelException(Info.NotFoundError));
                 }
                 else
                 {
-                    throw new SceKernelException((SceKernelErrors)(-1));
+                    throw (new SceKernelException((SceKernelErrors)(-1)));
                 }
             }
 
@@ -152,7 +152,10 @@ namespace ScePSP.Hle.Managers
                 return RevItems[Item];
             }
 
-            public int Count => Items.Count;
+            public int Count
+            {
+                get { return Items.Count; }
+            }
 
             public IEnumerable<IHleUidPoolClass> List()
             {

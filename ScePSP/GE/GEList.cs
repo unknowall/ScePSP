@@ -1,6 +1,7 @@
-﻿using ScePSP.Devices.Display;
+﻿using ScePSP.Components.Display;
 using ScePSP.GE.State;
 using ScePSP.Memory;
+using ScePSP.Threading.Synchronization;
 using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
@@ -8,21 +9,22 @@ using System.Threading;
 
 namespace ScePSP.GE
 {
-    public unsafe class GEList
+    public unsafe class GEList : IContextInitialize
     {
-        public GEBackEnd BackEnd => PSPDrivers.GeBackEnd;
+        [Context]
+        public GEBackEnd BackEnd;
 
-        public DisplayConfig Config => PSPDrivers.Config.DisplayConfig;
+        [Context]
+        public GEConfig Config;
 
-        public PspMemory Memory => PSPDrivers.PspMemory;
+        [Context]
+        public PspMemory Memory;
 
-        public IGEConnector Connector => PSPDrivers.GEConnector;
+        [Context]
+        public IGEConnector Connector;
 
-        public GlobalGpuState GlobalGpuState = new GlobalGpuState();
-
-        internal volatile LinkedList<GECore> Queue;
-
-        public volatile AutoResetEvent QueueEvent = new AutoResetEvent(false);
+        [Context]
+        public DisplayConfig DisplayConfig;
 
         public enum WaitStatus
         {
@@ -30,6 +32,13 @@ namespace ScePSP.GE
             AllSync = 1,
             Idle = 2
         }
+
+        public GlobalGpuState GlobalGpuState = new GlobalGpuState();
+
+        internal volatile LinkedList<GECore> Queue;
+
+        public volatile AutoResetEvent QueueEvent = new AutoResetEvent(false);
+
         public WaitableStateMachine<WaitStatus> SyncStatus = new WaitableStateMachine<WaitStatus>();
 
         protected volatile Queue<GECore> FreeQueue;
@@ -44,7 +53,11 @@ namespace ScePSP.GE
 
         public bool Syncing = false;
 
-        public GEList()
+        private GEList()
+        {
+        }
+
+        void IContextInitialize.Initialize()
         {
             Queue = new LinkedList<GECore>();
             FreeQueue = new Queue<GECore>();
@@ -70,6 +83,7 @@ namespace ScePSP.GE
                 result = FreeQueue.Dequeue();
                 result.Available = false;
             }
+
             return result;
         }
 
@@ -127,10 +141,10 @@ namespace ScePSP.GE
             }
         }
 
-        public void WaitSync(Action CallBack = null)
+        public void WaitSync(WaitStatus type, Action CallBack = null)
         {
             Syncing = true;
-            SyncStatus.CallbackOnStateOnce(WaitStatus.AllSync, () =>
+            SyncStatus.CallbackOnStateOnce(type, () =>
             {
                 CallBack?.Invoke();
                 Syncing = false;

@@ -12,7 +12,13 @@ namespace ScePSP.Hle.Threading.EventFlags
         public EventFlagInfo Info = new EventFlagInfo(0);
         protected List<WaitThread> _WaitingThreads = new List<WaitThread>();
 
-        public IEnumerable<WaitThread> WaitingThreads => _WaitingThreads;
+        public IEnumerable<WaitThread> WaitingThreads
+        {
+            get
+            {
+                return _WaitingThreads;
+            }
+        }
 
         public class WaitThread
         {
@@ -23,17 +29,16 @@ namespace ScePSP.Hle.Threading.EventFlags
 
             public override string ToString()
             {
-                return $"HleEventFlag.WaitThread({HleThread}, {BitsToMatch}, {WaitType})";
+                return String.Format(
+                    "HleEventFlag.WaitThread({0}, {1}, {2})",
+                    HleThread, BitsToMatch, WaitType
+                );
             }
 
             public uint* OutBits;
         }
 
-        public string Name
-        {
-            get => Info.Name;
-            set => Info.Name = value;
-        }
+        public string Name { get { return Info.Name; } set { Info.Name = value; } }
 
         public void AddWaitingThread(WaitThread WaitThread)
         {
@@ -107,9 +112,9 @@ namespace ScePSP.Hle.Threading.EventFlags
             }
 
             if (
-                WaitType.HasFlag(EventFlagWaitTypeSet.Or)
-                    ? (Info.CurrentPattern & BitsToMatch) != 0 // one or more bits of the mask
-                    : (Info.CurrentPattern & BitsToMatch) == BitsToMatch) // all the bits of the mask
+                (WaitType.HasFlag(EventFlagWaitTypeSet.Or))
+                ? ((Info.CurrentPattern & BitsToMatch) != 0) // one or more bits of the mask
+                : ((Info.CurrentPattern & BitsToMatch) == BitsToMatch)) // all the bits of the mask
             {
                 _DoClear(WaitType, BitsToMatch);
                 return true;

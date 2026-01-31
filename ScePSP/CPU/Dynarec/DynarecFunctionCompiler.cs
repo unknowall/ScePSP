@@ -7,9 +7,13 @@ namespace ScePSP.Cpu.Dynarec
 {
     public partial class DynarecFunctionCompiler
     {
-        CpuProcessor CpuProcessor => PSPDrivers.CPU;
+        [Context]
+        CpuProcessor CpuProcessor;
 
-        public DynarecFunctionCompiler()
+        [Context]
+        PspContext InjectContext;
+
+        private DynarecFunctionCompiler()
         {
         }
 
@@ -32,7 +36,7 @@ namespace ScePSP.Cpu.Dynarec
                     };
                 default:
                     var MipsMethodEmiter = new MipsMethodEmitter(CpuProcessor, PC, DoDebug, DoLog);
-                    var InternalFunctionCompiler = new InternalFunctionCompiler(MipsMethodEmiter, this, InstructionReader, ExploreNewPcCallback, PC, DoLog);
+                    var InternalFunctionCompiler = new InternalFunctionCompiler(InjectContext, MipsMethodEmiter, this, InstructionReader, ExploreNewPcCallback, PC, DoLog);
                     return InternalFunctionCompiler.CreateFunction();
             }
         }

@@ -1,5 +1,5 @@
-﻿using System;
-using LightCodec.Utils;
+﻿using LightCodec.Utils;
+using System;
 
 namespace LightCodec.aac
 {
@@ -154,7 +154,7 @@ namespace LightCodec.aac
     }
 
     public class OutputConfiguration
-	{
+    {
         public const int AAC_ERROR = -4;
         public const int MAX_CHANNELS = 64;
         public const int MAX_ELEM_ID = 16;
@@ -227,29 +227,29 @@ namespace LightCodec.aac
         public const int BEFORE_TNS = 0;
         public const int BETWEEN_TNS_AND_IMDCT = 1;
         public const int AFTER_IMDCT = 3;
-        
+
         public const int OC_NONE = 0; ///< Output unconfigured
 		public const int OC_TRIAL_PCE = 1; ///< Output configuration under trial specified by an inband PCE
 		public const int OC_TRIAL_FRAME = 2; ///< Output configuration under trial specified by a frame header
 		public const int OC_GLOBAL_HDR = 3; ///< Output configuration set in a global header but not yet locked
 		public const int OC_LOCKED = 4; ///< Output configuration locked in place
 
-		public MPEG4AudioConfig m4ac = new MPEG4AudioConfig();
-		public int[][] layoutMap = RectangularArrays.ReturnRectangularIntArray(MAX_ELEM_ID * 4, 3);
-		public int layoutMapTags;
-		public int channels;
-		public int channelLayout;
-		public int status;
+        public MPEG4AudioConfig m4ac = new MPEG4AudioConfig();
+        public int[][] layoutMap = RectangularArrays.ReturnRectangularIntArray(MAX_ELEM_ID * 4, 3);
+        public int layoutMapTags;
+        public int channels;
+        public int channelLayout;
+        public int status;
 
         public virtual void copy(OutputConfiguration that)
-		{
-			m4ac.copy(that.m4ac);
+        {
+            m4ac.copy(that.m4ac);
             Utils.copy(layoutMap, that.layoutMap);
-			layoutMapTags = that.layoutMapTags;
-			channels = that.channels;
-			channelLayout = that.channelLayout;
-			status = that.status;
-		}
-	}
+            layoutMapTags = that.layoutMapTags;
+            channels = that.channels;
+            channelLayout = that.channelLayout;
+            status = that.status;
+        }
+    }
 
 }

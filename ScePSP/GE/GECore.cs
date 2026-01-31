@@ -1,8 +1,7 @@
-﻿using ScePSP.BackEnd.OpenGL;
-using ScePSP.Devices.Display;
-using ScePSP.GE.Run;
+﻿using ScePSP.GE.Run;
 using ScePSP.GE.State;
 using ScePSP.Memory;
+using ScePSP.Threading.Synchronization;
 using ScePSPUtils;
 using System;
 using System.Collections.Generic;
@@ -27,10 +26,13 @@ namespace ScePSP.GE
         private static readonly Logger Logger = Logger.GetLogger("GE");
 
         internal PspMemory Memory;
+
         public GpuStateStruct* GEStateStruct;
 
         private GERunner Runner;
+
         public delegate void GeCoreOpDelegate(GERunner Runner, OpCodes GpuOpCode, uint Params);
+
         private static readonly GeCoreOpDelegate InstructionSwitch = GECore.GenerateSwitch();
 
         public int Id;
@@ -39,7 +41,6 @@ namespace ScePSP.GE
         public volatile uint AddressCurrent;
         public volatile uint AddressStall;
         public volatile uint AddressEnd;
-        public uint Pc;
 
         public AutoResetEvent StatusSync = new AutoResetEvent(false);
         private GlobalGpuState GlobalGpuState;
@@ -56,9 +57,11 @@ namespace ScePSP.GE
 
         public SignalBehavior Signal;
 
-        public int _primCount;
+        int _primCount;
 
         public int[] CMDValues = new int[0xFFFF];
+
+        public uint Pc;
 
         public bool StallReached
         {
@@ -86,6 +89,8 @@ namespace ScePSP.GE
             Pc = AddressCurrent;
             Status = (Addr == StallAddr) ? GEStatusEnum.StallReached : GEStatusEnum.Queued;
             WaitStatus.SetValue(Status);
+
+            GeList.BackEnd.Start(GEStateStruct);
         }
 
         public void SetStallAddress(uint value)
@@ -100,8 +105,10 @@ namespace ScePSP.GE
         public void SkipEnd()
         {
             var Current = AddressCurrent;
+
             var OP1 = *(GpuInstruction*)Memory.PspAddressToPointerUnsafe(Current);
             var OP2 = *(GpuInstruction*)Memory.PspAddressToPointerUnsafe(Current + 4);
+
             if (OP1.OpCode == OpCodes.FINISH && OP2.OpCode == OpCodes.END)
             {
                 AddressCurrent += 8;
@@ -117,7 +124,6 @@ namespace ScePSP.GE
                     return GEStatusEnum.Drawing;
                 }
             }
-
             return Status;
         }
 
@@ -136,7 +142,7 @@ namespace ScePSP.GE
             //Console.Out.WriteLineColored(ConsoleColor.Red, "WaitSyncStall Start!");
             Status = GEStatusEnum.StallReached;
             WaitStatus.SetValue(Status);
-            if (!StatusSync.WaitOne(1000))
+            if (!StatusSync.WaitOne(2000))
             {
                 MaxWaitCount++;
                 if (MaxWaitCount > 60)
@@ -155,7 +161,7 @@ namespace ScePSP.GE
         {
             Status = GEStatusEnum.EndReached;
             WaitStatus.SetValue(Status);
-            if (!StatusSync.WaitOne(1000))
+            if (!StatusSync.WaitOne(2000))
             {
                 MaxWaitCount++;
                 if (MaxWaitCount > 60)
@@ -172,8 +178,7 @@ namespace ScePSP.GE
 
         internal void Process()
         {
-            //Console.WriteLine("Process() : {0} : 0x{1:X8} : 0x{2:X8} : 0x{3:X8}", Id,
-            //    InstructionAddressCurrent, InstructionAddressStart, InstructionAddressStall);
+            //Console.WriteLine("Process() : {0} : 0x{1:X8} : 0x{2:X8} : 0x{3:X8}", Id, AddressCurrent, AddressStart, AddressStall);
             Finish = false;
             Done = false;
             Pause = false;
@@ -190,13 +195,9 @@ namespace ScePSP.GE
                     MaxWaitCount = 0;
                     ProcessInstruction();
                 }
-                if (Done)
-                {
-                    Status = GEStatusEnum.EndReached;
-                    if (Finish) Status = GEStatusEnum.Completed;
-                    WaitStatus.SetValue(Status);
-                }
             }
+            Status = GEStatusEnum.Completed;
+            WaitStatus.SetValue(Status);
         }
 
         private static GeCoreOpDelegate GenerateSwitch()
@@ -212,6 +213,7 @@ namespace ScePSP.GE
             ILGenerator.Emit(System.Reflection.Emit.OpCodes.Ldarg_1);
             ILGenerator.Emit(System.Reflection.Emit.OpCodes.Switch, SwitchLabels);
             ILGenerator.Emit(System.Reflection.Emit.OpCodes.Ret);
+
             for (int n = 0; n < SwitchLabels.Length; n++)
             {
                 ILGenerator.MarkLabel(SwitchLabels[n]);
@@ -237,6 +239,7 @@ namespace ScePSP.GE
                 }
                 ILGenerator.Emit(System.Reflection.Emit.OpCodes.Ret);
             }
+
             return (GeCoreOpDelegate)DynamicMethod.CreateDelegate(typeof(GeCoreOpDelegate));
         }
 
@@ -245,6 +248,7 @@ namespace ScePSP.GE
             Pc = AddressCurrent;
             GpuInstruction Value = *(GpuInstruction*)Memory.PspAddressToPointerUnsafe(AddressCurrent);
             AddressCurrent += 4;
+
             return Value;
         }
 
@@ -254,7 +258,9 @@ namespace ScePSP.GE
             var Instruction = ReadInstructionAndMoveNext();
             Runner.OpCode = Instruction.OpCode;
             Runner.Params24 = Instruction.Params;
+
             CMDValues[(int)Runner.OpCode] = (int)Instruction.Instruction & 0x00FFFFFF;
+
             InstructionSwitch(Runner, Instruction.OpCode, Instruction.Params);
 
             //if (Debug)
@@ -363,7 +369,6 @@ namespace ScePSP.GE
         public void DoFinish(uint PC, uint Arg, bool ExecuteNow)
         {
             //Console.WriteLine("FINISH: Arg:{0}", Arg);
-
             if (Callbacks.FinishFunction != 0)
             {
                 GeList.Connector.Finish(PC, Callbacks, Arg, ExecuteNow);
@@ -373,7 +378,6 @@ namespace ScePSP.GE
         public void DoSignal(uint PC, uint Signal, SignalBehavior Behavior, bool ExecuteNow)
         {
             Console.WriteLine("SIGNAL Callbacks {0} Signal {1} Behavior {2}", Callbacks.SignalFunction, Signal, Behavior);
-
             if (Callbacks.SignalFunction != 0)
             {
                 GeList.Connector.Signal(PC, Callbacks, Signal, Behavior, ExecuteNow);
@@ -394,9 +398,7 @@ namespace ScePSP.GE
         public void DeQueue()
         {
             Done = true;
-
             GeList.Queue.Remove(this);
-
             GeList.EnqueueFree(this);
         }
     }

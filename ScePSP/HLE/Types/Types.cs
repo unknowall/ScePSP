@@ -1,17 +1,9 @@
 ﻿namespace ScePSP.Hle
 {
-    public enum SceUID : int
-    {
-    }
-
-    public enum SceSize : int
-    {
-    }
-
+    public enum SceUID : int { }
+    public enum SceSize : int { }
     //public enum SceIoFlags : int { }
-    public struct PspIoDrv
-    {
-    }
+    public struct PspIoDrv { }
 
     public enum PspModule : uint
     {

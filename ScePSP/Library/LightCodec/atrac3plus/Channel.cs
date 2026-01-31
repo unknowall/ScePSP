@@ -1,6 +1,5 @@
 ﻿
 using static LightCodec.atrac3plus.Atrac3plusData2;
-using Atrac3plusData2 = LightCodec.atrac3plus.Atrac3plusData2;
 
 namespace LightCodec.atrac3plus
 {

@@ -16,7 +16,7 @@ namespace SafeILGenerator.Utils
                         expression = expr.Body;
                         continue;
                     case MemberExpression expr:
-                        return (FieldInfo) expr.Member;
+                        return (FieldInfo)expr.Member;
                 }
                 throw new NotImplementedException("NodeType: " + expression.NodeType);
             }

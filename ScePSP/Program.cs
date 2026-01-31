@@ -1,9 +1,8 @@
-﻿using System;
+﻿using ScePSP.UI;
+using System;
 using System.Windows.Forms;
 
-using ScePSP.UI;
-
-namespace ScePSP.UI
+namespace ScePSP
 {
     internal static class Program
     {

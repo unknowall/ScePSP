@@ -8,9 +8,11 @@ namespace ScePSP.GE
 {
     public unsafe abstract class GEBackEnd
     {
-        protected PspStoredConfig PspStoredConfig => PSPDrivers.Config.StoredConfig;
+        [Context]
+        protected PspStoredConfig PspStoredConfig;
 
-        public PspMemory Memory => PSPDrivers.PspMemory;
+        [Context]
+        public PspMemory Memory;
 
         protected int _ScaleViewport = 2;
 
@@ -55,7 +57,9 @@ namespace ScePSP.GE
 
         public virtual void PrimEnd() { }
 
-        public virtual void Prim(ushort VertexCountbool, bool IsPatchPrim = false) { }
+        public virtual void Prim(ushort VertexCountbool, uint PrimCount) { }
+
+        public virtual void Start(GpuStateStruct* GpuState) { }
 
         public virtual void Finish(GpuStateStruct* GpuState) { }
 
@@ -108,7 +112,7 @@ namespace ScePSP.GE
 
             morpingVertexCount = (uint)(VertexType.MorphingVertexCount + 1);
 
-            VertexType.NormalCount = GpuState->TextureMappingState.GetTextureComponentsCount();
+            //VertexType.NormalCount = GpuState->TextureMappingState.GetTextureComponentsCount();
 
             readVertex = ReadVertex_Void_delegate;
 
@@ -116,6 +120,19 @@ namespace ScePSP.GE
                 VertexType,
                 (byte*)Memory.PspAddressToPointerSafe(GpuState->GetAddressRelativeToBaseOffset(GpuState->VertexAddress), 0)
             );
+
+            // Fix missing geometry! At least!
+            if (VertexType.Index == VertexTypeStruct.IndexEnum.Void)
+            {
+                GpuState->VertexAddress += (uint)(VertexReader.VertexSize * vertexCount * morpingVertexCount);
+            }
+
+            //if (morpingVertexCount != 1 || VertexType.RealSkinningWeightCount != 0)
+            //{
+            //    Console.WriteLine("PrepareVertexs: {0}, Morphing:{1}, Skinning:{2}", vertexCount, morpingVertexCount, VertexType.RealSkinningWeightCount);
+            //}
+
+            //Console.WriteLine(TotalVerticesWithoutMorphing);
 
             void* indexPointer = null;
             if (VertexType.Index != VertexTypeStruct.IndexEnum.Void)
@@ -180,26 +197,12 @@ namespace ScePSP.GE
                 default:
                     throw new NotImplementedException("VertexType.Index: " + VertexType.Index);
             }
-
             // ensure we read at least one vertex when max-index logic yields zero
             if (totalVerticesWithoutMorphing == 0)
             {
                 totalVerticesWithoutMorphing = vertexCount;
             }
             totalVerticesWithoutMorphing++;
-
-            // Fix missing geometry! At least!
-            if (VertexType.Index == VertexTypeStruct.IndexEnum.Void)
-            {
-                GpuState->VertexAddress += (uint)(VertexReader.VertexSize * vertexCount * morpingVertexCount);
-            }
-
-            if (morpingVertexCount != 1 || VertexType.RealSkinningWeightCount != 0)
-            {
-                //Console.WriteLine("PRIM: {0}, {1}, Morphing:{2}, Skinning:{3}", PrimitiveType, vertexCount, morpingVertexCount, VertexType.RealSkinningWeightCount);
-            }
-            //Console.WriteLine(TotalVerticesWithoutMorphing);
         }
-
     }
 }

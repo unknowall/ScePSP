@@ -1,19 +1,10 @@
 ﻿using ScePSP.BackEnd.OpenGL;
-using ScePSP.Cpu;
 using ScePSP.GE;
-using ScePSP.Types;
-using ScePSPUtils;
 using ScePSPUtils.Drawing;
 using ScePSPUtils.Drawing.Extensions;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ScePSP.UI
@@ -25,8 +16,6 @@ namespace ScePSP.UI
         public TextureForm()
         {
             InitializeComponent();
-
-            backend = (PSPDrivers.GeBackEnd as GLBackEnd);
         }
 
         public class TextureElement
@@ -52,7 +41,8 @@ namespace ScePSP.UI
                 TextureList.Items.Clear();
                 foreach (var Element in backend.TextureCache.Cache.Values)
                 {
-                    TextureList.Items.Add(new TextureElement(Element));
+                    if (Element.Info != null)
+                        TextureList.Items.Add(new TextureElement(Element));
                 }
             }
             finally
@@ -63,6 +53,8 @@ namespace ScePSP.UI
 
         private void TextureViewerForm_Load(object sender, EventArgs e)
         {
+            backend = MainForm.Context.GetInstance<GEBackEnd>() as GLBackEnd;
+
             GLBackEnd.Context.MakeCurrent();
 
             UpdateTextureList();
@@ -71,7 +63,7 @@ namespace ScePSP.UI
                 TextureList.SelectedIndex = 0;
             }
 
-            Text = $"Total Cached Texture: {TextureList.Items.Count}";
+            this.Text = this.Text + $" {TextureList.Items.Count}";
         }
 
         private void TextureForm_FormClosing(object sender, FormClosingEventArgs e)

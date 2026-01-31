@@ -4,7 +4,7 @@ namespace LightGL
 {
     public class GLFrameBuffer : IDisposable
     {
-        private uint m_frameBuffer = 0;
+        public uint m_frameBuffer = 0;
 
         private static uint s_boundRead = 0;
         private static uint s_boundDraw = 0;
@@ -15,7 +15,6 @@ namespace LightGL
 
         public GLFrameBuffer()
         {
-
         }
 
         public GLFrameBuffer(GLFrameBuffer other) : this(other.m_frameBuffer)
@@ -45,6 +44,7 @@ namespace LightGL
         {
             switch (type)
             {
+                case FramebufferAttachment.DepthStencilAttachment:
                 case FramebufferAttachment.DepthAttachment:
                     TextureDepth = texture;
                     break;

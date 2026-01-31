@@ -1,39 +1,74 @@
-﻿using ScePSP.Hle.Formats.audio;
-using System;
+﻿using System;
 using System.Linq;
 
-namespace ScePSP.BackEnd
+namespace ScePSP.Audio
 {
-    public sealed unsafe class PspAudio : IDisposable
+    unsafe public sealed class PspAudio : IContextInitialize, IDisposable
     {
+        /// <summary>
         /// Output formats for PSP audio.
+        /// </summary>
         public enum FormatEnum
         {
+            /// <summary>
             /// Channel is set to stereo output (2 channels).
+            /// </summary>
             Stereo = 0x00,
 
+            /// <summary>
             /// Channel is set to mono output (1 channel).
+            /// </summary>
             Mono = 0x10,
         }
 
+        /// <summary>
         /// The maximum output volume.
+        /// </summary>
         public const int MaxVolume = 0x8000;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public const int SamplesMax = 0x10000 - 64;
 
+        /// <summary>
         /// Used to request the next available hardware channel.
+        /// </summary>
+        //public const int FreeChannel = -1;
+
+        /// <summary>
         /// Maximum number of allowed audio channels
+        /// </summary>
         public const int MaxChannels = 8;
         //public const int MaxChannels = 32;
 
+        /// <summary>
         /// Number of audio channels
+        /// </summary>
         public PspAudioChannel[] Channels;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public PspAudioChannel SrcOutput2Channel;
 
-        public AudioBackEnd AudioBackEnd => PSPDrivers.AudioBackEnd;
+        /// <summary>
+        /// 
+        /// </summary>
+        [Context]
+        public AudioBackEnd PspAudioImpl;
 
-        public PspAudio()
+        /// <summary>
+        /// 
+        /// </summary>
+        private PspAudio()
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        void IContextInitialize.Initialize()
         {
             Channels = new PspAudioChannel[MaxChannels];
             for (int n = 0; n < MaxChannels; n++)
@@ -52,20 +87,34 @@ namespace ScePSP.BackEnd
             };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public PspAudioChannel GetFreeChannel()
         {
-            if (!Channels.Any(Channel => Channel.Available)) throw new NoChannelsAvailableException();
+            if (!Channels.Any(Channel => Channel.Available)) throw (new NoChannelsAvailableException());
             return Channels.Reverse().First(Channel => Channel.Available);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ChannelId"></param>
         private void CheckChannelId(int ChannelId)
         {
             if (ChannelId < 0 || ChannelId >= Channels.Length)
             {
-                throw new InvalidChannelException();
+                throw (new InvalidChannelException());
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ChannelId"></param>
+        /// <param name="CanAlloc"></param>
+        /// <returns></returns>
         public PspAudioChannel GetChannel(int ChannelId, bool CanAlloc = false)
         {
             PspAudioChannel Channel;
@@ -81,9 +130,12 @@ namespace ScePSP.BackEnd
             return Channel;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Update()
         {
-            AudioBackEnd.Update((MixedSamples) =>
+            PspAudioImpl.Update((MixedSamples) =>
             {
                 var RequiredSamples = MixedSamples.Length;
                 fixed (short* MixedSamplesPtr = MixedSamples)
@@ -118,20 +170,18 @@ namespace ScePSP.BackEnd
             if (!Disposed)
             {
                 Disposed = true;
-                AudioBackEnd.Stop();
+                PspAudioImpl.StopSynchronized();
             }
         }
 
         void IDisposable.Dispose()
         {
-            AudioBackEnd.Stop();
+            StopSynchronized();
         }
     }
-
     public class InvalidChannelException : Exception
     {
     }
-
     public class NoChannelsAvailableException : Exception
     {
     }

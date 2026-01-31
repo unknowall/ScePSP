@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace ScePSP.Hle.Managers
 {
-    public sealed class HleModuleManager : IDisposable
+    sealed public class HleModuleManager : IContextInitialize, IDisposable
     {
         private readonly Dictionary<Type, HleModuleHost> HleModules = new Dictionary<Type, HleModuleHost>();
         public readonly List<HleModuleGuest> LoadedGuestModules = new List<HleModuleGuest>();
@@ -16,15 +16,17 @@ namespace ScePSP.Hle.Managers
         public readonly Queue<DelegateInfo> LastCalledCallbacks = new Queue<DelegateInfo>();
         private uint DelegateLastId = 0;
 
-        public Dictionary<string, Type> HleModuleTypes;
+        [Context]
+        HleThreadManager HleThreadManager;
 
-        //int LastCallIndex = 0;
+        [Context]
+        CpuProcessor CpuProcessor;
 
-        HleThreadManager HleThreadManager => PSPDrivers.HLE.HleThreadManager;
+        [Context]
+        PspContext PspContext;
 
-        CpuProcessor CpuProcessor => PSPDrivers.CPU;
-
-        HleConfig HleConfig => PSPDrivers.Config.HleConfig;
+        [Context]
+        HleConfig HleConfig;
 
         public static IEnumerable<Type> GetAllHleModules(Assembly ModulesAssembly)
         {
@@ -33,26 +35,20 @@ namespace ScePSP.Hle.Managers
             return ModulesAssembly.GetTypes().Where(Type => FindType.IsAssignableFrom(Type));
         }
 
-        public HleModuleManager()
+        public Dictionary<String, Type> HleModuleTypes;
+
+        public int LastCallIndex = 0;
+
+        void IContextInitialize.Initialize()
         {
             if (HleConfig.HleModulesDll == null)
             {
-                throw new NullReferenceException("HleConfig.HleModulesDll");
+                throw (new ArgumentNullException("PspEmulatorContext.PspConfig.HleModulesDll Can't be null"));
             }
 
             HleModuleTypes = GetAllHleModules(HleConfig.HleModulesDll).ToDictionary(Type => Type.Name);
 
-            Console.Out.WriteLineColored(ConsoleColor.Yellow, "HleModuleTypes: {0}", HleModuleTypes.Count);
-
-            //foreach (var type in HleModuleTypes)
-            //{
-            //    Console.Out.WriteLineColored(ConsoleColor.Yellow, "  Key {0}  -> Name {1}", type.Key, type.Value);
-            //}
-
-            //foreach (var type in HleModules)
-            //{
-            //    Console.Out.WriteLineColored(ConsoleColor.Green, "  Key {0}  -> Name {1}", type.Key, type.Value);
-            //}
+            //Console.WriteLine("HleModuleTypes: {0}", HleModuleTypes.Count);
 
             if (HleModuleTypes.Count < 10)
             {
@@ -107,40 +103,24 @@ namespace ScePSP.Hle.Managers
 
         public HleModuleHost GetModuleByType(Type Type)
         {
-            //Console.WriteLine("GetModuleByType('{0}')", Type);
-
             if (!HleModules.ContainsKey(Type))
             {
-                var HleModule = HleModules[Type] = (HleModuleHost)Activator.CreateInstance(Type);
-
-                PSPDrivers.HleModuleHostList.Add(HleModule);
+                var HleModule = HleModules[Type] = (HleModuleHost)PspContext.GetInstance(Type);
+                PspContext.InjectDependencesTo(HleModule);
             }
 
             return (HleModuleHost)HleModules[Type];
         }
 
-        public HleModuleHost GetModuleByName(string ModuleNameToFind)
+        public HleModuleHost GetModuleByName(String ModuleNameToFind)
         {
             //Console.WriteLine("GetModuleByName('{0}')", ModuleNameToFind);
-
             if (!HleModuleTypes.ContainsKey(ModuleNameToFind))
             {
-                throw new KeyNotFoundException("Can't find module '" + ModuleNameToFind + "'");
+                throw (new KeyNotFoundException("Can't find module '" + ModuleNameToFind + "'"));
                 //return new HleModuleHost();
             }
             return GetModuleByType(HleModuleTypes[ModuleNameToFind]);
-        }
-
-        public HleModuleGuest GetGuestModuleByAddress(int Address)
-        {
-            if (LoadedGuestModules != null)
-            foreach(var module in LoadedGuestModules)
-            {
-                if (module.Loaded)
-                if (Address >= module.SceModuleStructPartition.Low && Address <= module.SceModuleStructPartition.High)
-                    return module;
-            }
-            return null;
         }
 
         public TType GetModule<TType>() where TType : HleModuleHost
@@ -148,15 +128,19 @@ namespace ScePSP.Hle.Managers
             return (TType)GetModuleByType(typeof(TType));
         }
 
-        public Action<CpuThreadState> GetModuleDelegate<TType>(string FunctionName) where TType : HleModuleHost
+        public Action<CpuThreadState> GetModuleDelegate<TType>(String FunctionName) where TType : HleModuleHost
         {
             var Module = GetModule<TType>();
             var EntriesByName = Module.EntriesByName;
             if (!EntriesByName.ContainsKey(FunctionName))
             {
-                throw new KeyNotFoundException(
-                    $"Can't find method '{FunctionName}' on module '{Module.GetType().Name}'"
-                );
+                throw (new KeyNotFoundException(
+                    String.Format(
+                        "Can't find method '{0}' on module '{1}'",
+                        FunctionName,
+                        Module.GetType().Name
+                    )
+                ));
             }
             return EntriesByName[FunctionName].Delegate;
         }
@@ -168,7 +152,7 @@ namespace ScePSP.Hle.Managers
             {
                 Action = (CpuThreadState) =>
                 {
-                    throw new NotImplementedException("Not Implemented Syscall '" + ModuleImportName + ":" + FunctionEntry + "'");
+                    throw (new NotImplementedException("Not Implemented Syscall '" + ModuleImportName + ":" + FunctionEntry + "'"));
                 };
             }
             CpuProcessor.RegisteredNativeSyscallMethods[DelegateId] = new NativeSyscallInfo()

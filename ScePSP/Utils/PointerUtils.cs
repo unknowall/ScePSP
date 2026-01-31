@@ -196,7 +196,8 @@ namespace ScePSPUtils
         public static void Memcpy(byte* destination, byte* source, int size)
         {
             //Buffer.MemoryCopy(source, destination, size, size);
-            new Span<byte>(source, size).CopyTo(new Span<byte>(destination, size));
+            if (source != null && destination != null)
+                new Span<byte>(source, size).CopyTo(new Span<byte>(destination, size));
         }
 
         public static byte[] PointerToByteArray(byte* pointer, int size)

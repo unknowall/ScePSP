@@ -1,5 +1,5 @@
-﻿using ScePSP.Memory;
-using ScePSP.Hle.Formats;
+﻿using ScePSP.Hle.Formats;
+using ScePSP.Memory;
 using ScePSPUtils;
 using System.Text;
 

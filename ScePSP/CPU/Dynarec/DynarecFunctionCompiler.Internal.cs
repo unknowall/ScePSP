@@ -21,15 +21,19 @@ namespace ScePSP.Cpu.Dynarec
     {
         internal class InternalFunctionCompiler
         {
-            public static readonly Func<uint, CpuEmitter, AstNodeStm> CpuEmitterInstruction = EmitLookupGenerator.GenerateSwitchDelegateReturn<CpuEmitter, AstNodeStm>("CpuEmitterInstruction", InstructionTable.ALL);
+            public static readonly Func<uint, CpuEmitter, AstNodeStm> CpuEmitterInstruction =
+                EmitLookupGenerator.GenerateSwitchDelegateReturn<CpuEmitter, AstNodeStm>("CpuEmitterInstruction", InstructionTable.ALL);
+
             static MipsDisassembler MipsDisassembler = new MipsDisassembler();
             CpuEmitter CpuEmitter;
             DynarecFunctionCompiler DynarecFunctionCompiler;
             IInstructionReader InstructionReader;
 
-            CpuProcessor CpuProcessor => PSPDrivers.CPU;
+            [Context]
+            CpuProcessor CpuProcessor;
 
-            PspMemory Memory => PSPDrivers.PspMemory;
+            [Context]
+            PspMemory Memory;
 
             MipsMethodEmitter MipsMethodEmitter;
 
@@ -69,11 +73,12 @@ namespace ScePSP.Cpu.Dynarec
                 if (_ExploreNewPcCallback != null) _ExploreNewPcCallback(PC);
             }
 
-            internal InternalFunctionCompiler(MipsMethodEmitter MipsMethodEmitter, DynarecFunctionCompiler DynarecFunctionCompiler, IInstructionReader InstructionReader, Action<uint> _ExploreNewPcCallback, uint EntryPC, bool DoLog)
+            internal InternalFunctionCompiler(PspContext InjectContext, MipsMethodEmitter MipsMethodEmitter, DynarecFunctionCompiler DynarecFunctionCompiler, IInstructionReader InstructionReader, Action<uint> _ExploreNewPcCallback, uint EntryPC, bool DoLog)
             {
+                InjectContext.InjectDependencesTo(this);
                 this._ExploreNewPcCallback = _ExploreNewPcCallback;
                 this.MipsMethodEmitter = MipsMethodEmitter;
-                this.CpuEmitter = new CpuEmitter(MipsMethodEmitter, InstructionReader);
+                this.CpuEmitter = new CpuEmitter(InjectContext, MipsMethodEmitter, InstructionReader);
                 this.GlobalInstructionStats = CpuProcessor.GlobalInstructionStats;
                 //this.InstructionStats = MipsMethodEmitter.InstructionStats;
                 this.InstructionStats = new Dictionary<string, uint>();
@@ -90,6 +95,10 @@ namespace ScePSP.Cpu.Dynarec
                 }
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <returns></returns>
             internal DynarecFunction CreateFunction()
             {
                 CpuEmitter.SpecialName = "";
@@ -420,7 +429,7 @@ namespace ScePSP.Cpu.Dynarec
 
                     TryPutLabelAT(PC, Nodes);
 
-                    if (_DynarecConfig.UpdatePCEveryInstruction)
+                    if (DynarecConfig.UpdatePCEveryInstruction)
                     {
                         Nodes.AddStatement(ast.AssignPC(PC));
                     }

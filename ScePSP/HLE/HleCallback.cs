@@ -1,5 +1,4 @@
 ﻿using ScePSP.Cpu;
-using ScePSP.Hle.Interop;
 using System;
 
 namespace ScePSP.Hle
@@ -48,7 +47,7 @@ namespace ScePSP.Hle
 
         public override string ToString()
         {
-            return $"HleCallback(Name='{Name}', Function=0x{Function:X})";
+            return String.Format("HleCallback(Name='{0}', Function=0x{1:X})", Name, Function);
         }
     }
 }

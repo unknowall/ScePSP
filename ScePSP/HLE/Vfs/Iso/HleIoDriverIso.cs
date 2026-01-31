@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace ScePSP.Hle.Vfs.Iso
 {
-    public unsafe class HleIoDriverIso : AbstractHleIoDriver, IHleIoDriver
+    public unsafe class HleIoDriverIso : IHleIoDriver
     {
         public IsoFile Iso { get; protected set; }
 
@@ -20,8 +20,8 @@ namespace ScePSP.Hle.Vfs.Iso
 
             public void Dispose()
             {
-                IsoNode?.Dispose();
-                Stream?.Dispose();
+                if (IsoNode != null) IsoNode.Dispose();
+                if (Stream != null) Stream.Dispose();
             }
         }
 
@@ -82,8 +82,7 @@ namespace ScePSP.Hle.Vfs.Iso
                     }
                     else
                     {
-                        throw new NotImplementedException("Can't handle special filename '" + FileName + "' part '" +
-                                                         Part + "'");
+                        throw (new NotImplementedException("Can't handle special filename '" + FileName + "' part '" + Part + "'"));
                     }
                     //Console.WriteLine(Part);
                 }
@@ -114,7 +113,7 @@ namespace ScePSP.Hle.Vfs.Iso
 
         public unsafe int IoClose(HleIoDrvFileArg HleIoDrvFileArg)
         {
-            var IsoFileArgument = (IsoFileArgument)HleIoDrvFileArg.FileArgument;
+            var IsoFileArgument = ((IsoFileArgument)HleIoDrvFileArg.FileArgument);
             IsoFileArgument.Stream.Close();
             return 0;
             //throw new NotImplementedException();
@@ -122,7 +121,7 @@ namespace ScePSP.Hle.Vfs.Iso
 
         public unsafe int IoRead(HleIoDrvFileArg HleIoDrvFileArg, byte* OutputPointer, int OutputLength)
         {
-            var IsoFileArgument = (IsoFileArgument)HleIoDrvFileArg.FileArgument;
+            var IsoFileArgument = ((IsoFileArgument)HleIoDrvFileArg.FileArgument);
             var OutputData = new byte[OutputLength];
             int Readed = IsoFileArgument.Stream.Read(OutputData, 0, OutputLength);
             PointerUtils.Memcpy(OutputPointer, OutputData, OutputLength);
@@ -137,7 +136,7 @@ namespace ScePSP.Hle.Vfs.Iso
 
         public unsafe long IoLseek(HleIoDrvFileArg HleIoDrvFileArg, long Offset, SeekAnchor Whence)
         {
-            var IsoFileArgument = (IsoFileArgument)HleIoDrvFileArg.FileArgument;
+            var IsoFileArgument = ((IsoFileArgument)HleIoDrvFileArg.FileArgument);
             //Stream.Seek(
             return IsoFileArgument.Stream.Seek(Offset, (SeekOrigin)Whence);
         }
@@ -148,52 +147,42 @@ namespace ScePSP.Hle.Vfs.Iso
             /// UMD file seek set.
             /// </summary>
             FileSeekSet = 0x01010005,
-
             /// <summary>
             /// Get UMD Primary Volume Descriptor
             /// </summary>
             GetPrimaryVolumeDescriptor = 0x01020001,
-
             /// <summary>
             /// Get UMD Path Table
             /// </summary>
             GetPathTable = 0x01020002,
-
             /// <summary>
             /// Get Sector size
             /// </summary>
             GetSectorSize = 0x01020003,
-
             /// <summary>
             /// Get UMD file pointer.
             /// </summary>
             GetFilePointer = 0x01020004,
-
             /// <summary>
             /// Get UMD file start sector.
             /// </summary>
             GetStartSector = 0x01020006,
-
             /// <summary>
             /// Get UMD file length in bytes.
             /// </summary>
             GetLengthInBytes = 0x01020007,
-
             /// <summary>
             /// Read UMD file.
             /// </summary>
             ReadFile = 0x01030008,
-
             /// <summary>
             /// UMD disc read sectors operation.
             /// </summary>
             ReadSectors = 0x01F30003,
-
             /// <summary>
             /// UMD file seek whence.
             /// </summary>
             FileSeek = 0x01F100A6,
-
             /// <summary>
             /// Define decryption key (DRM by amctrl.prx).
             /// </summary>
@@ -209,9 +198,21 @@ namespace ScePSP.Hle.Vfs.Iso
 
         unsafe delegate void* ActionIntPVoid(int Value);
 
-        public unsafe int IoIoctl(HleIoDrvFileArg HleIoDrvFileArg, uint Command, Span<byte> Input, Span<byte> Output)
+        public unsafe int IoIoctl(HleIoDrvFileArg HleIoDrvFileArg, uint Command, byte* InputPointer, int InputLength, byte* OutputPointer, int OutputLength)
         {
-            var IsoFileArgument = (IsoFileArgument)HleIoDrvFileArg.FileArgument;
+            var IsoFileArgument = ((IsoFileArgument)HleIoDrvFileArg.FileArgument);
+
+            ActionIntPVoid ExpectedOutputSize = (int MinimumSize) =>
+            {
+                if (OutputLength < MinimumSize || OutputPointer == null) throw (new SceKernelException(SceKernelErrors.ERROR_INVALID_ARGUMENT));
+                return OutputPointer;
+            };
+
+            ActionIntPVoid ExpectedInputSize = (int MinimumSize) =>
+            {
+                if (InputLength < MinimumSize || InputPointer == null) throw (new SceKernelException(SceKernelErrors.ERROR_INVALID_ARGUMENT));
+                return InputPointer;
+            };
 
             switch ((UmdCommandEnum)Command)
             {
@@ -223,59 +224,58 @@ namespace ScePSP.Hle.Vfs.Iso
 #endif
                 case UmdCommandEnum.FileSeekSet:
                     {
-                        var In = ReinterpretSpan<uint>(Input);
-                        IsoFileArgument.Stream.Position = In[0];
+                        var In = (uint*)ExpectedInputSize(sizeof(uint));
+                        IsoFileArgument.Stream.Position = *In;
                         return 0;
                     }
                 case UmdCommandEnum.ReadSectors:
                     {
-                        var In = ReinterpretSpan<uint>(Input);
-                        var NumberOfSectors = In[0];
+                        var In = (uint*)ExpectedInputSize(sizeof(uint));
+                        var NumberOfSectors = *In;
                         var CopySize = (int)(IsoFile.SectorSize * NumberOfSectors);
-                        var Out = ReinterpretSpan<byte>(Output, CopySize);
+                        var Out = (byte*)ExpectedOutputSize(CopySize);
                         var BytesReaded = IsoFileArgument.Stream.ReadBytes(CopySize);
-                        new Span<byte>(BytesReaded).CopyTo(Out.Slice(0, BytesReaded.Length));
+                        PointerUtils.Memcpy(Out, BytesReaded, BytesReaded.Length);
                         return 0;
                     }
                 case UmdCommandEnum.FileSeek:
                     {
-                        var In = ReinterpretSpan<FileSeekIn>(Input);
-                        IsoFileArgument.Stream.Seek(In[0].Offset, (SeekOrigin)In[0].Whence);
+                        var In = (FileSeekIn*)ExpectedInputSize(sizeof(FileSeekIn));
+                        IsoFileArgument.Stream.Seek(In->Offset, (SeekOrigin)In->Whence);
                         return 0;
                     }
                 case UmdCommandEnum.GetFilePointer:
                     {
-                        var Out = ReinterpretSpan<uint>(Output);
-                        Out[0] = (uint)IsoFileArgument.Stream.Position;
+                        var Out = (uint*)ExpectedOutputSize(sizeof(uint));
+                        *Out = (uint)IsoFileArgument.Stream.Position;
                         return 0;
                     }
                 case UmdCommandEnum.GetStartSector:
                     {
-                        var Out = ReinterpretSpan<uint>(Output);
-                        Out[0] = (uint)IsoFileArgument.StartSector;
+                        var Out = (uint*)ExpectedOutputSize(sizeof(uint));
+                        *Out = (uint)IsoFileArgument.StartSector;
                         return 0;
                     }
                 case UmdCommandEnum.GetSectorSize:
                     {
-                        var Out = ReinterpretSpan<uint>(Output);
-                        Out[0] = IsoFile.SectorSize;
+                        var Out = (uint*)ExpectedOutputSize(sizeof(uint));
+                        *Out = IsoFile.SectorSize;
                         return 0;
                     }
                 case UmdCommandEnum.GetLengthInBytes:
                     {
-                        var Out = ReinterpretSpan<ulong>(Output);
-                        Out[9] = (uint)IsoFileArgument.Size;
+                        var Out = (ulong*)ExpectedOutputSize(sizeof(ulong));
+                        *Out = (uint)IsoFileArgument.Size;
                         return 0;
                     }
                 case UmdCommandEnum.GetPrimaryVolumeDescriptor:
                     {
-                        var Out = ReinterpretSpan<PrimaryVolumeDescriptor>(Output); ;
-                        Out[0] = Iso.PrimaryVolumeDescriptor;
+                        var Out = (PrimaryVolumeDescriptor*)ExpectedOutputSize(sizeof(PrimaryVolumeDescriptor));
+                        *Out = Iso.PrimaryVolumeDescriptor;
                         return 0;
                     }
                 default:
-                    throw new NotImplementedException(
-                        $"Not implemented command 0x{Command:X} : {(UmdCommandEnum)Command}");
+                    throw new NotImplementedException(String.Format("Not implemented command 0x{0:X} : {1}", Command, (UmdCommandEnum)Command));
             }
         }
 
@@ -348,8 +348,7 @@ namespace ScePSP.Hle.Vfs.Iso
             else
             {
                 Stat->Mode = SceMode.File;
-                Stat->Attributes = IOFileModes.File | IOFileModes.CanRead | IOFileModes.CanWrite |
-                                   IOFileModes.CanExecute;
+                Stat->Attributes = IOFileModes.File | IOFileModes.CanRead | IOFileModes.CanWrite | IOFileModes.CanExecute;
             }
             Stat->Size = IsoNode.DirectoryRecord.Size;
             Stat->TimeCreation = ScePspDateTime.FromDateTime(IsoNode.DirectoryRecord.Date);
@@ -394,10 +393,10 @@ namespace ScePSP.Hle.Vfs.Iso
             throw new NotImplementedException();
         }
 
-        public unsafe int IoDevctl(HleIoDrvFileArg HleIoDrvFileArg, string DeviceName, uint Command, Span<byte> Input,
-            Span<byte> Output, ref bool DoDleay)
+        public unsafe int IoDevctl(HleIoDrvFileArg HleIoDrvFileArg, string DeviceName, uint Command, byte* InputPointer, int InputLength, byte* OutputPointer, int OutputLength)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            return IoIoctl(HleIoDrvFileArg, Command, InputPointer, InputLength, OutputPointer, OutputLength);
         }
 
         public unsafe int IoUnk21(HleIoDrvFileArg HleIoDrvFileArg)

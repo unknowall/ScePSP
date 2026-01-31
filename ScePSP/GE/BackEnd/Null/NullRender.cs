@@ -1,6 +1,4 @@
-﻿using ScePSP.GE;
-
-namespace ScePSP.BackEnd
+﻿namespace ScePSP.GE
 {
     public unsafe class NullRender : GEBackEnd
     {

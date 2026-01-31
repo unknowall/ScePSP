@@ -5,7 +5,6 @@ using ScePSP.Core;
 using ScePSP.GE.State;
 using ScePSP.Memory;
 using ScePSP.Types;
-using ScePSP.UI;
 using ScePSP.Utils;
 using ScePSPUtils;
 using ScePSPUtils.Drawing;
@@ -13,13 +12,8 @@ using ScePSPUtils.Drawing.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
 
 namespace ScePSP.GE
 {
@@ -149,8 +143,8 @@ namespace ScePSP.GE
                     _invalidTexture.Height = invalidTextureHeight;
 
                     OutputPixel* dataPtr = (OutputPixel*)_invalidTexture.PixelDataPtr;
-                    var color1 = OutputPixel.FromRgba(0xFF, 0x00, 0x00, 0xFF);
-                    var color2 = OutputPixel.FromRgba(0x00, 0x00, 0xFF, 0xFF);
+                    var color1 = OutputPixel.FromRGBA(0xFF, 0x00, 0x00, 0xFF);
+                    var color2 = OutputPixel.FromRGBA(0x00, 0x00, 0xFF, 0xFF);
                     for (int n = 0; n < invalidTextureSize; n++)
                     {
                         dataPtr[n] = ((n & 1) != 0) ? color1 : color2;
@@ -215,14 +209,14 @@ namespace ScePSP.GE
                 PixelFormatDecoder.UnswizzleInline(textureFormat, (void*)swizzlingBufferPointer, bufferWidth, height);
                 PixelFormatDecoder.Decode(
                     textureFormat, (void*)swizzlingBufferPointer, texturePixelsPointer, bufferWidth, height,
-                    clutPointer, clutFormat, clutCount, clutStart, clutShift, clutMask, strideWidth: PixelFormatDecoder.GetPixelsSize(textureFormat, bufferWidth)
+                    clutPointer, clutFormat, clutCount, clutStart, clutShift, clutMask, StrideWidth: PixelFormatDecoder.GetPixelsSize(textureFormat, bufferWidth)
                 );
             }
             else
             {
                 PixelFormatDecoder.Decode(
                     textureFormat, (void*)texturePointer, texturePixelsPointer, bufferWidth, height,
-                    clutPointer, clutFormat, clutCount, clutStart, clutShift, clutMask, strideWidth: PixelFormatDecoder.GetPixelsSize(textureFormat, bufferWidth)
+                    clutPointer, clutFormat, clutCount, clutStart, clutShift, clutMask, StrideWidth: PixelFormatDecoder.GetPixelsSize(textureFormat, bufferWidth)
                 );
             }
 
@@ -252,20 +246,17 @@ namespace ScePSP.GE
             }
 
             texture.PixelDataLength = textureWidthHeight * sizeof(OutputPixel);
-            //texture.PixelDataPtr = Marshal.AllocHGlobal(texture.PixelDataLength);
-            //Buffer.MemoryCopy((void*)texturePixelsPointer, (void*)texture.PixelDataPtr, texture.PixelDataLength, texture.PixelDataLength);
-
-            if (Config.TexScaleType >= 1)
+            if (Config.TexScaleType != -1)
             {
                 int[] Pixels = new int[textureWidthHeight];
                 Marshal.Copy(_decodedTextureBufferPtr, Pixels, 0, textureWidthHeight);
 
-                var Out = PixelsScaler.Scale(Pixels, texture.Width, texture.Height, 2, (ScaleMode)Config.TexScaleType);
+                var Out = PixelsScaler.Scale(Pixels, texture.Width, texture.Height, Config.TexScaleX, (ScaleMode)Config.TexScaleType);
 
                 texture.Info.ScaleMode = (ScaleMode)Config.TexScaleType;
-                texture.Info.ScaleX = 2;
-                texture.Width = texture.Width * 2;
-                texture.Height = texture.Height * 2;
+                texture.Info.ScaleX = Config.TexScaleX;
+                texture.Width = texture.Width * Config.TexScaleX;
+                texture.Height = texture.Height * Config.TexScaleX;
                 texture.PixelDataLength = Out.Length;
 
                 texture.Initialize((byte*)Marshal.UnsafeAddrOfPinnedArrayElement(Out, 0));
@@ -277,6 +268,7 @@ namespace ScePSP.GE
             {
                 texture.Initialize((byte*)texturePixelsPointer);
             }
+
             //texture.Save(ApplicationPaths.AssertFolder + "/" + TextureName + ".bmp");
 
             return texture;

@@ -2,9 +2,7 @@
 
 namespace ScePSP.Hle.Managers
 {
-    public enum EventFlagId
-    {
-    }
+    public enum EventFlagId : int { }
 
     public class HleEventFlagManager
     {

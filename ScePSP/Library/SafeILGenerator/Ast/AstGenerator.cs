@@ -129,14 +129,14 @@ namespace SafeILGenerator.Ast
             Indirect(Cast(type.MakePointerType(), GetAddress(value), Explicit: false));
 
         public AstNodeExprIndirect Indirect(AstNodeExpr pointerExpr) => new AstNodeExprIndirect(pointerExpr);
-        public AstNodeStm DebugWrite(string text) => Statement(CallStatic((Action<string>) Console.WriteLine, text));
+        public AstNodeStm DebugWrite(string text) => Statement(CallStatic((Action<string>)Console.WriteLine, text));
         public AstNodeExprLValue StaticFieldAccess(FieldInfo fieldInfo) => new AstNodeExprStaticFieldAccess(fieldInfo);
 
         public AstNodeExprLValue StaticFieldAccess<T>(Expression<Func<T>> expression) =>
             StaticFieldAccess(_fieldof(expression));
 
         private static FieldInfo _fieldof<T>(Expression<Func<T>> expression) =>
-            (FieldInfo) ((MemberExpression) expression.Body).Member;
+            (FieldInfo)((MemberExpression)expression.Body).Member;
 
         public AstNodeCase Case(object value, AstNodeStm code) => new AstNodeCase(value, code);
         public AstNodeCaseDefault Default(AstNodeStm code) => new AstNodeCaseDefault(code);

@@ -135,14 +135,6 @@ namespace LightGL
         }
 
         [DebuggerHidden]
-        public void Set(Vector4 vector)
-        {
-            if (!CheckValid())
-                return;
-            Set(new[] { vector });
-        }
-
-        [DebuggerHidden]
         public void Set(int[] vectors)
         {
             if (!CheckValid())
@@ -175,34 +167,56 @@ namespace LightGL
         }
 
         [DebuggerHidden]
-        public void Set(Vector3[] vectors)
+        public void Set(Vector3 vector, bool isInt = false)
         {
             if (!CheckValid())
                 return;
-            if (ValueType != GLValueType.GL_FLOAT_VEC3)
-                throw new InvalidOperationException("this.ValueType != GLValueType.GL_FLOAT_VEC3");
+            Set(new[] { vector }, isInt);
+        }
+
+        [DebuggerHidden]
+        public void Set(Vector3[] vectors, bool isInt = false)
+        {
+            if (!CheckValid())
+                return;
+            if (ValueType != GLValueType.GL_FLOAT_VEC3 && ValueType != GLValueType.GL_INT_VEC3)
+                throw new InvalidOperationException("this.ValueType != VEC3");
             if (ArrayLength != vectors.Length)
                 throw new InvalidOperationException("this.ArrayLength != Vectors.Length");
             PrepareUsing();
             fixed (Vector3* ptr = &vectors[0])
             {
-                GL.Uniform3fv(Location, vectors.Length, (float*)ptr);
+                if (!isInt)
+                    GL.Uniform3fv(Location, vectors.Length, (float*)ptr);
+                else
+                    GL.Uniform3iv(Location, vectors.Length, (int*)ptr);
             }
         }
 
         [DebuggerHidden]
-        public void Set(Vector4[] vectors)
+        public void Set(Vector4 vector, bool isInt = false)
         {
             if (!CheckValid())
                 return;
-            if (ValueType != GLValueType.GL_FLOAT_VEC4)
-                throw new InvalidOperationException("this.ValueType != GLValueType.GL_FLOAT_VEC4");
+            Set(new[] { vector }, isInt);
+        }
+
+        [DebuggerHidden]
+        public void Set(Vector4[] vectors, bool isInt = false)
+        {
+            if (!CheckValid())
+                return;
+            if (ValueType != GLValueType.GL_FLOAT_VEC4 && ValueType != GLValueType.GL_INT_VEC4)
+                throw new InvalidOperationException("this.ValueType != VEC4");
             if (ArrayLength != vectors.Length)
                 throw new InvalidOperationException("this.ArrayLength != Vectors.Length");
             PrepareUsing();
             fixed (Vector4* ptr = &vectors[0])
             {
-                GL.Uniform4fv(Location, vectors.Length, (float*)ptr);
+                if (!isInt)
+                    GL.Uniform4fv(Location, vectors.Length, (float*)ptr);
+                else
+                    GL.Uniform4iv(Location, vectors.Length, (int*)ptr);
             }
         }
 

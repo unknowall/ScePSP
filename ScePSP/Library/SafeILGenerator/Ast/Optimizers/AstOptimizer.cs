@@ -33,7 +33,7 @@ namespace SafeILGenerator.Ast.Optimizers
 
                 if (_generateMappings.ContainsKey(astNodeType))
                 {
-                    astNode = (AstNode) _generateMappings[astNodeType].Invoke(this, new object[] {astNode});
+                    astNode = (AstNode)_generateMappings[astNodeType].Invoke(this, new object[] { astNode });
                 }
                 else
                 {
@@ -247,9 +247,9 @@ namespace SafeILGenerator.Ast.Optimizers
                                 case "*": return new AstNodeExprImm(AstUtils.CastType(leftValue * rightValue, type));
                                 case "/": return new AstNodeExprImm(AstUtils.CastType(leftValue / rightValue, type));
                                 case "<<":
-                                    return new AstNodeExprImm(AstUtils.CastType(leftValue << (int) rightValue, type));
+                                    return new AstNodeExprImm(AstUtils.CastType(leftValue << (int)rightValue, type));
                                 case ">>":
-                                    return new AstNodeExprImm(AstUtils.CastType(leftValue >> (int) rightValue, type));
+                                    return new AstNodeExprImm(AstUtils.CastType(leftValue >> (int)rightValue, type));
                             }
                         }
                         else
@@ -265,9 +265,9 @@ namespace SafeILGenerator.Ast.Optimizers
                                 case "*": return new AstNodeExprImm(AstUtils.CastType(leftValue * rightValue, type));
                                 case "/": return new AstNodeExprImm(AstUtils.CastType(leftValue / rightValue, type));
                                 case "<<":
-                                    return new AstNodeExprImm(AstUtils.CastType(leftValue << (int) rightValue, type));
+                                    return new AstNodeExprImm(AstUtils.CastType(leftValue << (int)rightValue, type));
                                 case ">>":
-                                    return new AstNodeExprImm(AstUtils.CastType(leftValue >> (int) rightValue, type));
+                                    return new AstNodeExprImm(AstUtils.CastType(leftValue >> (int)rightValue, type));
                             }
                         }
                     }

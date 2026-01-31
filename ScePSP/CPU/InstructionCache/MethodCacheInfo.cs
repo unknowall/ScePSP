@@ -2,7 +2,6 @@
 using SafeILGenerator.Utils;
 using ScePSP.Cpu.Dynarec;
 using System;
-using System.Runtime.CompilerServices;
 
 namespace ScePSP.Cpu.InstructionCache
 {

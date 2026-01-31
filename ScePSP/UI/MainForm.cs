@@ -1,28 +1,22 @@
-﻿using ScePSP.BackEnd;
-using ScePSP.BackEnd.OpenGL;
+﻿using ScePSP.Audio;
+using ScePSP.Components.Display;
+using ScePSP.Controller;
 using ScePSP.Core;
-using ScePSP.Devices.Display;
+using ScePSP.Cpu;
+using ScePSP.Display;
 using ScePSP.GE;
-using ScePSP.Hle;
-using ScePSP.Memory;
+using ScePSP.Rtc;
 using ScePSP.Runner;
+using ScePSP.Runner.Display;
 using ScePSP.Types;
-using ScePSP.Types.Controller;
 using ScePSPUtils;
 using ScePSPUtils.Extensions;
-using ScePSX.UI;
-
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using static ScePSPUtils.Logger;
 
@@ -30,27 +24,31 @@ namespace ScePSP.UI
 {
     public partial class MainForm : Form
     {
-        public IntPtr window;
-
-        public SceCtrlData ctrlData;
-        public int lx, ly;
-        public int pressingAnalogLeft, pressingAnalogRight, pressingAnalogUp, pressingAnalogDown;
-
-        public static PspEmulator pspEmulator;
+        public Runner.Runner Runner;
         PspStoredConfig cfg;
+        public static PspContext Context;
+        public PspRtc Rtc;
+        public PspController Controller;
+        public DisplayConfig DisplayConfig;
+        public DisplayThread Display;
         ControllerConfig keymap;
 
         NullRenderer nullrender;
         RomList RomList;
 
-        string Title_O = "ScePSP Alpha[260120]", Title;
-        private readonly System.Diagnostics.Stopwatch _stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        private int _frameCount;
-        public float CurrentFPS { get; private set; }
+        public static string Title_O = "ScePSP Alpha 0.0.2";
+        string Title;
 
         Dictionary<Keys, PspCtrlButtons> KeyMap;
         Dictionary<Keys, PspCtrlAnalog> AnalogKeyMap;
-        [Flags]
+        SceCtrlData ctrlData = new SceCtrlData
+        {
+            Buttons = PspCtrlButtons.None,
+            Lx = 0,
+            Ly = 0
+        };
+        SceCtrlData ConCtrlData = new SceCtrlData();
+
         public enum PspCtrlAnalog
         {
             None = 0,
@@ -64,24 +62,25 @@ namespace ScePSP.UI
         bool AnalogLeft = false;
         bool AnalogRight = false;
         float AnalogX = 0.0f, AnalogY = 0.0f;
-        internal SceCtrlData SceCtrlData;
+
+        SDLControler SdlController = new SDLControler();
+
+        [DllImport("kernel32.dll")]
+        public static extern Boolean AllocConsole();
+        [DllImport("kernel32.dll")]
+        public static extern Boolean FreeConsole();
 
         public MainForm()
         {
             InitializeComponent();
 
+            AllocConsole();
+
+            CheckForIllegalCrossThreadCalls = false;
+
             Text = Title_O;
 
             ctrlData = new SceCtrlData { Buttons = 0, Lx = 0, Ly = 0 };
-            lx = 0;
-            ly = 0;
-            pressingAnalogLeft = 0;
-            pressingAnalogRight = 0;
-            pressingAnalogUp = 0;
-            pressingAnalogDown = 0;
-
-            Logger.OnGlobalLog += Log;
-            PspDisplay.DrawEvent += DrawEvent;
 
             RomList = new RomList();
             RomList.Dock = DockStyle.Fill;
@@ -89,6 +88,9 @@ namespace ScePSP.UI
             RomList.Visible = true;
             panel1.Controls.Add(RomList);
             RomList.BringToFront();
+
+            PspDisplay.DrawEvent += DrawEvent;
+            Logger.OnGlobalLog += Log;
 
             nullrender = new NullRenderer();
             nullrender.Initialize(panel1);
@@ -100,6 +102,10 @@ namespace ScePSP.UI
             DbgHleCall.Checked = cfg.TrackHLECalls;
 
             RomList.DoubleClick += RomList_DoubleClick;
+
+            Translations.DefaultLanguage = "en";
+            Translations.Init();
+            Translations.UpdateLang(this);
         }
 
         private void RomList_DoubleClick(object sender, EventArgs e)
@@ -108,7 +114,7 @@ namespace ScePSP.UI
             var Item = RomList.Entries[RomList.SelectedIndex];
             if (File.Exists(Item.IsoFile))
             {
-                RunPSP(Item.IsoFile);
+                RunGame(Item.IsoFile, nullrender.Handle);
             }
         }
 
@@ -157,46 +163,59 @@ namespace ScePSP.UI
             ofn.Title = "PSP Rom";
             if (ofn.ShowDialog() == DialogResult.Cancel) return;
 
-            RunPSP(ofn.FileName);
+            RunGame(ofn.FileName, nullrender.Handle);
         }
 
-        private void RunPSP(string file)
+        string isofile;
+
+        private void RunGame(string FileName, IntPtr Window)
         {
             RomList.Enabled = false;
-            if (pspEmulator != null) FreePSP();
             nullrender.BringToFront();
             this.Focus();
 
-            cfg.H264Enable = MnuH264.Checked;
-            cfg.TrackHLECalls = DbgHleCall.Checked;
+            isofile = FileName;
 
-            pspEmulator = new PspEmulator();
+            DynarecConfig.AllowCreatingUsedFunctionsInBackground = cfg.ScanCreatingFunctions;
+            DynarecConfig.EnableTailCalling = cfg.TailCall;
+            DynarecConfig.EmitCallTick = cfg.TickCall;
+            DynarecConfig.EnableFastPspMemoryUtilsGetFastMemoryReader = cfg.FastMemoryReader;
 
-            PSPDrivers.Config.StoredConfig = cfg;
+            Context = PSP.Create(cfg, Window);
+            Runner = Context.GetInstance<Runner.Runner>();
+            Rtc = Context.GetInstance<PspRtc>();
+            Controller = Context.GetInstance<PspController>();
+            DisplayConfig = Context.GetInstance<DisplayConfig>();
+            Display = Context.GetInstance<DisplayThread>();
 
-            pspEmulator.Start(file, cfg.TrackHLECalls, false, NullRenderer.hwnd);
+            Runner.StartSynchronized();
 
-            PSPDrivers.Config.DisplayConfig.H264Enabled = cfg.H264Enable;
+            Runner.CpuThread.ThreadTaskQueue.EnqueueAndWaitCompleted(() =>
+            {
+                Runner.CpuThread._LoadFile(FileName);
+            });
 
             Title = Title_O;
-            if (PSPDrivers.GameInfo.ID != null)
+            if (DisplayConfig.ID != null)
             {
-                Title += " - " + PSPDrivers.GameInfo.ID;
+                Title += " - " + DisplayConfig.ID;
             }
-            if (PSPDrivers.GameInfo.Title != null)
+            if (DisplayConfig.Title != "")
             {
-                Title += " - " + PSPDrivers.GameInfo.Title;
+                Title += " - " + DisplayConfig.Title;
             }
-            Title += " - " + cfg.RenderScale + "xIR";
-            if (cfg.TexScaleType >= 1)
-                Title += " - " + cfg.TexScale + "*" + (ScaleMode)cfg.TexScaleType;
         }
 
         private void FreePSP()
         {
-            pspEmulator.Stop();
-            pspEmulator = null;
-            GC.Collect();
+            PspDisplay.DrawEvent -= DrawEvent;
+            Logger.OnGlobalLog -= Log;
+
+            Runner.StopSynchronized();
+            Context.GetInstance<GEBackEnd>().StopSynchronized();
+            Context.GetInstance<AudioBackEnd>().StopSynchronized();
+            Context.Dispose();
+            Context = null;
         }
 
         private void Log(string name, Level level, string message, StackFrame stack)
@@ -212,22 +231,10 @@ namespace ScePSP.UI
             }
         }
 
-        public void UpdateFrame()
-        {
-            _frameCount++;
-            double elapsedSeconds = _stopwatch.Elapsed.TotalSeconds;
-            if (elapsedSeconds >= 1.0f)
-            {
-                CurrentFPS = (float)(_frameCount / elapsedSeconds);
-                _frameCount = 0;
-                _stopwatch.Restart();
-            }
-        }
-
         private void DrawEvent()
         {
-            SceCtrlData.X = 0;
-            SceCtrlData.Y = 0;
+            ctrlData.X = 0;
+            ctrlData.Y = 0;
 
             bool AnalogXUpdated = false;
             bool AnalogYUpdated = false;
@@ -235,73 +242,135 @@ namespace ScePSP.UI
             if (AnalogDown) { AnalogY += 0.4f; AnalogYUpdated = true; }
             if (AnalogLeft) { AnalogX -= 0.4f; AnalogXUpdated = true; }
             if (AnalogRight) { AnalogX += 0.4f; AnalogXUpdated = true; }
-            if (!AnalogXUpdated) AnalogX /= 2.0f;
-            if (!AnalogYUpdated) AnalogY /= 2.0f;
+            if (!AnalogXUpdated) AnalogX /= 3.0f;
+            if (!AnalogYUpdated) AnalogY /= 3.0f;
 
             AnalogX = MathFloat.Clamp(AnalogX, -1.0f, 1.0f);
             AnalogY = MathFloat.Clamp(AnalogY, -1.0f, 1.0f);
 
             //Console.WriteLine("{0}, {1}", AnalogX, AnalogY);
 
-            SceCtrlData.X = AnalogX;
-            SceCtrlData.Y = AnalogY;
+            ctrlData.X = AnalogX;
+            ctrlData.Y = AnalogY;
 
-            ctrlData.TimeStamp = (uint)PSPDrivers.PspRtc.UnixTimeStampTS.Milliseconds;
+            ctrlData.TimeStamp = (uint)Rtc.Elapsed.TotalMilliseconds;
+            ConCtrlData.TimeStamp = ctrlData.TimeStamp;
 
-            PSPDrivers.Devices.Controller.InsertSceCtrlData(ctrlData);
+            if (SdlController.controller == 0)
+                SdlController.CheckController();
+            else
+                ConCtrlData = SdlController.QueryControllerState();
 
-            PSPDrivers.Config.DisplayConfig.Width = panel1.Width;
-            PSPDrivers.Config.DisplayConfig.Height = panel1.Height;
+            if (AnalogX != 0 || AnalogY != 0 || ctrlData.Buttons != PspCtrlButtons.None)
+                Controller.InsertSceCtrlData(ctrlData);
+            else
+                Controller.InsertSceCtrlData(ConCtrlData);
 
-            UpdateFrame();
+            DisplayConfig.Width = panel1.Width;
+            DisplayConfig.Height = panel1.Height;
 
-            this.Text = this.Title + $" - [ {CurrentFPS:F2} FPS ]";
+            this.Text = this.Title;// + $" - [ {Display.CurrentFPS:F2} FPS ]";
         }
 
         private void MnuFunc_Click(object sender, EventArgs e)
         {
-            if (pspEmulator == null || !pspEmulator.Runing) return;
+            if (Context == null || !Runner.Runing) return;
 
-            pspEmulator.Pause();
+            Runner.PauseSynchronized();
 
-            FunctionForm funForm = new FunctionForm();
+            MethodForm funForm = new MethodForm();
 
             ShowFrom(funForm);
         }
 
+        private void MnuSubFunc_Click(object sender, EventArgs e)
+        {
+            if (Context == null || !Runner.Runing) return;
+
+            Runner.PauseSynchronized();
+
+            FuncForm funForm = new FuncForm();
+
+            ShowFrom(funForm);
+        }
+
+        private void MnuCheat_Click(object sender, EventArgs e)
+        {
+            if (Context == null || !Runner.Runing) return;
+
+            Runner.PauseSynchronized();
+
+            CheatForm frm = new CheatForm();
+
+            ShowFrom(frm);
+        }
+
         private void MnuTexture_Click(object sender, EventArgs e)
         {
-            if (pspEmulator == null || !pspEmulator.Runing) return;
+            if (Context == null || !Runner.Runing) return;
 
-            pspEmulator.Pause();
+            Runner.PauseSynchronized();
 
-            TextureForm textureForm = new TextureForm();
+            TextureForm Form = new TextureForm();
 
-            ShowFrom(textureForm);
+            ShowFrom(Form);
+        }
+
+        private void MnuFileView_Click(object sender, EventArgs e)
+        {
+            if (Context == null || !Runner.Runing) return;
+
+            FileExtract Form = new FileExtract(isofile);
+
+            ShowFrom(Form);
         }
 
         private void MnuKeyConfig_Click(object sender, EventArgs e)
         {
-            ButtonForm buttonForm = new ButtonForm(cfg);
+            ButtonForm Form = new ButtonForm(cfg);
 
-            ShowFrom(buttonForm);
+            ShowFrom(Form);
+        }
+
+        private void MnuSet_Click(object sender, EventArgs e)
+        {
+            SetForm Form = new SetForm(cfg);
+
+            ShowFrom(Form);
+        }
+
+        private void MnuMem_Click(object sender, EventArgs e)
+        {
+            if (Context == null || !Runner.Runing) return;
+
+            MemForm Form = new MemForm(Context);
+
+            ShowFrom(Form);
+        }
+
+        private void MnuAbout_Click(object sender, EventArgs e)
+        {
+            FrmAbout Form = new FrmAbout();
+
+            ShowFrom(Form, false);
         }
 
         private void DbgHleCall_Click(object sender, EventArgs e)
         {
-            if (pspEmulator == null || !pspEmulator.Runing) return;
+            if (Context == null || !Runner.Runing) return;
         }
 
         private void MnuExit_Click(object sender, EventArgs e)
         {
-            if (pspEmulator != null) FreePSP();
+            if (Context != null) FreePSP();
             RomList.BringToFront();
             RomList.Enabled = true;
             Text = Title_O;
         }
 
-        private void ShowFrom(Form Frm)
+        private void ShowFrom(Form Frm, bool UpdateLang = true)
         {
+            if (UpdateLang) Translations.UpdateLang(Frm);
             Frm.StartPosition = FormStartPosition.Manual;
             Frm.Owner = this;
             Frm.FormClosed += CloseFrom;
@@ -325,9 +394,9 @@ namespace ScePSP.UI
         {
             SetKeyMap();
 
-            if (pspEmulator == null || !pspEmulator.Runing) return;
+            if (Context == null || !Runner.Runing) return;
 
-            pspEmulator.Resume();
+            Runner.ResumeSynchronized();
         }
 
         public Keys StringToKey(string keyStr)
@@ -354,6 +423,8 @@ namespace ScePSP.UI
 
         private void SetKeyMap()
         {
+            keymap = cfg.ControllerConfig;
+
             KeyMap = new Dictionary<Keys, PspCtrlButtons>();
             {
                 KeyMap[StringToKey(keymap.DigitalLeft)] = PspCtrlButtons.Left;
@@ -383,10 +454,12 @@ namespace ScePSP.UI
 
         private void SKeyPress(KeyEventArgs e, bool Down)
         {
-            if (pspEmulator == null || !pspEmulator.Runing) return;
+            if (Context == null || !Runner.Runing) return;
 
             PspCtrlButtons buttonMask = KeyMap.GetOrDefault(e.KeyCode, PspCtrlButtons.None);
+
             TryUpdateAnalog(e.KeyCode, Down);
+
             if (Down)
                 ctrlData.Buttons |= buttonMask;
             else
@@ -398,7 +471,7 @@ namespace ScePSP.UI
             switch (e.KeyCode)
             {
                 case Keys.Tab:
-                    PSPDrivers.Tasks.DisplayTask.FullSpeed = true;
+                    Display.FullSpeed = true;
                     break;
             }
             SKeyPress(e, true);
@@ -409,7 +482,7 @@ namespace ScePSP.UI
             switch (e.KeyCode)
             {
                 case Keys.Tab:
-                    PSPDrivers.Tasks.DisplayTask.FullSpeed = false;
+                    Display.FullSpeed = false;
                     break;
             }
             SKeyPress(e, false);
@@ -417,7 +490,7 @@ namespace ScePSP.UI
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (pspEmulator != null) FreePSP();
+            if (Context != null) FreePSP();
             cfg.FromPos = $"{this.Location.X}|{this.Location.Y}|{this.Size.Width}|{this.Size.Height}";
             cfg.H264Enable = MnuH264.Checked;
             cfg.TrackHLECalls = DbgHleCall.Checked;
@@ -426,7 +499,7 @@ namespace ScePSP.UI
 
         private void MnuOpenCfg_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start("notepad.exe", "./memstick/Config.xml");
+            System.Diagnostics.Process.Start("notepad.exe", "./assert/Config.xml");
 
         }
 

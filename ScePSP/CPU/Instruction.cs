@@ -61,9 +61,7 @@ namespace ScePSP.Cpu
         public VfpuRegisterInt VT { get { return get(16, 7); } set { set(16, 7, value); } }
         public VfpuRegisterInt VT5_1 { get { return VT5 | (VT1 << 5); } set { VT5 = value; VT1 = ((uint)value >> 5); } }
 
-        // @TODO: Signed or unsigned?
         public int IMM14 { get { return get_s(2, 14); } set { set(2, 14, (uint)value); } }
-        //public int IMM14 { get { return (int)get(2, 14); } set { set(2, 14, (uint)value); } }
 
         public uint IMM8 { get { return get(16, 8); } set { set(16, 8, value); } }
         public uint IMM5 { get { return get(16, 5); } set { set(16, 5, value); } }

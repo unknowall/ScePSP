@@ -77,7 +77,10 @@ namespace ScePSP.Hle.Vfs
         /// </summary>
         public void Dispose()
         {
-            FileArgument?.Dispose();
+            if (FileArgument != null)
+            {
+                FileArgument.Dispose();
+            }
         }
     }
 
@@ -260,19 +263,20 @@ namespace ScePSP.Hle.Vfs
 
         public DateTime ToDateTime()
         {
-            return new DateTime((int)Year, (int)Month, (int)Day, (int)Hour, (int)Minute, (int)Second,
-                (int)Microsecond / 1000, DateTimeKind.Utc);
+            return new DateTime((int)Year, (int)Month, (int)Day, (int)Hour, (int)Minute, (int)Second, (int)Microsecond / 1000, DateTimeKind.Utc);
         }
 
         public long ToUnixTimestamp()
         {
-            return (long)(ToDateTime() - new DateTime(1970, 1, 1)).TotalSeconds;
+            return (long)((ToDateTime() - new DateTime(1970, 1, 1)).TotalSeconds);
         }
 
         public override string ToString()
         {
-            return
-                $"ScePspDateTime(Year={Year}, Month={Month}, Day={Day}, Hour={Hour}, Minute={Minute}, Second={Second}, Microsecond={Microsecond})";
+            return String.Format(
+                "ScePspDateTime(Year={0}, Month={1}, Day={2}, Hour={3}, Minute={4}, Second={5}, Microsecond={6})",
+                Year, Month, Day, Hour, Minute, Second, Microsecond
+            );
         }
     }
 
@@ -281,8 +285,14 @@ namespace ScePSP.Hle.Vfs
     /// </summary>
     public struct SceIoStat
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public SceMode Mode;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IOFileModes Attributes;
 
         /// <summary>
@@ -313,7 +323,6 @@ namespace ScePSP.Hle.Vfs
         /// the sector of a file in the first index.
         /// </summary>
         public uint DeviceDependentData0;
-
         public uint DeviceDependentData1;
         public uint DeviceDependentData2;
         public uint DeviceDependentData3;
@@ -322,7 +331,7 @@ namespace ScePSP.Hle.Vfs
 
         public override string ToString()
         {
-            return $"SceIoStat({Mode}, {Size})";
+            return String.Format("SceIoStat({0}, {1})", Mode, Size);
         }
     }
 
@@ -358,55 +367,215 @@ namespace ScePSP.Hle.Vfs
         /// </summary>
         public uint PrivateData;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public uint Dummy;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Dispose()
         {
         }
 
         public override string ToString()
         {
-            return $"HleIoDirent('{Name}', {Stat})";
+            return String.Format("HleIoDirent('{0}', {1})", Name, Stat);
         }
     }
 
-    public abstract class AbstractHleIoDriver
-    {
-        protected unsafe Span<T> ReinterpretSpan<T>(Span<byte> Span, int count = 1) where T : unmanaged
-        {
-            if (Span == null || Span.Length < count * sizeof(T))
-                throw new SceKernelException(SceKernelErrors.ERROR_INVALID_ARGUMENT);
-            fixed (byte* bp = &Span.GetPinnableReference())
-            {
-                //return new Span<T>(bp, count * sizeof(T));
-                return new Span<T>(bp, Span.Length / sizeof(T));
-            }
-        }
-    }
-
+    /// <summary>
+    /// 
+    /// </summary>
     public unsafe interface IHleIoDriver
     {
-        int IoInit(); // Initializes the Driver
-        int IoExit(); // Deinitializes the driver.
-        int IoOpen(HleIoDrvFileArg HleIoDrvFileArg, string FileName, HleIoFlags Flags, SceMode Mode); // Opens a file. If the user opened 'host0:/path/to/file.txt', this function will get 'path/to/file.txt'
-        int IoClose(HleIoDrvFileArg HleIoDrvFileArg); // Closes a file.
-        int IoRead(HleIoDrvFileArg HleIoDrvFileArg, byte* OutputPointer, int OutputLength); // Reads data from a file.
-        int IoWrite(HleIoDrvFileArg HleIoDrvFileArg, byte* InputPointer, int InputLength); // Writes data to a file.
-        long IoLseek(HleIoDrvFileArg HleIoDrvFileArg, long Offset, SeekAnchor Whence); // Seeks a file.
-        int IoIoctl(HleIoDrvFileArg HleIoDrvFileArg, uint Command, Span<byte> Input, Span<byte> Output); // Sends a command to the driver.
-        int IoRemove(HleIoDrvFileArg HleIoDrvFileArg, string Name); // Removes a file.
-        int IoMkdir(HleIoDrvFileArg HleIoDrvFileArg, string Name, SceMode Mode); // Creates a file.
-        int IoRmdir(HleIoDrvFileArg HleIoDrvFileArg, string Name); // Removes a directory.
-        int IoDopen(HleIoDrvFileArg HleIoDrvFileArg, string Name); // Opens a directory for listing.
-        int IoDclose(HleIoDrvFileArg HleIoDrvFileArg); // Closes a directory for listing.
-        int IoDread(HleIoDrvFileArg HleIoDrvFileArg, HleIoDirent* dir); // Reads an entry from the file.
-        int IoGetstat(HleIoDrvFileArg HleIoDrvFileArg, string FileName, SceIoStat* Stat); // Obtains a stat of a file.
-        int IoChstat(HleIoDrvFileArg HleIoDrvFileArg, string FileName, SceIoStat* stat, int bits); // Changes the stat of a file.
-        int IoRename(HleIoDrvFileArg HleIoDrvFileArg, string OldFileName, string NewFileName); // Renames a file.
-        int IoChdir(HleIoDrvFileArg HleIoDrvFileArg, string DirectoryName); // Changes the current directory.
+        /// <summary>
+        /// Initializes the Driver
+        /// </summary>
+        /// <returns></returns>
+        int IoInit();
+
+        /// <summary>
+        /// Deinitializes the driver.
+        /// </summary>
+        /// <returns></returns>
+        int IoExit();
+
+        /// <summary>
+        /// Opens a file.
+        /// If the user opened 'host0:/path/to/file.txt', this function will get 'path/to/file.txt'
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <param name="FileName"></param>
+        /// <param name="Flags"></param>
+        /// <param name="Mode"></param>
+        /// <returns></returns>
+        int IoOpen(HleIoDrvFileArg HleIoDrvFileArg, string FileName, HleIoFlags Flags, SceMode Mode);
+
+        /// <summary>
+        /// Closes a file.
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <returns></returns>
+        int IoClose(HleIoDrvFileArg HleIoDrvFileArg);
+
+        /// <summary>
+        /// Reads data from a file.
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <param name="OutputPointer"></param>
+        /// <param name="OutputLength"></param>
+        /// <returns></returns>
+        int IoRead(HleIoDrvFileArg HleIoDrvFileArg, byte* OutputPointer, int OutputLength);
+
+        /// <summary>
+        /// Writes data to a file.
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <param name="InputPointer"></param>
+        /// <param name="InputLength"></param>
+        /// <returns></returns>
+        int IoWrite(HleIoDrvFileArg HleIoDrvFileArg, byte* InputPointer, int InputLength);
+
+        /// <summary>
+        /// Seeks a file.
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <param name="Offset"></param>
+        /// <param name="Whence"></param>
+        /// <returns></returns>
+        long IoLseek(HleIoDrvFileArg HleIoDrvFileArg, long Offset, SeekAnchor Whence);
+
+        /// <summary>
+        /// Sends a command to the driver.
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <param name="Command"></param>
+        /// <param name="InputPointer"></param>
+        /// <param name="InputLength"></param>
+        /// <param name="OutputPointer"></param>
+        /// <param name="OutputLength"></param>
+        /// <returns></returns>
+        int IoIoctl(HleIoDrvFileArg HleIoDrvFileArg, uint Command, byte* InputPointer, int InputLength, byte* OutputPointer, int OutputLength);
+
+        /// <summary>
+        /// Removes a file.
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <param name="Name"></param>
+        /// <returns></returns>
+        int IoRemove(HleIoDrvFileArg HleIoDrvFileArg, string Name);
+
+        /// <summary>
+        /// Creates a file.
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <param name="Name"></param>
+        /// <param name="Mode"></param>
+        /// <returns></returns>
+        int IoMkdir(HleIoDrvFileArg HleIoDrvFileArg, string Name, SceMode Mode);
+
+        /// <summary>
+        /// Removes a directory.
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <param name="Name"></param>
+        /// <returns></returns>
+        int IoRmdir(HleIoDrvFileArg HleIoDrvFileArg, string Name);
+
+        /// <summary>
+        /// Opens a directory for listing.
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <param name="Name"></param>
+        /// <returns></returns>
+        int IoDopen(HleIoDrvFileArg HleIoDrvFileArg, string Name);
+
+        /// <summary>
+        /// Closes a directory for listing.
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <returns></returns>
+        int IoDclose(HleIoDrvFileArg HleIoDrvFileArg);
+
+        /// <summary>
+        /// Reads an entry from the file.
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <param name="dir"></param>
+        /// <returns></returns>
+        int IoDread(HleIoDrvFileArg HleIoDrvFileArg, HleIoDirent* dir);
+
+        /// <summary>
+        /// Obtains a stat of a file.
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <param name="FileName"></param>
+        /// <param name="Stat"></param>
+        /// <returns></returns>
+        int IoGetstat(HleIoDrvFileArg HleIoDrvFileArg, string FileName, SceIoStat* Stat);
+
+        /// <summary>
+        /// Changes the stat of a file.
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <param name="FileName"></param>
+        /// <param name="stat"></param>
+        /// <param name="bits"></param>
+        /// <returns></returns>
+        int IoChstat(HleIoDrvFileArg HleIoDrvFileArg, string FileName, SceIoStat* stat, int bits);
+
+        /// <summary>
+        /// Renames a file.
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <param name="OldFileName"></param>
+        /// <param name="NewFileName"></param>
+        /// <returns></returns>
+        int IoRename(HleIoDrvFileArg HleIoDrvFileArg, string OldFileName, string NewFileName);
+
+        /// <summary>
+        /// Changes the current directory.
+        /// </summary>
+        /// <remarks>@TODO Check if it is device based or global.</remarks>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <param name="DirectoryName"></param>
+        /// <returns></returns>
+        int IoChdir(HleIoDrvFileArg HleIoDrvFileArg, string DirectoryName);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <returns></returns>
         int IoMount(HleIoDrvFileArg HleIoDrvFileArg);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <returns></returns>
         int IoUmount(HleIoDrvFileArg HleIoDrvFileArg);
-        int IoDevctl(HleIoDrvFileArg HleIoDrvFileArg, string DeviceName, uint Command, Span<byte> Input, Span<byte> Output, ref bool DoDleay);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <param name="DeviceName"></param>
+        /// <param name="Command"></param>
+        /// <param name="InputPointer"></param>
+        /// <param name="InputLength"></param>
+        /// <param name="OutputPointer"></param>
+        /// <param name="OutputLength"></param>
+        /// <returns></returns>
+        int IoDevctl(HleIoDrvFileArg HleIoDrvFileArg, string DeviceName, uint Command, byte* InputPointer, int InputLength, byte* OutputPointer, int OutputLength);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <returns></returns>
         int IoUnk21(HleIoDrvFileArg HleIoDrvFileArg);
     }
 }

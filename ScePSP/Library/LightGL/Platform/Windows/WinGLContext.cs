@@ -224,9 +224,6 @@ namespace LightGL.Windows
                     {
                         _sharedContextRefCount++;
                     }
-                    else
-                    {
-                    }
                 }
             }
 

@@ -2,11 +2,12 @@
 using System.Collections.Concurrent;
 using static SDL2.SDL;
 
-namespace ScePSP.BackEnd.SDL
+namespace ScePSP.Audio.SDL
 {
     public unsafe class SDLAudioBackEnd : AudioBackEnd
     {
         private static uint audiodeviceid;
+
         private SDL_AudioCallback audioCallbackDelegate;
 
         private ConcurrentQueue<short[]> Queue = new ConcurrentQueue<short[]>();
@@ -45,7 +46,7 @@ namespace ScePSP.BackEnd.SDL
 
         ~SDLAudioBackEnd()
         {
-            Stop();
+            StopSynchronized();
         }
 
         private unsafe void AudioCallback(IntPtr userdata, IntPtr stream, int len)
@@ -83,19 +84,19 @@ namespace ScePSP.BackEnd.SDL
             }
         }
 
-        public override void Pause()
-        {
-            if (audiodeviceid != 0)
-                SDL_PauseAudioDevice(audiodeviceid, 1);
-        }
+        //public override void Pause()
+        //{
+        //    if (audiodeviceid != 0)
+        //        SDL_PauseAudioDevice(audiodeviceid, 1);
+        //}
 
-        public override void Resume()
-        {
-            if (audiodeviceid != 0)
-                SDL_PauseAudioDevice(audiodeviceid, 0);
-        }
+        //public override void Resume()
+        //{
+        //    if (audiodeviceid != 0)
+        //        SDL_PauseAudioDevice(audiodeviceid, 0);
+        //}
 
-        public override void Stop()
+        public override void StopSynchronized()
         {
             if (audiodeviceid != 0)
             {

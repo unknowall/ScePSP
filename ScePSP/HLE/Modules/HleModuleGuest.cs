@@ -3,7 +3,6 @@ using ScePSP.Hle.Formats;
 using ScePSP.Hle.Loader;
 using ScePSP.Hle.Managers;
 using ScePSP.Utils;
-using ScePSPUtils;
 using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
@@ -37,12 +36,8 @@ namespace ScePSP.Hle
 
     public class HleModuleGuest : HleModule
     {
-        private static Logger Logger = Logger.GetLogger(nameof(HleModuleGuest));
-
         public int ID;
-
-        public string Name => ModuleInfo.Name;
-
+        public string Name { get { return ModuleInfo.Name; } }
         public bool Loaded;
         public ElfPsp.ModuleInfo ModuleInfo;
         public InitInfoStruct InitInfo;
@@ -50,13 +45,16 @@ namespace ScePSP.Hle
         public List<HleModuleImports> ModulesImports = new List<HleModuleImports>();
         public List<HleModuleExports> ModulesExports = new List<HleModuleExports>();
 
-        HleModuleManager ModuleManager => PSPDrivers.HLE.HleModuleManager;
+        [Context]
+        HleModuleManager ModuleManager;
 
-        CpuProcessor CpuProcessor => PSPDrivers.CPU;
+        [Context]
+        CpuProcessor CpuProcessor;
 
-        HleThreadManager HleThreadManager => PSPDrivers.HLE.HleThreadManager;
+        [Context]
+        HleThreadManager HleThreadManager;
 
-        public HleModuleGuest()
+        private HleModuleGuest()
         {
         }
 
@@ -76,7 +74,7 @@ namespace ScePSP.Hle
         {
             //Console.WriteLine(NativeFunction);
 
-            CpuProcessor.Memory.WriteSafe(CallAddress + 0, SyscallInfo.NativeCallSyscallOpCode); // syscall NativeCallSyscallCode
+            CpuProcessor.Memory.WriteSafe(CallAddress + 0, SyscallInfo.NativeCallSyscallOpCode);  // syscall NativeCallSyscallCode
             CpuProcessor.Memory.WriteSafe(CallAddress + 4, (uint)ModuleManager.AllocDelegateSlot(
                 Action: CreateDelegate(
                     ModuleManager: ModuleManager,
@@ -89,10 +87,10 @@ namespace ScePSP.Hle
                 FunctionEntry: NativeFunction
             ));
 
-            Logger.Info(
-                "    CODE_ADDR({0:X})  :  NID(0x{1:X8}) : {2} - {3}",
-                CallAddress, NativeFunction.NID, NativeFunction.Name, NativeFunction.Description
-            );
+            //Console.WriteLine(
+            //    "    CODE_ADDR({0:X})  :  NID(0x{1:X8}) : {2} - {3}",
+            //    CallAddress, NativeFunction.NID, NativeFunction.Name, NativeFunction.Description
+            //);
         }
 
         public void ExportModules()
@@ -131,7 +129,6 @@ namespace ScePSP.Hle
             }
         }
 
-
         public void ImportModules()
         {
             foreach (var ModuleImports in ModulesImports)
@@ -143,16 +140,13 @@ namespace ScePSP.Hle
                 }
                 catch (Exception Exception)
                 {
-                    //Logger.Error(Exception);
-                    Console.Error.WriteLine(Exception);
+                    Console.WriteLine(Exception);
                 }
 
                 // Can't use a host module. Try to use a Guest module.
                 if (HleModuleHost == null)
                 {
-                    var HleModuleGuest =
-                        ModuleManager.LoadedGuestModules.FirstOrDefault(ModuleExports =>
-                            ModuleExports.Name == ModuleImports.Name);
+                    var HleModuleGuest = ModuleManager.LoadedGuestModules.FirstOrDefault(ModuleExports => (ModuleExports.Name == ModuleImports.Name));
                     if (HleModuleGuest != null)
                     {
                         HleModuleGuest.ExportModules(this);
@@ -160,8 +154,7 @@ namespace ScePSP.Hle
                     }
                 }
 
-                Logger.Info("'{0}' - {1}", ModuleImports.Name, HleModuleHost != null ? HleModuleHost.ModuleLocation : "?");
-
+                //Console.WriteLine("'{0}' - {1}", ModuleImports.Name, (HleModuleHost != null) ? HleModuleHost.ModuleLocation : "?");
                 foreach (var Function in ModuleImports.Functions)
                 {
                     var NID = Function.Key;
@@ -175,7 +168,7 @@ namespace ScePSP.Hle
                         Module = null,
                         ModuleName = ModuleImports.Name,
                     };
-                    var FunctionEntry = HleModuleHost?.EntriesByNID.GetOrDefault(NID, DefaultEntry) ?? DefaultEntry;
+                    var FunctionEntry = (HleModuleHost != null) ? HleModuleHost.EntriesByNID.GetOrDefault(NID, DefaultEntry) : DefaultEntry;
                     FunctionEntry.NID = NID;
                     //var Delegate = Module.DelegatesByNID.GetOrDefault(NID, null);
 
@@ -184,8 +177,7 @@ namespace ScePSP.Hle
             }
         }
 
-        protected Action<CpuThreadState> CreateDelegate(HleModuleManager ModuleManager, HleModuleHost Module, uint NID,
-            string ModuleImportName, string NIDName)
+        protected Action<CpuThreadState> CreateDelegate(HleModuleManager ModuleManager, HleModuleHost Module, uint NID, string ModuleImportName, string NIDName)
         {
             Action<CpuThreadState> Callback = null;
             if (Module != null)
@@ -204,16 +196,16 @@ namespace ScePSP.Hle
             {
                 if (Callback == null)
                 {
-                    if (CpuThreadState.CpuProcessor.CpuConfig.DebugSyscalls)
+                    if (CpuThreadState.CpuProcessor.CpuConfig.TrackCallStack)
                     {
-                        Logger.Info(
+                        Console.WriteLine(
                             "Thread({0}:'{1}'):{2}:{3}",
                             HleThreadManager.Current.Id,
                             HleThreadManager.Current.Name,
                             ModuleImportName, NIDName
                         );
                     }
-                    throw new NotImplementedException($"Not Implemented {ModuleImportName}:{NIDName}");
+                    throw (new NotImplementedException("Not Implemented '" + String.Format("{0}:{1}", ModuleImportName, NIDName) + "'"));
                 }
                 else
                 {

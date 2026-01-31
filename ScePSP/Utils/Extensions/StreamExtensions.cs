@@ -564,7 +564,7 @@ namespace ScePSPUtils.Extensions
         /// <typeparam name="T"></typeparam>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public static T ReadStructPartiallyEx<T>(this Stream stream) where T : struct
+        public static T ReadStructPartially<T>(this Stream stream) where T : struct
         {
             var size = Marshal.SizeOf(typeof(T));
             var bufferPartial = stream.ReadBytes(Math.Min((int)stream.Available(), size));
@@ -597,7 +597,7 @@ namespace ScePSPUtils.Extensions
             stream.PreservePositionAndLock(() =>
             {
                 stream.Position = offset;
-                value = stream.ReadStructVectorEx<TType>(count, entrySize);
+                value = stream.ReadStructVector<TType>(count, entrySize);
             });
             return value;
         }
@@ -611,10 +611,10 @@ namespace ScePSPUtils.Extensions
         /// <param name="count"></param>
         /// <param name="entrySize"></param>
         /// <returns></returns>
-        public static TType[] ReadStructVectorEx<TType>(this Stream stream, out TType[] vector, uint count,
+        public static TType[] ReadStructVector<TType>(this Stream stream, out TType[] vector, uint count,
             int entrySize = -1) where TType : struct
         {
-            vector = stream.ReadStructVectorEx<TType>(count, entrySize);
+            vector = stream.ReadStructVector<TType>(count, entrySize);
             return vector;
         }
 
@@ -627,7 +627,7 @@ namespace ScePSPUtils.Extensions
         /// <param name="entrySize"></param>
         /// <param name="allowReadLess"></param>
         /// <returns></returns>
-        public static TType[] ReadStructVectorEx<TType>(this Stream stream, uint count, int entrySize = -1,
+        public static TType[] ReadStructVector<TType>(this Stream stream, uint count, int entrySize = -1,
             bool allowReadLess = false) where TType : struct
         {
             if (count == 0) return new TType[0];
@@ -667,7 +667,7 @@ namespace ScePSPUtils.Extensions
             var entrySize = Marshal.SizeOf(typeof(T));
             var bytesAvailable = stream.Available();
             //Console.WriteLine("BytesAvailable={0}/EntrySize={1}", BytesAvailable, EntrySize);
-            return stream.ReadStructVectorEx<T>((uint)(bytesAvailable / entrySize));
+            return stream.ReadStructVector<T>((uint)(bytesAvailable / entrySize));
         }
 
         /// <summary>
@@ -1095,26 +1095,6 @@ namespace ScePSPUtils.Extensions
             return new StreamStructArrayWrapper<TType>(baseStream);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TType"></typeparam>
-        /// <param name="baseStream"></param>
-        /// <param name="bufferCount"></param>
-        /// <returns></returns>
-        public static StreamStructCachedArrayWrapper<TType> ConvertToStreamStructCachedArrayWrapper<TType>(
-            this Stream baseStream, int bufferCount) where TType : struct
-        {
-            return new StreamStructCachedArrayWrapper<TType>(bufferCount, baseStream);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="pointer"></param>
-        /// <param name="count"></param>
-        /// <returns></returns>
         public static unsafe int ReadToPointer(this Stream stream, byte* pointer, int count)
         {
             var data = new byte[count];

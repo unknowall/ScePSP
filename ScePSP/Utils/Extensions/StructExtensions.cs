@@ -4,21 +4,9 @@ using System.Reflection;
 
 namespace ScePSPUtils.Extensions
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public static class StructExtensions
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Struct"></param>
-        /// <param name="simplifyBool"></param>
-        /// <param name="structType"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static string
-            ToStringDefault<T>(this T Struct, bool simplifyBool = false, Type structType = null, HashSet<object> memory = null) //where T : struct
+        public static string ToStringDefault<T>(this T Struct, bool simplifyBool = false, Type structType = null, HashSet<object> memory = null) //where T : struct
         {
             if (structType == null) structType = typeof(T);
 

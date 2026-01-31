@@ -1,4 +1,5 @@
-﻿using ScePSP.Cpu;
+﻿using ScePSP.Core;
+using ScePSP.Cpu;
 using ScePSP.Memory;
 using ScePSPUtils;
 using System;
@@ -11,34 +12,24 @@ namespace ScePSP.Hle
 {
     public unsafe partial class HleModuleHost : HleModule
     {
-        public static readonly HleModuleHost Methods = new HleModuleHost();
+        static readonly public HleModuleHost Methods = new HleModuleHost();
 
         private Dictionary<uint, HleFunctionEntry> _EntriesByNID = null;
         private Dictionary<string, HleFunctionEntry> _EntriesByName = null;
 
         public string ModuleLocation;
+        public Dictionary<uint, HleFunctionEntry> EntriesByNID { get { InitializeOnce(); return _EntriesByNID; } }
+        public Dictionary<string, HleFunctionEntry> EntriesByName { get { InitializeOnce(); return _EntriesByName; } }
+        public string Name { get { return this.GetType().Name; } }
 
-        public Dictionary<uint, HleFunctionEntry> EntriesByNID
-        {
-            get
-            {
-                InitializeOnce();
-                return _EntriesByNID;
-            }
-        }
+        [Context]
+        protected PspMemory Memory;
 
-        public Dictionary<string, HleFunctionEntry> EntriesByName
-        {
-            get
-            {
-                InitializeOnce();
-                return _EntriesByName;
-            }
-        }
+        [Context]
+        protected PspContext PspContext;
 
-        public string Name => this.GetType().Name;
-
-        protected PspMemory Memory => PSPDrivers.PspMemory;
+        [Context]
+        protected PspStoredConfig StoredConfig;
 
         protected HleModuleHost()
         {
@@ -80,18 +71,17 @@ namespace ScePSP.Hle
                 foreach (
                     var MethodInfo in
                     new MethodInfo[0]
-                        .Concat(this.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance))
+                    .Concat(this.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance))
                 //.Concat(this.GetType().GetMethods(BindingFlags.NonPublic))
                 //.Concat(this.GetType().GetMethods(BindingFlags.Public))
                 )
                 {
-                    var Attributes = MethodInfo.GetCustomAttributes(typeof(HlePspFunctionAttribute), true)
-                        .Cast<HlePspFunctionAttribute>();
+                    var Attributes = MethodInfo.GetCustomAttributes(typeof(HlePspFunctionAttribute), true).Cast<HlePspFunctionAttribute>();
                     if (Attributes.Any())
                     {
                         if (!MethodInfo.IsPublic)
                         {
-                            throw new InvalidProgramException("Method " + MethodInfo + " is not public");
+                            throw (new InvalidProgramException("Method " + MethodInfo + " is not public"));
                         }
                         var Delegate = CreateDelegateForMethodInfo(MethodInfo, Attributes.First());
                         foreach (var Attribute in Attributes)
@@ -133,10 +123,8 @@ namespace ScePSP.Hle
         {
             public enum RegisterTypeEnum
             {
-                Gpr,
-                Fpr,
+                Gpr, Fpr,
             }
-
             public RegisterTypeEnum RegisterType;
             public int RegisterIndex;
             public ParameterInfo ParameterInfo;

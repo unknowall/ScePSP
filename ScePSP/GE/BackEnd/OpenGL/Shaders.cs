@@ -85,7 +85,9 @@ namespace ScePSP.BackEnd.OpenGL
 			uniform bool hasTexture;
 			uniform bool clearingMode;
 
-			uniform bool colorTest;
+			//FOG
+			uniform bool fogEnable;
+			uniform vec3 fogColor;
 
 			// ALPHA TEST
 			uniform bool alphaTest;
@@ -102,6 +104,21 @@ namespace ScePSP.BackEnd.OpenGL
 			varying vec2 v_backtexCoords;
 			varying vec3 v_worldPos;
 			varying vec3 v_viewDir;
+			varying float v_fogDepth;
+			
+			//BLEND
+			uniform bool blendEnable;
+			uniform int blendEquation;
+			uniform int blendSrc;
+			uniform int blendDst;
+			uniform vec3 blendSFix;
+			uniform vec3 blendDFix;
+
+			//COLOR TEST
+			uniform bool colorTest;
+			uniform int ctestFunc;
+			uniform ivec3 ctestRef;
+			uniform ivec3 ctestMsk;
 
 			ivec4 convertToByte(vec4 v) {
 				return ivec4(v * 255.0);
@@ -251,11 +268,124 @@ namespace ScePSP.BackEnd.OpenGL
 				return finalColor;
 			}
 
+			vec3 BlendParameter(int parameter, in vec3 color, float srcAlpha, float dstAlpha, in vec3 fix)
+			{
+				if (parameter == 0) // ALPHA_SOURCE_COLOR / ALPHA_DESTINATION_COLOR
+				{
+					return color;
+				}
+				else if (parameter == 1) // ALPHA_ONE_MINUS_SOURCE_COLOR / ALPHA_ONE_MINUS_DESTINATION_COLOR
+				{
+					return vec3(1.0 - color);
+				}
+				else if (parameter == 2) // ALPHA_SOURCE_ALPHA
+				{
+					return vec3(srcAlpha);
+				}
+				else if (parameter == 3) // ALPHA_ONE_MINUS_SOURCE_ALPHA
+				{
+					return vec3(1.0 - srcAlpha);
+				}
+				else if (parameter == 4) // ALPHA_DESTINATION_ALPHA
+				{
+					return vec3(dstAlpha);
+				}
+				else if (parameter == 5) // ALPHA_ONE_MINUS_DESTINATION_ALPHA
+				{
+					return vec3(1.0 - dstAlpha);
+				}
+				else if (parameter == 6) // ALPHA_DOUBLE_SOURCE_ALPHA
+				{
+					return vec3(2.0 * srcAlpha);
+				}
+				else if (parameter == 7) // ALPHA_ONE_MINUS_DOUBLE_SOURCE_ALPHA
+				{
+					return vec3(1.0 - 2.0 * srcAlpha);
+				}
+				else if (parameter == 8) // ALPHA_DOUBLE_DESTINATION_ALPHA
+				{
+					return vec3(2.0 * dstAlpha);
+				}
+				else if (parameter == 9) // ALPHA_ONE_MINUS_DOUBLE_DESTINATION_ALPHA
+				{
+					return vec3(1.0 - 2.0 * dstAlpha);
+				}
+				else if (parameter == 10) // ALPHA_FIX
+				{
+					return fix;
+				}
+	
+				return color;
+			}
+
+			void ApplyBlend(inout vec4 Cf, in vec4 Csrc, in vec4 Cdst)
+			{
+				vec3 CPsrc = clamp(Csrc.rgb * BlendParameter(blendSrc, Cdst.rgb, Csrc.a, Cdst.a, blendSFix), 0.0, 1.0);
+				vec3 CPdst = clamp(Cdst.rgb * BlendParameter(blendDst, Csrc.rgb, Csrc.a, Cdst.a, blendDFix), 0.0, 1.0);
+
+				if (blendEquation == 0) // ALPHA_SOURCE_BLEND_OPERATION_ADD
+				{
+					Cf.rgb = CPsrc + CPdst;
+				}
+				else if (blendEquation == 1) // ALPHA_SOURCE_BLEND_OPERATION_SUBTRACT
+				{
+					Cf.rgb = CPsrc - CPdst;
+				}
+				else if (blendEquation == 2) // ALPHA_SOURCE_BLEND_OPERATION_REVERSE_SUBTRACT
+				{
+					Cf.rgb = CPdst - CPsrc;
+				}
+				else if (blendEquation == 3) // ALPHA_SOURCE_BLEND_OPERATION_MINIMUM_VALUE
+				{
+					Cf.rgb = min(Csrc.rgb, Cdst.rgb);
+				}
+				else if (blendEquation == 4) // ALPHA_SOURCE_BLEND_OPERATION_MAXIMUM_VALUE
+				{
+					Cf.rgb = max(Csrc.rgb, Cdst.rgb);
+				}
+				else if (blendEquation == 5) // ALPHA_SOURCE_BLEND_OPERATION_ABSOLUTE_VALUE
+				{
+					Cf.rgb = abs(Csrc.rgb - Cdst.rgb);
+				}
+			}
+
+			void ApplyColorTest(in vec3 Cf)
+			{
+				if (ctestFunc == 0)
+				{
+					discard;
+				}
+				else if (ctestFunc == 2)
+				{
+					ivec3 Cs = ivec3(round(Cf * 255.0));
+					if ((Cs & ctestMsk) != (ctestRef & ctestMsk)) discard;
+				}
+				else if (ctestFunc == 3)
+				{
+					ivec3 Cs = ivec3((Cf * 255.0));
+					if ((Cs & ctestMsk) == (ctestRef & ctestMsk)) discard;
+				}
+			}
+
+			void ApplyFog(inout vec4 Cf)
+			{
+				float fog = clamp(v_fogDepth, 0.0, 1.0);
+				Cf.rgb = mix(fogColor, Cf.rgb, fog);
+			}
+
+			ivec2 getFragCoord()
+			{
+				// i.e.:
+				//     vec4 screenColor = texelFetch(texture0, getFragCoord(), 0);
+				//
+				return ivec2(gl_FragCoord.xy);
+			}
+
 			void main() {
 
 				vec4 litColor = vec4(1.0, 1.0, 1.0, 1.0);
 
-				if (lightenable) {
+				if (!clearingMode && lightenable) {
 					vec3 normal = normalize(v_normal.xyz);
 					vec3 viewDir = normalize(v_viewDir);
 					litColor = calculateLighting(normal, v_worldPos, viewDir);
@@ -265,6 +395,11 @@ namespace ScePSP.BackEnd.OpenGL
 					gl_FragColor = v_color;
 				} else {
 					gl_FragColor = uniformColor;
+				}
+
+				if (!clearingMode && colorTest)
+				{
+					ApplyColorTest(gl_FragColor.rgb);
 				}
 
 				if (!clearingMode && hasTexture) {
@@ -328,7 +463,12 @@ namespace ScePSP.BackEnd.OpenGL
 					}
 				}
 
-				if (lopEnabled) {
+				if (!clearingMode && blendEnable) {
+					vec4 Cdst = texture2D(backtex, v_texCoords);
+					ApplyBlend(gl_FragColor, gl_FragColor, Cdst);
+				}
+
+				if (!clearingMode && lopEnabled) {
 					ivec4 s = convertToByte(gl_FragColor);
 					ivec4 d = convertToByte(texture2D(backtex, v_backtexCoords));
 					ivec4 o = ivec4(0x77);
@@ -356,14 +496,11 @@ namespace ScePSP.BackEnd.OpenGL
 				if (!clearingMode && !hasTexture && lightenable) {
 					gl_FragColor = gl_FragColor * litColor;
 				}
-
-				if (!clearingMode && lightenable) {
-					//gl_FragColor = litColor;
+				
+				if (!clearingMode && fogEnable)
+				{
+					ApplyFog(gl_FragColor);
 				}
-
-				//if (colorTest) {
-				//	discard; return;
-				//}
 			}
         ";
 
@@ -375,8 +512,8 @@ namespace ScePSP.BackEnd.OpenGL
 			uniform mat4 matrixView;
 			uniform int weightCount;
 			uniform bool hasReversedNormal;
-			
 			uniform int TextureMode;
+			uniform vec3 FogRange_Scale;
 
 			attribute vec4 vertexTexCoords;
 			attribute vec4 vertexColor;
@@ -397,6 +534,7 @@ namespace ScePSP.BackEnd.OpenGL
 			varying vec4 v_normal;
 			varying vec3 v_worldPos;
 			varying vec3 v_viewDir;
+			varying float v_fogDepth;
 
 			vec4 performSkinning(vec4 In) {
 				if (weightCount == 0) {
@@ -454,6 +592,18 @@ namespace ScePSP.BackEnd.OpenGL
 				v_backtexCoords = (gl_Position.xy + vec2(1.0, 1.0)) / 2.0;
 
 				v_color = vertexColor;
+
+				vec4 viewPos = matrixView * skinnedPos;
+				float fogdepth = abs(viewPos.z);
+				float fogRange = FogRange_Scale.y - FogRange_Scale.x;
+				if (fogRange > 0.0)
+				{
+					v_fogDepth = (FogRange_Scale.y - fogdepth) / fogRange;
+				}
+				else
+				{
+					v_fogDepth = 1.0; // 如果范围无效，默认清晰
+				}
 
 				if(TextureMode == 0){
 					v_texCoords = (matrixTexture * vertexTexCoords).xy;

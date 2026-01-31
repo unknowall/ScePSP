@@ -1,22 +1,18 @@
 ﻿using System;
 
-namespace ScePSP.BackEnd.NullAudio
+namespace ScePSP.Audio
 {
     public class NullAudio : AudioBackEnd
     {
-        public override void Update(Action<short[]> readStream)
+        public NullAudio()
         {
         }
 
-        public override void Pause()
+        public override void Update(Action<short[]> ReadStream)
         {
         }
 
-        public override void Resume()
-        {
-        }
-
-        public override void Stop()
+        public override void StopSynchronized()
         {
         }
     }

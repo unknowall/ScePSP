@@ -2,92 +2,130 @@
 using System;
 using System.Collections.Generic;
 
-namespace ScePSP.Devices.Rtc
+namespace ScePSP.Rtc
 {
-    public unsafe class PspRtc
+    public class PspRtc
     {
-        public static Logger Logger = Logger.GetLogger("Rtc");
-
-        internal LinkedList<PspVirtualTimer> Timers = new LinkedList<PspVirtualTimer>();
         public DateTime StartDateTime { get; protected set; }
+
         public DateTime CurrentDateTime { get; protected set; }
 
-        protected PspTimeStruct StartTime;
-        protected PspTimeStruct CurrentTime;
+        public PspTimeStruct ElapsedTime
+        {
+            get
+            {
+                return this._ElapsedTime;
+            }
+        }
 
-        public PspTimeStruct ElapsedTime;
+        public TimeSpan Elapsed
+        {
+            get
+            {
+                return this.CurrentDateTime - this.StartDateTime;
+            }
+        }
 
-        public TimeSpan Elapsed => CurrentDateTime - StartDateTime;
-        public TimeSpan UnixTimeStampTS => CurrentDateTime - new DateTime(1970, 1, 1);
-        public uint UnixTimeStamp => (uint)UnixTimeStampTS.TotalSeconds;
-        public PspRtc() => Start();
+        public uint UnixTimeStamp
+        {
+            get
+            {
+                return (uint)(this.CurrentDateTime - new DateTime(1970, 1, 1)).TotalSeconds;
+            }
+        }
+
+        public PspRtc()
+        {
+            this.Start();
+        }
 
         public void Start()
         {
-            StartDateTime = DateTime.UtcNow;
-            StartTime.SetToNow();
+            this.StartDateTime = DateTime.UtcNow;
+            this.StartTime.SetToNow();
         }
 
         protected virtual void UpdateInternal()
         {
-            CurrentTime.SetToNow();
-            CurrentDateTime = DateTime.UtcNow;
+            this.CurrentTime.SetToNow();
+            this.CurrentDateTime = DateTime.UtcNow;
         }
 
         public void Update()
         {
-            UpdateInternal();
-            ElapsedTime.TotalMicroseconds = CurrentTime.TotalMicroseconds - StartTime.TotalMicroseconds;
-
-            lock (Timers)
+            this.UpdateInternal();
+            this._ElapsedTime.TotalMicroseconds = this.CurrentTime.TotalMicroseconds - this.StartTime.TotalMicroseconds;
+            lock (this.Timers)
             {
-            RetryLoop:
-                foreach (var timer in Timers)
+                for (; ; )
                 {
-                    lock (timer)
+                IL_39:
+                    foreach (PspVirtualTimer pspVirtualTimer in this.Timers)
                     {
-                        if (timer.Enabled && CurrentDateTime >= timer.DateTime)
+                        lock (pspVirtualTimer)
                         {
-                            Timers.Remove(timer);
-                            timer.Callback();
-                            timer.OnList = false;
-                            goto RetryLoop;
+                            if (pspVirtualTimer.Enabled && this.CurrentDateTime >= pspVirtualTimer.DateTime)
+                            {
+                                this.Timers.Remove(pspVirtualTimer);
+                                pspVirtualTimer.Callback();
+                                pspVirtualTimer.OnList = false;
+                                goto IL_39;
+                            }
                         }
                     }
+                    break;
                 }
             }
         }
 
-        public PspVirtualTimer CreateVirtualTimer(Action callback) => new PspVirtualTimer(this)
+        public PspVirtualTimer CreateVirtualTimer(Action Callback)
         {
-            Callback = callback,
-        };
-
-        public PspVirtualTimer RegisterTimerInOnce(TimeSpan timeSpan, Action callback)
-        {
-            Logger.Notice("RegisterTimerInOnce: " + timeSpan);
-            Update();
-            return RegisterTimerAtOnce(CurrentDateTime + timeSpan, callback);
+            return new PspVirtualTimer(this)
+            {
+                Callback = Callback
+            };
         }
 
-        public PspVirtualTimer RegisterTimerAtOnce(DateTime dateTime, Action callback)
+        public PspVirtualTimer RegisterTimerInOnce(TimeSpan TimeSpan, Action Callback)
         {
-            lock (Timers)
+            PspRtc.Logger.Notice("RegisterTimerInOnce: " + TimeSpan, new object[0]);
+            this.Update();
+            return this.RegisterTimerAtOnce(this.CurrentDateTime + TimeSpan, Callback);
+        }
+
+        public PspVirtualTimer RegisterTimerAtOnce(DateTime DateTime, Action Callback)
+        {
+            PspVirtualTimer result;
+            lock (this.Timers)
             {
-                Logger.Notice("RegisterTimerAtOnce: " + dateTime);
-                var virtualTimer = CreateVirtualTimer(callback);
-                virtualTimer.SetAt(dateTime);
-                virtualTimer.Enabled = true;
-                return virtualTimer;
+                PspRtc.Logger.Notice("RegisterTimerAtOnce: " + DateTime, new object[0]);
+                PspVirtualTimer pspVirtualTimer = this.CreateVirtualTimer(Callback);
+                pspVirtualTimer.SetAt(DateTime);
+                pspVirtualTimer.Enabled = true;
+                result = pspVirtualTimer;
+            }
+            return result;
+        }
+
+        public unsafe void RegisterTimeout(uint* Timeout, Action WakeUpCallback)
+        {
+            if (Timeout != null)
+            {
+                this.RegisterTimerInOnce(TimeSpanUtils.FromMicroseconds((long)((ulong)(*Timeout))), delegate
+                {
+                    WakeUpCallback();
+                });
             }
         }
 
-        public void RegisterTimeout(uint* timeout, Action wakeUpCallback)
-        {
-            if (timeout != null)
-            {
-                RegisterTimerInOnce(TimeSpanUtils.FromMicroseconds(*timeout), wakeUpCallback);
-            }
-        }
+        public static Logger Logger = Logger.GetLogger("Rtc");
+
+        internal LinkedList<PspVirtualTimer> Timers = new LinkedList<PspVirtualTimer>();
+
+        protected PspTimeStruct StartTime;
+
+        protected PspTimeStruct CurrentTime;
+
+        protected PspTimeStruct _ElapsedTime;
     }
 }

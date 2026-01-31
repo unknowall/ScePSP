@@ -1,6 +1,5 @@
-using System.Reflection;
-using System.Runtime;
 using SafeILGenerator.Ast.Nodes;
+using System.Reflection;
 
 namespace SafeILGenerator.Utils
 {
@@ -14,12 +13,12 @@ namespace SafeILGenerator.Utils
 
         public TType Value
         {
-            
-            
+
+
             set { _item.Value = value; }
-            
-            
-            get { return (TType) _item.Value; }
+
+
+            get { return (TType)_item.Value; }
         }
 
         public void Free() => _item.Free();

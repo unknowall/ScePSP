@@ -6,21 +6,16 @@ namespace ScePSP.Hle.Types
     {
         private Version Version;
 
-        public int Major => Version.Major;
-
-        public int Minor => Version.Minor;
-
-        public int Revision => Version.Revision;
-
-        public string VersionStr;
+        public int Major { get { return Version.Major; } }
+        public int Minor { get { return Version.Minor; } }
+        public int Revision { get { return Version.Revision; } }
 
         public PspVersion(string VersionString)
         {
-            VersionStr = VersionString;
             this.SetVersion(VersionString);
         }
 
-        public static implicit operator PspVersion(string String)
+        static public implicit operator PspVersion(string String)
         {
             return new PspVersion(String);
         }

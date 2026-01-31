@@ -25,14 +25,14 @@ namespace ScePSP.GE.State.SubStates
         {
             switch (idx)
             {
-                case 0:return MorphWeight0;
-                case 1:return MorphWeight1;
-                case 2:return MorphWeight2;
-                case 3:return MorphWeight3;
-                case 4:return MorphWeight4;
-                case 5:return MorphWeight5;
-                case 6:return MorphWeight6;
-                case 7:return MorphWeight7;
+                case 0: return MorphWeight0;
+                case 1: return MorphWeight1;
+                case 2: return MorphWeight2;
+                case 3: return MorphWeight3;
+                case 4: return MorphWeight4;
+                case 5: return MorphWeight5;
+                case 6: return MorphWeight6;
+                case 7: return MorphWeight7;
             }
             return MorphWeight0;
         }

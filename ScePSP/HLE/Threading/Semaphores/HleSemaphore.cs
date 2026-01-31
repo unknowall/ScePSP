@@ -18,22 +18,17 @@ namespace ScePSP.Hle.Threading.Semaphores
         }
 
         public SceKernelSemaInfo SceKernelSemaInfo;
-
         protected List<WaitingSemaphoreThread> WaitingSemaphoreThreadList = new List<WaitingSemaphoreThread>();
         //public SortedSet<>
 
-        public int CurrentCount
-        {
-            get => SceKernelSemaInfo.CurrentCount;
-            protected set => SceKernelSemaInfo.CurrentCount = value;
-        }
+        public int CurrentCount { get { return SceKernelSemaInfo.CurrentCount; } protected set { SceKernelSemaInfo.CurrentCount = value; } }
 
         public HleSemaphore()
         {
             SceKernelSemaInfo.Size = sizeof(SceKernelSemaInfo);
         }
 
-        public string Name
+        public String Name
         {
             get
             {
@@ -41,8 +36,7 @@ namespace ScePSP.Hle.Threading.Semaphores
             }
             set
             {
-                fixed (byte* NamePtr =
-                    SceKernelSemaInfo.Name) PointerUtils.StoreStringOnPtr(value, Encoding.ASCII, NamePtr);
+                fixed (byte* NamePtr = SceKernelSemaInfo.Name) PointerUtils.StoreStringOnPtr(value, Encoding.ASCII, NamePtr);
             }
         }
 
@@ -77,18 +71,18 @@ namespace ScePSP.Hle.Threading.Semaphores
         {
             // Selects all the waiting semaphores, that fit the count condition, in a FIFO order.
             var WaitingSemaphoreThreadIterator = WaitingSemaphoreThreadList
-                    //.Reverse()
-                    //.Where(WaitingThread => (CurrentCount >= WaitingThread.ExpectedMinimumCount))
-                    .AsEnumerable()
                 //.Reverse()
-                ;
+                //.Where(WaitingThread => (CurrentCount >= WaitingThread.ExpectedMinimumCount))
+                .AsEnumerable()
+            //.Reverse()
+            ;
 
             // Reorders the waiting semaphores in a Thread priority order (descending).
             if (SceKernelSemaInfo.Attributes == SemaphoreAttribute.Priority)
             {
                 WaitingSemaphoreThreadIterator = WaitingSemaphoreThreadIterator
-                        .OrderByDescending(WaitingThread => WaitingThread.HleThread.PriorityValue)
-                    ;
+                    .OrderByDescending(WaitingThread => WaitingThread.HleThread.PriorityValue)
+                ;
             }
 
             int AwakenCount = 0;

@@ -35,7 +35,7 @@
             tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             TextureInfo = new System.Windows.Forms.TextBox();
             flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            SaveButton = new System.Windows.Forms.Button();
+            BtnSave = new System.Windows.Forms.Button();
             tableLayoutPanel1.SuspendLayout();
             TextureViewContainer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)TextureView).BeginInit();
@@ -124,7 +124,7 @@
             // 
             // flowLayoutPanel1
             // 
-            flowLayoutPanel1.Controls.Add(SaveButton);
+            flowLayoutPanel1.Controls.Add(BtnSave);
             flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             flowLayoutPanel1.Location = new System.Drawing.Point(4, 4);
             flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(4);
@@ -132,15 +132,15 @@
             flowLayoutPanel1.Size = new System.Drawing.Size(217, 34);
             flowLayoutPanel1.TabIndex = 2;
             // 
-            // SaveButton
+            // BtnSave
             // 
-            SaveButton.Location = new System.Drawing.Point(4, 4);
-            SaveButton.Margin = new System.Windows.Forms.Padding(4);
-            SaveButton.Name = "SaveButton";
-            SaveButton.Size = new System.Drawing.Size(208, 30);
-            SaveButton.TabIndex = 1;
-            SaveButton.Text = "&Save...";
-            SaveButton.UseVisualStyleBackColor = true;
+            BtnSave.Location = new System.Drawing.Point(4, 4);
+            BtnSave.Margin = new System.Windows.Forms.Padding(4);
+            BtnSave.Name = "BtnSave";
+            BtnSave.Size = new System.Drawing.Size(208, 30);
+            BtnSave.TabIndex = 1;
+            BtnSave.Text = "&Save...";
+            BtnSave.UseVisualStyleBackColor = true;
             // 
             // TextureForm
             // 
@@ -174,6 +174,6 @@
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
 		private System.Windows.Forms.TextBox TextureInfo;
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-        private System.Windows.Forms.Button SaveButton;
+        private System.Windows.Forms.Button BtnSave;
     }
 }

@@ -56,11 +56,10 @@ namespace ScePSP.Cpu.Emitter
             Action<CpuThreadState> Delegate;
             var Time2 = Time1;
 
-            bool DisableOptimizations = _DynarecConfig.DisableDotNetJitOptimizations;
-            if (TotalInstructions >= _DynarecConfig.InstructionCountToDisableOptimizations) DisableOptimizations = true;
+            bool DisableOptimizations = DynarecConfig.DisableDotNetJitOptimizations;
+            if (TotalInstructions >= DynarecConfig.InstructionCountToDisableOptimizations) DisableOptimizations = true;
 
             if (Platform.IsMono) DisableOptimizations = false;
-            if (_DynarecConfig.ForceJitOptimizationsOnEvenLargeFunctions) DisableOptimizations = false;
 
             try
             {

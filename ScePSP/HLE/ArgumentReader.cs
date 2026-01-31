@@ -1,5 +1,4 @@
 ﻿using ScePSP.Cpu;
-using ScePSP.Utils;
 using ScePSPUtils;
 
 namespace ScePSP

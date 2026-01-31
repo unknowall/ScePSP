@@ -1,4 +1,6 @@
-﻿using SafeILGenerator.Ast;
+﻿#define ENABLE_NATIVE_CALLS
+
+using SafeILGenerator.Ast;
 using SafeILGenerator.Ast.Nodes;
 
 namespace ScePSP.Cpu.Emitter
@@ -19,7 +21,11 @@ namespace ScePSP.Cpu.Emitter
                     BranchFlag(),
                     ast.StatementsInline(
                         ast.AssignGPR(31, BranchPC + 8),
+#if ENABLE_NATIVE_CALLS
                         CallFixedAddress(BranchPC)
+#else
+						ast.GotoAlways(BranchLabel)
+#endif
                     )
                 );
             }
@@ -40,7 +46,7 @@ namespace ScePSP.Cpu.Emitter
 
         private AstNodeExprLValue BranchFlag()
         {
-            if (_DynarecConfig.BranchFlagAsLocal)
+            if (DynarecConfig.BranchFlagAsLocal)
             {
                 if (BranchFlagLocal == null)
                 {
@@ -109,7 +115,7 @@ namespace ScePSP.Cpu.Emitter
 
         private AstNodeStm JumpDynamicToAddress(AstNodeExpr Address)
         {
-            if (_DynarecConfig.EnableTailCalling)
+            if (DynarecConfig.EnableTailCalling)
             {
                 return ast.MethodCacheInfoCallDynamicPC(Address, TailCall: true);
             }
@@ -126,13 +132,17 @@ namespace ScePSP.Cpu.Emitter
         {
             return ast.StatementsInline(
                 _link(),
+#if ENABLE_NATIVE_CALLS
                 ast.MethodCacheInfoCallDynamicPC(Address, TailCall: false)
+#else
+				JumpToAddress(Address)
+#endif
             );
         }
 
         private AstNodeStm JumpToFixedAddress(uint Address)
         {
-            if (_DynarecConfig.EnableTailCalling)
+            if (DynarecConfig.EnableTailCalling)
             {
                 return ast.Statements(
                     ast.Statement(ast.TailCall(ast.MethodCacheInfoCallStaticPC(CpuProcessor, Address))),
@@ -152,7 +162,11 @@ namespace ScePSP.Cpu.Emitter
         {
             return ast.StatementsInline(
                 _link(),
+#if ENABLE_NATIVE_CALLS
                 ast.Statement(ast.MethodCacheInfoCallStaticPC(CpuProcessor, Address))
+#else
+				JumpToFixedAddress(Address)
+#endif
             );
         }
 
@@ -163,11 +177,15 @@ namespace ScePSP.Cpu.Emitter
 
         private AstNodeStm ReturnFromFunction(AstNodeExpr AstNodeExpr)
         {
+#if ENABLE_NATIVE_CALLS
             return ast.StatementsInline(
                 ast.AssignPC(ast.GPR(31)),
                 ast.GetTickCall((BranchCount > 0) ? true : false),
                 ast.Return()
             );
+#else
+			return JumpToAddress(AstNodeExpr);
+#endif
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,4 @@
-﻿using ScePSP.Utils;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -164,15 +163,9 @@ namespace ScePSPUtils.Drawing
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct RgbaFloat
     {
-        /// <summary>
-        /// 
-        /// </summary>
         public float R, G, B, A;
 
         public RgbaFloat(float r, float g, float b, float a)
@@ -189,7 +182,11 @@ namespace ScePSPUtils.Drawing
 
         public Rgba Rgba => new Rgba(PackComponent(R), PackComponent(G), PackComponent(B), PackComponent(A));
         public uint Int => Rgba.Value;
-        static private uint PackComponent(float v) => (uint)((int)(v * 255)).Clamp(0, 255);
+        static private uint PackComponent(float v)
+        {
+            var ret = (uint)((int)(v * 255));
+            return Math.Clamp(ret, 0, 255);
+        }
     }
 
     /// <summary>

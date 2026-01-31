@@ -5,9 +5,11 @@ namespace ScePSP.Cpu.Emitter
 {
     public unsafe sealed partial class CpuEmitter
     {
-        private CpuProcessor CpuProcessor => PSPDrivers.CPU;
+        [Context]
+        private CpuProcessor CpuProcessor;
 
-        private PspMemory Memory => PSPDrivers.PspMemory;
+        [Context]
+        private PspMemory Memory;
 
         private MipsMethodEmitter MipsMethodEmitter;
         private IInstructionReader InstructionReader;
@@ -18,8 +20,9 @@ namespace ScePSP.Cpu.Emitter
 
         static private AstMipsGenerator ast = AstMipsGenerator.Instance;
 
-        public CpuEmitter(MipsMethodEmitter MipsMethodEmitter, IInstructionReader InstructionReader)
+        public CpuEmitter(PspContext PspContext, MipsMethodEmitter MipsMethodEmitter, IInstructionReader InstructionReader)
         {
+            PspContext.InjectDependencesTo(this);
             this.MipsMethodEmitter = MipsMethodEmitter;
             this.InstructionReader = InstructionReader;
         }

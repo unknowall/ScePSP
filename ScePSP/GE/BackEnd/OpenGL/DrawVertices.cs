@@ -4,7 +4,6 @@ using ScePSP.GE.State;
 using ScePSPUtils.Drawing;
 using System;
 using System.Numerics;
-using ScePSPUtils.Extensions;
 
 namespace ScePSP.BackEnd.OpenGL
 {
@@ -177,50 +176,18 @@ namespace ScePSP.BackEnd.OpenGL
 
             PutVertexIndex(_verticesPosition.Length);
 
-            _verticesPosition.Add(vertexInfo.Position.ToRVector3());
-            _verticesNormal.Add(vertexInfo.Normal.ToRVector3());
-            _verticesTexcoords.Add(vertexInfo.Texture.ToRVector3());
+            _verticesPosition.Add(vertexInfo.Position.ToVector3());
+            _verticesNormal.Add(vertexInfo.Normal.ToVector3());
+            _verticesTexcoords.Add(vertexInfo.Texture.ToVector3());
             _verticesColors.Add(new RgbaFloat(vertexInfo.Color));
-
-            var weightsStruct = new VertexInfoWeights(vertexInfo);
-
-            var count = VertexType.RealSkinningWeightCount;
-            if (count <= 0) count = 0; // defensive
-            float sum = 0f;
-            for (int i = 0; i < count && i < 8; i++)
-            {
-                sum += weightsStruct.W[i];
-            }
-            if (count > 0)
-            {
-                if (sum <= float.Epsilon)
-                {
-                    // 如果总权重为 0，则设置第一个权重为 1，避免除零并保持顶点不变形
-                    weightsStruct.W[0] = 1.0f;
-                    for (int i = 1; i < count && i < 8; i++) weightsStruct.W[i] = 0.0f;
-                }
-                else
-                {
-                    // 归一化前 count 个权重
-                    for (int i = 0; i < count && i < 8; i++) weightsStruct.W[i] = weightsStruct.W[i] / sum;
-                }
-                // 其余槽置 0
-                for (int i = count; i < 8; i++) weightsStruct.W[i] = 0.0f;
-            }
-            else
-            {
-                // 没有权重
-                for (int i = 0; i < 8; i++) weightsStruct.W[i] = 0.0f;
-            }
-
-            _verticesWeights.Add(weightsStruct);
+            _verticesWeights.Add(new VertexInfoWeights(vertexInfo));
         }
 
         private void EndVertex()
         {
             //Console.Out.WriteLineColored(ConsoleColor.Green, $"DrawVertices Geometr: {_primitiveType.ToString()}");
-
-            DrawVertices(ConvertGLGeometry(_primitiveType));
+            if (_indicesList.Length > 0)
+                DrawVertices(ConvertGLGeometry(_primitiveType));
 
             ResetVertex();
         }

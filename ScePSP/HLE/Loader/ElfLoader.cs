@@ -1,7 +1,7 @@
 ﻿//#define DEBUG_ELF_LOADER
 
-using ScePSP.Memory;
 using ScePSP.Hle.Formats;
+using ScePSP.Memory;
 using ScePSPUtils;
 using ScePSPUtils.Extensions;
 using System;
@@ -17,9 +17,7 @@ namespace ScePSP.Hle.Loader
         public Stream FileStream;
         public Stream MemoryStream;
         public MemoryPartition MemoryPartition;
-        protected uint BaseAddress;
-
-        static public Logger Logger = Logger.GetLogger(nameof(ElfLoader));
+        protected uint BaseAddress = 0;
 
         public Elf.HeaderStruct Header;
         public Elf.SectionHeader[] SectionHeaders;
@@ -28,67 +26,67 @@ namespace ScePSP.Hle.Loader
         public Dictionary<string, Elf.SectionHeader> SectionHeadersByName { get; protected set; }
         protected byte[] StringTable;
 
-        public string GetStringFromStringTable(uint index)
+        public String GetStringFromStringTable(uint Index)
         {
-            fixed (byte* namePointer = &StringTable[index])
-                return PointerUtils.PtrToString(namePointer, Encoding.ASCII);
+            fixed (byte* NamePointer = &StringTable[Index])
+            {
+                return PointerUtils.PtrToString(NamePointer, Encoding.ASCII);
+            }
         }
 
-        public virtual void Load(Stream fileStream, string name)
+        public virtual void Load(Stream FileStream, string Name)
         {
-            fileStream = new MemoryStream(fileStream.ReadAll());
+            FileStream = new MemoryStream(FileStream.ReadAll());
 
-            FileStream = fileStream;
+            this.FileStream = FileStream;
 
-            Header = fileStream.ReadStruct<Elf.HeaderStruct>();
-            if (Header.Magic != Elf.HeaderStruct.MagicEnum.ExpectedValue)
+            this.Header = FileStream.ReadStruct<Elf.HeaderStruct>();
+            if (this.Header.Magic != Elf.HeaderStruct.MagicEnum.ExpectedValue)
             {
-                throw new InvalidProgramException($"Not an ELF File \'{name}\'");
+                throw (new InvalidProgramException("Not an ELF File '" + Name + "'"));
             }
 
-            if (Header.Machine != Elf.HeaderStruct.MachineEnum.Allegrex)
+            if (this.Header.Machine != Elf.HeaderStruct.MachineEnum.ALLEGREX)
             {
-                throw new InvalidProgramException("Invalid Elf.Header.Machine");
+                throw (new InvalidProgramException("Invalid Elf.Header.Machine"));
             }
 
-            ProgramHeaders = fileStream.ReadStructVectorAt<Elf.ProgramHeader>(Header.ProgramHeaderOffset,
-                    Header.ProgramHeaderCount, Header.ProgramHeaderEntrySize);
-            SectionHeaders = fileStream.ReadStructVectorAt<Elf.SectionHeader>(Header.SectionHeaderOffset,
-                Header.SectionHeaderCount, Header.SectionHeaderEntrySize);
+            this.ProgramHeaders = FileStream.ReadStructVectorAt<Elf.ProgramHeader>(Header.ProgramHeaderOffset, Header.ProgramHeaderCount, Header.ProgramHeaderEntrySize);
+            this.SectionHeaders = FileStream.ReadStructVectorAt<Elf.SectionHeader>(Header.SectionHeaderOffset, Header.SectionHeaderCount, Header.SectionHeaderEntrySize);
 
-            NamesSectionHeader = SectionHeaders[Header.SectionHeaderStringTable];
-            StringTable = fileStream.SliceWithLength(NamesSectionHeader.Offset, NamesSectionHeader.Size).ReadAll();
+            this.NamesSectionHeader = this.SectionHeaders[Header.SectionHeaderStringTable];
+            this.StringTable = FileStream.SliceWithLength(this.NamesSectionHeader.Offset, this.NamesSectionHeader.Size).ReadAll();
 
-            SectionHeadersByName = new Dictionary<string, Elf.SectionHeader>();
-            foreach (var sectionHeader in SectionHeaders)
+            this.SectionHeadersByName = new Dictionary<string, Elf.SectionHeader>();
+            foreach (var SectionHeader in this.SectionHeaders)
             {
-                var sectionHeaderName = GetStringFromStringTable(sectionHeader.Name);
-                SectionHeadersByName[sectionHeaderName] = sectionHeader;
+                var SectionHeaderName = GetStringFromStringTable(SectionHeader.Name);
+                this.SectionHeadersByName[SectionHeaderName] = SectionHeader;
             }
 
-            Logger.Info("ProgramHeaders:{0}", ProgramHeaders.Length);
-            foreach (var programHeader in ProgramHeaders)
-            {
-                Logger.Info("{0}", programHeader.ToStringDefault());
-            }
+            //Console.WriteLine("ProgramHeaders:{0}", this.ProgramHeaders.Length);
+            //foreach (var ProgramHeader in ProgramHeaders)
+            //{
+            //    Console.WriteLine("{0}", ProgramHeader.ToStringDefault());
+            //}
 
-            Logger.Info("SectionHeaders:{0}", SectionHeaders.Length);
-            foreach (var sectionHeader in SectionHeaders)
-            {
-                Logger.Info("{0}:{1}", GetStringFromStringTable(sectionHeader.Name), sectionHeader.ToStringDefault());
-            }
+            //Console.WriteLine("SectionHeaders:{0}", this.SectionHeaders.Length);
+            //foreach (var SectionHeader in SectionHeaders)
+            //{
+            //    Console.WriteLine("{0}:{1}", GetStringFromStringTable(SectionHeader.Name), SectionHeader.ToStringDefault());
+            //}
 
-            if (NeedsRelocation && ProgramHeaders.Length > 1)
+            if (NeedsRelocation && this.ProgramHeaders.Length > 1)
             {
                 //throw (new NotImplementedException("Not implemented several ProgramHeaders yet using relocation"));
             }
         }
 
-        public void AllocateAndWrite(Stream memoryStream, MemoryPartition memoryPartition, uint baseAddress = 0)
+        public void AllocateAndWrite(Stream MemoryStream, MemoryPartition MemoryPartition, uint BaseAddress = 0)
         {
-            MemoryStream = memoryStream;
-            MemoryPartition = memoryPartition;
-            BaseAddress = baseAddress;
+            this.MemoryStream = MemoryStream;
+            this.MemoryPartition = MemoryPartition;
+            this.BaseAddress = BaseAddress;
 
             AllocateMemory();
             WriteToMemory();
@@ -99,21 +97,20 @@ namespace ScePSP.Hle.Loader
         protected void AllocateMemory()
         {
 #if true
-            var lowest = 0xFFFFFFFFU;
-            var highest = 0U;
-            foreach (var sectionHeader in SectionHeadersWithFlag(Elf.SectionHeader.FlagsSet.Allocate))
+            uint Lowest = 0xFFFFFFFF;
+            uint Highest = 0;
+            foreach (var SectionHeader in SectionHeadersWithFlag(Elf.SectionHeader.FlagsSet.Allocate))
             {
-                lowest = Math.Min(lowest, BaseAddress + sectionHeader.Address);
-                highest = Math.Max(highest, (uint)(BaseAddress + sectionHeader.Address + sectionHeader.Size));
+                Lowest = Math.Min(Lowest, (uint)(BaseAddress + SectionHeader.Address));
+                Highest = Math.Max(Highest, (uint)(BaseAddress + SectionHeader.Address + SectionHeader.Size));
             }
-            foreach (var programHeader in ProgramHeaders)
+            foreach (var ProgramHeader in ProgramHeaders)
             {
-                lowest = Math.Min(lowest, BaseAddress + programHeader.VirtualAddress);
-                highest = Math.Max(highest,
-                    BaseAddress + programHeader.VirtualAddress + programHeader.MemorySize);
+                Lowest = Math.Min(Lowest, (uint)(BaseAddress + ProgramHeader.VirtualAddress));
+                Highest = Math.Max(Highest, (uint)(BaseAddress + ProgramHeader.VirtualAddress + ProgramHeader.MemorySize));
             }
 
-            MemoryPartition.AllocateLowHigh(lowest, highest, Name: "Elf");
+            MemoryPartition.AllocateLowHigh(Lowest, Highest, Name: "Elf");
 #else
 			foreach (var SectionHeader in SectionHeadersWithFlag(Elf.SectionHeader.FlagsSet.Allocate))
 			{
@@ -124,25 +121,22 @@ namespace ScePSP.Hle.Loader
 
         protected void WriteToMemory()
         {
-            foreach (var sectionHeader in SectionHeadersWithFlag(Elf.SectionHeader.FlagsSet.Allocate))
+            foreach (var SectionHeader in SectionHeadersWithFlag(Elf.SectionHeader.FlagsSet.Allocate))
             {
-                var sectionHeaderFileStream = FileStream.SliceWithLength(sectionHeader.Offset, sectionHeader.Size);
-                var sectionHeaderMemoryStream =
-                    MemoryStream.SliceWithLength(sectionHeader.Address + BaseAddress, sectionHeader.Size);
+                var SectionHeaderFileStream = FileStream.SliceWithLength(SectionHeader.Offset, SectionHeader.Size);
+                var SectionHeaderMemoryStream = MemoryStream.SliceWithLength(SectionHeader.Address + BaseAddress, SectionHeader.Size);
 
-                Logger.Info("WriteToMemory('{0:X}') : 0x{1:X} : {2} : {3}",
-                    GetStringFromStringTable(sectionHeader.Name), sectionHeader.Address, sectionHeader.Type,
-                    sectionHeader.Size);
-                Logger.Info("   0x{0:X} - 0x{1:X}", sectionHeader.Address + BaseAddress, sectionHeader.Size);
+                //Console.WriteLine("WriteToMemory('{0:X}') : 0x{1:X} : {2} : {3}", GetStringFromStringTable(SectionHeader.Name), SectionHeader.Address, SectionHeader.Type, SectionHeader.Size);
+                //Console.WriteLine("   0x{0:X} - 0x{1:X}", SectionHeader.Address + BaseAddress, SectionHeader.Size);
 
-                switch (sectionHeader.Type)
+                switch (SectionHeader.Type)
                 {
                     case Elf.SectionHeader.TypeEnum.ProgramBits:
-                        //Logger.Trace(SectionHeaderFileStream.ReadAll().ToHexString());
-                        sectionHeaderMemoryStream.WriteStream(sectionHeaderFileStream);
+                        //Console.WriteLine(SectionHeaderFileStream.ReadAll().ToHexString());
+                        SectionHeaderMemoryStream.WriteStream(SectionHeaderFileStream);
                         break;
                     case Elf.SectionHeader.TypeEnum.NoBits:
-                        sectionHeaderMemoryStream.WriteByteRepeated(0, sectionHeader.Size);
+                        SectionHeaderMemoryStream.WriteByteRepeated(0, SectionHeader.Size);
                         break;
                     default:
                         break;
@@ -150,20 +144,41 @@ namespace ScePSP.Hle.Loader
             }
         }
 
-        public Stream ProgramHeaderFileStream(Elf.ProgramHeader programHeader) =>
-            FileStream.SliceWithLength(programHeader.Offset, programHeader.FileSize);
+        public Stream ProgramHeaderFileStream(Elf.ProgramHeader ProgramHeader)
+        {
+            return this.FileStream.SliceWithLength(ProgramHeader.Offset, ProgramHeader.FileSize);
+        }
 
-        public Stream SectionHeaderFileStream(Elf.SectionHeader sectionHeader) =>
-            FileStream.SliceWithLength(sectionHeader.Offset, sectionHeader.Size);
+        public Stream SectionHeaderFileStream(Elf.SectionHeader SectionHeader)
+        {
+            return this.FileStream.SliceWithLength(SectionHeader.Offset, SectionHeader.Size);
+        }
 
-        public Stream SectionHeaderMemoryStream(Elf.SectionHeader sectionHeader) =>
-            MemoryStream.SliceWithLength(BaseAddress + sectionHeader.Address, sectionHeader.Size);
+        public Stream SectionHeaderMemoryStream(Elf.SectionHeader SectionHeader)
+        {
+            return this.MemoryStream.SliceWithLength(BaseAddress + SectionHeader.Address, SectionHeader.Size);
+        }
 
-        protected IEnumerable<Elf.SectionHeader> SectionHeadersWithFlag(Elf.SectionHeader.FlagsSet flag) =>
-            SectionHeaders.Where(sectionHeader => sectionHeader.Flags.HasFlag(flag));
+        protected IEnumerable<Elf.SectionHeader> SectionHeadersWithFlag(Elf.SectionHeader.FlagsSet Flag)
+        {
+            return SectionHeaders.Where(SectionHeader => SectionHeader.Flags.HasFlag(Flag));
+        }
 
-        public bool IsPrx => Header.Type.HasFlag(Elf.HeaderStruct.TypeEnum.Prx);
+        public bool IsPrx
+        {
+            get
+            {
+                return Header.Type.HasFlag(Elf.HeaderStruct.TypeEnum.Prx);
+            }
+        }
 
-        public bool NeedsRelocation => IsPrx || Header.EntryPoint < PspMemory.MainOffset;
+        public bool NeedsRelocation
+        {
+            get
+            {
+                return IsPrx || (Header.EntryPoint < PspMemory.MainOffset);
+                //return SectionHeaders.Any(SectionHeader => SectionHeader.Type == Elf.SectionHeader.TypeEnum.PRXRELOC);
+            }
+        }
     }
 }

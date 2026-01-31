@@ -2,12 +2,10 @@
 using System;
 using static LightCodec.atrac3plus.Atrac3plusData1;
 using static LightCodec.atrac3plus.Atrac3plusData2;
-using static LightCodec.atrac3plus.Atrac3plusDsp;
 using static LightCodec.Utils.CodecUtils;
 using Atrac3pSpecCodeTab = LightCodec.atrac3plus.Atrac3plusData1.Atrac3pSpecCodeTab;
 using BitReader = LightCodec.Utils.BitReader;
 using VLC = LightCodec.Utils.VLC;
-using Atrac3plusData2 = LightCodec.atrac3plus.Atrac3plusData2;
 
 namespace LightCodec.atrac3plus
 {

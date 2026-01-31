@@ -1,4 +1,5 @@
-﻿using ScePSP.Cpu.Dynarec;
+﻿using ScePSP.Core;
+using ScePSP.Cpu.Dynarec;
 using ScePSP.Cpu.InstructionCache;
 using ScePSP.Memory;
 using System;
@@ -10,17 +11,29 @@ namespace ScePSP.Cpu
     {
         public readonly Dictionary<string, uint> GlobalInstructionStats = new Dictionary<string, uint>();
 
-        public CpuConfig CpuConfig => PSPDrivers.Config.CpuConfig;
+        [Context]
+        public PspContext PspContext;
 
-        public PspMemory Memory => PSPDrivers.PspMemory;
+        [Context]
+        public CpuConfig CpuConfig;
 
-        public ICpuConnector CpuConnector => PSPDrivers.CpuConnector;
+        [Context]
+        public PspStoredConfig Config;
 
-        public DynarecFunctionCompiler DynarecFunctionCompiler => PSPDrivers.DynarecFunctionCompiler;
+        [Context]
+        public PspMemory Memory;
 
-        public IInterruptManager IInterruptManager => PSPDrivers.InterruptManager;
+        [Context]
+        public ICpuConnector CpuConnector;
 
-        public MethodCache MethodCache => PSPDrivers.MethodCache;
+        [Context]
+        public DynarecFunctionCompiler DynarecFunctionCompiler;
+
+        [Context]
+        public IInterruptManager IInterruptManager;
+
+        [Context]
+        public MethodCache MethodCache;
 
         public Dictionary<uint, NativeSyscallInfo> RegisteredNativeSyscallMethods = new Dictionary<uint, NativeSyscallInfo>();
         private Dictionary<int, Action<CpuThreadState, int>> RegisteredNativeSyscalls = new Dictionary<int, Action<CpuThreadState, int>>();
@@ -40,7 +53,7 @@ namespace ScePSP.Cpu
             }
         }
 
-        public CpuProcessor()
+        private CpuProcessor()
         {
         }
 

@@ -3,41 +3,41 @@
     public enum SceKernelErrors : int
     {
         /*
-         * PSP Errors:
-         * Represented by a 32-bit value with the following scheme:
-         *
-         *  31  30  29  28  27        16  15        0
-         * | 1 | 0 | 0 | 0 | X | ... | X | E |... | E |
-         *
-         * Bits 31 and 30: Can only be 1 or 0.
-         *      -> If both are 0), there's no error (0x0==SUCCESS).
-         *      -> If 31 is 1 but 30 is 0), there's an error (0x80000000).
-         *      -> If both bits are 1), a critical error stops the PSP (0xC0000000).
-         *
-         * Bits 29 and 28: Unknown. Never change.
-         *
-         * Bits 27 to 16 (X): Represent the system area associated with the error.
-         *      -> 0x000 - Null (can be used anywhere).
-         *      -> 0x001 - Errno (PSP's implementation of errno.h).
-         *      -> 0x002 - Kernel.
-         *      -> 0x011 - Utility.
-         *      -> 0x021 - UMD.
-         *      -> 0x022 - MemStick.
-         *      -> 0x026 - Audio.
-         *      -> 0x02b - Power.
-         *      -> 0x041 - Wlan.
-         *      -> 0x042 - SAS.
-         *      -> 0x043 - HTTP(0x0431)/HTTPS/SSL(0x0435).
-         *      -> 0x044 - WAVE.
-         *      -> 0x046 - Font.
-         *      -> 0x061 - MPEG(0x0618)/PSMF(0x0615)/PSMF Player(0x0616).
-         *      -> 0x062 - AVC.
-         *      -> 0x063 - ATRAC.
-         *      -> 0x07f - Codec.
-         *
-         * Bits 15 to 0 (E): Represent the error code itself (different for each area).
-         *      -> E.g.: 0x80110001 - Error -> Utility -> Some unknown error.
-         */
+		 * PSP Errors:
+		 * Represented by a 32-bit value with the following scheme:
+		 *
+		 *  31  30  29  28  27        16  15        0
+		 * | 1 | 0 | 0 | 0 | X | ... | X | E |... | E |
+		 *
+		 * Bits 31 and 30: Can only be 1 or 0.
+		 *      -> If both are 0), there's no error (0x0==SUCCESS).
+		 *      -> If 31 is 1 but 30 is 0), there's an error (0x80000000).
+		 *      -> If both bits are 1), a critical error stops the PSP (0xC0000000).
+		 *
+		 * Bits 29 and 28: Unknown. Never change.
+		 *
+		 * Bits 27 to 16 (X): Represent the system area associated with the error.
+		 *      -> 0x000 - Null (can be used anywhere).
+		 *      -> 0x001 - Errno (PSP's implementation of errno.h).
+		 *      -> 0x002 - Kernel.
+		 *      -> 0x011 - Utility.
+		 *      -> 0x021 - UMD.
+		 *      -> 0x022 - MemStick.
+		 *      -> 0x026 - Audio.
+		 *      -> 0x02b - Power.
+		 *      -> 0x041 - Wlan.
+		 *      -> 0x042 - SAS.
+		 *      -> 0x043 - HTTP(0x0431)/HTTPS/SSL(0x0435).
+		 *      -> 0x044 - WAVE.
+		 *      -> 0x046 - Font.
+		 *      -> 0x061 - MPEG(0x0618)/PSMF(0x0615)/PSMF Player(0x0616).
+		 *      -> 0x062 - AVC.
+		 *      -> 0x063 - ATRAC.
+		 *      -> 0x07f - Codec.
+		 *
+		 * Bits 15 to 0 (E): Represent the error code itself (different for each area).
+		 *      -> E.g.: 0x80110001 - Error -> Utility -> Some unknown error.
+		 */
 
         ERROR_OK = unchecked((int)0x00000000),
 
@@ -472,11 +472,9 @@
         ERROR_SAS_INVALID_VOICE_INDEX = unchecked((int)0x80420010),
         ERROR_SAS_INVALID_NOISE_CLOCK = unchecked((int)0x80420011),
         ERROR_SAS_INVALID_PITCH_VAL = unchecked((int)0x80420012),
-
         //ERROR_SAS_INVALID_ADSR_CURVE_MODE                   = unchecked((int)0x80420013),
         ERROR_SAS_INVALID_ADPCM_SIZE = unchecked((int)0x80420014),
         ERROR_SAS_INVALID_LOOP_MODE = unchecked((int)0x80420015),
-
         //ERROR_SAS_VOICE_PAUSED                              = unchecked((int)0x80420016),
         ERROR_SAS_INVALID_VOLUME_VAL = unchecked((int)0x80420018),
         ERROR_SAS_INVALID_ADSR_VAL = unchecked((int)0x80420019),
@@ -485,7 +483,6 @@
         ERROR_SAS_INVALID_FX_FEEDBACK = unchecked((int)0x80420021),
         ERROR_SAS_INVALID_FX_DELAY = unchecked((int)0x80420022),
         ERROR_SAS_INVALID_FX_VOLUME_VAL = unchecked((int)0x80420023),
-
         //ERROR_SAS_BUSY                                      = unchecked((int)0x80420030),
         //ERROR_SAS_NOT_INIT                                  = unchecked((int)0x80420100),
         ERROR_SAS_ALREADY_INIT = unchecked((int)0x80420101),

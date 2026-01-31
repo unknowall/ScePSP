@@ -4,7 +4,6 @@
     {
         //ulong Value;
         public uint Low;
-
         public uint High;
 
         public long MicroSeconds

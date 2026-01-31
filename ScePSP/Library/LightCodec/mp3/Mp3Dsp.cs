@@ -3,11 +3,9 @@ using static System.Math;
 
 namespace LightCodec.mp3
 {
-    using LightCodec.Utils;
-    using static LightCodec.mp3.Mp3Decoder;
     using static LightCodec.mp3.Mp3Data;
+    using static LightCodec.mp3.Mp3Decoder;
     using Dct32 = LightCodec.Utils.Dct32;
-    using Mp3Data = LightCodec.mp3.Mp3Data;
 
     public class Mp3Dsp
     {

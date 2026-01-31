@@ -25,7 +25,7 @@ namespace ScePSP.Cpu.Emitter
 
         public AstNodeExprCallDelegate MethodCacheInfoCallStaticPC(CpuProcessor CpuProcessor, uint PC)
         {
-            if (_DynarecConfig.FunctionCallWithStaticReferences)
+            if (DynarecConfig.FunctionCallWithStaticReferences)
             {
                 var MethodCacheInfo = CpuProcessor.MethodCache.GetForPC(PC);
                 return ast.CallDelegate(ast.StaticFieldAccess(MethodCacheInfo.StaticField.FieldInfo), ast.CpuThreadState);
@@ -38,7 +38,7 @@ namespace ScePSP.Cpu.Emitter
 
         public AstNodeStm MethodCacheInfoCallDynamicPC(AstNodeExpr PC, bool TailCall)
         {
-            //if (_DynarecConfig.FunctionCallWithStaticReferences)
+            //if (DynarecConfig.FunctionCallWithStaticReferences)
             //{
             //	var Call = (AstNodeExpr)ast.CallInstance(GetMethodCacheInfoAtPC(PC), (Action<CpuThreadState>)MethodCacheInfo.Methods.CallDelegate, ast.CpuThreadState);
             //	if (TailCall) Call = ast.TailCall(Call as AstNodeExprCall);
@@ -200,9 +200,9 @@ namespace ScePSP.Cpu.Emitter
             }
             else
             {
-                if (_DynarecConfig.AllowFastMemory && Memory.HasFixedGlobalAddress)
+                if (DynarecConfig.AllowFastMemory && Memory.HasFixedGlobalAddress)
                 {
-                    if (_DynarecConfig.EnableFastPspMemoryUtilsGetFastMemoryReader)
+                    if (DynarecConfig.EnableFastPspMemoryUtilsGetFastMemoryReader)
                     {
                         return ast.CallStatic(FastPspMemoryUtils.GetFastMemoryReader(Memory.FixedGlobalAddress), Address);
                     }
@@ -264,7 +264,7 @@ namespace ScePSP.Cpu.Emitter
         public AstNodeStm GetTickCall(bool Mandatory)
         {
             Mandatory = true;
-            if (Mandatory || _DynarecConfig.EmitCallTick)
+            if (Mandatory || DynarecConfig.EmitCallTick)
             {
                 return ast.Statement(ast.CallInstance(ast.CpuThreadState, (Action)ScePSP.Cpu.CpuThreadState.Methods.Tick));
             }

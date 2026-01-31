@@ -68,7 +68,6 @@ namespace ScePSP.GE
                     default: VertexAlignment = Align1; break;
                 }
             }
-            //public VertexTypeStruct VertexTypeStruct;
             this.BasePointer = BasePointer;
             //this.PointerOffset = PointerOffset;
         }
@@ -106,7 +105,7 @@ namespace ScePSP.GE
 
         protected void Align(int Size)
         {
-            // Fixme !
+            // Fix?
             while ((this.PointerOffset % Size) != 0)
             {
                 this.PointerOffset++;

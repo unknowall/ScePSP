@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace LightCodec.Utils
+﻿namespace LightCodec.Utils
 {
     public class BitReader : IBitReader
     {

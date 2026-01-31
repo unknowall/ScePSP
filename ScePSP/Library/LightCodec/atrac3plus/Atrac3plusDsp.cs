@@ -1,12 +1,9 @@
-﻿using System;
-using static System.Math;
-using LightCodec.Utils;
-using static LightCodec.atrac3plus.Atrac3plusDecoder;
+﻿using LightCodec.Utils;
+using static LightCodec.atrac3plus.Atrac3plusData2;
 using static LightCodec.atrac3plus.ChannelUnitContext;
+using static System.Math;
 using FFT = LightCodec.Utils.FFT;
 using SineWin = LightCodec.Utils.SineWin;
-using static LightCodec.atrac3plus.Atrac3plusData2;
-using Atrac3plusData2 = LightCodec.atrac3plus.Atrac3plusData2;
 
 namespace LightCodec.atrac3plus
 {

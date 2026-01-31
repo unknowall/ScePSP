@@ -1,113 +1,126 @@
-﻿using ScePSP.Devices;
+﻿using ScePSP.Crypto;
 using ScePSPUtils;
 using ScePSPUtils.Extensions;
+using ScePSPUtils.Streams;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Kirk = ScePSP.Devices.Crypto.Kirk;
 
-namespace ScePSP.Devices.Ipl
+namespace ScePSP.Core
 {
-    /// <see cref="http://silverspring.lan.st/NPSPTD_01.txt"/>
-    /// <see cref="http://daxhordes.org/forum/viewtopic.php?f=33&t=808"/>
-    public unsafe class IplReader
+    // Token: 0x02000057 RID: 87
+    public class IplReader
     {
-
-        protected Stream Stream;
-
-        public IplReader(NandReader nandReader)
+        // Token: 0x06000171 RID: 369 RVA: 0x00068694 File Offset: 0x00066894
+        public IplReader(NandReader NandReader)
         {
-            Stream = nandReader.SliceWithLength();
+            this.Stream = NandReader.SliceWithLength(0L, -1L, null);
         }
 
+        // Token: 0x06000172 RID: 370 RVA: 0x000686C0 File Offset: 0x000668C0
         public MemoryStream GetIplData()
         {
-            var memoryStream = new MemoryStream();
-            foreach (var blockOffset in GetIplOffsets().ToArray())
+            MemoryStream memoryStream = new MemoryStream();
+            foreach (ushort num in this.GetIplOffsets().ToArray<ushort>())
             {
-                //Console.WriteLine(BlockOffset);
-                Stream.Position = NandReader.BytesPerBlock * blockOffset;
-                memoryStream.WriteBytes(Stream.ReadBytes(NandReader.BytesPerBlock));
+                this.Stream.Position = (long)(16384 * num);
+                memoryStream.WriteBytes(this.Stream.ReadBytes(16384));
             }
-            memoryStream.Position = 0;
+            memoryStream.Position = 0L;
             return memoryStream;
         }
 
-        [StructLayout(LayoutKind.Sequential, Size = 0xF60)]
-        public struct IplBlock
+        // Token: 0x06000173 RID: 371 RVA: 0x00046B4A File Offset: 0x00044D4A
+        public IplReader.IplInfo LoadIplToMemory(Stream OutputStream)
         {
-            public uint LoadAddress;
-            public uint BlockSize;
-            public uint EntryFunction;
-            public uint Checksum;
-            public byte BlockData;
+            return IplReader.DecryptIplToMemory(this.GetIplData().ToArray().Skip(16384).ToArray<byte>(), OutputStream, true);
         }
 
-        public struct IplInfo
+        // Token: 0x06000174 RID: 372 RVA: 0x00046B6D File Offset: 0x00044D6D
+        public void WriteIplToFile(Stream StreamOut)
         {
-            public uint EntryFunction;
+            IplReader.DecryptIplToMemory(this.GetIplData().ToArray().Skip(16384).ToArray<byte>(), StreamOut, false);
         }
 
-        public IplInfo LoadIplToMemory(Stream outputStream)
+        // Token: 0x06000175 RID: 373 RVA: 0x00068728 File Offset: 0x00066928
+        public unsafe static IplReader.IplInfo DecryptIplToMemory(byte[] IplData, Stream OutputStream, bool ToMemoryAddress = true)
         {
-            return DecryptIplToMemory(GetIplData().ToArray().Skip(0x4000).ToArray(), outputStream,
-                toMemoryAddress: true);
-        }
-
-        public void WriteIplToFile(Stream streamOut)
-        {
-            DecryptIplToMemory(GetIplData().ToArray().Skip(0x4000).ToArray(), streamOut, toMemoryAddress: false);
-        }
-
-        public static IplInfo DecryptIplToMemory(byte[] iplData, Stream outputStream, bool toMemoryAddress = true)
-        {
-            var buffer = new byte[0x1000];
-            var iplInfo = default(IplInfo);
-
-            //ArrayUtils.HexDump(IplData);
-
-            fixed (byte* iplPtr = iplData)
-            fixed (byte* bufferPtr = buffer)
+            byte[] array = new byte[4096];
+            IplReader.IplInfo result = default(IplReader.IplInfo);
+            fixed (byte* ptr = IplData)
             {
-                for (var n = 0; n < iplData.Length; n += 0x1000)
+                fixed (byte* ptr2 = array)
                 {
-                    var ptr = iplPtr + n;
-
-                    var header = *(Kirk.Aes128CmacHeader*)ptr;
-                    //Console.WriteLine(Header.DataSize);
-                    var kirk = new Kirk();
-                    kirk.kirk_init();
-                    kirk.kirk_CMD1(bufferPtr, ptr, 0x1000, doCheck: false);
-                    var iplBlock = *(IplBlock*)bufferPtr;
-                    //Console.WriteLine(IplBlock.ToStringDefault());
-                    if (toMemoryAddress)
+                    for (int i = 0; i < IplData.Length; i += 4096)
                     {
-                        outputStream.Position = iplBlock.LoadAddress;
-                        Console.WriteLine("IplBlock.LoadAddress: 0x{0:X8}", iplBlock.LoadAddress);
-                    }
-                    outputStream.WriteBytes(PointerUtils.PointerToByteArray(&iplBlock.BlockData,
-                        (int)iplBlock.BlockSize));
-                    if (iplBlock.EntryFunction != 0)
-                    {
-                        iplInfo.EntryFunction = iplBlock.EntryFunction;
+                        byte* ptr3 = ptr + i;
+                        Kirk.AES128CMACHeader aes128CMACHeader = *(Kirk.AES128CMACHeader*)ptr3;
+                        Kirk kirk = new Kirk();
+                        kirk.kirk_init();
+                        kirk.kirk_CMD1(ptr2, ptr3, 4096, false);
+                        IplReader.IplBlock iplBlock = *(IplReader.IplBlock*)ptr2;
+                        if (ToMemoryAddress)
+                        {
+                            OutputStream.Position = (long)((ulong)iplBlock.LoadAddress);
+                            Console.WriteLine("IplBlock.LoadAddress: 0x{0:X8}", iplBlock.LoadAddress);
+                        }
+                        OutputStream.WriteBytes(PointerUtils.PointerToByteArray(&iplBlock.BlockData, (int)iplBlock.BlockSize));
+                        if (iplBlock.EntryFunction != 0u)
+                        {
+                            result.EntryFunction = iplBlock.EntryFunction;
+                        }
                     }
                 }
             }
-
-            return iplInfo;
+            return result;
         }
 
+        // Token: 0x06000176 RID: 374 RVA: 0x0006884C File Offset: 0x00066A4C
         public IEnumerable<ushort> GetIplOffsets()
         {
-            var stream = Stream.SliceWithLength(NandReader.BytesPerBlock * 4);
-            while (true)
+            SliceStream Stream = this.Stream.SliceWithLength(65536L, -1L, null);
+            for (; ; )
             {
-                var result = stream.ReadStruct<ushort>();
-                if (result == 0) break;
-                yield return result;
+                ushort Result = Stream.ReadStruct<ushort>();
+                if (Result == 0)
+                {
+                    break;
+                }
+                yield return Result;
             }
+            yield break;
+        }
+
+        // Token: 0x040001C3 RID: 451
+        protected Stream Stream;
+
+        // Token: 0x02000058 RID: 88
+        [StructLayout(LayoutKind.Sequential, Size = 3936)]
+        public struct IplBlock
+        {
+            // Token: 0x040001C4 RID: 452
+            public uint LoadAddress;
+
+            // Token: 0x040001C5 RID: 453
+            public uint BlockSize;
+
+            // Token: 0x040001C6 RID: 454
+            public uint EntryFunction;
+
+            // Token: 0x040001C7 RID: 455
+            public uint Checksum;
+
+            // Token: 0x040001C8 RID: 456
+            public byte BlockData;
+        }
+
+        // Token: 0x02000059 RID: 89
+        public struct IplInfo
+        {
+            // Token: 0x040001C9 RID: 457
+            public uint EntryFunction;
         }
     }
 }

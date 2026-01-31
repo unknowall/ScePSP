@@ -10,19 +10,10 @@ namespace ScePSP.GE.State.SubStates
         /// </summary>
         public bool Enabled;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public ColorfStruct Color;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public float Dist;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public float End;
 
         /// <summary>
@@ -30,14 +21,8 @@ namespace ScePSP.GE.State.SubStates
         /// </summary>
         public float Density;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public int Mode;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public int Hint;
     }
 }

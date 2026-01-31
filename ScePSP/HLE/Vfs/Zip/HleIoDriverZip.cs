@@ -34,7 +34,7 @@ namespace ScePSP.Hle.Vfs.Zip
             }
             catch (KeyNotFoundException)
             {
-                throw new FileNotFoundException("Can't find file '" + FileName + "' on ZipFile");
+                throw (new FileNotFoundException("Can't find file '" + FileName + "' on ZipFile"));
             }
         }
 
@@ -62,7 +62,7 @@ namespace ScePSP.Hle.Vfs.Zip
             return FileArgument.Seek(Offset, (SeekOrigin)Whence);
         }
 
-        public unsafe int IoIoctl(HleIoDrvFileArg HleIoDrvFileArg, uint Command, Span<byte> Input, Span<byte> Output)
+        public unsafe int IoIoctl(HleIoDrvFileArg HleIoDrvFileArg, uint Command, byte* InputPointer, int InputLength, byte* OutputPointer, int OutputLength)
         {
             throw new NotImplementedException();
         }
@@ -109,7 +109,7 @@ namespace ScePSP.Hle.Vfs.Zip
             }
             catch (KeyNotFoundException)
             {
-                throw new FileNotFoundException("Can't find file '" + FileName + "' on ZipFile");
+                throw (new FileNotFoundException("Can't find file '" + FileName + "' on ZipFile"));
             }
         }
 
@@ -138,8 +138,7 @@ namespace ScePSP.Hle.Vfs.Zip
             throw new NotImplementedException();
         }
 
-        public unsafe int IoDevctl(HleIoDrvFileArg HleIoDrvFileArg, string DeviceName, uint Command, Span<byte> Input,
-            Span<byte> Output, ref bool DoDleay)
+        public unsafe int IoDevctl(HleIoDrvFileArg HleIoDrvFileArg, string DeviceName, uint Command, byte* InputPointer, int InputLength, byte* OutputPointer, int OutputLength)
         {
             throw new NotImplementedException();
         }

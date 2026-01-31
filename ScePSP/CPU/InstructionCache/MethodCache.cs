@@ -1,6 +1,6 @@
-﻿using LightCodec.h264.decoder;
-using LightGL.DynamicLibrary;
+﻿using LightGL.DynamicLibrary;
 using SafeILGenerator.Ast.Generators;
+using ScePSP.Core;
 using ScePSP.Cpu.Dynarec;
 using ScePSP.Cpu.Emitter;
 using ScePSP.Memory;
@@ -13,37 +13,67 @@ using System.Threading;
 
 namespace ScePSP.Cpu.InstructionCache
 {
-    public sealed class MethodCache
+    public sealed class MethodCache : IContextInitialize
     {
         public static readonly MethodCache Methods = new MethodCache();
 
         private static readonly AstMipsGenerator ast = AstMipsGenerator.Instance;
         private static readonly GeneratorIL GeneratorILInstance = new GeneratorIL();
 
-        private readonly Dictionary<uint, MethodCacheInfo> MethodMapping = new Dictionary<uint, MethodCacheInfo>(64 * 1024);
+        public readonly Dictionary<uint, MethodCacheInfo> MethodMapping = new Dictionary<uint, MethodCacheInfo>(64 * 1024);
+        public Dictionary<uint, DynarecFunction> Functions = new Dictionary<uint, DynarecFunction>();
         public IEnumerable<uint> PCs { get { return MethodMapping.Keys; } }
+        public IEnumerable<uint> FUNCs { get { return Functions.Keys; } }
 
-        public CpuProcessor CpuProcessor => PSPDrivers.CPU;
+        [Context]
+        public CpuProcessor CpuProcessor;
 
-        public MethodCompilerThread MethodCompilerThread;
-        public bool Runing = true;
+        [Context]
+        public PspStoredConfig StoredConfig;
 
-        public MethodCache()
+        private Thread Thread;
+        public bool Runing;
+
+        private ThreadMessageBus<uint> ExploreQueue = new ThreadMessageBus<uint>();
+        AutoResetEvent CompletedFunction = new AutoResetEvent(false);
+
+        void IContextInitialize.Initialize()
         {
-            MethodCompilerThread = new MethodCompilerThread(CpuProcessor, this);
+            Runing = true;
+            Thread = new Thread(ThreadMain);
+            Thread.Name = "DynaracThread";
+            Thread.Start();
+        }
+
+        public void Dispose()
+        {
+            Runing = false;
+            ExploreQueue.Add(0xDEAD);
         }
 
         public MethodCacheInfo GetForPC(uint PC)
         {
+            if (!Runing) throw new OperationCanceledException("Stop CPU Core");
+
             if (MethodMapping.ContainsKey(PC))
             {
                 return MethodMapping[PC];
             }
             else
             {
-                var DelegateGeneratorForPC = GeneratorILInstance.GenerateDelegate<Action<CpuThreadState>>("MethodCache.DynamicCreateNewFunction", ast.Statements(
-                    ast.Statement(ast.CallInstance(ast.CpuThreadState, (Action<MethodCacheInfo, uint>)CpuThreadState.Methods._MethodCacheInfo_SetInternal, ast.GetMethodCacheInfoAtPC(PC), PC)),
-                    ast.Statement(ast.TailCall(ast.CallInstance(ast.GetMethodCacheInfoAtPC(PC), (Action<CpuThreadState>)MethodCacheInfo.Methods.CallDelegate, ast.CpuThreadState))),
+                var DelegateGeneratorForPC = GeneratorILInstance.GenerateDelegate<Action<CpuThreadState>>(
+                    "MethodCache.DynamicCreateNewFunction",
+
+                    ast.Statements(
+                        ast.Statement(
+                            ast.CallInstance(
+                                ast.CpuThreadState, (Action<MethodCacheInfo, uint>)CpuThreadState.Methods.GetFunc, ast.GetMethodCacheInfoAtPC(PC), PC)),
+
+                    ast.Statement(
+                        ast.TailCall(
+                            ast.CallInstance(
+                                ast.GetMethodCacheInfoAtPC(PC), (Action<CpuThreadState>)MethodCacheInfo.Methods.CallDelegate, ast.CpuThreadState))),
+
                     ast.Return()
                 ));
                 return MethodMapping[PC] = new MethodCacheInfo(this, DelegateGeneratorForPC, PC);
@@ -61,16 +91,14 @@ namespace ScePSP.Cpu.InstructionCache
             {
                 MethodCacheInfo.Free();
             }
+
+            Functions.Clear();
         }
 
         public void FlushRange(uint Start, uint End)
         {
-            //Console.Error.WriteLine("[{0}]", MethodMapping);
-            //Console.Error.WriteLine("[{0}]", MethodMapping.Values);
             foreach (var MethodCacheInfo in MethodMapping.Values.ToArray())
-            //foreach (var MethodCacheInfo in MethodMapping.Values)
             {
-                //Console.Error.WriteLine("[{0}]", MethodCacheInfo);
                 if (MethodCacheInfo.MaxPC >= Start && MethodCacheInfo.MinPC <= End)
                 {
                     MethodCacheInfo.Free();
@@ -78,122 +106,49 @@ namespace ScePSP.Cpu.InstructionCache
             }
         }
 
-        public void _MethodCacheInfo_SetInternal(CpuThreadState CpuThreadState, MethodCacheInfo MethodCacheInfo, uint PC)
+        public void GetFunc(CpuThreadState CpuThreadState, MethodCacheInfo MethodCacheInfo, uint PC)
         {
-            MethodCacheInfo.SetDynarecFunction(MethodCompilerThread.GetDynarecFunctionForPC(PC));
-        }
-    }
-
-    public class ThreadMessageBus<T>
-    {
-        private LinkedList<T> Queue = new LinkedList<T>();
-        private ManualResetEvent HasItems = new ManualResetEvent(false);
-
-        public void AddFirst(T item)
-        {
-            lock (this)
+            if (!this.Functions.ContainsKey(PC))
             {
-                Queue.AddFirst(item);
-                HasItems.Set();
+                var Func = CpuProcessor.DynarecFunctionCompiler.CreateFunction(new InstructionStreamReader(new PspMemoryStream(CpuProcessor.Memory)), PC);
+
+                Functions[PC] = Func;
+
+                if (DynarecConfig.AllowCreatingUsedFunctionsInBackground)
+                    foreach (var callpc in Func.CallingPCs) AddQueue(callpc);
             }
+            MethodCacheInfo.SetDynarecFunction(Functions[PC]);
         }
 
-        public void AddLast(T item)
+        private void ThreadMain()
         {
-            lock (this)
+            while (Runing)
             {
-                Queue.AddLast(item);
-                HasItems.Set();
+                var PC = ExploreQueue.ReadOne();
+                if (_ShouldAdd(PC) && Runing)
+                {
+                    var DynarecFunction = _GenerateForPC(PC);
+                    lock (this) this.Functions[PC] = DynarecFunction;
+                }
+                CompletedFunction.Set();
             }
-        }
-
-        public T ReadOne()
-        {
-            lock (this)
-            {
-                HasItems.WaitOne();
-                var item = Queue.First.Value;
-                Queue.RemoveFirst();
-                if (Queue.Count == 0) HasItems.Reset();
-                return item;
-            }
-        }
-    }
-
-    public class MethodCompilerThread
-    {
-        private Thread Thread;
-        private Dictionary<uint, DynarecFunction> Functions = new Dictionary<uint, DynarecFunction>();
-        private HashSet<uint> ExploringPCs = new HashSet<uint>();
-        private ThreadMessageBus<uint> ExploreQueue = new ThreadMessageBus<uint>();
-        private CpuProcessor CpuProcessor;
-        private MethodCache MethodCache;
-
-        public MethodCompilerThread(CpuProcessor CpuProcessor, MethodCache MethodCache)
-        {
-            this.CpuProcessor = CpuProcessor;
-            this.MethodCache = MethodCache;
-            this.Thread = new Thread(Main)
-            {
-                IsBackground = true
-            };
-            this.Thread.Start();
-        }
-
-        public void Clear()
-        {
-            Functions.Clear();
-            ExploringPCs.Clear();
         }
 
         private bool _ShouldAdd(uint PC)
         {
-            return !Functions.ContainsKey(PC) && !ExploringPCs.Contains(PC);
+            return !Functions.ContainsKey(PC) && !MethodMapping.ContainsKey(PC) && PspMemory.IsAddressValid(PC);
         }
 
-        public void AddPCNow(uint PC)
+        public void AddQueue(uint PC)
         {
-            lock (this)
-            {
-                if (_ShouldAdd(PC))
-                {
-                    ExploringPCs.Add(PC);
-                    ExploreQueue.AddFirst(PC);
-                }
-            }
-        }
-
-        public void AddPCLater(uint PC)
-        {
-            lock (this)
-            {
-                if (_ShouldAdd(PC))
-                {
-                    ExploringPCs.Add(PC);
-                    ExploreQueue.AddLast(PC);
-                }
-            }
-        }
-
-        AutoResetEvent CompletedFunction = new AutoResetEvent(false);
-
-        private void Main()
-        {
-            while (MethodCache.Runing)
-            {
-                var PC = ExploreQueue.ReadOne();
-                //Console.Write("Compiling {0:X8}...", PC);
-                var DynarecFunction = _GenerateForPC(PC);
-                lock (this) this.Functions[PC] = DynarecFunction;
-                //Console.WriteLine("Ok");
-                CompletedFunction.Set();
-            }
+            ExploreQueue.Add(PC);
         }
 
         private DynarecFunction _GenerateForPC(uint PC)
         {
             var Memory = CpuProcessor.Memory;
-            if (_DynarecConfig.DebugFunctionCreation)
+
+            if (DynarecConfig.DebugFunctionCreation)
             {
                 Console.Write("PC=0x{0:X8}...", PC);
             }
@@ -203,20 +158,9 @@ namespace ScePSP.Cpu.InstructionCache
             var DynarecFunction = CpuProcessor.DynarecFunctionCompiler.CreateFunction(new InstructionStreamReader(new PspMemoryStream(Memory)), PC);
             if (DynarecFunction.EntryPC != PC) throw (new Exception("Unexpected error"));
 
-            if (_DynarecConfig.AllowCreatingUsedFunctionsInBackground)
-            {
-                foreach (var CallingPC in DynarecFunction.CallingPCs)
-                {
-                    if (PspMemory.IsAddressValid(CallingPC))
-                    {
-                        AddPCLater(CallingPC);
-                    }
-                }
-            }
-
             var Time1 = DateTime.UtcNow;
 
-            if (_DynarecConfig.ImmediateLinking)
+            if (DynarecConfig.ImmediateLinking)
             {
                 try
                 {
@@ -233,11 +177,10 @@ namespace ScePSP.Cpu.InstructionCache
             }
 
             var Time2 = DateTime.UtcNow;
-
             DynarecFunction.TimeLinking = Time2 - Time1;
             var TimeAstGeneration = Time1 - Time0;
 
-            if (_DynarecConfig.DebugFunctionCreation)
+            if (DynarecConfig.DebugFunctionCreation)
             {
                 ConsoleUtils.SaveRestoreConsoleColor(((TimeAstGeneration + DynarecFunction.TimeLinking).TotalMilliseconds > 10) ? ConsoleColor.Red : ConsoleColor.Gray, () =>
                 {
@@ -254,21 +197,32 @@ namespace ScePSP.Cpu.InstructionCache
                     );
                 });
             }
-
             //DynarecFunction.AstNode = DynarecFunction.AstNode.Optimize(CpuProcessor);
-
             return DynarecFunction;
         }
+    }
 
-        public DynarecFunction GetDynarecFunctionForPC(uint PC)
+    public class ThreadMessageBus<T>
+    {
+        private Queue<T> Queue = new Queue<T>();
+        private AutoResetEvent HasItems = new AutoResetEvent(false);
+
+        public void Add(T item)
         {
             lock (this)
             {
-                if (!this.Functions.ContainsKey(PC))
-                {
-                    this.Functions[PC] = CpuProcessor.DynarecFunctionCompiler.CreateFunction(new InstructionStreamReader(new PspMemoryStream(CpuProcessor.Memory)), PC);
-                }
-                return this.Functions[PC];
+                Queue.Enqueue(item);
+                HasItems.Set();
+            }
+        }
+
+        public T ReadOne()
+        {
+            HasItems.WaitOne();
+
+            lock (this)
+            {
+                return Queue.Dequeue();
             }
         }
     }

@@ -28,21 +28,12 @@ namespace ScePSP.Hle
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="NewItemsFirst"></param>
-        /// <param name="ThrowException"></param>
         public PreemptiveScheduler(bool NewItemsFirst, bool ThrowException = true)
         {
             this.NewItemsFirst = NewItemsFirst;
             this.ThrowException = ThrowException;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="PreemptiveItem"></param>
         public void Remove(T PreemptiveItem)
         {
             lock (this)
@@ -51,10 +42,6 @@ namespace ScePSP.Hle
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Item"></param>
         public void Update(T Item)
         {
             lock (this)
@@ -100,20 +87,10 @@ namespace ScePSP.Hle
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public int CurrentHighestPriority { get; private set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public T Current { get; private set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <remarks>If an item changes its priority, this method should be executed.</remarks>
         public bool ReScheduleHighestPriority()
         {
             lock (this)
@@ -121,7 +98,7 @@ namespace ScePSP.Hle
                 var ReadyItems = Items.Where(Item => Item.Ready);
                 if (!ReadyItems.Any())
                 {
-                    if (ThrowException) throw new Exception("No items to schedule");
+                    if (ThrowException) throw (new Exception("No items to schedule"));
                     return false;
                 }
                 else
@@ -138,9 +115,6 @@ namespace ScePSP.Hle
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void Next()
         {
             lock (this)

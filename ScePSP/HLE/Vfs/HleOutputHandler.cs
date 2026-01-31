@@ -4,13 +4,9 @@ namespace ScePSP.Hle
 {
     public class HleOutputHandler
     {
-        public HleOutputHandler()
-        {
-        }
-
         public virtual void Output(string Output)
         {
-            Console.WriteLine("     {0}", Output);
+            Console.WriteLine("   OUTPUT:  {0}", Output);
         }
     }
 }

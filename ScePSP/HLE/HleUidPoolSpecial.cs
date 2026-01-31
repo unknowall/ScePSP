@@ -9,7 +9,7 @@ namespace ScePSP.Hle.Managers
     {
         protected TKey LastId = default(TKey);
         protected Dictionary<TKey, TType> Items = new Dictionary<TKey, TType>();
-        protected SceKernelErrors OnKeyNotFoundError = unchecked((SceKernelErrors)0xDEAD0017);
+        protected SceKernelErrors OnKeyNotFoundError = unchecked((SceKernelErrors)(0xDEAD0017));
 
         public HleUidPoolSpecial()
         {
@@ -33,18 +33,14 @@ namespace ScePSP.Hle.Managers
 
         static Type TKeyType = typeof(TKey);
 
-        private long TKeyToLong(TKey Value)
-        {
-            return Convert.ToInt64(Value);
-        }
-
+        private long TKeyToLong(TKey Value) { return Convert.ToInt64(Value); }
         private TKey LongToTKey(long Value)
         {
             if (TKeyType.IsEnum)
             {
                 return (TKey)Enum.ToObject(typeof(TKey), Value);
             }
-            if (TKeyType == typeof(int)) return (TKey)(object)(int)Value;
+            if (TKeyType == typeof(int)) return (TKey)(object)(Int32)Value;
             return (TKey)(object)Value;
         }
 
@@ -56,22 +52,22 @@ namespace ScePSP.Hle.Managers
         }
 
         /*
-        public TKey? Find(TType Value)
-        {
-            foreach (var Pair in Items) if (Pair.Value.Equals(Value)) return Pair.Key;
-            return null;
-        }
+		public TKey? Find(TType Value)
+		{
+			foreach (var Pair in Items) if (Pair.Value.Equals(Value)) return Pair.Key;
+			return null;
+		}
 
-        public TKey GetOrCreate(TType Item)
-        {
-            var Result = Find(Item);
-            if (Result == null)
-            {
-                Result = Create(Item);
-            }
-            return Result.Value;
-        }
-        */
+		public TKey GetOrCreate(TType Item)
+		{
+			var Result = Find(Item);
+			if (Result == null)
+			{
+				Result = Create(Item);
+			}
+			return Result.Value;
+		}
+		*/
 
         public bool Contains(TKey Id)
         {
@@ -82,7 +78,7 @@ namespace ScePSP.Hle.Managers
         {
             if (!Items.ContainsKey(Id))
             {
-                throw new SceKernelException(OnKeyNotFoundError);
+                throw (new SceKernelException(OnKeyNotFoundError));
             }
             return Items[Id];
         }
@@ -99,7 +95,7 @@ namespace ScePSP.Hle.Managers
         {
             if (!Items.ContainsKey(Id))
             {
-                throw new SceKernelException(OnKeyNotFoundError);
+                throw (new SceKernelException(OnKeyNotFoundError));
             }
             var Item = Items[Id];
             Items.Remove(Id);

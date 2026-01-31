@@ -27,17 +27,9 @@ namespace ScePSP.Hle.Managers
         Binary = 4,
     }
 
-    public enum RegHandle : uint
-    {
-    }
-
-    public enum RegCategoryHandle : uint
-    {
-    }
-
-    public enum RegKeyHandle : uint
-    {
-    }
+    public enum RegHandle : uint { }
+    public enum RegCategoryHandle : uint { }
+    public enum RegKeyHandle : uint { }
 
     public class HleRegistryNode : IDisposable
     {
@@ -63,7 +55,6 @@ namespace ScePSP.Hle.Managers
         public string Name;
         public RegKeyTypes Type;
         protected object _Value;
-
         public object Value
         {
             set
@@ -83,19 +74,21 @@ namespace ScePSP.Hle.Managers
                 }
                 else
                 {
-                    throw new NotImplementedException("Unknown type '" + value.GetType() + "'");
+                    throw (new NotImplementedException("Unknown type '" + value.GetType() + "'"));
                 }
             }
-            get => _Value;
+            get
+            {
+                return _Value;
+            }
         }
-
         public uint Size
         {
             get
             {
                 switch (Type)
                 {
-                    case RegKeyTypes.Binary: throw new NotImplementedException();
+                    case RegKeyTypes.Binary: throw (new NotImplementedException());
                     case RegKeyTypes.Directory: return (uint)((string)Value).Length;
                     case RegKeyTypes.Integer: return sizeof(uint);
                     case RegKeyTypes.String: return (uint)((string)Value).Length;
@@ -108,13 +101,13 @@ namespace ScePSP.Hle.Managers
         {
             switch (Type)
             {
-                case RegKeyTypes.Binary: throw new NotImplementedException();
-                case RegKeyTypes.Directory: throw new NotImplementedException();
+                case RegKeyTypes.Binary: throw (new NotImplementedException());
+                case RegKeyTypes.Directory: throw (new NotImplementedException());
                 case RegKeyTypes.Integer:
                     *(uint*)Buffer = (uint)Value;
                     break;
-                case RegKeyTypes.String: throw new NotImplementedException();
-                default: throw new NotImplementedException();
+                case RegKeyTypes.String: throw (new NotImplementedException());
+                default: throw (new NotImplementedException());
             }
         }
     }
@@ -122,9 +115,7 @@ namespace ScePSP.Hle.Managers
     public class HleRegistryCategoryNode : IDisposable
     {
         HleRegistryNode HleRegistryNode;
-
         string Name;
-
         Dictionary<RegKeyHandle, HleRegistryKeyNode> HleRegistryKeyNodeList = new Dictionary<RegKeyHandle, HleRegistryKeyNode>();
 
         public HleRegistryCategoryNode(HleConfig HleConfig, HleRegistryNode HleRegistryNode, string Name)
@@ -156,7 +147,7 @@ namespace ScePSP.Hle.Managers
             }
             catch (InvalidOperationException)
             {
-                throw new KeyNotFoundException("Can't find key '" + Name + "'");
+                throw (new KeyNotFoundException("Can't find key '" + Name + "'"));
             }
         }
 

@@ -1,46 +1,40 @@
 ﻿using ScePSP.Cpu;
-using ScePSP.Hle.Interop;
 using ScePSP.Hle.Vfs.MemoryStick;
 using System;
 using System.Collections.Generic;
-
-#pragma warning disable 649
-#pragma warning disable 169
 
 namespace ScePSP.Hle.Managers
 {
     public class HleCallbackManager : IMemoryStickEventHandler
     {
         public HleUidPool<HleCallback> Callbacks { get; protected set; }
+        private Queue<HleCallback> ScheduledCallbacks = new Queue<HleCallback>();
 
-        private readonly Queue<HleCallback> _scheduledCallbacks = new Queue<HleCallback>();
+        [Context]
+        private CpuProcessor CpuProcessor;
 
-        private CpuProcessor _cpuProcessor => PSPDrivers.CPU;
+        [Context]
+        private HleInterop HleInterop;
 
-        private HleInterop _hleInterop => PSPDrivers.HLE.HleInterop;
-
-        public HleCallbackManager()
+        private HleCallbackManager()
         {
-            Callbacks = new HleUidPool<HleCallback>();
+            this.Callbacks = new HleUidPool<HleCallback>();
         }
 
-        public void ScheduleCallback(HleCallback hleCallback)
+        public void ScheduleCallback(HleCallback HleCallback)
         {
-            //Console.WriteLine("ScheduleCallback! {0}", hleCallback);
+            //Console.WriteLine("ScheduleCallback! {0}", HleCallback);
             lock (this)
             {
-                _scheduledCallbacks.Enqueue(hleCallback);
+                this.ScheduledCallbacks.Enqueue(HleCallback);
             }
         }
 
         public HleCallback DequeueScheduledCallback()
         {
-            lock (this)
-            {
-                var hleCallback = _scheduledCallbacks.Dequeue();
-                //Console.WriteLine("DequeueScheduledCallback! : {0}", hleCallback);
-                return hleCallback;
-            }
+            var HleCallback = ScheduledCallbacks.Dequeue();
+            //Console.WriteLine("DequeueScheduledCallback! : {0}", HleCallback);
+            return HleCallback;
         }
 
         public bool HasScheduledCallbacks
@@ -49,65 +43,67 @@ namespace ScePSP.Hle.Managers
             {
                 lock (this)
                 {
-                    return _scheduledCallbacks.Count > 0;
+                    return ScheduledCallbacks.Count > 0;
                 }
             }
         }
 
-        public int ExecuteQueued(CpuThreadState cpuThreadState, bool mustReschedule)
+        public int ExecuteQueued(CpuThreadState CpuThreadState, bool MustReschedule)
         {
-            var executedCount = 0;
+            int ExecutedCount = 0;
 
             //Console.WriteLine("ExecuteQueued");
-            if (!HasScheduledCallbacks) return executedCount;
-            //Console.WriteLine("ExecuteQueued.HasScheduledCallbacks!");
-            //Console.Error.WriteLine("STARTED CALLBACKS");
-            while (HasScheduledCallbacks)
+            if (HasScheduledCallbacks)
             {
-                var hleCallback = DequeueScheduledCallback();
+                //Console.WriteLine("ExecuteQueued.HasScheduledCallbacks!");
+                //Console.Error.WriteLine("STARTED CALLBACKS");
+                while (HasScheduledCallbacks)
+                {
+                    var HleCallback = DequeueScheduledCallback();
+                    Console.Out.WriteLineColored(ConsoleColor.Yellow, "Execute: {0}", HleCallback);
+                    /*
+					var FakeCpuThreadState = new CpuThreadState(CpuProcessor);
+					FakeCpuThreadState.CopyRegistersFrom(CpuThreadState);
+					HleCallback.SetArgumentsToCpuThreadState(FakeCpuThreadState);
 
-                /*
-                    var FakeCpuThreadState = new CpuThreadState(CpuProcessor);
-                    FakeCpuThreadState.CopyRegistersFrom(CpuThreadState);
-                    HleCallback.SetArgumentsToCpuThreadState(FakeCpuThreadState);
+					if (FakeCpuThreadState.PC == 0x88040E0) FakeCpuThreadState.PC = 0x880416C;
+					*/
+                    //Console.WriteLine("ExecuteCallback: PC=0x{0:X}", FakeCpuThreadState.PC);
+                    //Console.WriteLine("               : A0=0x{0:X}", FakeCpuThreadState.GPR[4]);
+                    //Console.WriteLine("               : A1=0x{0:X}", FakeCpuThreadState.GPR[5]);
+                    try
+                    {
+                        HleInterop.ExecuteFunctionNow(HleCallback.Function, HleCallback.Arguments);
+                    }
+                    catch (Exception Exception)
+                    {
+                        Console.Error.WriteLine(Exception);
+                    }
+                    finally
+                    {
+                        //Console.WriteLine("               : PC=0x{0:X}", FakeCpuThreadState.PC);
+                        ExecutedCount++;
+                    }
 
-                    if (FakeCpuThreadState.PC == 0x88040E0) FakeCpuThreadState.PC = 0x880416C;
-                    */
-                //Console.WriteLine("ExecuteCallback: PC=0x{0:X}", FakeCpuThreadState.PC);
-                //Console.WriteLine("               : A0=0x{0:X}", FakeCpuThreadState.GPR[4]);
-                //Console.WriteLine("               : A1=0x{0:X}", FakeCpuThreadState.GPR[5]);
-                try
-                {
-                    _hleInterop.ExecuteFunctionNow(hleCallback.Function, hleCallback.Arguments);
-                }
-                catch (Exception e)
-                {
-                    Console.Error.WriteLine(e);
-                }
-                finally
-                {
-                    //Console.WriteLine("               : PC=0x{0:X}", FakeCpuThreadState.PC);
-                    executedCount++;
+                    //Console.Error.WriteLine("  CALLBACK ENDED : " + HleCallback);
+                    if (MustReschedule)
+                    {
+                        //Console.Error.WriteLine("    RESCHEDULE");
+                        break;
+                    }
                 }
 
-                //Console.Error.WriteLine("  CALLBACK ENDED : " + HleCallback);
-                if (mustReschedule)
-                {
-                    //Console.Error.WriteLine("    RESCHEDULE");
-                    break;
-                }
+                ExecutedCount += HleInterop.ExecuteAllQueuedFunctionsNow();
+                //Console.Error.WriteLine("ENDED CALLBACKS");
             }
 
-            executedCount += _hleInterop.ExecuteAllQueuedFunctionsNow();
-            //Console.Error.WriteLine("ENDED CALLBACKS");
-
-            return executedCount;
+            return ExecutedCount;
         }
 
-        void IMemoryStickEventHandler.ScheduleCallback(int callbackId, int arg1, int arg2)
+        void IMemoryStickEventHandler.ScheduleCallback(int CallbackId, int Arg1, int Arg2)
         {
-            var callback = Callbacks.Get(callbackId);
-            ScheduleCallback(callback.Clone().PrependArguments(arg1, arg2));
+            var Callback = Callbacks.Get(CallbackId);
+            ScheduleCallback(Callback.Clone().PrependArguments(Arg1, Arg2));
             //Console.WriteLine("IMemoryStickEventHandler.ScheduleCallback");
         }
     }

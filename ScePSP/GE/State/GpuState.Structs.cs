@@ -117,6 +117,11 @@ namespace ScePSP.GE.State
             return R == this.Red && G == this.Green && B == this.Blue;
         }
 
+        public bool IsColorf(float R, float G, float B, float A)
+        {
+            return R == this.Red && G == this.Green && B == this.Blue && A == this.Alpha;
+        }
+
         public static ColorfStruct operator +(ColorfStruct Left, ColorfStruct Right)
         {
             return new ColorfStruct()
@@ -128,10 +133,14 @@ namespace ScePSP.GE.State
             };
         }
 
-
         public Vector4 ToVector4()
         {
             return new Vector4(Red, Green, Blue, Alpha);
+        }
+
+        public Vector3 ToVector3()
+        {
+            return new Vector3(Red, Green, Blue);
         }
     }
 }

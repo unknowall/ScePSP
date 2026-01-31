@@ -8,8 +8,7 @@ namespace ScePSP.Hle.Vfs.MemoryStick
         PspMemory Memory;
         IMemoryStickEventHandler MemoryStickEventHandler;
 
-        public HleIoDriverMemoryStick(PspMemory Memory, IMemoryStickEventHandler MemoryStickEventHandler,
-            IHleIoDriver HleIoDriver)
+        public HleIoDriverMemoryStick(PspMemory Memory, IMemoryStickEventHandler MemoryStickEventHandler, IHleIoDriver HleIoDriver)
             : base(HleIoDriver)
         {
             this.Memory = Memory;
@@ -35,8 +34,18 @@ namespace ScePSP.Hle.Vfs.MemoryStick
             public uint SectorCount;
         }
 
-        public override int IoDevctl(HleIoDrvFileArg HleIoDrvFileArg, string DeviceName, uint Command,
-            Span<byte> Input, Span<byte> Output, ref bool DoDleay)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="HleIoDrvFileArg"></param>
+        /// <param name="DeviceName"></param>
+        /// <param name="Command"></param>
+        /// <param name="InputPointer"></param>
+        /// <param name="InputLength"></param>
+        /// <param name="OutputPointer"></param>
+        /// <param name="OutputLength"></param>
+        /// <returns></returns>
+        public override int IoDevctl(HleIoDrvFileArg HleIoDrvFileArg, string DeviceName, uint Command, byte* InputPointer, int InputLength, byte* OutputPointer, int OutputLength)
         {
             //Console.Error.WriteLine("MemoryStick.IoDevctl: ({0}, 0x{1:X})", DeviceName, Command);
 
@@ -44,14 +53,16 @@ namespace ScePSP.Hle.Vfs.MemoryStick
             {
                 case CommandType.CheckInserted:
                     {
+                        if (OutputPointer == null || OutputLength < 4) return (int)SceKernelErrors.ERROR_ERRNO_INVALID_ARGUMENT;
                         // 0 - Device is not assigned (callback not registered).
                         // 1 - Device is assigned (callback registered).
-                        ReinterpretSpan<uint>(Output)[0] = 1;
+                        *(uint*)OutputPointer = 1;
                         return 0;
                     }
                 case CommandType.MScmRegisterMSInsertEjectCallback:
                     {
-                        var CallbackId = ReinterpretSpan<int>(Input)[0];
+                        if (InputPointer == null || InputLength < 4) return (int)SceKernelErrors.ERROR_ERRNO_INVALID_ARGUMENT;
+                        int CallbackId = *(int*)InputPointer;
                         MemoryStickEventHandler.ScheduleCallback(CallbackId, 1, 1);
                         //var Callback = CallbackManager.Callbacks.Get(CallbackId);
                         //CallbackManager.ScheduleCallback(
@@ -70,14 +81,14 @@ namespace ScePSP.Hle.Vfs.MemoryStick
                     }
                 case CommandType.GetMemoryStickCapacity:
                     {
-                        var SizeInfo = (SizeInfoStruct*)Memory.PspAddressToPointerSafe(ReinterpretSpan<uint>(Input)[0]);
-                        var MemoryStickSectorSize = 32 * 1024;
+                        if (InputPointer == null || InputLength < 4) return (int)SceKernelErrors.ERROR_ERRNO_INVALID_ARGUMENT;
+                        var SizeInfo = (SizeInfoStruct*)Memory.PspAddressToPointerSafe(*(uint*)InputPointer);
+                        var MemoryStickSectorSize = (32 * 1024);
                         //var TotalSpaceInBytes = 2L * 1024 * 1024 * 1024;
                         var FreeSpaceInBytes = 1L * 1024 * 1024 * 1024;
                         SizeInfo->SectorSize = 0x200;
                         SizeInfo->SectorCount = (uint)(MemoryStickSectorSize / SizeInfo->SectorSize);
-                        SizeInfo->MaxClusters = (uint)(FreeSpaceInBytes * 95 / 100) /
-                                                (SizeInfo->SectorSize * SizeInfo->SectorCount);
+                        SizeInfo->MaxClusters = (uint)(FreeSpaceInBytes * 95 / 100) / (SizeInfo->SectorSize * SizeInfo->SectorCount);
                         SizeInfo->FreeClusters = SizeInfo->MaxClusters;
                         SizeInfo->MaxSectors = SizeInfo->MaxClusters;
 
@@ -87,15 +98,15 @@ namespace ScePSP.Hle.Vfs.MemoryStick
                     // Ignore.
                     return 0;
                 case CommandType.CheckMemoryStickIsInserted:
-                    ReinterpretSpan<uint>(Output)[0] = 1;
+                    *((uint*)OutputPointer) = 1;
                     return 0;
                 case CommandType.CheckMemoryStickStatus:
                     // 0 <- Busy
                     // 1 <- Ready
-                    ReinterpretSpan<uint>(Output)[0] = 4;
+                    *((uint*)OutputPointer) = 4;
                     break;
                 default:
-                    Console.Error.WriteLine($"MemoryStick.IoDevctl Not Implemented! ({DeviceName}, 0x{Command:X})");
+                    Console.Error.WriteLine("MemoryStick.IoDevctl Not Implemented! ({0}, 0x{1:X})", DeviceName, Command);
                     break;
             }
 

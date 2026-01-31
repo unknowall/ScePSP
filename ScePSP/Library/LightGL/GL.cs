@@ -79,7 +79,8 @@ namespace LightGL
     {
         ColorAttachment0 = 0x8CE0,
         DepthAttachment = 0x8D00,
-        StencilAttachment = 0x8D20
+        StencilAttachment = 0x8D20,
+        DepthStencilAttachment = 0x821A
     }
 
     public enum ClearBufferMask
@@ -179,7 +180,8 @@ namespace LightGL
         Luminance = 0x1909,
         LuminanceAlpha = 0x190A,
         StencilIndex = 0x1901,
-        Bgra = 0x80E1
+        Bgra = 0x80E1,
+        depth_stencil = 0x84F9,
     }
 
     public enum PixelType
@@ -195,7 +197,8 @@ namespace LightGL
         UnsignedShort4444 = 0x8033,
         UnsignedShort5551 = 0x8034,
         UnsignedShort565 = 0x8363,
-        UnsignedShort1555Rev = 0x8366
+        UnsignedShort1555Rev = 0x8366,
+        int24_8 = 0x84FA
     }
 
     public enum FramebufferStatus
@@ -373,6 +376,8 @@ namespace LightGL
         public const int GL_ONE_MINUS_DST_COLOR = 0x0307;
         public const int GL_SRC_ALPHA_SATURATE = 0x0308;
         public const int GL_FUNC_ADD = 0x8006;
+        public const int GL_MIN = 0x8007;
+        public const int GL_MAX = 0x8008;
         public const int GL_BLEND_EQUATION = 0x8009;
         public const int GL_BLEND_EQUATION_RGB = 0x8009;
         public const int GL_BLEND_EQUATION_ALPHA = 0x883D;
@@ -480,6 +485,8 @@ namespace LightGL
         public const int GL_FLOAT = 0x1406;
         public const int GL_FIXED = 0x140C;
         public const int GL_DEPTH_COMPONENT = 0x1902;
+        public const int GL_DEPTH_STENCIL = 0x84F9;
+        public const int GL_DEPTH24_STENCIL8 = 0x88F0;
         public const int GL_ALPHA = 0x1906;
         public const int GL_RGB = 0x1907;
         public const int GL_RGBA = 0x1908;
@@ -674,6 +681,7 @@ namespace LightGL
         public const int GL_DIFFUSE = 0x1201;
         public const int GL_SPECULAR = 0x1202;
         public const int GL_SHININESS = 0x1601;
+        public const int GL_PRIMITIVE_RESTART = 0x8F9D;
 
         public static readonly glActiveTexture ActiveTexture;
         public static readonly glAttachShader AttachShader;
@@ -877,6 +885,8 @@ namespace LightGL
         public static readonly glLightiv Lightiv;
         public static readonly glLightf Lightf;
         public static readonly glLighti Lighti;
+        public static readonly GetTexLevelParameteriv GetTexLevelParameteriv;
+        public static readonly glPrimitiveRestartIndex PrimitiveRestartIndex;
 
         public static void ClearError()
         {
@@ -913,15 +923,17 @@ namespace LightGL
             return EnableDisable;
         }
 
-        // REMOVE! Not available in OpenGL|ES
         [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
-        public delegate void glGetTexImage_(int texture, int level, int format, int type, void* img);
+        public delegate void glGetTexImage(int texture, int level, int format, int type, void* img);
 
-        public static readonly glGetTexImage_ GetTexImage;
+        public static readonly glGetTexImage GetTexImage;
 
         public const int GL_MAJOR_VERSION = 0x821B;
         public const int GL_MINOR_VERSION = 0x821C;
     }
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+    public unsafe delegate void GetTexLevelParameteriv(int texture, int level, int format, void* values);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
     public delegate void glActiveTexture(int texture);
@@ -1437,5 +1449,8 @@ namespace LightGL
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
     public delegate void glLighti(uint light, uint pname, uint value);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+    public delegate void glPrimitiveRestartIndex(uint index);
 
 }

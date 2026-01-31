@@ -1,7 +1,6 @@
 using LightGL;
 using ScePSP.GE;
 using ScePSP.GE.State;
-using ScePSPUtils.Extensions;
 using System;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -93,27 +92,20 @@ namespace ScePSP.BackEnd.OpenGL
                 5 => DepthFunction.Notequal,    // 不等于阈值
                 6 => DepthFunction.Gequal,      // 大于等于阈值
                 7 => DepthFunction.Always,      // 始终通过
-                _ => DepthFunction.Always       // 未知值默认始终通过，避免渲染崩溃
+                _ => DepthFunction.Always       // 未知值默认始终通过
             };
         }
 
-        public void PrepareStateCommon(GpuStateStruct* gpuState, int scaleViewport)
+        public void PrepareStateViewPort(GpuStateStruct* gpuState, int scaleViewport)
         {
-            if (_shader == null) DrawInitVertices();
-
             var viewport = gpuState->Viewport;
 
-            // PSP 中 viewport 坐标通常以左上为原点，OpenGL 以左下为原点
             var left = (int)viewport.RegionTopLeft.X * scaleViewport;
             var top = (int)viewport.RegionTopLeft.Y * scaleViewport;
             var width = Math.Max(1, (int)viewport.RegionSize.X * scaleViewport);
             var height = Math.Max(1, (int)viewport.RegionSize.Y * scaleViewport);
 
             GL.Viewport(left, top, width, height);
-
-            //GL.Disable(GL.GL_LIGHTING);
-            //GL.Disable(GL.GL_POLYGON_OFFSET_FILL);
-            //GL.EnableDisable(GL.GL_DITHER, true);
         }
 
         private void PrepareStateDraw(GpuStateStruct* gpuState)
@@ -139,14 +131,13 @@ namespace ScePSP.BackEnd.OpenGL
                 PrepareState_CullFace(gpuState);
                 PrepareState_Lighting(gpuState);
                 PrepareState_Depth(gpuState);
-                PrepareState_DepthTest(gpuState);
                 PrepareState_Stencil(gpuState);
             }
             //GL.ShadeMode1((GpuState->ShadeModel == ShadingModelEnum.Flat) ? ShadingModel.Flat : ShadingModel.Smooth);
-            PrepareState_AlphaTest(gpuState);
+            //PrepareState_AlphaTest(gpuState);
         }
 
-        private void PrepareShaderTexSet()
+        private void PrepareStateShader()
         {
             var vertexType = GeContext->VertexState.Type;
 
@@ -165,13 +156,21 @@ namespace ScePSP.BackEnd.OpenGL
 
             ShaderInfo.hasReversedNormal.Set(VertexType.ReversedNormal);
 
+            ShaderInfo.colorTest.Set(GeContext->ColorTestState.Enabled);
+            ShaderInfo.ctestFunc.Set((int)GeContext->ColorTestState.Function);
+            ShaderInfo.ctestRef.Set(GeContext->ColorTestState.Ref.ToVector3(), true);
+            ShaderInfo.ctestMsk.Set(GeContext->ColorTestState.Mask.ToVector3(), true);
+
+            ShaderInfo.fogEnable.Set(GeContext->FogState.Enabled);
+            ShaderInfo.fogColor.Set(GeContext->FogState.Color.ToVector3());
+            ShaderInfo.FogRange_Scale.Set(new Vector3(GeContext->FogState.Dist, GeContext->FogState.End, 0));
+
             _lightBuf.SetStructData<LightSet>(LightData);
 
             if (vertexType.HasWeight && ShaderInfo.matrixBones != null && ShaderInfo.matrixBones.IsAvailable)
             {
                 int uniformArrayLength = Math.Max(0, ShaderInfo.matrixBones.ArrayLength);
 
-                // PSP 最多8根骨骼
                 if (uniformArrayLength > 0)
                 {
                     var bones = new Matrix4x4[uniformArrayLength];
@@ -200,16 +199,24 @@ namespace ScePSP.BackEnd.OpenGL
 
                 ShaderInfo.tfx.Set((int)textureState.Effect);
                 ShaderInfo.tcc.Set((int)textureState.ColorComponent);
-                ShaderInfo.colorTest.NoWarning().Set(GeContext->ColorTestState.Enabled);
 
                 ShaderInfo.alphaTest.Set(GeContext->AlphaTestState.Enabled);
                 ShaderInfo.alphaFunction.Set((int)GeContext->AlphaTestState.Function);
                 ShaderInfo.alphaMask.Set(GeContext->AlphaTestState.Mask);
                 ShaderInfo.alphaValue.Set(GeContext->AlphaTestState.Value);
 
+                //var blendingState = GeContext->BlendingState;
+                //GL.Disable(GL.GL_BLEND);
+                //SetBackTexture();
+                //ShaderInfo.blendEnable.Set(blendingState.Enabled);
+                //ShaderInfo.blendEquation.Set((int)blendingState.Equation);
+                //ShaderInfo.blendSrc.Set((int)blendingState.FunctionSource);
+                //ShaderInfo.blendDst.Set((int)blendingState.FunctionDestination);
+                //ShaderInfo.blendSFix.Set(blendingState.FixColorSource.ToVector3());
+                //ShaderInfo.blendDFix.Set(blendingState.FixColorDestination.ToVector3());
+
                 //CurrentTextureCache = TextureCache.Get(GpuState);
                 //CurrentTextureCache.Texture.Bind();
-
                 //ShaderInfo.texture0.Set(TexUnit
                 //    .SetWrap(
                 //        (GLWrap)(textureState.WrapU == WrapMode.Repeat ? GL.GL_REPEAT : GL.GL_CLAMP_TO_EDGE),
@@ -243,32 +250,12 @@ namespace ScePSP.BackEnd.OpenGL
             );
         }
 
-        //RenderDoc need disable this
-        private void PrepareState_AlphaTest(GpuStateStruct* gpuState)
-        {
-            if (!gpuState->AlphaTestState.Enabled)
-            {
-                GL.Disable(GL.GL_ALPHA_TEST);
-                return;
-            }
-
-            GL.Enable(GL.GL_ALPHA_TEST);
-
-            var glCompareFunc = DepthFunctionTranslate((int)gpuState->AlphaTestState.Function);
-
-            float alphaThreshold = gpuState->AlphaTestState.Value / 255.0f;
-
-            GL.AlphaFunc((int)glCompareFunc, alphaThreshold);
-        }
-
         private void PrepareState_Stencil(GpuStateStruct* gpuState)
         {
             if (!GL.EnableDisable(GL.GL_STENCIL_TEST, gpuState->StencilState.Enabled))
             {
                 return;
             }
-
-            //if (state.stencilFuncFunc == 2) { outputDepthAndStencil(); assert(0); }
 
             //Console.Error.WriteLine(
             //    "{0}:{1}:{2} - {3}, {4}, {5}",
@@ -304,34 +291,21 @@ namespace ScePSP.BackEnd.OpenGL
                 ? GL.GL_FRONT
                 : GL.GL_BACK;
 
-            //if (face == GL.GL_FRONT)
-            //{
-            //    ShaderInfo.hasReversedNormal.Set(true);
-            //}
-            //else
-            //{
-            //    ShaderInfo.hasReversedNormal.Set(false);
-            //}
-
             GL.CullFace(face);
         }
 
         private void PrepareState_Depth(GpuStateStruct* gpuState)
         {
-            GL.DepthRange(gpuState->DepthTestState.RangeNear, gpuState->DepthTestState.RangeFar);
-        }
-
-        private void PrepareState_DepthTest(GpuStateStruct* gpuState)
-        {
             if (gpuState->DepthTestState.Mask != 0 && gpuState->DepthTestState.Mask != 1)
             {
                 Console.Error.WriteLine("WARNING! DepthTestState.Mask: {0}", gpuState->DepthTestState.Mask);
             }
-            GL.DepthMask(gpuState->DepthTestState.Mask == 0);
             if (!GL.EnableDisable(GL.GL_DEPTH_TEST, gpuState->DepthTestState.Enabled))
             {
                 return;
             }
+            GL.DepthMask(gpuState->DepthTestState.Mask == 0);
+            GL.DepthRange(gpuState->DepthTestState.RangeNear, gpuState->DepthTestState.RangeFar);
             GL.DepthFunc(ConversionTables.DepthFunctionTranslate[(int)gpuState->DepthTestState.Function]);
         }
 
@@ -352,7 +326,6 @@ namespace ScePSP.BackEnd.OpenGL
             if (!lighting.Enabled)
             {
                 ShaderInfo.lightenable.Set(false);
-
                 return;
             }
 
@@ -401,7 +374,7 @@ namespace ScePSP.BackEnd.OpenGL
 
                 LightData.Lights[n].specular = light.SpecularColor.ToVector4();
 
-                LightData.Lights[n].spotDirection = light.SpotDirection.ToRVector3();
+                LightData.Lights[n].spotDirection = light.SpotDirection.ToVector3();
 
                 LightData.Lights[n].spotExponent = light.SpotExponent;
 
@@ -419,55 +392,79 @@ namespace ScePSP.BackEnd.OpenGL
         private void PrepareState_Blend(GpuStateStruct* gpuState)
         {
             var blendingState = gpuState->BlendingState;
-            if (!GL.EnableDisable(GL.GL_BLEND, blendingState.Enabled))
-            {
-                return;
-            }
+            if (!GL.EnableDisable(GL.GL_BLEND, blendingState.Enabled)) return;
 
-            var openglFunctionSource = ConversionTables.BlendFuncSrcTranslate[(int)blendingState.FunctionSource];
-            //var OpenglFunctionDestination = BlendFuncDstTranslate[(int)BlendingState->FunctionDestination];
-            var openglFunctionDestination = ConversionTables.BlendFuncSrcTranslate[(int)blendingState.FunctionDestination];
+            var BlendEquation = ConversionTables.BlendEquationTranslate[(int)blendingState.Equation];
+            var Source = ConversionTables.BlendFuncSrcTranslate[(int)blendingState.FunctionSource];
+            var Destination = ConversionTables.BlendFuncSrcTranslate[(int)blendingState.FunctionDestination];
 
             Func<ColorfStruct, int> getBlendFix = (color) =>
             {
-                if (color.IsColorf(0, 0, 0)) return GL.GL_ZERO;
-                if (color.IsColorf(1, 1, 1)) return GL.GL_ONE;
-                return GL.GL_CONSTANT_COLOR;
+                if (color.IsColorf(0, 0, 0)) return (int)BlendingFactor.Zero;
+                if (color.IsColorf(1, 1, 1)) return (int)BlendingFactor.One;
+                return (int)BlendingFactor.ConstantColor;
             };
 
+            bool Fixed = false;
             if (blendingState.FunctionSource == GuBlendingFactorSource.GU_FIX)
             {
-                openglFunctionSource = getBlendFix(blendingState.FixColorSource);
+                Source = getBlendFix(blendingState.FixColorSource);
+                Fixed = true;
             }
 
             if (blendingState.FunctionDestination == GuBlendingFactorDestination.GU_FIX)
             {
-                if ((int)openglFunctionSource == GL.GL_CONSTANT_COLOR && (blendingState.FixColorSource + blendingState.FixColorDestination).IsColorf(1, 1, 1))
+                if ((int)Source == (int)BlendingFactor.ConstantColor && (blendingState.FixColorSource + blendingState.FixColorDestination).IsColorf(1, 1, 1))
                 {
-                    openglFunctionDestination = GL.GL_ONE_MINUS_CONSTANT_COLOR;
+                    Destination = (int)BlendingFactor.OneMinusConstantColor;
                 }
                 else
                 {
-                    openglFunctionDestination = getBlendFix(blendingState.FixColorDestination);
+                    Destination = getBlendFix(blendingState.FixColorDestination);
                 }
+                Fixed = true;
             }
 
-            //Console.WriteLine("PrepareState_Blend {0}, {1}", OpenglFunctionSource, OpenglFunctionDestination);
+            //if ((int)blendingState.FunctionSource > 3)
+            //    Console.WriteLine("PrepareState_Blend {0} : {1} -> {2}", (BlendEquationMode)BlendEquation, (BlendingFactor)Source, (BlendingFactor)Destination);
 
-            var openglBlendEquation = ConversionTables.BlendEquationTranslate[(int)blendingState.Equation];
+            var srcAlpha = (int)BlendingFactor.Zero;
+            var dstAlpha = (int)BlendingFactor.One;
+            if ((int)blendingState.FunctionSource == 6)
+            {
+                srcAlpha = (int)BlendingFactor.One;
+                dstAlpha = (int)BlendingFactor.Zero;
+            }
+            GL.BlendEquationSeparate((int)BlendEquation, (int)BlendEquationMode.FuncAdd);
+            GL.BlendFuncSeparate((int)Source, (int)Destination, srcAlpha, dstAlpha);
 
-            //Console.WriteLine("PrepareState_Blend {0} : {1} -> {2}", OpenglBlendEquation, OpenglFunctionSource, OpenglFunctionDestination);
+            //GL.BlendEquation((int)BlendEquation);
+            //GL.BlendFunc((int)Source, (int)Destination);
 
-            GL.BlendEquation(openglBlendEquation);
+            if (Fixed)
+                GL.BlendColor(
+                    blendingState.FixColorDestination.Red,
+                    blendingState.FixColorDestination.Green,
+                    blendingState.FixColorDestination.Blue,
+                    blendingState.FixColorDestination.Alpha
+                );
+        }
 
-            GL.BlendFunc(openglFunctionSource, openglFunctionDestination);
+        private void PrepareState_AlphaTest(GpuStateStruct* gpuState)
+        {
+            if (!gpuState->AlphaTestState.Enabled)
+            {
+                GL.Disable(GL.GL_ALPHA_TEST);
+                return;
+            }
 
-            GL.BlendColor(
-                blendingState.FixColorDestination.Red,
-                blendingState.FixColorDestination.Green,
-                blendingState.FixColorDestination.Blue,
-                blendingState.FixColorDestination.Alpha
-            );
+            GL.Enable(GL.GL_ALPHA_TEST);
+
+            var glCompareFunc = DepthFunctionTranslate((int)gpuState->AlphaTestState.Function);
+
+            float alphaThreshold = gpuState->AlphaTestState.Value / 255.0f;
+
+            GL.AlphaFunc((int)glCompareFunc, alphaThreshold);
         }
 
         private void PrepareState_Texture_Common(GpuStateStruct* gpuState)
@@ -485,13 +482,11 @@ namespace ScePSP.BackEnd.OpenGL
 
             var textureState = gpuState->TextureMappingState.TextureState;
 
-            if (GeTexture.ContainsKey(textureState.Mipmap0.Address))
+            if (Frames.TryGetValue(textureState.Mipmap0.Address, out var FB))
             {
-                var Texture = GeTexture.GetOrDefault(textureState.Mipmap0.Address, null);
+                FB.TextureColor.Bind();
 
-                Texture.Bind();
-
-                TexUnit.SetTexture(Texture);
+                TexUnit.SetTexture(FB.TextureColor);
             }
             else
             {
@@ -502,8 +497,7 @@ namespace ScePSP.BackEnd.OpenGL
                 TexUnit.SetTexture(null).SetIndex(0);
             }
 
-            TexUnit
-            .SetWrap(
+            TexUnit.SetWrap(
                 (GLWrap)(textureState.WrapU == WrapMode.Repeat ? GL.GL_REPEAT : GL.GL_CLAMP_TO_EDGE),
                 (GLWrap)(textureState.WrapV == WrapMode.Repeat ? GL.GL_REPEAT : GL.GL_CLAMP_TO_EDGE)
             )
@@ -517,8 +511,6 @@ namespace ScePSP.BackEnd.OpenGL
             );
 
             ShaderInfo.texture0.Set(TexUnit);
-
-            //GL.TexEnvi(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvModeTranslate[(int)TextureState.Effect]);
         }
 
         private void PrepareState_Texture_2D(GpuStateStruct* gpuState)
@@ -532,8 +524,6 @@ namespace ScePSP.BackEnd.OpenGL
                 _textureMatrix = Matrix4x4.CreateScale(1.0f / mipmap0.BufferWidth, 1.0f / mipmap0.TextureHeight, 1.0f);
 
                 ShaderInfo.TextureMode.Set((int)TexCoordMode.Default);
-
-                //ShaderInfo.matrixTexture.Set(_textureMatrix);
             }
         }
 
@@ -549,9 +539,14 @@ namespace ScePSP.BackEnd.OpenGL
                 switch (textureMappingState.TextureMapMode)
                 {
                     case TextureMapMode.GU_TEXTURE_COORDS:
-                        _textureMatrix = _textureMatrix *
-                                         Matrix4x4.CreateTranslation(textureState.OffsetU, textureState.OffsetV, 0) *
-                                         Matrix4x4.CreateScale(textureState.ScaleU, textureState.ScaleV, 1);
+
+                        //_textureMatrix = Matrix4x4.CreateScale(textureState.ScaleU, textureState.ScaleV, 1);
+                        //_textureMatrix.M14 = textureState.OffsetU;
+                        //_textureMatrix.M24 = textureState.OffsetV;
+
+                        _textureMatrix =
+                             Matrix4x4.CreateTranslation(textureState.OffsetU, textureState.OffsetV, 0) *
+                             Matrix4x4.CreateScale(textureState.ScaleU, textureState.ScaleV, 1);
 
                         ShaderInfo.TextureMode.Set((int)TexCoordMode.Default);
                         break;
@@ -599,14 +594,16 @@ namespace ScePSP.BackEnd.OpenGL
             {
                 // OrthographicOffCenter(左, 右, 下, 上, 近裁面, 远裁面)
                 WVPMatrix = Matrix4x4.CreateOrthographicOffCenter(
-                    0, 480,    // 左右边界（宽度480）
-                    272, 0,    // 下上边界（翻转Y轴，匹配PSP左上角原点）
-                    0, 0xFFFF  // 深度范围（0~65535，正序）
+                    0, 480,
+                    272, 0,
+                    0, -0xFFFF
                 );
             }
             else
             {
-                WVPMatrix = gpuState->VertexState.WorldMatrix.Matrix4 * gpuState->VertexState.ViewMatrix.Matrix4 * gpuState->VertexState.ProjectionMatrix.Matrix4;
+                WVPMatrix = gpuState->VertexState.WorldMatrix.Matrix4 *
+                            gpuState->VertexState.ViewMatrix.Matrix4 *
+                            gpuState->VertexState.ProjectionMatrix.Matrix4;
             }
         }
 
@@ -617,9 +614,7 @@ namespace ScePSP.BackEnd.OpenGL
             bool stencilMask = gpuState->ClearFlags.HasFlag(ClearBufferSet.StencilBuffer);
 
             GL.Disable(GL.GL_BLEND);
-            GL.Disable(GL.GL_LIGHTING);
             GL.Disable(GL.GL_TEXTURE_2D);
-            GL.Disable(GL.GL_ALPHA_TEST);
             GL.Disable(GL.GL_DEPTH_TEST);
             GL.Disable(GL.GL_STENCIL_TEST);
             GL.Disable(GL.GL_FOG);

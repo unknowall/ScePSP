@@ -7,14 +7,6 @@ namespace ScePSP.Hle
     {
         public bool PartialImplemented = false;
 
-        public bool Notice = true; //Debug Set True
-    }
-
-    public sealed class PspTestedAttribute : Attribute
-    {
-    }
-
-    public sealed class PspUntestedAttribute : Attribute
-    {
+        public bool Notice = false;
     }
 }

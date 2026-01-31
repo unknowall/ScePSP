@@ -3,7 +3,6 @@ using ScePSPUtils;
 using ScePSPUtils.Extensions;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -11,13 +10,14 @@ namespace ScePSP.Hle
 {
     public class MemoryPartitionNoMemoryException : Exception
     {
-        public MemoryPartitionNoMemoryException(string Text) : base(Text)
+        public MemoryPartitionNoMemoryException(string Text)
+            : base(Text)
         {
         }
     }
 
     [HleUidPoolClass(NotFoundError = SceKernelErrors.ERROR_KERNEL_ILLEGAL_PARTITION_ID, FirstItem = 1)]
-    public unsafe class MemoryPartition : IHleUidPoolClass, IDisposable
+    unsafe public class MemoryPartition : IHleUidPoolClass, IDisposable
     {
         public enum Anchor : int
         {
@@ -26,22 +26,24 @@ namespace ScePSP.Hle
             Set = 3,
         }
 
-        PspMemory PspMemory => PSPDrivers.PspMemory;
+        [Context]
+        PspContext PspContext;
+
+        [Context]
+        PspMemory PspMemory;
 
         public bool Allocated;
-        public string Name;
-
-        public TType* GetLowPointerSafe<TType>(int count = 1) where TType : unmanaged => (TType*)PspMemory.PspAddressToPointerSafe(Low, sizeof(TType) * count);
-
+        public String Name;
+        public void* GetLowPointerSafe<TType>()
+        {
+            return PspMemory.PspAddressToPointerSafe(Low, Marshal.SizeOf(typeof(TType)));
+        }
         public uint Low { get; protected set; }
         public uint High { get; protected set; }
-
-        public int Size => (int)(High - Low);
-
+        public int Size { get { return (int)(High - Low); } }
         public MemoryPartition ParentPartition { get; private set; }
         private SortedSet<MemoryPartition> _ChildPartitions;
-
-        public void* LowPointer => PspMemory.PspPointerToPointerSafe(Low, Size);
+        public void* LowPointer { get { return PspMemory.PspPointerToPointerSafe(Low, Size); } }
 
         public uint GetAnchoredAddress(Anchor Anchor)
         {
@@ -50,21 +52,27 @@ namespace ScePSP.Hle
                 case MemoryPartition.Anchor.High: return High;
                 case MemoryPartition.Anchor.Low: return Low;
             }
-            throw new InvalidOperationException("Invalid Anchor Value : " + Anchor);
+            throw (new InvalidOperationException("Invalid Anchor Value : " + Anchor));
         }
 
-        public MemoryPartition Root => ParentPartition != null ? ParentPartition.Root : this;
+        public MemoryPartition Root
+        {
+            get
+            {
+                return (ParentPartition != null) ? ParentPartition.Root : this;
+            }
+        }
 
         public int MaxFreeSize
         {
             get
             {
                 return ChildPartitions
-                        .Where(Partition => !Partition.Allocated)
-                        .OrderByDescending(Partition => Partition.Size)
-                        .LinqExFirstOrDefault(new MemoryPartition(0, 0))
-                        .Size
-                    ;
+                    .Where(Partition => !Partition.Allocated)
+                    .OrderByDescending(Partition => Partition.Size)
+                    .FirstOrDefault(new MemoryPartition(PspContext, 0, 0))
+                    .Size
+                ;
             }
         }
 
@@ -73,35 +81,38 @@ namespace ScePSP.Hle
             get
             {
                 return ChildPartitions
-                        .Where(Partition => !Partition.Allocated)
-                        .Aggregate(0, (Accumulated, Partition) => Accumulated + Partition.Size)
-                    ;
+                    .Where(Partition => !Partition.Allocated)
+                    .Aggregate(0, (Accumulated, Partition) => Accumulated + Partition.Size)
+                ;
             }
         }
 
-        public IEnumerable<MemoryPartition> ChildPartitions => _ChildPartitions;
-
-        public MemoryPartition(uint Low, uint High, bool Allocated = true, string Name = "<Unknown>", MemoryPartition ParentPartition = null)
+        public IEnumerable<MemoryPartition> ChildPartitions
         {
-            if (Low > High) throw new InvalidOperationException();
+            get
+            {
+                return _ChildPartitions;
+            }
+        }
 
+        public MemoryPartition(PspContext PspContext, uint Low, uint High, bool Allocated = true, string Name = "<Unknown>", MemoryPartition ParentPartition = null)
+        {
+            if (Low > High) throw (new InvalidOperationException());
+            PspContext.InjectDependencesTo(this);
             this.ParentPartition = ParentPartition;
             this.Name = Name;
             this.Low = Low;
             this.High = High;
             this.Allocated = Allocated;
-            this._ChildPartitions = new SortedSet<MemoryPartition>(new AnonymousComparer<MemoryPartition>(
-                (Left, Right) =>
+            this._ChildPartitions = new SortedSet<MemoryPartition>(new AnonymousComparer<MemoryPartition>((Left, Right) =>
+            {
+                int Result = Left.Low.CompareTo(Right.Low);
+                if (Result == 0)
                 {
-                    int Result = Left.Low.CompareTo(Right.Low);
-                    if (Result == 0)
-                    {
-                        Result = Left.High.CompareTo(Right.High);
-                    }
-                    return Result;
-                }));
-
-            //Console.Out.WriteLineColored(ConsoleColor.White, $"  -> {this.ToString()}");
+                    Result = Left.High.CompareTo(Right.High);
+                }
+                return Result;
+            }));
         }
 
         private void NormalizePartitions()
@@ -120,11 +131,12 @@ namespace ScePSP.Hle
                         break;
                     }
 
-                    if (Previous != null && Previous.Allocated == false && Current.Allocated == false)
+                    if ((Previous != null) && (Previous.Allocated == false) && (Current.Allocated == false))
                     {
                         _ChildPartitions.Remove(Previous);
                         _ChildPartitions.Remove(Current);
                         _ChildPartitions.Add(new MemoryPartition(
+                            PspContext,
                             Math.Min(Previous.Low, Current.Low),
                             Math.Max(Previous.High, Current.High),
                             false,
@@ -153,17 +165,9 @@ namespace ScePSP.Hle
 
         public void DeallocateAnchoredAddress(uint Address, Anchor Anchor)
         {
-            if (Anchor == MemoryPartition.Anchor.Low)
-            {
-                DeallocateLow(Address);
-                return;
-            }
-            if (Anchor == MemoryPartition.Anchor.High)
-            {
-                DeallocateHigh(Address);
-                return;
-            }
-            throw new InvalidOperationException();
+            if (Anchor == MemoryPartition.Anchor.Low) { DeallocateLow(Address); return; }
+            if (Anchor == MemoryPartition.Anchor.High) { DeallocateHigh(Address); return; }
+            throw (new InvalidOperationException());
         }
 
         public MemoryPartition AllocateLowHigh(uint Low, uint High, string Name = "<Unknown>")
@@ -198,15 +202,16 @@ namespace ScePSP.Hle
             {
                 if (_ChildPartitions.Count == 0)
                 {
-                    _ChildPartitions.Add(new MemoryPartition(Low, High, false, ParentPartition: this, Name: Name));
+                    _ChildPartitions.Add(new MemoryPartition(PspContext, Low, High, false, ParentPartition: this, Name: Name));
                 }
                 MemoryPartition OldFreePartition;
+
                 MemoryPartition NewPartiton;
 
                 var SizeCheck = Size;
 
                 // As much we will need those space.
-                SizeCheck += Alignment - 1;
+                SizeCheck += (Alignment - 1);
 
                 var AcceptablePartitions = _ChildPartitions.Where(Partition => !Partition.Allocated && Partition.Size >= SizeCheck);
 
@@ -222,8 +227,7 @@ namespace ScePSP.Hle
                         OldFreePartition = AcceptablePartitions.Last();
                         break;
                     case Anchor.Set:
-                        OldFreePartition = AcceptablePartitions.Single(Partition =>
-                            Partition.Low <= Position && Partition.High >= Position + Size);
+                        OldFreePartition = AcceptablePartitions.Single(Partition => (Partition.Low <= Position) && (Partition.High >= Position + Size));
                         break;
                 }
 
@@ -254,35 +258,17 @@ namespace ScePSP.Hle
                 {
                     default:
                     case Anchor.Low:
-
-                        _ChildPartitions.Add(NewPartiton = new MemoryPartition(OldFreePartition.Low,
-                            (uint)(OldFreePartition.Low + Size), true, ParentPartition: this, Name: Name));
-
-                        _ChildPartitions.Add(new MemoryPartition((uint)(OldFreePartition.Low + Size),
-                            OldFreePartition.High, false, ParentPartition: this, Name: "<Free>"));
-
+                        _ChildPartitions.Add(NewPartiton = new MemoryPartition(PspContext, OldFreePartition.Low, (uint)(OldFreePartition.Low + Size), true, ParentPartition: this, Name: Name));
+                        _ChildPartitions.Add(new MemoryPartition(PspContext, (uint)(OldFreePartition.Low + Size), OldFreePartition.High, false, ParentPartition: this, Name: "<Free>"));
                         break;
                     case Anchor.High:
-
-                        _ChildPartitions.Add(NewPartiton = new MemoryPartition(
-                            (uint)(OldFreePartition.High - Size), OldFreePartition.High, true, ParentPartition: this,
-                            Name: Name));
-
-                        _ChildPartitions.Add(new MemoryPartition(OldFreePartition.Low,
-                            (uint)(OldFreePartition.High - Size), false, ParentPartition: this, Name: "<Free>"));
-
+                        _ChildPartitions.Add(NewPartiton = new MemoryPartition(PspContext, (uint)(OldFreePartition.High - Size), OldFreePartition.High, true, ParentPartition: this, Name: Name));
+                        _ChildPartitions.Add(new MemoryPartition(PspContext, OldFreePartition.Low, (uint)(OldFreePartition.High - Size), false, ParentPartition: this, Name: "<Free>"));
                         break;
                     case Anchor.Set:
-
-                        _ChildPartitions.Add(new MemoryPartition(OldFreePartition.Low, Position, false,
-                            ParentPartition: this, Name: "<Free>"));
-
-                        _ChildPartitions.Add(NewPartiton = new MemoryPartition(Position,
-                            (uint)(Position + Size), true, ParentPartition: this, Name: Name));
-
-                        _ChildPartitions.Add(new MemoryPartition((uint)(Position + Size),
-                            OldFreePartition.High, false, ParentPartition: this, Name: "<Free>"));
-
+                        _ChildPartitions.Add(new MemoryPartition(PspContext, OldFreePartition.Low, Position, false, ParentPartition: this, Name: "<Free>"));
+                        _ChildPartitions.Add(NewPartiton = new MemoryPartition(PspContext, Position, (uint)(Position + Size), true, ParentPartition: this, Name: Name));
+                        _ChildPartitions.Add(new MemoryPartition(PspContext, (uint)(Position + Size), OldFreePartition.High, false, ParentPartition: this, Name: "<Free>"));
                         break;
                 }
 
@@ -298,21 +284,30 @@ namespace ScePSP.Hle
 					Root.Dump(this);
 					Console.WriteLine("");
 #endif
-                throw new MemoryPartitionNoMemoryException(
-                    $"Can't allocate Size={Size} : AllocateAnchor={AllocateAnchor} : Position=0x{Position:X}"
-                );
+                throw (new MemoryPartitionNoMemoryException(
+                    String.Format(
+                        "Can't allocate Size={0} : AllocateAnchor={1} : Position=0x{2:X}",
+                        Size, AllocateAnchor, Position
+                    )
+                ));
             }
         }
 
-        public void Dump(MemoryPartition Mark = null, int Level = 0, TextWriter output = null)
+        public void Dump(MemoryPartition Mark = null, int Level = 0)
         {
-            output ??= Console.Out;
-            output.Write(new string(' ', Level * 2));
-            output.WriteLine(
-                $"MemoryPartition(Low={Low:X}, High={High:X}, Allocated={Allocated}, Size={Size}, Name='{Name}'){(this == Mark ? " * " : "")}");
+            Console.Write(new String(' ', Level * 2));
+            Console.WriteLine(String.Format(
+                "MemoryPartition(Low={0:X}, High={1:X}, Allocated={2}, Size={3}, Name='{4}'){5}",
+                Low,
+                High,
+                Allocated,
+                Size,
+                Name,
+                (this == Mark) ? " * " : ""
+            ));
             foreach (var ChildPartition in ChildPartitions)
             {
-                ChildPartition.Dump(Level: Level + 1, Mark: Mark, output: output);
+                ChildPartition.Dump(Level: Level + 1, Mark: Mark);
             }
         }
 
@@ -326,15 +321,24 @@ namespace ScePSP.Hle
 
         public override string ToString()
         {
-            if (_ChildPartitions != null && _ChildPartitions.Count > 0)
+            if ((_ChildPartitions != null) && _ChildPartitions.Count > 0)
             {
-                return
-                    $"MemoryPartition(Low={Low:X}, High={High:X}, Allocated={Allocated}, Name='{Name}', Size={Size}, ChildPartitions=[{string.Join(",", _ChildPartitions)}])";
+                return String.Format(
+                    "MemoryPartition(Low={0:X}, High={1:X}, Allocated={2}, Name='{3}', Size={4}, ChildPartitions=[{5}])",
+                    Low, High, Allocated,
+                    Name,
+                    Size,
+                    String.Join(",", _ChildPartitions)
+                );
             }
             else
             {
-                return
-                    $"MemoryPartition(Low={Low:X}, High={High:X}, Allocated={Allocated}, Name='{Name}', Size={Size})";
+                return String.Format(
+                    "MemoryPartition(Low={0:X}, High={1:X}, Allocated={2}, Name='{3}', Size={4})",
+                    Low, High, Allocated,
+                    Name,
+                    Size
+                );
             }
         }
 

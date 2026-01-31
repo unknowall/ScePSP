@@ -46,8 +46,8 @@
             AnalogRight = new System.Windows.Forms.TextBox();
             AnalogLeft = new System.Windows.Forms.TextBox();
             AnalogUp = new System.Windows.Forms.TextBox();
-            button1 = new System.Windows.Forms.Button();
-            button2 = new System.Windows.Forms.Button();
+            BtnApply = new System.Windows.Forms.Button();
+            BtnCancel = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
@@ -191,27 +191,27 @@
             AnalogUp.Size = new System.Drawing.Size(44, 23);
             AnalogUp.TabIndex = 4;
             // 
-            // button1
+            // BtnApply
             // 
-            button1.Location = new System.Drawing.Point(550, 397);
-            button1.Margin = new System.Windows.Forms.Padding(4);
-            button1.Name = "button1";
-            button1.Size = new System.Drawing.Size(88, 30);
-            button1.TabIndex = 14;
-            button1.Text = "&Apply";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            BtnApply.Location = new System.Drawing.Point(550, 397);
+            BtnApply.Margin = new System.Windows.Forms.Padding(4);
+            BtnApply.Name = "BtnApply";
+            BtnApply.Size = new System.Drawing.Size(88, 30);
+            BtnApply.TabIndex = 14;
+            BtnApply.Text = "&Apply";
+            BtnApply.UseVisualStyleBackColor = true;
+            BtnApply.Click += button1_Click;
             // 
-            // button2
+            // BtnCancel
             // 
-            button2.Location = new System.Drawing.Point(644, 397);
-            button2.Margin = new System.Windows.Forms.Padding(4);
-            button2.Name = "button2";
-            button2.Size = new System.Drawing.Size(88, 30);
-            button2.TabIndex = 15;
-            button2.Text = "&Cancel";
-            button2.UseVisualStyleBackColor = true;
-            button2.Click += button2_Click;
+            BtnCancel.Location = new System.Drawing.Point(644, 397);
+            BtnCancel.Margin = new System.Windows.Forms.Padding(4);
+            BtnCancel.Name = "BtnCancel";
+            BtnCancel.Size = new System.Drawing.Size(88, 30);
+            BtnCancel.TabIndex = 15;
+            BtnCancel.Text = "&Cancel";
+            BtnCancel.UseVisualStyleBackColor = true;
+            BtnCancel.Click += button2_Click;
             // 
             // ButtonForm
             // 
@@ -219,10 +219,10 @@
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(747, 432);
             Controls.Add(AnalogDown);
-            Controls.Add(button2);
+            Controls.Add(BtnCancel);
             Controls.Add(AnalogLeft);
             Controls.Add(AnalogRight);
-            Controls.Add(button1);
+            Controls.Add(BtnApply);
             Controls.Add(AnalogUp);
             Controls.Add(CircleButton);
             Controls.Add(CrossButton);
@@ -272,7 +272,7 @@
 		public System.Windows.Forms.TextBox AnalogRight;
 		public System.Windows.Forms.TextBox AnalogLeft;
 		public System.Windows.Forms.TextBox AnalogUp;
-		private System.Windows.Forms.Button button1;
-		private System.Windows.Forms.Button button2;
+		private System.Windows.Forms.Button BtnApply;
+		private System.Windows.Forms.Button BtnCancel;
 	}
 }

@@ -1,9 +1,9 @@
-﻿using ScePSP.Types.Controller;
+﻿using ScePSP.Types;
 using ScePSPUtils;
 using System;
 using System.Collections.Generic;
 
-namespace ScePSP.Devices.Controller
+namespace ScePSP.Controller
 {
     public class PspController
     {
@@ -27,28 +27,28 @@ namespace ScePSP.Devices.Controller
             {
                 //Console.WriteLine("PspController");
             });
-            for (var n = 0; n < MaxStoredFrames; n++)
+            for (int n = 0; n < MaxStoredFrames; n++)
             {
                 InsertSceCtrlData(default(SceCtrlData).Init());
             }
         }
 
-        public void InsertSceCtrlData(SceCtrlData sceCtrlData)
+        public void InsertSceCtrlData(SceCtrlData SceCtrlData)
         {
             lock (this)
             {
-                sceCtrlData.TimeStamp = LastTimestamp++;
-                SceCtrlDataBuffer.Add(sceCtrlData);
+                SceCtrlData.TimeStamp = LastTimestamp++;
+                SceCtrlDataBuffer.Add(SceCtrlData);
                 if (SceCtrlDataBuffer.Count > MaxStoredFrames) SceCtrlDataBuffer.RemoveAt(0);
             }
             LatchSamplingCount++;
         }
 
-        public SceCtrlData GetSceCtrlDataAt(int index)
+        public SceCtrlData GetSceCtrlDataAt(int Index)
         {
             lock (this)
             {
-                return SceCtrlDataBuffer[SceCtrlDataBuffer.Count - index - 1];
+                return SceCtrlDataBuffer[SceCtrlDataBuffer.Count - Index - 1];
             }
         }
     }

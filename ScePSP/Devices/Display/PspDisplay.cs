@@ -1,41 +1,72 @@
-﻿using ScePSP.Devices.Rtc;
-using ScePSP.Memory;
+﻿using ScePSP.Memory;
+using ScePSP.Rtc;
+using ScePSP.Threading.Synchronization;
 using ScePSP.Types;
-using ScePSP.GE;
 using ScePSP.Utils;
 using System;
-using System.Collections.Generic;
+using System.Drawing;
 
-using Bitmap = System.Drawing.Bitmap;
-
-namespace ScePSP.Devices.Display
+namespace ScePSP.Display
 {
-    public class PspWaitEvent
-    {
-        protected Queue<Action> Notifications = new Queue<Action>();
-
-        public void Signal()
-        {
-            while (Notifications.Count > 0)
-            {
-                Notifications.Dequeue()();
-            }
-        }
-
-        public void CallbackOnStateOnce(Action Callback)
-        {
-            Notifications.Enqueue(Callback);
-        }
-    }
-
     public class PspDisplay
     {
-        public const double ProcessedPixelsPerSecond = 9000000; // hz
-        public const double CyclesPerPixel = 1;
-        public const double PixelsInARow = 525;
-        public const double VsyncRow = 272;
-        public const double NumberOfRows = 286;
-        public const float HCountPerVblank = 285.72f;
+        public bool IsVblank { get; protected set; }
+
+        public const double ProcessedPixelsPerSecond = 9000000.0;
+        public const double CyclesPerPixel = 1.0;
+        public const double PixelsInARow = 525.0;
+        public const double VsyncRow = 272.0;
+        public const double NumberOfRows = 286.0;
+        public const float hCountPerVblank = 285.72f;
+        public const double HorizontalSyncHertz = 17142.857142857141;
+        public const double VerticalSyncHertz = 59.940059940059932;
+
+        [Context]
+        private PspRtc PspRtc;
+
+        [Context]
+        private PspMemory Memory;
+
+        public PspDisplay.Info CurrentInfo = new PspDisplay.Info
+        {
+            Enabled = true,
+            FrameAddress = 67108864u,
+            BufferWidth = 512,
+            PixelFormat = GuPixelFormats.RGBA_8888,
+            Mode = 0,
+            Width = 480,
+            Height = 272
+        };
+
+        private DateTime StartDrawTime;
+        public PspWaitEvent VBlankEvent = new PspWaitEvent();
+        private int _VblankCount;
+
+        public enum SyncMode
+        {
+            Immediate,
+            NextFrame
+        }
+
+        public struct Info
+        {
+            public int BufferWidthHeightCount
+            {
+                get
+                {
+                    return this.BufferWidth * this.Height;
+                }
+            }
+            public bool Enabled;
+            public bool PlayingVideo;
+            public uint FrameAddress;
+            public int BufferWidth;
+            public GuPixelFormats PixelFormat;
+            public int Mode;
+            public int Width;
+            public int Height;
+        }
+
         public const int MaxBufferWidth = 512;
         public const int MaxBufferHeight = 272;
         public const int MaxBufferArea = MaxBufferWidth * MaxBufferHeight;
@@ -43,123 +74,78 @@ namespace ScePSP.Devices.Display
         public const int MaxVisibleHeight = 272;
         public const int MaxVisibleArea = MaxVisibleWidth * MaxVisibleHeight;
 
-        public const double HorizontalSyncHertz = ProcessedPixelsPerSecond * CyclesPerPixel / PixelsInARow;
-        public const double VerticalSyncHertz = HorizontalSyncHertz / NumberOfRows;
-
-        PspRtc _pspRtc => PSPDrivers.PspRtc;
-
-        PspMemory _memory => PSPDrivers.PspMemory;
-
-        public PspDisplay()
+        private PspDisplay()
         {
         }
-
-        public Info CurrentInfo = new Info()
-        {
-            Enabled = true,
-            FrameAddress = 0x04000000,
-            BufferWidth = 512,
-            PixelFormat = GuPixelFormats.Rgba8888,
-            //Sync = SyncMode.Immediate,
-            Mode = 0,
-            Width = 480,
-            Height = 272,
-        };
-
-        public enum SyncMode
-        {
-            Immediate = 0,
-            NextFrame = 1,
-        }
-
-        public struct Info
-        {
-            public bool Enabled;
-            public bool PlayingVideo;
-            public uint FrameAddress;
-            public int BufferWidth;
-
-            public GuPixelFormats PixelFormat;
-
-            //public SyncMode Sync;
-            public int Mode;
-
-            public int Width;
-            public int Height;
-
-            public int BufferWidthHeightCount => BufferWidth * Height;
-        }
-
-        private DateTime _startDrawTime;
 
         public static event Action DrawEvent;
 
         public void TriggerDrawStart()
         {
-            _startDrawTime = DateTime.UtcNow;
-            DrawEvent?.Invoke();
+            this.StartDrawTime = DateTime.UtcNow;
+            if (PspDisplay.DrawEvent != null)
+            {
+                PspDisplay.DrawEvent();
+            }
         }
 
         public int GetHCount()
         {
-            var elaspedTime = DateTime.UtcNow - _startDrawTime;
-            return (int)(elaspedTime.TotalSeconds / (1 / HorizontalSyncHertz));
+            return (int)((DateTime.UtcNow - this.StartDrawTime).TotalSeconds / 5.833333333333334E-05);
         }
 
         public static event Action VBlankCallback;
 
-        public void VBlankCallbackOnce(Action callback)
+        public void VBlankCallbackOnce(Action Callback)
         {
-            void Action()
+            Action Callback2 = null;
+            Callback2 = delegate ()
             {
-                VBlankCallback -= Action;
-                callback();
-            }
-
-            VBlankCallback += Action;
+                PspDisplay.VBlankCallback -= Callback2;
+                Callback();
+            };
+            PspDisplay.VBlankCallback += Callback2;
         }
 
         public void TriggerVBlankStart()
         {
-            VBlankCallback?.Invoke();
-            VBlankEvent.Signal();
-            VBlankEventCall?.Invoke();
-            VblankCount++;
-            IsVblank = true;
+            if (PspDisplay.VBlankCallback != null)
+            {
+                PspDisplay.VBlankCallback();
+            }
+            this.VBlankEvent.Signal();
+            if (this.VBlankEventCall != null)
+            {
+                this.VBlankEventCall();
+            }
+            this.VblankCount++;
+            this.IsVblank = true;
         }
 
         public void TriggerVBlankEnd()
         {
-            IsVblank = false;
+            this.IsVblank = false;
         }
 
-        public PspWaitEvent VBlankEvent = new PspWaitEvent();
         public event Action VBlankEventCall;
-
-        private int _vblankCount;
 
         public int VblankCount
         {
-            set => _vblankCount = value;
-            get => _vblankCount;
+            get
+            {
+                return this._VblankCount;
+            }
+            set
+            {
+                this._VblankCount = value;
+            }
         }
 
-        public unsafe PspBitmap TakePspScreenshot()
+        public unsafe Bitmap TakeScreenshot()
         {
-            return new PspBitmap(
-                CurrentInfo.PixelFormat,
-                CurrentInfo.BufferWidth,
-                CurrentInfo.Height,
-                (byte*)_memory.PspAddressToPointerSafe(
-                    CurrentInfo.FrameAddress,
-                    PixelFormatDecoder.GetPixelsSize(CurrentInfo.PixelFormat,
-                        CurrentInfo.BufferWidth * CurrentInfo.Height)
-                )
-            );
+            return new PspBitmap(this.CurrentInfo.PixelFormat, this.CurrentInfo.BufferWidth, this.CurrentInfo.Height,
+                (byte*)this.Memory.PspAddressToPointerSafe(this.CurrentInfo.FrameAddress,
+                PixelFormatDecoder.GetPixelsSize(this.CurrentInfo.PixelFormat, this.CurrentInfo.BufferWidth * this.CurrentInfo.Height), true, false), -1).ToBitmap();
         }
-
-        public unsafe Bitmap TakeScreenshot() => TakePspScreenshot().ToBitmap();
-
-        public bool IsVblank { get; protected set; }
     }
 }

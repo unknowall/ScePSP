@@ -269,7 +269,7 @@ namespace ScePSP.UI
             DisplayConfig.Width = panel1.Width;
             DisplayConfig.Height = panel1.Height;
 
-            this.Text = this.Title;// + $" - [ {Display.CurrentFPS:F2} FPS ]";
+            this.Text = this.Title + $" - [ {Display.CurrentFPS:F2} FPS ]";
         }
 
         private void MnuFunc_Click(object sender, EventArgs e)

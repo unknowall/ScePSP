@@ -166,15 +166,14 @@ namespace ScePSP.Hle.Modules.modulemgr
                     Path.EndsWith(@"/mpeg.prx") ||
                     Path.EndsWith(@"/mpegbase.prx") ||
                     Path.EndsWith(@"/libfont.prx") ||
+                    Path.EndsWith(@"/libccc.prx") ||
                 false)
                 {
                     Logger.Warning("Ignore {0}!", Path);
-                    throw (new Exception("Ignore " + Path + "!"));
-
-                    //var ModuleId = Modules.Create(new HleModule());
-                    //Module.ID = ModuleId;
-                    //return ModuleId;
-
+                    //throw (new Exception("Ignore " + Path + "!"));
+                    Module.Loaded = false;
+                    Module.ID = Modules.Create(Module);
+                    return Module.ID;
                 }
 
                 var ModuleStream = GetStreamAction();
@@ -355,10 +354,6 @@ namespace ScePSP.Hle.Modules.modulemgr
             return Module.ID;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         [HlePspFunction(NID = 0x8F2DF740, FirmwareVersion = 150)]
         public uint sceKernelStopUnloadSelfModuleWithStatus()
         {

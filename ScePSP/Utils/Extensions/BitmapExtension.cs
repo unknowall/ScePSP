@@ -151,11 +151,6 @@ namespace ScePSPUtils.Drawing.Extensions
             bitmap.LockBitsUnlock(new Rectangle(0, 0, bitmap.Width, bitmap.Height), pixelFormat, callback);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="bitmap"></param>
-        /// <param name="Delegate"></param>
         public static void ForEach(this Bitmap bitmap, Action<Color, int, int> Delegate)
         {
             int width = bitmap.Width;
@@ -169,11 +164,6 @@ namespace ScePSPUtils.Drawing.Extensions
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="bitmap"></param>
-        /// <param name="Delegate"></param>
         public static unsafe void Shader(this Bitmap bitmap, Func<ArgbRev, int, int, ArgbRev> Delegate)
         {
             var width = bitmap.Width;
@@ -192,11 +182,6 @@ namespace ScePSPUtils.Drawing.Extensions
             });
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="bitmap"></param>
-        /// <returns></returns>
         public static IEnumerable<Color> Colors(this Bitmap bitmap)
         {
             var width = bitmap.Width;
@@ -210,28 +195,9 @@ namespace ScePSPUtils.Drawing.Extensions
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="bitmap"></param>
-        /// <returns></returns>
         public static Rectangle GetFullRectangle(this Bitmap bitmap)
         {
             return new Rectangle(0, 0, bitmap.Width, bitmap.Height);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="oldBitmap"></param>
-        /// <param name="newPixelFormat"></param>
-        /// <returns></returns>
-        public static Bitmap ConvertToFormat(this Bitmap oldBitmap, PixelFormat newPixelFormat)
-        {
-            var newBitmap = new Bitmap(oldBitmap.Width, oldBitmap.Height, newPixelFormat);
-            //Graphics.FromImage(newBitmap).DrawImage(oldBitmap, Point.Empty);
-            throw new NotImplementedException();
-            return newBitmap;
         }
     }
 }

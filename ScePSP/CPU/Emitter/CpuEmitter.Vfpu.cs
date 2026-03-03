@@ -183,26 +183,28 @@ namespace ScePSP.Cpu.Emitter
 
         static public float _vwbn_impl(float Source, int Imm8)
         {
-            return 0f;
-#if true
-            var exp = new BigInteger((int)Math.Pow(2, 127 - Imm8));
-            var bn = new BigInteger((int)Source);
-            if ((int)bn > 0)
+            Console.WriteLine($"!!! vfpu Call _vwbn_impl {Source} {Imm8}");
+
+            //return 0f;
+
+            // Calculate modulus with exponent.
+            BigInteger exp = (int)System.Math.Pow(2, 127 - Imm8);
+            BigInteger bn = (int)Source;
+            if (((int)bn) > 0)
             {
                 bn = BigInteger.ModPow(bn, exp, bn);
             }
-            return (float)(bn + ((Source < 0.0f) ? -exp : exp));
-
-#else
-			double exp = Math.Pow(2.0, 127 - Imm8);
-			double bn = (double)Source;
-			if (bn > 0.0) bn = Math.Pow(bn, exp) % bn;
-			return (float)((Source < 0.0f) ? (bn - exp) : (bn + exp));
-#endif
+            return ((float)bn + (Source < 0.0f ? -((int)exp) : (int)exp));
         }
 
         public AstNodeStm vwbn()
         {
+            int VectorSize = ONE_TWO;
+            if (VectorSize != 1)
+            {
+                Console.WriteLine("Only supported VWBN.S");
+                return ast.NotImplemented("Only supported VWBN.S");
+            }
             return VEC_VD.SetVector(Index => ast.CallStatic((Func<float, int, float>)_vwbn_impl, VEC_VS[Index], (int)Instruction.IMM8), PC);
         }
 

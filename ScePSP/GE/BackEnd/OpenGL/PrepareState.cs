@@ -123,7 +123,7 @@ namespace ScePSP.BackEnd.OpenGL
                 GL.Disable(GL.GL_CULL_FACE);
                 GL.DepthRange(0, 1);
                 GL.Disable(GL.GL_DEPTH_TEST);
-                //PrepareState_Lighting(gpuState);
+                PrepareState_Lighting(gpuState);
             }
             else
             {
@@ -133,7 +133,9 @@ namespace ScePSP.BackEnd.OpenGL
                 PrepareState_Depth(gpuState);
                 PrepareState_Stencil(gpuState);
             }
-            //GL.ShadeMode1((GpuState->ShadeModel == ShadingModelEnum.Flat) ? ShadingModel.Flat : ShadingModel.Smooth);
+
+            GL.ShadeModel((gpuState->ShadeModel == ShadingModelEnum.Flat) ? (uint)ShadingModel.flat : (uint)ShadingModel.smooth);
+
             //PrepareState_AlphaTest(gpuState);
         }
 
@@ -207,7 +209,6 @@ namespace ScePSP.BackEnd.OpenGL
 
                 //var blendingState = GeContext->BlendingState;
                 //GL.Disable(GL.GL_BLEND);
-                //SetBackTexture();
                 //ShaderInfo.blendEnable.Set(blendingState.Enabled);
                 //ShaderInfo.blendEquation.Set((int)blendingState.Equation);
                 //ShaderInfo.blendSrc.Set((int)blendingState.FunctionSource);

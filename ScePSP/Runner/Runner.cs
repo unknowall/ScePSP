@@ -79,7 +79,6 @@ namespace ScePSP.Runner
             foreach (var HleThread in ThreadManager.Threads)
             {
                 while (HleThread.WorkThread.Running) { Thread.Sleep(1); }
-                ;
             }
 
             CpuThread.CpuProcessor.MethodCache.Dispose();

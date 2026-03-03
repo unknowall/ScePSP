@@ -41,7 +41,7 @@ namespace ScePSP.GE
 
         public WaitableStateMachine<WaitStatus> SyncStatus = new WaitableStateMachine<WaitStatus>();
 
-        protected volatile Queue<GECore> FreeQueue;
+        public volatile Queue<GECore> FreeQueue;
 
         public const int GECoreCount = 64;
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 namespace ScePSP.Utils
 {
@@ -19,7 +20,7 @@ namespace ScePSP.Utils
 
             try
             {
-                return FastHash_64(pointer, count, startHash);
+                return FastHash_ROL(pointer, count);
             }
             catch (NullReferenceException nullReferenceException)
             {
@@ -31,6 +32,37 @@ namespace ScePSP.Utils
             }
 
             return startHash;
+        }
+
+        private static unsafe ulong FastHash_ROL(byte* data, int len)
+        {
+            const ulong prime = 0x9e3779b97f4a7c15ul;
+            ulong hash = (ulong)len * prime;
+
+            ulong* ptr = (ulong*)data;
+            int blocks = len >> 3;
+
+            for (int i = 0; i < blocks; i++)
+            {
+                hash ^= ptr[i];
+                hash = BitOperations.RotateLeft(hash, 13);  // rol13
+                hash *= prime;
+            }
+            int remaining = len & 7;
+            if (remaining > 0)
+            {
+                ulong last = 0;
+                byte* bytePtr = (byte*)(ptr + blocks);
+                for (int i = 0; i < remaining; i++)
+                {
+                    last |= (ulong)bytePtr[i] << (i << 3);
+                }
+
+                hash ^= last;
+                hash = BitOperations.RotateLeft(hash, 13);
+                hash *= prime;
+            }
+            return hash;
         }
 
         private static ulong FastHash_64(byte* pointer, int count, ulong startHash = 0)

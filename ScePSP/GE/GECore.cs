@@ -371,7 +371,7 @@ namespace ScePSP.GE
             //Console.WriteLine("FINISH: Arg:{0}", Arg);
             if (Callbacks.FinishFunction != 0)
             {
-                GeList.Connector.Finish(PC, Callbacks, Arg, ExecuteNow);
+                GeList.Connector.Finish(PC, Callbacks, (uint)CallbacksId, ExecuteNow);
             }
         }
 

@@ -23,7 +23,7 @@ namespace ScePSP.Hle.Modules.libfont
         ///		FontHandle
         /// </returns>
         [HlePspFunction(NID = 0xA834319D, FirmwareVersion = 150)]
-        //[HleTrackCall]
+        [HleTrackCall]
         public Font sceFontOpen(FontLibrary FontLibrary, int Index, int Mode, uint* ErrorCode)
         {
             var FontRegistry = FontLibrary.FontRegistryList[Index];
@@ -37,6 +37,7 @@ namespace ScePSP.Hle.Modules.libfont
             }
             catch (FileNotFoundException)
             {
+                Console.WriteLine($"Can't Found Font: {FontRegistry.FontStyle.FileName}");
                 var Font = new Font(FontLibrary, new NativeFontIPGF());
                 *ErrorCode = 0;
                 return Font;

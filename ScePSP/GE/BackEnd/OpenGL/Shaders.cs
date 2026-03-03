@@ -89,7 +89,7 @@ namespace ScePSP.BackEnd.OpenGL
 			uniform bool fogEnable;
 			uniform vec3 fogColor;
 
-			// ALPHA TEST
+			//ALPHA TEST
 			uniform bool alphaTest;
 			uniform int alphaFunction;
 			uniform int alphaValue;
@@ -385,121 +385,122 @@ namespace ScePSP.BackEnd.OpenGL
 
 				vec4 litColor = vec4(1.0, 1.0, 1.0, 1.0);
 
-				if (!clearingMode && lightenable) {
-					vec3 normal = normalize(v_normal.xyz);
-					vec3 viewDir = normalize(v_viewDir);
-					litColor = calculateLighting(normal, v_worldPos, viewDir);
-				}
-
 				if (hasPerVertexColor) {
 					gl_FragColor = v_color;
 				} else {
-					gl_FragColor = uniformColor;
+					gl_FragColor = uniformColor; //materialAmbient
 				}
 
-				if (!clearingMode && colorTest)
+				if (!clearingMode)
 				{
-					ApplyColorTest(gl_FragColor.rgb);
-				}
-
-				if (!clearingMode && hasTexture) {
-					vec4 texColor = texture2D(texture0, v_texCoords);
-
-					if (alphaTest) {
-						int alphaInt = int(texColor.a * 255.0) & alphaMask;
-						if (alphaFunction == GU_NEVER   ) { discard; }
-						else if (alphaFunction == GU_EQUAL   ) { if (!(alphaInt == alphaValue)) { discard; return; } }
-						else if (alphaFunction == GU_NOTEQUAL) { if (!(alphaInt != alphaValue)) { discard; return; } }
-						else if (alphaFunction == GU_LESS    ) { if (!(alphaInt <  alphaValue)) { discard; return; } }
-						else if (alphaFunction == GU_LEQUAL  ) { if (!(alphaInt <= alphaValue)) { discard; return; } }
-						else if (alphaFunction == GU_GREATER ) { if (!(alphaInt >  alphaValue)) { discard; return; } }
-						else if (alphaFunction == GU_GEQUAL  ) { if (!(alphaInt >= alphaValue)) { discard; return; } }
+					if (lightenable) {
+						vec3 normal = normalize(v_normal.xyz);
+						vec3 viewDir = normalize(v_viewDir);
+						litColor = calculateLighting(normal, v_worldPos, viewDir);
 					}
 
-					if (tfx == GU_TFX_MODULATE) {
-						gl_FragColor.rgb = texColor.rgb * gl_FragColor.rgb;
-						gl_FragColor.a = (tcc == GU_TCC_RGBA) ? (gl_FragColor.a * texColor.a) : texColor.a;
-						if (lightenable) {
-							gl_FragColor.rgb = gl_FragColor.rgb * litColor.rgb;
+					if (!hasTexture && lightenable) {
+						gl_FragColor = gl_FragColor * litColor;
+					}
+
+					if (hasTexture) {
+						vec4 texColor = texture2D(texture0, v_texCoords);
+
+						if (alphaTest) {
+							int alphaInt = int(texColor.a * 255.0) & alphaMask;
+							if (alphaFunction == GU_NEVER   ) { discard; }
+							else if (alphaFunction == GU_EQUAL   ) { if (!(alphaInt == alphaValue)) { discard; return; } }
+							else if (alphaFunction == GU_NOTEQUAL) { if (!(alphaInt != alphaValue)) { discard; return; } }
+							else if (alphaFunction == GU_LESS    ) { if (!(alphaInt <  alphaValue)) { discard; return; } }
+							else if (alphaFunction == GU_LEQUAL  ) { if (!(alphaInt <= alphaValue)) { discard; return; } }
+							else if (alphaFunction == GU_GREATER ) { if (!(alphaInt >  alphaValue)) { discard; return; } }
+							else if (alphaFunction == GU_GEQUAL  ) { if (!(alphaInt >= alphaValue)) { discard; return; } }
 						}
-					}
-					else if (tfx == GU_TFX_DECAL) {
-						if (tcc == GU_TCC_RGB) {
+
+						if (tfx == GU_TFX_MODULATE) {
+							gl_FragColor.rgb = texColor.rgb * gl_FragColor.rgb;
+							gl_FragColor.a = (tcc == GU_TCC_RGBA) ? (gl_FragColor.a * texColor.a) : texColor.a;
+							if (lightenable) {
+								gl_FragColor.rgb = gl_FragColor.rgb * litColor.rgb;
+							}
+						}
+						else if (tfx == GU_TFX_DECAL) {
+							if (tcc == GU_TCC_RGB) {
+								gl_FragColor.rgb = texColor.rgb;
+								if (lightenable) {
+									gl_FragColor.rgb = gl_FragColor.rgb * litColor.rgb;
+								}
+								gl_FragColor.a = texColor.a;
+							} else {
+								gl_FragColor.rgb = texColor.rgb * gl_FragColor.rgb;
+								if (lightenable) {
+									gl_FragColor.rgb = gl_FragColor.rgb * litColor.rgb;
+								}
+								gl_FragColor.a = texColor.a;
+							}
+						} 
+						else if (tfx == GU_TFX_BLEND) {
+							gl_FragColor.rgba = mix(texColor, gl_FragColor, 0.5);
+							if (lightenable) {
+								gl_FragColor *= litColor;
+							}
+						} 
+						else if (tfx == GU_TFX_REPLACE) {
 							gl_FragColor.rgb = texColor.rgb;
 							if (lightenable) {
 								gl_FragColor.rgb = gl_FragColor.rgb * litColor.rgb;
 							}
-							gl_FragColor.a = texColor.a;
-						} else {
-							gl_FragColor.rgb = texColor.rgb * gl_FragColor.rgb;
+							gl_FragColor.a = (tcc == GU_TCC_RGB) ? gl_FragColor.a : texColor.a;
+						} 
+						else if (tfx == GU_TFX_ADD) {
+							gl_FragColor.rgb += texColor.rgb;
 							if (lightenable) {
-								gl_FragColor.rgb = gl_FragColor.rgb * litColor.rgb;
+								gl_FragColor.rgb += texColor.rgb * litColor.rgb;
 							}
-							gl_FragColor.a = texColor.a;
+							gl_FragColor.a = (tcc == GU_TCC_RGB) ? gl_FragColor.a : (texColor.a * gl_FragColor.a);
+						} 
+						else {
+							gl_FragColor = vec4(1, 0, 1, 1);
 						}
-					} 
-					else if (tfx == GU_TFX_BLEND) {
-						gl_FragColor.rgba = mix(texColor, gl_FragColor, 0.5);
-						if (lightenable) {
-							gl_FragColor *= litColor;
-						}
-					} 
-					else if (tfx == GU_TFX_REPLACE) {
-						gl_FragColor.rgb = texColor.rgb;
-						if (lightenable) {
-							gl_FragColor.rgb = gl_FragColor.rgb * litColor.rgb;
-						}
-						gl_FragColor.a = (tcc == GU_TCC_RGB) ? gl_FragColor.a : texColor.a;
-					} 
-					else if (tfx == GU_TFX_ADD) {
-						gl_FragColor.rgb += texColor.rgb;
-						if (lightenable) {
-							gl_FragColor.rgb += texColor.rgb * litColor.rgb;
-						}
-						gl_FragColor.a = (tcc == GU_TCC_RGB) ? gl_FragColor.a : (texColor.a * gl_FragColor.a);
-					} 
-					else {
-						gl_FragColor = vec4(1, 0, 1, 1);
 					}
-				}
 
-				if (!clearingMode && blendEnable) {
-					vec4 Cdst = texture2D(backtex, v_texCoords);
-					ApplyBlend(gl_FragColor, gl_FragColor, Cdst);
-				}
+					if (colorTest) {
+						ApplyColorTest(gl_FragColor.rgb);
+					}
 
-				if (!clearingMode && lopEnabled) {
-					ivec4 s = convertToByte(gl_FragColor);
-					ivec4 d = convertToByte(texture2D(backtex, v_backtexCoords));
-					ivec4 o = ivec4(0x77);
+					if (blendEnable) {
+						vec4 Cdst = texture2D(backtex, v_backtexCoords);
+						ApplyBlend(gl_FragColor, gl_FragColor, Cdst);
+					}
 
-					if (lop == GU_CLEAR        ) o = ivec4(0x00);
-					else if (lop == GU_AND          ) o = s & d;
-					else if (lop == GU_AND_REVERSE  ) o = s & ~d;
-					else if (lop == GU_COPY         ) o = s;
-					else if (lop == GU_AND_INVERTED ) o = ~s & d;
-					else if (lop == GU_NOOP         ) o = d;
-					else if (lop == GU_XOR          ) o = s ^ d;
-					else if (lop == GU_OR           ) o = s | d;
-					else if (lop == GU_NOR          ) o = ~(s | d);
-					else if (lop == GU_EQUIV        ) o = ~(s ^ d);
-					else if (lop == GU_INVERTED     ) o = ~d;
-					else if (lop == GU_OR_REVERSE   ) o = s | ~d;
-					else if (lop == GU_COPY_INVERTED) o = ~s;
-					else if (lop == GU_OR_INVERTED  ) o = ~s | d;
-					else if (lop == GU_NAND         ) o = ~(s & d);
-					else if (lop == GU_SET          ) o = ivec4(0xFF);
+					if (lopEnabled) {
+						ivec4 s = convertToByte(gl_FragColor);
+						ivec4 d = convertToByte(texture2D(backtex, v_backtexCoords));
+						ivec4 o = ivec4(0x77);
 
-					gl_FragColor = convertToFloat(o);
-				}
+						if (lop == GU_CLEAR             ) o = ivec4(0x00);
+						else if (lop == GU_AND          ) o = s & d;
+						else if (lop == GU_AND_REVERSE  ) o = s & ~d;
+						else if (lop == GU_COPY         ) o = s;
+						else if (lop == GU_AND_INVERTED ) o = ~s & d;
+						else if (lop == GU_NOOP         ) o = d;
+						else if (lop == GU_XOR          ) o = s ^ d;
+						else if (lop == GU_OR           ) o = s | d;
+						else if (lop == GU_NOR          ) o = ~(s | d);
+						else if (lop == GU_EQUIV        ) o = ~(s ^ d);
+						else if (lop == GU_INVERTED     ) o = ~d;
+						else if (lop == GU_OR_REVERSE   ) o = s | ~d;
+						else if (lop == GU_COPY_INVERTED) o = ~s;
+						else if (lop == GU_OR_INVERTED  ) o = ~s | d;
+						else if (lop == GU_NAND         ) o = ~(s & d);
+						else if (lop == GU_SET          ) o = ivec4(0xFF);
 
-				if (!clearingMode && !hasTexture && lightenable) {
-					gl_FragColor = gl_FragColor * litColor;
-				}
+						gl_FragColor = convertToFloat(o);
+					}
 				
-				if (!clearingMode && fogEnable)
-				{
-					ApplyFog(gl_FragColor);
+					if (fogEnable) {
+						ApplyFog(gl_FragColor);
+					}
 				}
 			}
         ";

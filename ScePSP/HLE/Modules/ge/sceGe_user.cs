@@ -45,6 +45,9 @@ namespace ScePSP.Hle.Modules.ge
 
         private int _sceGeListEnQueue(uint InstructionAddressStart, uint InstructionAddressStall, int CallbackId, PspGeListArgs* Args, bool Head)
         {
+            if (GeList.FreeQueue.Count == 0)
+                return (int)SceKernelErrors.ERROR_ERRNO_INVALID_ARGUMENT;
+
             var GE = GeList.DequeueFree();
 
             //Console.WriteLine($"_sceGeListEnQueue Start 0x{InstructionAddressStart & PspMemory.MemoryMask:X} Stall 0x{InstructionAddressStall & PspMemory.MemoryMask:X} ");
@@ -399,6 +402,9 @@ namespace ScePSP.Hle.Modules.ge
         [HleTrackCall]
         public int sceGeListSync(int GEProcessID, int Mode)
         {
+            //Console.WriteLine($"sceGeListSync {GEProcessID}");
+            if (GEProcessID > 64 || GEProcessID <0) return 0;
+
             var GE = GeList.Get(GEProcessID);
 
             int result = 0;

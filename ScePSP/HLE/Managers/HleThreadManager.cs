@@ -73,9 +73,6 @@ namespace ScePSP.Hle.Managers
                 Console.Error.WriteLine("HleThreadManager:: IGpuConnector.Signal :: 0x{0:X8}, 0x{1:X8}, 0x{2:X8}, {3}, {4}", CallbackData.SignalFunction, CallbackData.SignalArgument, PC, Signal, Behavior);
                 HleInterop.ExecuteFunctionNowLater(CallbackData.SignalFunction, ExecuteNow, new Object[] { Signal, CallbackData.SignalArgument, PC });
             }
-            else
-            {
-            }
         }
 
         void IGEConnector.Finish(uint PC, GeCallbackData CallbackData, uint Arg, bool ExecuteNow)

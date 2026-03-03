@@ -13,7 +13,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ScePSP.GE
 {
@@ -53,9 +55,19 @@ namespace ScePSP.GE
 
             var textureDataSize = PixelFormatDecoder.GetPixelsSize(textureFormat, bufferWidth * height);
 
+            var clutState = textureMappingState.ClutState;
+            uint clutAddress = clutState.Address;
+            var clutStart = clutState.Start;
+            var ClutFormat = clutState.PixelFormat;
+
+            var ClutDataStart = PixelFormatDecoder.GetPixelsSize(ClutFormat, clutStart);
+
             byte* texturePointer = (byte*)_pspMemory.PspAddressToPointerSafe(textureAddress);
 
-            ulong hash1 = FastHash(texturePointer, textureDataSize);
+            ulong hash1 = FastHash(texturePointer, textureDataSize) | (ulong)((clutAddress + ClutDataStart) << 32);
+            //ulong hash1 = (ulong)( textureAddress | ((clutAddress + ClutDataStart) << 32) );
+            //int clutEntrySize = ClutFormat == GuPixelFormats.RGBA_8888 ? 4 : 2;
+            //ulong hash1 = (ulong)(textureAddress + clutAddress + (clutStart << 4) * clutEntrySize);
 
             bool recheck = false;
 
@@ -150,6 +162,7 @@ namespace ScePSP.GE
                         dataPtr[n] = ((n & 1) != 0) ? color1 : color2;
                     }
                 }
+                _invalidTexture.Info = new TextureInfo();
                 return _invalidTexture;
             }
 
@@ -274,9 +287,37 @@ namespace ScePSP.GE
             return texture;
         }
 
-        public static ulong FastHash(byte* Pointer, int Count, ulong StartHash = 0)
+        public static ulong FastHash(byte* data, int len, ulong StartHash = 0)
         {
-            return Utils.Hashing.FastHash(Pointer, Count, StartHash);
+            //return Utils.Hashing.FastHash(data, len, StartHash);
+
+            const ulong prime = 0x9e3779b97f4a7c15ul;
+            ulong hash = (ulong)len * prime;
+
+            ulong* ptr = (ulong*)data;
+            int blocks = len >> 3;
+
+            for (int i = 0; i < blocks; i++)
+            {
+                hash ^= ptr[i];
+                hash = BitOperations.RotateLeft(hash, 13);  // rol13
+                hash *= prime;
+            }
+            int remaining = len & 7;
+            if (remaining > 0)
+            {
+                ulong last = 0;
+                byte* bytePtr = (byte*)(ptr + blocks);
+                for (int i = 0; i < remaining; i++)
+                {
+                    last |= (ulong)bytePtr[i] << (i << 3);
+                }
+
+                hash ^= last;
+                hash = BitOperations.RotateLeft(hash, 13);
+                hash *= prime;
+            }
+            return hash;
         }
 
         public void RecheckAll()

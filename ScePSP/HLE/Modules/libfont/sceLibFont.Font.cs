@@ -36,13 +36,6 @@ namespace ScePSP.Hle.Modules.libfont
             return 0;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Font"></param>
-        /// <param name="CharCode"></param>
-        /// <param name="FontCharInfoPointer"></param>
-        /// <returns></returns>
         [HlePspFunction(NID = 0xDCC80C2F, FirmwareVersion = 150)]
         [HleTrackCall]
         public int sceFontGetCharInfo(Font Font, ushort CharCode, ref FontCharInfo FontCharInfoPointer)
@@ -50,7 +43,7 @@ namespace ScePSP.Hle.Modules.libfont
             try
             {
                 FontCharInfoPointer = Font.GetCharInfo(CharCode);
-                Console.WriteLine("sceFontGetCharInfo({0}) : {1}", CharCode, FontCharInfoPointer);
+                //Console.WriteLine("sceFontGetCharInfo({0}) : {1}", CharCode, FontCharInfoPointer);
                 return 0;
             }
             catch (Exception Exception)
@@ -60,12 +53,6 @@ namespace ScePSP.Hle.Modules.libfont
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Font"></param>
-        /// <param name="CharCode"></param>
-        /// <param name="GlyphImagePointer"></param>
         [HlePspFunction(NID = 0x980F4895, FirmwareVersion = 150)]
         public int sceFontGetCharGlyphImage(Font Font, ushort CharCode, ref GlyphImage GlyphImagePointer)
         {
@@ -148,16 +135,6 @@ namespace ScePSP.Hle.Modules.libfont
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Font"></param>
-        /// <param name="CharCode"></param>
-        /// <param name="GlyphImage"></param>
-        /// <param name="ClipX"></param>
-        /// <param name="ClipY"></param>
-        /// <param name="ClipWidth"></param>
-        /// <param name="ClipHeight"></param>
         [HlePspFunction(NID = 0xCA1E6945, FirmwareVersion = 150)]
         public int sceFontGetCharGlyphImage_Clip(Font Font, ushort CharCode, ref GlyphImage GlyphImage, int ClipX, int ClipY, int ClipWidth, int ClipHeight)
         {
@@ -218,69 +195,42 @@ namespace ScePSP.Hle.Modules.libfont
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Font"></param>
-        /// <param name="CharCode"></param>
-        /// <param name="CharRectPointer"></param>
-        /// <returns></returns>
         [HlePspFunction(NID = 0x5C3E4A9E, FirmwareVersion = 150)]
         public int sceFontGetCharImageRect(Font Font, ushort CharCode, CharRect* CharRectPointer)
         {
             throw (new NotImplementedException());
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Font"></param>
-        /// <returns></returns>
         [HlePspFunction(NID = 0x02D7F94B, FirmwareVersion = 150)]
         public int sceFontFlush(Font Font)
         {
             return 0;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         [HlePspFunction(NID = 0x2F67356A, FirmwareVersion = 150)]
         public void sceFontCalcMemorySize()
         {
             throw (new NotImplementedException());
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         [HlePspFunction(NID = 0x48B06520, FirmwareVersion = 150)]
         public void sceFontGetShadowImageRect()
         {
             throw (new NotImplementedException());
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         [HlePspFunction(NID = 0x568BE516, FirmwareVersion = 150)]
         public void sceFontGetShadowGlyphImage()
         {
             throw (new NotImplementedException());
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         [HlePspFunction(NID = 0x5DCF6858, FirmwareVersion = 150)]
         public void sceFontGetShadowGlyphImage_Clip()
         {
             throw (new NotImplementedException());
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         [HlePspFunction(NID = 0xAA3DE7B5, FirmwareVersion = 150)]
         public void sceFontGetShadowInfo()
         {

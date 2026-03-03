@@ -216,13 +216,9 @@ namespace ScePSP.BackEnd.OpenGL
                 //Console.WriteLine("###################################");
 
                 _shader.BindUniformsAndAttributes(ShaderInfo);
-
                 _shader.BindUniformBlock("LightBlock", 0);
-
                 _lightBuf = GLBuffer.Create(BufferTarget.UniformBuffer, BufferUsage.DynamicDraw);
-
                 TexUnit = GLTextureUnit.CreateAtIndex(0);
-
                 Context.ReleaseCurrent();
 
                 AlreadyInitialized = true;
@@ -504,16 +500,19 @@ namespace ScePSP.BackEnd.OpenGL
 
         private void SetBackTexture()
         {
-            CurrentFB.Bind(FramebufferTarget.ReadFramebuffer);
+            //CurrentFB.Bind(FramebufferTarget.ReadFramebuffer);
             LogicTex2D.Bind();
             GL.CopyTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, 0, 0, CurrentFB.TextureColor.Width, CurrentFB.TextureColor.Height, 0);
-            CurrentFB.Bind(FramebufferTarget.Framebuffer);
+            //CurrentFB.Bind(FramebufferTarget.Framebuffer);
             CurrentFB.TextureColor.Bind();
-            ShaderInfo.backtex.Set(
-                GLTextureUnit.CreateAtIndex(1)
-                .SetFiltering(GLScaleFilter.Linear)
-                .SetWrap(GLWrap.ClampToEdge)
-                .SetTexture(LogicTex2D));
+
+            GLTextureUnit.CreateAtIndex(1)
+            .SetFiltering(GLScaleFilter.Linear)
+            .SetWrap(GLWrap.ClampToEdge)
+            .SetTexture(LogicTex2D)
+            .MakeCurrent();
+
+            ShaderInfo.backtex.Set(1);
         }
 
         public override void PrimStart(GlobalGpuState globalGpuState, GpuStateStruct* gpuState, GuPrimitiveType primitiveType)

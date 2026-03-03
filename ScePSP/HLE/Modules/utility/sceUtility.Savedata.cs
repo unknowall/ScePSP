@@ -279,7 +279,7 @@ namespace ScePSP.Hle.Modules.utility
                                 if (SizeUsedInfo != null)
                                 {
 #if true
-                                    if (true)
+                                    //if (true)
                                     {
                                         //Console.WriteLine(SizeUsedInfo->saveName);
                                         //Console.WriteLine(SizeUsedInfo->gameName);
@@ -290,10 +290,10 @@ namespace ScePSP.Hle.Modules.utility
                                         SizeUsedInfo->UsedKbString = (SizeUsedInfo->UsedKb) + "KB";
                                         SizeUsedInfo->UsedKb32String = (SizeUsedInfo->UsedKb32) + "KB";
                                     }
-                                    else
-                                    {
-                                        SceKernelError = SceKernelErrors.ERROR_SAVEDATA_SIZES_NO_DATA;
-                                    }
+                                    //else
+                                    //{
+                                    //    SceKernelError = SceKernelErrors.ERROR_SAVEDATA_SIZES_NO_DATA;
+                                    //}
 #else
 									SceKernelError = SceKernelErrors.ERROR_SAVEDATA_SIZES_NO_DATA;
 #endif

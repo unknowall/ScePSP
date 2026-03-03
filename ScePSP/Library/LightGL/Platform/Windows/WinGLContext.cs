@@ -1,9 +1,9 @@
-﻿using LightGL.DynamicLibrary;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Threading;
+using LightGL.DynamicLibrary;
 using static LightGL.GlContextFactory;
 
 namespace LightGL.Windows
@@ -124,12 +124,12 @@ namespace LightGL.Windows
             return DefWindowProc(handle, message, wParam, lParam);
         }
 
-        public static WinGlContext FromWindowHandle(IntPtr windowHandle, int Major, int Minor, GlProfile arbProfile)
+        public static WinGlContext FromWindowHandle(IntPtr windowHandle, int Major, int Minor, GlProfile arbProfile, int VSync = 0)
         {
-            return new WinGlContext(windowHandle, Major, Minor, arbProfile);
+            return new WinGlContext(windowHandle, Major, Minor, arbProfile, VSync);
         }
 
-        private WinGlContext(IntPtr winHandle, int Major, int Minor, GlProfile arbProfile)
+        private WinGlContext(IntPtr winHandle, int Major, int Minor, GlProfile arbProfile, int VSync = 0)
         {
             _hWnd = winHandle;
 
@@ -265,7 +265,7 @@ namespace LightGL.Windows
                 }
             }
 
-            SetVSync(1);
+            SetVSync(VSync);
 
         }
 

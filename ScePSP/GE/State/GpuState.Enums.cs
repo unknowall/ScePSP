@@ -109,18 +109,32 @@ namespace ScePSP.GE.State
 
     public enum GuBlendingFactorSource : byte
     {
-        // Source
-        GU_SRC_COLOR = 0, GU_ONE_MINUS_SRC_COLOR = 1, GU_SRC_ALPHA = 2, GU_ONE_MINUS_SRC_ALPHA = 3,
-        // Both?
-        GU_FIX = 10
+        GU_SRC_COLOR,
+        GU_ONE_MINUS_SRC_COLOR,
+        GU_SRC_ALPHA,
+        GU_ONE_MINUS_SRC_ALPHA,
+        GU_DST_ALPHA,
+        GU_ONE_MINUS_DST_ALPHA,
+        GU_DOUBLE_SRC_ALPHA,
+        GU_ONE_MINUS_DOUBLE_SRC_ALPHA,
+        GU_DOUBLE_DST_ALPHA,
+        GU_ONE_MINUS_DOUBLE_DST_ALPHA,
+        GU_FIX,
     }
 
     public enum GuBlendingFactorDestination : byte
     {
-        // Dest
-        GU_DST_COLOR = 0, GU_ONE_MINUS_DST_COLOR = 1, GU_DST_ALPHA = 4, GU_ONE_MINUS_DST_ALPHA = 5,
-        // Both?
-        GU_FIX = 10
+        GU_DST_COLOR,
+        GU_ONE_MINUS_DST_COLOR,
+        GU_SRC_ALPHA,
+        GU_ONE_MINUS_SRC_ALPHA,
+        GU_DST_ALPHA,
+        GU_ONE_MINUS_DST_ALPHA,
+        GU_DOUBLE_SRC_ALPHA,
+        GU_ONE_MINUS_DOUBLE_SRC_ALPHA,
+        GU_DOUBLE_DST_ALPHA,
+        GU_ONE_MINUS_DOUBLE_DST_ALPHA,
+        GU_FIX,
     }
 
     public enum TestFunctionEnum : byte

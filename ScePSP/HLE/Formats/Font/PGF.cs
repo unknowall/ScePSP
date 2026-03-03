@@ -196,7 +196,7 @@ namespace ScePSP.Hle.Formats.Font
             var NumberOfCharacters = Header.TableCharPointerLength;
 
             CharMap = new int[Header.FirstGlyph + Header.LastGlyph + 1];
-            CharPointer = new int[NumberOfCharacters];
+            CharPointer = new int[NumberOfCharacters + 1];
             Glyphs = new Glyph[NumberOfCharacters];
             ReverseCharMap = new Dictionary<int, int>();
             ShadowCharMap = new Dictionary<int, int>();
@@ -223,12 +223,11 @@ namespace ScePSP.Hle.Formats.Font
                 CharPointer[Pair.Key] = (int)Pair.Value;
             }
 
-            /*
+            
 			for (int n = 0; n < NumberOfCharacters; n++)
 			{
-				Glyphs[n] = new Glyph().Read(this, n);
+				Glyphs[n] = new Glyph(this, n);
 			}
-			*/
 
             Console.WriteLine(this.Header.FontName);
 
@@ -342,7 +341,6 @@ namespace ScePSP.Hle.Formats.Font
             }
 
         }
-
 
         IPGF IGlyph.PGF
         {

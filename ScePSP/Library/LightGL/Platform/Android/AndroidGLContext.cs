@@ -16,7 +16,7 @@ namespace LightGL.Android
         private IntPtr WindowHandle;
         private bool _createdSurface;
 
-        public AndroidGLContext(IntPtr windowHandle, int EGLVersion = 2)
+        public AndroidGLContext(IntPtr windowHandle, int EGLVersion = 3)
         {
             this.WindowHandle = windowHandle;
 
@@ -45,7 +45,7 @@ namespace LightGL.Android
             {
                 EGL.EGLConfig* cfgs = stackalloc EGL.EGLConfig[1];
                 if (!EGL.eglChooseConfig(Display, attribPtr, cfgs, 1, &numConfigs) || numConfigs == 0)
-                    throw new Exception("eglChooseConfig failed: " + EGL.eglGetErrorString());
+                    throw new Exception($"eglChooseConfig failed: {EGL.eglGetErrorString()} numConfigs: {numConfigs}");
                 cfg = cfgs[0];
             }
 
@@ -64,8 +64,7 @@ namespace LightGL.Android
                 {
                     sharePtr = IntPtr.Zero;
                     becomeSharedRoot = true;
-                }
-                else
+                } else
                 {
                     sharePtr = _sharedContext;
                     _sharedRefCount++;
@@ -78,6 +77,9 @@ namespace LightGL.Android
                 Context = EGL.eglCreateContext(Display, Config, (EGL.EGLContext)sharePtr, ctxAttrPtr);
             }
 
+            if (Context == EGL.EGL_NO_CONTEXT)
+                throw new Exception("eglCreateContext failed: " + EGL.eglGetErrorString());
+
             lock (_sharedLock)
             {
                 if (becomeSharedRoot)
@@ -86,13 +88,11 @@ namespace LightGL.Android
                     {
                         _sharedContext = Context;
                         _sharedRefCount = 1;
-                    }
-                    else if (_sharedContext != IntPtr.Zero)
+                    } else if (_sharedContext != IntPtr.Zero)
                     {
                         _sharedRefCount++;
                     }
-                }
-                else
+                } else
                 {
                     if (Context == EGL.EGL_NO_CONTEXT)
                     {
@@ -101,12 +101,12 @@ namespace LightGL.Android
                 }
             }
 
-            if (Context == EGL.EGL_NO_CONTEXT)
-                throw new Exception("eglCreateContext failed: " + EGL.eglGetErrorString());
-
-            // make current
             if (!EGL.eglMakeCurrent(Display, Surface, Surface, Context))
                 throw new Exception("eglMakeCurrent failed: " + EGL.eglGetErrorString());
+
+            Console.WriteLine("EGL Version: {0}", GL.GetStringStr(GL.GL_VERSION));
+            Console.WriteLine("EGL Vendor: {0}", GL.GetStringStr(GL.GL_VENDOR));
+            Console.WriteLine("EGL Renderer: {0}", GL.GetStringStr(GL.GL_RENDERER));
         }
 
         public static AndroidGLContext FromWindowHandle(IntPtr WindowHandle) => new AndroidGLContext(WindowHandle);
@@ -115,7 +115,8 @@ namespace LightGL.Android
         {
             get
             {
-                if (!_createdSurface) return new GlContextSize { Width = 0, Height = 0 };
+                if (!_createdSurface)
+                    return new GlContextSize { Width = 0, Height = 0 };
                 int w = 0, h = 0;
                 EGL.eglQuerySurface(Display, Surface, EGL.EGL_WIDTH, &w);
                 EGL.eglQuerySurface(Display, Surface, EGL.EGL_HEIGHT, &h);
@@ -167,8 +168,7 @@ namespace LightGL.Android
                             EGL.eglDestroyContext(Display, Context);
                             _sharedContext = IntPtr.Zero;
                         }
-                    }
-                    else
+                    } else
                     {
                         EGL.eglDestroyContext(Display, Context);
                         if (_sharedContext != IntPtr.Zero && _sharedRefCount > 0)
@@ -186,8 +186,6 @@ namespace LightGL.Android
                 EGL.eglDestroySurface(Display, Surface);
                 Surface = EGL.EGL_NO_SURFACE;
             }
-
-            // 不在这里调用 eglTerminate(Display) — 由上层负责生命周期（或根据需要添加计数）
         }
     }
 }

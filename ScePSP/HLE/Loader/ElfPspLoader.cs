@@ -79,7 +79,7 @@ namespace ScePSP.Hle.Loader
                 try
                 {
                     var DecryptedData = new EncryptedPrx().Decrypt(FileStream.ReadAll(), true);
-                    File.WriteAllBytes("last_decoded_prx.bin", DecryptedData);
+                    //File.WriteAllBytes("last_decoded_prx.bin", DecryptedData);
                     FileStream = new MemoryStream(DecryptedData);
                 }
                 catch (Exception Exception)

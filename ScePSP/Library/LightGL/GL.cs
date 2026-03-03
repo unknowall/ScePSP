@@ -15,13 +15,13 @@
  * 
  */
 
-using LightGL.DynamicLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
+using LightGL.DynamicLibrary;
 
 namespace LightGL
 {
@@ -305,11 +305,18 @@ namespace LightGL
         SeparateSpecularColor = 0x81F9
     }
 
+    public enum ShadingModel : uint
+    {
+        flat = 0x1D00,
+        smooth = 0x1D01
+    }
+
     public unsafe class GL
     {
         internal static readonly object Lock = new object();
 
         internal const string DllWindows = "OpenGL32";
+        internal const string DllEGLLinux = "libEGL.so.1";
         internal const string DllLinux = "libGL.so.1";
         internal const string DllMac = "/System/Library/Frameworks/OpenGL.framework/OpenGL";
         internal const string DllAndroid = "libopengl.so.1";
@@ -768,7 +775,8 @@ namespace LightGL
         public static string GetStringStr(int Name)
         {
             var str = Marshal.PtrToStringAnsi(GetString(Name));
-            if (str == null) return "";
+            if (str == null)
+                return "";
             return str;
         }
 
@@ -887,6 +895,7 @@ namespace LightGL
         public static readonly glLighti Lighti;
         public static readonly GetTexLevelParameteriv GetTexLevelParameteriv;
         public static readonly glPrimitiveRestartIndex PrimitiveRestartIndex;
+        public static readonly glShadeModel ShadeModel;
 
         public static void ClearError()
         {
@@ -903,8 +912,7 @@ namespace LightGL
                 var Error = GetError();
                 if (Error != GL_NO_ERROR)
                     throw new Exception($"{prefix} glError: 0x{Error:X4}");
-            }
-            finally
+            } finally
             {
                 ClearError();
             }
@@ -915,8 +923,7 @@ namespace LightGL
             if (EnableDisable)
             {
                 Enable(EnableCap);
-            }
-            else
+            } else
             {
                 Disable(EnableCap);
             }
@@ -1452,5 +1459,8 @@ namespace LightGL
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
     public delegate void glPrimitiveRestartIndex(uint index);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+    public delegate void glShadeModel(uint mode);
 
 }

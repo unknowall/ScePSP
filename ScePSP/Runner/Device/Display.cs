@@ -1,5 +1,6 @@
 ﻿using LightGL;
 using ScePSP.BackEnd.OpenGL;
+using ScePSP.BackEnd.OpenGL.Shader;
 using ScePSP.Components.Display;
 using ScePSP.Display;
 using ScePSP.GE;
@@ -36,6 +37,10 @@ namespace ScePSP.Runner.Display
         GLBuffer TexCoordsBuffer;
         GLShader Shader;
         GLTexture2D TexVram;
+
+        //XBRShader xBRShader;
+        //GLTexture2D Texture;
+
         bool Vflip;
         public bool FullSpeed = false;
 
@@ -66,6 +71,8 @@ namespace ScePSP.Runner.Display
                 Context = GlContextFactory.CreateFromWindowHandle(Config.WindowHandle);
                 Context.MakeCurrent();
 
+                //xBRShader = new XBRShader();
+
                 Shader = new GLShader(
                     "attribute vec4 position; attribute vec4 texCoords; varying vec2 v_texCoord; void main() { gl_Position = position; v_texCoord = texCoords.xy; }",
                     "uniform sampler2D texture; varying vec2 v_texCoord; void main() { gl_FragColor = texture2D(texture, v_texCoord); }"
@@ -80,7 +87,7 @@ namespace ScePSP.Runner.Display
                 ShaderInfo.position.SetData<float>(VertexBuffer, 2);
                 ShaderInfo.texCoords.SetData<float>(TexCoordsBuffer, 2);
                 ShaderInfo.texture.Set(0);
-                Shader.Use();
+                Shader.Use(true);
 
                 GL.BindFramebuffer(GL.GL_FRAMEBUFFER, 0);
                 Context.ReleaseCurrent();
@@ -99,6 +106,7 @@ namespace ScePSP.Runner.Display
             VertexBuffer.Dispose();
             TexCoordsBuffer.Dispose();
             Shader.Dispose();
+            //xBRShader.Dispose();
             Context.ReleaseCurrent();
             Context.Dispose();
         }
@@ -153,7 +161,9 @@ namespace ScePSP.Runner.Display
             {
                 GLE.Frames.TryGetValue(PspDisplay.CurrentInfo.FrameAddress, out var FB);
                 if (FB == null) { UpdateFrame(); return; }
-                FB.TextureColor.Bind();
+                //Texture = xBRShader.Process(FB.TextureColor);
+                //Texture.Bind();
+                FB.TextureColor.Bind();                
                 //GLE.CurrentFB.TextureColor.Bind();
                 if (Vflip)
                 {
@@ -206,7 +216,7 @@ namespace ScePSP.Runner.Display
 
                 // Draw time
                 PspDisplay.TriggerDrawStart();
-                if (!FullSpeed) ThreadUtils.SleepUntilUtc(VSyncTime);
+                //if (!FullSpeed) ThreadUtils.SleepUntilUtc(VSyncTime);
 
                 // VBlank time
                 PspDisplay.TriggerVBlankStart();

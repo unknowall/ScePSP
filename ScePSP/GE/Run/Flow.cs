@@ -134,7 +134,7 @@ namespace ScePSP.GE.Run
                     break;
 
                 case SignalBehavior.PSP_GE_SIGNAL_CALL:
-                    next = GECore.ReadInstructionAndMoveNext();
+                    next = *(GpuInstruction*)GECore.Memory.PspAddressToPointerUnsafe(PC + 4);
                     if (next.OpCode == OpCodes.END)
                     {
                         uint hi16 = Signal & 0x0FFF;
@@ -148,7 +148,7 @@ namespace ScePSP.GE.Run
                     break;
 
                 case SignalBehavior.PSP_GE_SIGNAL_RET:
-                    next = GECore.ReadInstructionAndMoveNext();
+                    next = *(GpuInstruction*)GECore.Memory.PspAddressToPointerUnsafe(PC + 4);
                     if (next.OpCode == OpCodes.END)
                     {
                         GECore.Ret();
@@ -163,7 +163,7 @@ namespace ScePSP.GE.Run
                 case SignalBehavior.PSP_GE_SIGNAL_RTBP5:
                 case SignalBehavior.PSP_GE_SIGNAL_RTBP6:
                 case SignalBehavior.PSP_GE_SIGNAL_RTBP7:
-                    next = GECore.ReadInstructionAndMoveNext();
+                    next = *(GpuInstruction*)GECore.Memory.PspAddressToPointerUnsafe(PC + 4);
                     if (next.OpCode == OpCodes.END)
                     {
                         uint hi16 = Signal & 0xFFFF;
@@ -184,7 +184,7 @@ namespace ScePSP.GE.Run
                 case SignalBehavior.PSP_GE_SIGNAL_OTBP5:
                 case SignalBehavior.PSP_GE_SIGNAL_OTBP6:
                 case SignalBehavior.PSP_GE_SIGNAL_OTBP7:
-                    next = GECore.ReadInstructionAndMoveNext();
+                    next = *(GpuInstruction*)GECore.Memory.PspAddressToPointerUnsafe(PC + 4);
                     if (next.OpCode == OpCodes.END)
                     {
                         uint hi16 = Signal & 0xFFFF;
@@ -200,7 +200,7 @@ namespace ScePSP.GE.Run
                 case SignalBehavior.PSP_GE_SIGNAL_HANDLER_CONTINUE:
                 case SignalBehavior.PSP_GE_SIGNAL_HANDLER_PAUSE:
                 case SignalBehavior.PSP_GE_SIGNAL_HANDLER_SUSPEND:
-                    next = GECore.ReadInstructionAndMoveNext();
+                    next = *(GpuInstruction*)GECore.Memory.PspAddressToPointerUnsafe(PC + 4);
                     if (next.OpCode != OpCodes.END)
                     {
                         throw new NotImplementedException("Error! Next Signal not an END! : " + next.OpCode);
